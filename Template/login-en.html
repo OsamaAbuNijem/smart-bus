@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sign In — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cairo:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#FFD700; --yellow-light:#FFFDE7; --yellow-dark:#B8960C;
+    --blue:#3B82F6; --blue-light:#EFF6FF;
+    --purple:#A855F7; --purple-light:#FDF4FF;
+    --gray-50:#F9FAFB; --gray-200:#E5E7EB;
+    --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-900:#111;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:#E5E5E5;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:48px 32px;gap:48px;flex-wrap:wrap;}
+  .sw{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .sl{font-size:13px;font-weight:700;color:#555;font-family:'Inter',sans-serif;}
+  .phone{width:375px;min-height:812px;background:#fff;border-radius:56px;border:10px solid #1a1a1a;overflow:hidden;display:flex;flex-direction:column;}
+  .statusbar{height:44px;background:var(--yellow-light);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;}
+  .statusbar span{font-size:13px;color:#333;}
+  .screen{background:var(--yellow-light);flex:1;display:flex;flex-direction:column;position:relative;}
+
+  /* LANG ICON — top RIGHT corner (Arabic = RTL side) */
+  .lang-btn{
+    position:absolute;
+    top:16px;
+    right:20px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#fff;
+    border:1px solid var(--gray-200);
+    border-radius:20px;
+    padding:5px 10px 5px 8px;
+    cursor:pointer;
+    text-decoration:none;
+    z-index:10;
+    direction:rtl;
+  }
+  .lang-btn svg{flex-shrink:0;}
+  .lang-btn span{font-size:12px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+
+  .top{background:var(--yellow-light);padding:30px 28px 18px;text-align:center;flex-shrink:0;}
+  .app-icon{width:72px;height:72px;background:var(--yellow);border-radius:22px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;}
+  .bus-body{width:38px;height:24px;background:#fff;border-radius:7px 7px 4px 4px;position:relative;}
+  .bus-windows{display:flex;justify-content:center;gap:4px;padding:4px 3px 0;}
+  .bus-win{width:11px;height:8px;background:var(--yellow);border-radius:2px;border:1.5px solid var(--yellow-dark);}
+  .bus-wheel{position:absolute;bottom:-7px;width:10px;height:10px;border-radius:50%;background:var(--yellow);}
+  .bus-wheel.l{left:5px;} .bus-wheel.r{right:5px;}
+  .app-name{font-size:26px;font-weight:700;color:var(--gray-900);font-family:'Inter',sans-serif;}
+  .app-sub{font-size:14px;color:var(--gray-500);margin-top:8px;font-family:'Inter',sans-serif;}
+  .feats{display:flex;justify-content:center;gap:28px;margin-top:22px;}
+  .feat{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .fi{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;}
+  .fl{font-size:12px;font-weight:600;color:var(--gray-500);font-family:'Inter',sans-serif;text-align:center;}
+  .card-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 18px;}
+  .card{background:#fff;border-radius:22px;border:1px solid var(--gray-200);padding:26px 22px 22px;}
+  .card-title{font-size:20px;font-weight:700;color:var(--gray-900);text-align:center;margin-bottom:20px;font-family:'Inter',sans-serif;}
+  .phone-row{display:flex;align-items:center;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:0 14px;margin-bottom:18px;height:56px;direction:ltr;}
+  .flag{font-size:18px;flex-shrink:0;margin-right:8px;}
+  .code{font-size:14px;color:var(--gray-500);font-family:'Inter',sans-serif;flex-shrink:0;padding-right:10px;border-right:1px solid var(--gray-200);margin-right:10px;height:24px;display:flex;align-items:center;}
+  .pnum{flex:1;background:transparent;border:none;outline:none;font-size:14px;color:var(--gray-400);font-family:'Inter',sans-serif;direction:ltr;text-align:left;}
+  .btn{background:var(--yellow);border-radius:14px;padding:15px;text-align:center;cursor:pointer;border:none;width:100%;}
+  .btn span{font-size:16px;font-weight:700;color:var(--gray-900);font-family:'Inter',sans-serif;}
+  .hint{font-size:12px;color:var(--gray-400);text-align:center;margin-top:12px;line-height:1.6;font-family:'Inter',sans-serif;}
+  .terms{font-size:11px;color:var(--gray-400);text-align:center;padding:14px 18px 18px;line-height:1.6;font-family:'Inter',sans-serif;margin-top:auto;}
+  .otp-boxes{display:flex;justify-content:center;gap:14px;margin:6px 0 18px;}
+  .otp-b{width:56px;height:56px;background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--gray-900);font-family:'Inter',sans-serif;}
+  .otp-b.filled{border-color:var(--yellow);background:var(--yellow-light);}
+  .otp-b.active{border-color:var(--yellow);border-width:2px;}
+  .rt-row{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:0 2px;}
+  .rt-left{font-size:13px;color:var(--gray-400);font-family:'Inter',sans-serif;}
+  .rt-left b{color:var(--gray-900);font-weight:700;}
+  .rt-right{font-size:13px;color:var(--gray-400);font-family:'Inter',sans-serif;}
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1: LOGIN EN -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+      <!-- LANG ICON top-right -->
+      <a class="lang-btn" href="login-ar.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>عربي</span>
+      </a>
+      <div class="top">
+        <div class="app-icon"><div class="bus-body"><div class="bus-windows"><div class="bus-win"></div><div class="bus-win"></div></div><div class="bus-wheel l"></div><div class="bus-wheel r"></div></div></div>
+        <div class="app-name">School Bus Tracker</div>
+        <div class="app-sub">Keep your child safe on the road</div>
+        <div class="feats">
+          <div class="feat"><div class="fi" style="background:#EFF6FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" fill="#3B82F6" opacity="0.2"/><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" stroke="#3B82F6" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">Safety</span></div>
+          <div class="feat"><div class="fi" style="background:#FFFDE7;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFD700" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#FFD700"/><line x1="12" y1="3" x2="12" y2="6" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="21" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="12" x2="6" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="18" y1="12" x2="21" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="fl">Live Track</span></div>
+          <div class="feat"><div class="fi" style="background:#FDF4FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#A855F7" opacity="0.2" stroke="#A855F7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">Peace</span></div>
+        </div>
+      </div>
+      <div class="card-wrap">
+        <div class="card">
+          <div class="card-title">Sign In</div>
+          <div class="phone-row"><span class="flag">🇯🇴</span><div class="code">+962</div><input class="pnum" type="tel" placeholder="7X XXX XXXX"/></div>
+          <button class="btn"><span>Send Verification Code</span></button>
+          <div class="hint">Get a 4-digit code on your phone</div>
+        </div>
+      </div>
+      <div class="terms">Accept Terms & Privacy Policy</div>
+    </div>
+  </div>
+  <div class="sl">01 — Sign In</div>
+</div>
+
+<!-- SCREEN 2: OTP EN -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+      <a class="lang-btn" href="login-ar.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>عربي</span>
+      </a>
+      <div class="top">
+        <div class="app-icon"><div class="bus-body"><div class="bus-windows"><div class="bus-win"></div><div class="bus-win"></div></div><div class="bus-wheel l"></div><div class="bus-wheel r"></div></div></div>
+        <div class="app-name">School Bus Tracker</div>
+        <div class="app-sub">Keep your child safe on the road</div>
+        <div class="feats">
+          <div class="feat"><div class="fi" style="background:#EFF6FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" fill="#3B82F6" opacity="0.2"/><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" stroke="#3B82F6" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">Safety</span></div>
+          <div class="feat"><div class="fi" style="background:#FFFDE7;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFD700" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#FFD700"/><line x1="12" y1="3" x2="12" y2="6" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="21" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="12" x2="6" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="18" y1="12" x2="21" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="fl">Live Track</span></div>
+          <div class="feat"><div class="fi" style="background:#FDF4FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#A855F7" opacity="0.2" stroke="#A855F7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">Peace</span></div>
+        </div>
+      </div>
+      <div class="card-wrap">
+        <div class="card">
+          <div class="card-title">Enter Verification Code</div>
+          <div class="otp-boxes"><div class="otp-b filled">3</div><div class="otp-b filled">7</div><div class="otp-b active"></div><div class="otp-b"></div></div>
+          <button class="btn"><span>Confirm & Sign In</span></button>
+          <div class="rt-row"><span class="rt-left">Didn't receive it? <b>Resend</b></span><span class="rt-right">Expires 02:41</span></div>
+        </div>
+      </div>
+      <div class="terms">Your code is private, never share it with anyone</div>
+    </div>
+  </div>
+  <div class="sl">02 — OTP</div>
+</div>
+
+</body>
+</html>

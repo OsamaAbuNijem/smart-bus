@@ -1,0 +1,3353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BusMate — Parent App</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════
+   SHELL — top nav + page system
+══════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #CACACA;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* ── TOP NAV BAR ── */
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 14px;
+  height: 52px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.5);
+  overflow-x: auto;
+}
+.topnav::-webkit-scrollbar { display: none; }
+
+.nav-logo {
+  font-size: 15px;
+  font-weight: 800;
+  color: #FFD700;
+  font-family: 'Cairo', sans-serif;
+  white-space: nowrap;
+  padding-left: 14px;
+  flex-shrink: 0;
+  letter-spacing: -.3px;
+}
+.nav-logo em { color: #fff; font-style: normal; }
+
+.nav-divider {
+  width: 1px;
+  height: 22px;
+  background: #333;
+  margin: 0 10px;
+  flex-shrink: 0;
+}
+
+.nav-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.nav-group-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #444;
+  white-space: nowrap;
+  padding: 0 6px 0 2px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.nb {
+  background: #2b2b2b;
+  border: 1px solid #363636;
+  border-radius: 8px;
+  padding: 5px 11px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  font-family: 'Cairo', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all .14s;
+  line-height: 1.3;
+}
+.nb:hover { background: #3a3a3a; color: #ddd; border-color: #555; }
+.nb.active {
+  background: #FFD700;
+  border-color: #FFD700;
+  color: #111;
+  font-weight: 700;
+}
+
+/* ── PAGE WRAPPER ── */
+.content {
+  padding-top: 52px;
+  min-height: 100vh;
+}
+
+.ps {
+  display: none;
+}
+.ps.active {
+  display: block;
+}
+
+/* Each page section keeps original body styles (padding, flex, wrap) */
+.ps > body { display: contents; }
+
+/* ══════════════════════════════════
+   ORIGINAL PAGE STYLES BELOW
+══════════════════════════════════ */
+
+/* ─── login-ar ─── */
+:root {
+    --yellow:#FFD700; --yellow-light:#FFFDE7; --yellow-dark:#B8960C;
+    --blue:#3B82F6; --blue-light:#EFF6FF;
+    --purple:#A855F7; --purple-light:#FDF4FF;
+    --gray-50:#F9FAFB; --gray-200:#E5E7EB;
+    --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-900:#111;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Cairo',sans-serif;background:#E5E5E5;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:48px 32px;gap:48px;flex-wrap:wrap;}
+  .sw{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .sl{font-size:13px;font-weight:700;color:#555;font-family:'Cairo',sans-serif;}
+  .phone{width:375px;min-height:812px;background:#fff;border-radius:56px;border:10px solid #1a1a1a;overflow:hidden;display:flex;flex-direction:column;}
+  .statusbar{height:44px;background:var(--yellow-light);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;}
+  .statusbar span{font-size:13px;color:#333;font-family:'Cairo',sans-serif;}
+  .screen{background:var(--yellow-light);flex:1;display:flex;flex-direction:column;position:relative;}
+
+  /* LANG ICON — top LEFT corner (English = LTR side) */
+  .lang-btn{
+    position:absolute;
+    top:16px;
+    left:20px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#fff;
+    border:1px solid var(--gray-200);
+    border-radius:20px;
+    padding:5px 10px 5px 8px;
+    cursor:pointer;
+    text-decoration:none;
+    z-index:10;
+  }
+  .lang-btn svg{flex-shrink:0;}
+  .lang-btn span{font-size:12px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;letter-spacing:0.02em;}
+
+  .top{background:var(--yellow-light);padding:30px 28px 18px;text-align:center;flex-shrink:0;}
+  .app-icon{width:72px;height:72px;background:var(--yellow);border-radius:22px;margin:0 auto 0px;display:flex;align-items:center;justify-content:center;}
+  .bus-body{width:38px;height:24px;background:#fff;border-radius:7px 7px 4px 4px;position:relative;}
+  .bus-windows{display:flex;justify-content:center;gap:4px;padding:4px 3px 0;}
+  .bus-win{width:11px;height:8px;background:var(--yellow);border-radius:2px;border:1.5px solid var(--yellow-dark);}
+  .bus-wheel{position:absolute;bottom:-7px;width:10px;height:10px;border-radius:50%;background:var(--yellow);}
+  .bus-wheel.l{left:5px;} .bus-wheel.r{right:5px;}
+  .app-name{font-size:26px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .app-sub{font-size:14px;color:var(--gray-500);font-family:'Cairo',sans-serif;}
+  .feats{display:flex;justify-content:center;gap:28px;margin-top:22px;}
+  .feat{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .fi{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;}
+  .fl{font-size:12px;font-weight:600;color:var(--gray-500);font-family:'Cairo',sans-serif;text-align:center;}
+  .card-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 18px;}
+  .card{background:#fff;border-radius:22px;border:1px solid var(--gray-200);padding:26px 22px 22px;}
+  .card-title{font-size:20px;font-weight:700;color:var(--gray-900);text-align:center;margin-bottom:20px;font-family:'Cairo',sans-serif;}
+  .phone-row{display:flex;align-items:center;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:0 14px;margin-bottom:18px;height:56px;direction:ltr;}
+  .flag{font-size:18px;flex-shrink:0;margin-right:8px;}
+  .code{font-size:14px;color:var(--gray-500);font-family:'Cairo',sans-serif;flex-shrink:0;padding-right:10px;border-right:1px solid var(--gray-200);margin-right:10px;height:24px;display:flex;align-items:center;}
+  .pnum{flex:1;background:transparent;border:none;outline:none;font-size:14px;color:var(--gray-400);font-family:'Cairo',sans-serif;direction:ltr;text-align:left;}
+  .btn{background:var(--yellow);border-radius:14px;padding:15px;text-align:center;cursor:pointer;border:none;width:100%;}
+  .btn span{font-size:16px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .hint{font-size:12px;color:var(--gray-400);text-align:center;margin-top:12px;line-height:1.6;font-family:'Cairo',sans-serif;}
+  .terms{font-size:11px;color:var(--gray-400);text-align:center;padding:14px 18px 18px;line-height:1.6;font-family:'Cairo',sans-serif;margin-top:auto;}
+  .otp-boxes{display:flex;justify-content:center;gap:14px;margin:6px 0 18px;direction:ltr;}
+  .otp-b{width:56px;height:56px;background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .otp-b.filled{border-color:var(--yellow);background:var(--yellow-light);}
+  .otp-b.active{border-color:var(--yellow);border-width:2px;}
+  .rt-row{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:0 2px;direction:ltr;}
+  .rt-left{font-size:13px;color:var(--gray-400);font-family:'Cairo',sans-serif;direction:ltr;}
+  .rt-left b{color:var(--gray-900);font-weight:700;}
+  .rt-right{font-size:13px;color:var(--gray-400);direction:ltr;font-family:'Cairo',sans-serif;}
+
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAVIGATION ── -->
+<nav class="topnav">
+  <div class="nav-logo">🚌 Bus<em>Mate</em></div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <span class="nav-group-label">Auth</span>
+<button class="nb" onclick="sp('pg_login_en')" id="b_pg_login_en">Sign In EN</button>
+<button class="nb" onclick="sp('pg_home_multichildren_en')" id="b_pg_home_multichildren_en">Home EN</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <span class="nav-group-label">الصفحات</span>
+<button class="nb" onclick="sp('pg_login_ar')" id="b_pg_login_ar">تسجيل الدخول AR</button>
+<button class="nb" onclick="sp('pg_home_multichildren_ar')" id="b_pg_home_multichildren_ar">الرئيسية AR</button>
+<button class="nb" onclick="sp('pg_student_info')" id="b_pg_student_info">بيانات الطالب</button>
+<button class="nb" onclick="sp('pg_student_edit')" id="b_pg_student_edit">تعديل الطالب</button>
+<button class="nb" onclick="sp('pg_attendance')" id="b_pg_attendance">الحضور</button>
+<button class="nb" onclick="sp('pg_report_absence')" id="b_pg_report_absence">تسجيل غياب</button>
+<button class="nb" onclick="sp('pg_trip_history')" id="b_pg_trip_history">سجل الرحلات</button>
+<button class="nb" onclick="sp('pg_notifications')" id="b_pg_notifications">الإشعارات</button>
+<button class="nb" onclick="sp('pg_settings')" id="b_pg_settings">الإعدادات</button>
+<button class="nb" onclick="sp('pg_live_tracking')" id="b_pg_live_tracking">التتبع المباشر</button>
+  </div>
+</nav>
+
+<!-- ── PAGE CONTENT ── -->
+<div class="content">
+<div class="ps" id="pg_login_ar">
+<!-- SCREEN 1: LOGIN AR -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+      <!-- LANG ICON top-left -->
+      <a class="lang-btn" href="login-en.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>EN</span>
+      </a>
+      <div class="top">
+        <div class="app-icon"><div class="bus-body"><div class="bus-windows"><div class="bus-win"></div><div class="bus-win"></div></div><div class="bus-wheel l"></div><div class="bus-wheel r"></div></div></div>
+        <div class="app-name">School Bus Tracker</div>
+        <div class="app-sub">أبقِ طفلك آمناً على الطريق</div>
+        <div class="feats">
+          <div class="feat"><div class="fi" style="background:#EFF6FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" fill="#3B82F6" opacity="0.2"/><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" stroke="#3B82F6" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">أمان</span></div>
+          <div class="feat"><div class="fi" style="background:#FFFDE7;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFD700" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#FFD700"/><line x1="12" y1="3" x2="12" y2="6" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="21" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="12" x2="6" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="18" y1="12" x2="21" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="fl">تتبع مباشر</span></div>
+          <div class="feat"><div class="fi" style="background:#FDF4FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#A855F7" opacity="0.2" stroke="#A855F7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">راحة</span></div>
+        </div>
+      </div>
+      <div class="card-wrap">
+        <div class="card">
+          <div class="card-title">تسجيل الدخول</div>
+          <div class="phone-row"><span class="flag">🇯🇴</span><div class="code">+962</div><input class="pnum" type="tel" placeholder="7X XXX XXXX"/></div>
+          <button class="btn"><span>إرسال رمز التحقق</span></button>
+          <div class="hint">سيصلك رمز مكون من 4 أرقام على رقم هاتفك</div>
+        </div>
+      </div>
+      <div class="terms">بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية</div>
+    </div>
+  </div>
+  <div class="sl">01 — تسجيل الدخول</div>
+</div>
+
+<!-- SCREEN 2: OTP AR -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+      <a class="lang-btn" href="login-en.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>EN</span>
+      </a>
+      <div class="top">
+        <div class="app-icon"><div class="bus-body"><div class="bus-windows"><div class="bus-win"></div><div class="bus-win"></div></div><div class="bus-wheel l"></div><div class="bus-wheel r"></div></div></div>
+        <div class="app-name">School Bus Tracker</div>
+        <div class="app-sub">أبقِ طفلك آمناً على الطريق</div>
+        <div class="feats">
+          <div class="feat"><div class="fi" style="background:#EFF6FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" fill="#3B82F6" opacity="0.2"/><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" stroke="#3B82F6" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">أمان</span></div>
+          <div class="feat"><div class="fi" style="background:#FFFDE7;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFD700" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#FFD700"/><line x1="12" y1="3" x2="12" y2="6" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="21" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="12" x2="6" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="18" y1="12" x2="21" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="fl">تتبع مباشر</span></div>
+          <div class="feat"><div class="fi" style="background:#FDF4FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#A855F7" opacity="0.2" stroke="#A855F7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">راحة</span></div>
+        </div>
+      </div>
+      <div class="card-wrap">
+        <div class="card">
+          <div class="card-title">أدخل رمز التحقق</div>
+          <div class="otp-boxes" dir="ltr"><div class="otp-b filled">3</div><div class="otp-b filled">7</div><div class="otp-b active"></div><div class="otp-b"></div></div>
+          <button class="btn"><span>تأكيد الدخول</span></button>
+          <div class="rt-row"><span class="rt-left">لم يصلك الرمز؟ <b>إعادة إرسال</b></span><span class="rt-right">بعد 02:41</span></div>
+        </div>
+      </div>
+      <div class="terms">رمزك سري، لا تشاركه مع أحد</div>
+    </div>
+  </div>
+  <div class="sl">02 — رمز OTP</div>
+</div>
+</div>
+
+<div class="ps" id="pg_login_en">
+<!-- SCREEN 1: LOGIN EN -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+      <!-- LANG ICON top-right -->
+      <a class="lang-btn" href="login-ar.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>عربي</span>
+      </a>
+      <div class="top">
+        <div class="app-icon"><div class="bus-body"><div class="bus-windows"><div class="bus-win"></div><div class="bus-win"></div></div><div class="bus-wheel l"></div><div class="bus-wheel r"></div></div></div>
+        <div class="app-name">School Bus Tracker</div>
+        <div class="app-sub">Keep your child safe on the road</div>
+        <div class="feats">
+          <div class="feat"><div class="fi" style="background:#EFF6FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" fill="#3B82F6" opacity="0.2"/><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" stroke="#3B82F6" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">Safety</span></div>
+          <div class="feat"><div class="fi" style="background:#FFFDE7;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFD700" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#FFD700"/><line x1="12" y1="3" x2="12" y2="6" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="21" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="12" x2="6" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="18" y1="12" x2="21" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="fl">Live Track</span></div>
+          <div class="feat"><div class="fi" style="background:#FDF4FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#A855F7" opacity="0.2" stroke="#A855F7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">Peace</span></div>
+        </div>
+      </div>
+      <div class="card-wrap">
+        <div class="card">
+          <div class="card-title">Sign In</div>
+          <div class="phone-row"><span class="flag">🇯🇴</span><div class="code">+962</div><input class="pnum" type="tel" placeholder="7X XXX XXXX"/></div>
+          <button class="btn"><span>Send Verification Code</span></button>
+          <div class="hint">Get a 4-digit code on your phone</div>
+        </div>
+      </div>
+      <div class="terms">Accept Terms & Privacy Policy</div>
+    </div>
+  </div>
+  <div class="sl">01 — Sign In</div>
+</div>
+
+<!-- SCREEN 2: OTP EN -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+      <a class="lang-btn" href="login-ar.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>عربي</span>
+      </a>
+      <div class="top">
+        <div class="app-icon"><div class="bus-body"><div class="bus-windows"><div class="bus-win"></div><div class="bus-win"></div></div><div class="bus-wheel l"></div><div class="bus-wheel r"></div></div></div>
+        <div class="app-name">School Bus Tracker</div>
+        <div class="app-sub">Keep your child safe on the road</div>
+        <div class="feats">
+          <div class="feat"><div class="fi" style="background:#EFF6FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" fill="#3B82F6" opacity="0.2"/><path d="M12 2L4 6v6c0 5 3.5 9.74 8 11 4.5-1.26 8-6 8-11V6L12 2z" stroke="#3B82F6" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">Safety</span></div>
+          <div class="feat"><div class="fi" style="background:#FFFDE7;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFD700" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#FFD700"/><line x1="12" y1="3" x2="12" y2="6" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="21" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="12" x2="6" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/><line x1="18" y1="12" x2="21" y2="12" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="fl">Live Track</span></div>
+          <div class="feat"><div class="fi" style="background:#FDF4FF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#A855F7" opacity="0.2" stroke="#A855F7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="fl">Peace</span></div>
+        </div>
+      </div>
+      <div class="card-wrap">
+        <div class="card">
+          <div class="card-title">Enter Verification Code</div>
+          <div class="otp-boxes"><div class="otp-b filled">3</div><div class="otp-b filled">7</div><div class="otp-b active"></div><div class="otp-b"></div></div>
+          <button class="btn"><span>Confirm & Sign In</span></button>
+          <div class="rt-row"><span class="rt-left">Didn't receive it? <b>Resend</b></span><span class="rt-right">Expires 02:41</span></div>
+        </div>
+      </div>
+      <div class="terms">Your code is private, never share it with anyone</div>
+    </div>
+  </div>
+  <div class="sl">02 — OTP</div>
+</div>
+</div>
+
+<div class="ps" id="pg_home_multichildren_ar">
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <!-- HEADER -->
+      <div class="header">
+        <div>
+          <div class="greeting">صباح الخير، أم أحمد</div>
+          <div class="time-txt">7:39 صباحاً</div>
+        </div>
+        <div class="h-icons">
+          <div class="h-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <div class="notif-badge"></div>
+          </div>
+          <div class="h-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHILD TABS -->
+      <div class="child-tabs" id="childTabs">
+        <div class="child-tab active" onclick="switchChild(0)">
+          <div class="child-tab-avatar">أح</div>
+          <span class="child-tab-name">أحمد</span>
+          <div class="child-tab-status" style="background:#22C55E;"></div>
+        </div>
+        <div class="child-tab" onclick="switchChild(1)">
+          <div class="child-tab-avatar">سا</div>
+          <span class="child-tab-name">سارة</span>
+          <div class="child-tab-status" style="background:#F59E0B;"></div>
+        </div>
+        <div class="child-tab" onclick="switchChild(2)">
+          <div class="child-tab-avatar">يو</div>
+          <span class="child-tab-name">يوسف</span>
+          <div class="child-tab-status" style="background:#9CA3AF;"></div>
+        </div>
+        <div class="add-child-btn" title="إضافة طفل">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE CONTENT -->
+      <div style="flex:1;overflow-y:auto;" id="scrollContent">
+        <div id="scrollContent">
+
+        <!-- ── CHILD 0: أحمد ── -->
+        <div class="child-panel active" id="panel-0">
+          <div class="yellow-card">
+
+            <div class="yc-row"><span class="yc-lbl">الحالة الحالية</span><div class="yc-pill"><span>في الباص</span></div></div>
+            <div class="yc-row"><span class="yc-lbl">وقت الصعود للباص</span><span class="yc-eta">7:31 ص</span></div>
+            <div class="yc-row"><span class="yc-lbl">وقت الوصول للمدرسة</span><span class="yc-eta">8 دقائق</span></div>
+            <div class="track-btn"><div class="track-arr"></div><span>تتبع مباشر</span></div>
+          </div>
+          <div class="grid2">
+            <div class="gc">
+              <div class="gc-icon" style="background:#FDF4FF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div class="gc-title">الحضور</div>
+              <div class="gc-sub">عرض السجلات</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#EFF6FF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="gc-title">بيانات الطالب</div>
+              <div class="gc-sub">عرض التفاصيل</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFF7ED;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="gc-title">تسجيل غياب</div>
+              <div class="gc-sub">إبلاغ السائق</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFFDE7;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="gc-title">سجل الرحلات</div>
+              <div class="gc-sub">الرحلات السابقة</div>
+            </div>
+          </div>
+          <div class="alert-card">
+            <div class="alert-top"><div class="alert-dot"></div><span class="alert-title">ملاحظات السائق</span></div>
+            <div class="alert-body">الباص سيتأخر 5 دقائق اليوم بسبب الازدحام في منطقة الزيتون</div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+
+        <!-- ── CHILD 1: سارة ── -->
+        <div class="child-panel" id="panel-1">
+          <div class="yellow-card" style="background:#3B82F6;">
+
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#BFDBFE;">الحالة الحالية</span>
+              <div class="yc-pill" style="background:rgba(255,255,255,.2);"><span style="color:#fff;">الباص لم يصل بعد</span></div>
+            </div>
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#BFDBFE;">وقت الصعود للباص</span>
+              <span class="yc-eta" style="color:#fff;">—</span>
+            </div>
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#BFDBFE;">وقت الوصول المتوقع</span>
+              <span class="yc-eta" style="color:#fff;">15 دقيقة</span>
+            </div>
+            <div class="track-btn" style="background:rgba(255,255,255,.15);">
+              <div class="track-arr" style="border-left-color:#fff;"></div>
+              <span style="color:#fff;">تتبع مباشر</span>
+            </div>
+          </div>
+
+          <div style="background:#FFFDE7;margin:10px 14px 0;border-radius:14px;padding:12px 14px;border:1px solid #FFD700;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span style="font-size:13px;font-weight:700;color:#B8960C;font-family:'Cairo',sans-serif;">تذكير</span>
+            </div>
+            <div style="font-size:12px;color:#7a6200;font-family:'Cairo',sans-serif;line-height:1.5;">الباص #38 تأخر 5 دقائق بسبب الازدحام</div>
+          </div>
+          <div class="grid2">
+            <div class="gc">
+              <div class="gc-icon" style="background:#FDF4FF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div class="gc-title">الحضور</div>
+              <div class="gc-sub">عرض السجلات</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#EFF6FF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="gc-title">بيانات الطالب</div>
+              <div class="gc-sub">عرض التفاصيل</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFF7ED;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="gc-title">تسجيل غياب</div>
+              <div class="gc-sub">إبلاغ السائق</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFFDE7;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="gc-title">سجل الرحلات</div>
+              <div class="gc-sub">الرحلات السابقة</div>
+            </div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+
+        <!-- ── CHILD 2: يوسف ── -->
+        <div class="child-panel" id="panel-2">
+          <div class="yellow-card" style="background:#6B7280;">
+
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#D1D5DB;">الحالة الحالية</span>
+              <div class="yc-pill" style="background:rgba(255,255,255,.2);"><span style="color:#fff;">في المدرسة</span></div>
+            </div>
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#D1D5DB;">وقت الصعود للباص</span>
+              <span class="yc-eta" style="color:#fff;">7:15 ص</span>
+            </div>
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#D1D5DB;">رحلة الإياب</span>
+              <span class="yc-eta" style="color:#fff;">2:00 م</span>
+            </div>
+            <div class="track-btn" style="background:rgba(255,255,255,.15);">
+              <div class="track-arr" style="border-left-color:#fff;"></div>
+              <span style="color:#fff;">تتبع مباشر</span>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="gc">
+              <div class="gc-icon" style="background:#FDF4FF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div class="gc-title">الحضور</div>
+              <div class="gc-sub">عرض السجلات</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#EFF6FF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="gc-title">بيانات الطالب</div>
+              <div class="gc-sub">عرض التفاصيل</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFF7ED;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="gc-title">تسجيل غياب</div>
+              <div class="gc-sub">إبلاغ السائق</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFFDE7;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="gc-title">سجل الرحلات</div>
+              <div class="gc-sub">الرحلات السابقة</div>
+            </div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+
+        </div><!-- end scrollContent inner -->
+
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">Home — تبديل الأطفال</div>
+</div>
+
+<script>
+const children = [
+  { name: 'أحمد', avatar: 'أح', statusColor: '#22C55E' },
+  { name: 'سارة', avatar: 'سا', statusColor: '#F59E0B' },
+  { name: 'يوسف', avatar: 'يو', statusColor: '#9CA3AF' },
+];
+
+function switchChild(idx) {
+  document.querySelectorAll('.child-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.child-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
+}
+</script>
+</div>
+
+<div class="ps" id="pg_home_multichildren_en">
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="header">
+        <div>
+          <div class="greeting">Good morning, Sarah</div>
+          <div class="time-txt">7:39 AM</div>
+        </div>
+        <div class="h-icons">
+          <div class="h-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <div class="notif-badge"></div>
+          </div>
+          <div class="h-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="child-tabs">
+        <div class="child-tab active" onclick="switchChild(0)">
+          <div class="child-tab-avatar">AH</div>
+          <span class="child-tab-name">Ahmed</span>
+          <div class="child-tab-status" style="background:#22C55E;"></div>
+        </div>
+        <div class="child-tab" onclick="switchChild(1)">
+          <div class="child-tab-avatar">SA</div>
+          <span class="child-tab-name">Sara</span>
+          <div class="child-tab-status" style="background:#F59E0B;"></div>
+        </div>
+        <div class="child-tab" onclick="switchChild(2)">
+          <div class="child-tab-avatar">YO</div>
+          <span class="child-tab-name">Yousef</span>
+          <div class="child-tab-status" style="background:#9CA3AF;"></div>
+        </div>
+        <div class="add-child-btn" title="Add child">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;">
+        <div>
+
+        <!-- CHILD 0: Ahmed -->
+        <div class="child-panel active" id="panel-0">
+          <div class="yellow-card">
+            <div class="yc-row"><span class="yc-lbl">Current Status</span><div class="yc-pill"><span>On the bus</span></div></div>
+            <div class="yc-row"><span class="yc-lbl">Bus Boarding Time</span><span class="yc-eta">7:31 AM</span></div>
+            <div class="yc-row"><span class="yc-lbl">ETA to School</span><span class="yc-eta">8 min</span></div>
+            <div class="track-btn"><div class="track-arr"></div><span>Live Tracking</span></div>
+          </div>
+          <div class="grid2">
+            <div class="gc">
+              <div class="gc-icon" style="background:#FDF4FF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div class="gc-title">Attendance</div>
+              <div class="gc-sub">View records</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#EFF6FF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="gc-title">Student Info</div>
+              <div class="gc-sub">View details</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFF7ED;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="gc-title">Report Absence</div>
+              <div class="gc-sub">Notify driver</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFFDE7;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="gc-title">Trip History</div>
+              <div class="gc-sub">Past trips</div>
+            </div>
+          </div>
+          <div class="alert-card">
+            <div class="alert-top"><div class="alert-dot"></div><span class="alert-title">Driver Notes</span></div>
+            <div class="alert-body">Bus will be 5 minutes late today due to traffic near Al-Zeitoun area</div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+
+        <!-- CHILD 1: Sara -->
+        <div class="child-panel" id="panel-1">
+          <div class="yellow-card" style="background:#3B82F6;">
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#BFDBFE;">Current Status</span>
+              <div class="yc-pill" style="background:rgba(255,255,255,.2);"><span style="color:#fff;">Bus not arrived yet</span></div>
+            </div>
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#BFDBFE;">Bus Boarding Time</span>
+              <span class="yc-eta" style="color:#fff;">—</span>
+            </div>
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#BFDBFE;">Expected Arrival</span>
+              <span class="yc-eta" style="color:#fff;">15 min</span>
+            </div>
+            <div class="track-btn" style="background:rgba(255,255,255,.15);">
+              <div class="track-arr" style="border-left-color:#fff;border-right:none;"></div>
+              <span style="color:#fff;">Live Tracking</span>
+            </div>
+          </div>
+          <div style="background:#FFFDE7;margin:10px 14px 0;border-radius:14px;padding:12px 14px;border:1px solid #FFD700;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span style="font-size:13px;font-weight:700;color:#B8960C;font-family:'Inter',sans-serif;">Reminder</span>
+            </div>
+            <div style="font-size:12px;color:#7a6200;font-family:'Inter',sans-serif;line-height:1.5;">Bus #38 is delayed 5 minutes due to traffic</div>
+          </div>
+          <div class="grid2">
+            <div class="gc">
+              <div class="gc-icon" style="background:#FDF4FF;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+              <div class="gc-title">Attendance</div><div class="gc-sub">View records</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#EFF6FF;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+              <div class="gc-title">Student Info</div><div class="gc-sub">View details</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFF7ED;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div class="gc-title">Report Absence</div><div class="gc-sub">Notify driver</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFFDE7;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="gc-title">Trip History</div><div class="gc-sub">Past trips</div>
+            </div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+
+        <!-- CHILD 2: Yousef -->
+        <div class="child-panel" id="panel-2">
+          <div class="yellow-card" style="background:#6B7280;">
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#D1D5DB;">Current Status</span>
+              <div class="yc-pill" style="background:rgba(255,255,255,.2);"><span style="color:#fff;">At school</span></div>
+            </div>
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#D1D5DB;">Bus Boarding Time</span>
+              <span class="yc-eta" style="color:#fff;">7:15 AM</span>
+            </div>
+            <div class="yc-row">
+              <span class="yc-lbl" style="color:#D1D5DB;">Return Trip</span>
+              <span class="yc-eta" style="color:#fff;">2:00 PM</span>
+            </div>
+            <div class="track-btn" style="background:rgba(255,255,255,.15);">
+              <div class="track-arr" style="border-left-color:#fff;border-right:none;"></div>
+              <span style="color:#fff;">Live Tracking</span>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="gc">
+              <div class="gc-icon" style="background:#FDF4FF;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+              <div class="gc-title">Attendance</div><div class="gc-sub">View records</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#EFF6FF;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+              <div class="gc-title">Student Info</div><div class="gc-sub">View details</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFF7ED;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div class="gc-title">Report Absence</div><div class="gc-sub">Notify driver</div>
+            </div>
+            <div class="gc">
+              <div class="gc-icon" style="background:#FFFDE7;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="gc-title">Trip History</div><div class="gc-sub">Past trips</div>
+            </div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">Home — Switch Children</div>
+</div>
+
+<script>
+function switchChild(idx) {
+  document.querySelectorAll('.child-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.child-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
+}
+</script>
+</div>
+
+<div class="ps" id="pg_student_info">
+<!-- ===== ARABIC VERSION ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="page-title">معلومات الطالب</div>
+        <div class="edit-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span>تعديل</span>
+        </div>
+      </div>
+
+
+
+      <div class="scroll-body">
+
+        <!-- PROFILE -->
+        <div class="profile-card">
+          <div class="student-avatar">أح</div>
+          <div>
+            <div class="student-name">أحمد محمد الخالدي</div>
+            <div class="student-id">رقم الطالب: SE2024001</div>
+            <div class="student-grade-badge"><span>روضة ب</span></div>
+          </div>
+        </div>
+
+        <!-- GENERAL INFO -->
+        <div class="info-section">
+          <div class="info-section-title">المعلومات الأساسية</div>
+          <div class="info-row">
+            <span class="info-label">تاريخ الميلاد</span>
+            <span class="info-value">15 / 3 / 2020</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">المدرسة</span>
+            <span class="info-value">مدرسة النور الدولية</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">الصف</span>
+            <span class="info-value">روضة ب</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">الفصل</span>
+            <span class="info-value">أ</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">العنوان</span>
+            <span class="info-value">شارع الزيتون، عمان</span>
+          </div>
+        </div>
+
+                <!-- MEDICAL -->
+        <div class="medical-card">
+          <div class="medical-title-row">
+            <div class="medical-dot"></div>
+            <span class="medical-title">تنبيهات طبية</span>
+          </div>
+          <div class="allergy-tags">
+            <div class="allergy-tag"><span>حساسية: مكسرات</span></div>
+            <div class="allergy-tag"><span>حساسية: غبار</span></div>
+            <div class="allergy-tag"><span>ربو خفيف</span></div>
+          </div>
+        </div>
+
+        <!-- PARENT NOTES -->
+        <div class="notes-card">
+          <div class="notes-title-row">
+            <div class="notes-dot"></div>
+            <span class="notes-title">ملاحظات الوالدين</span>
+          </div>
+          <div class="notes-body">أحمد يحتاج وقتاً إضافياً للتكيف في المواقف الجديدة. يرجى إعطاؤه بعض الوقت عند الصعود.</div>
+        </div>
+
+        <!-- EMERGENCY -->
+        <div class="contact-card">
+          <div class="contact-title">جهات الطوارئ</div>
+          <div class="contact-row">
+            <div class="contact-avatar">أم</div>
+            <div style="flex:1;">
+              <div class="contact-name">أم أحمد الخالدي</div>
+              <div class="contact-relation">الأم · +962 79 123 4567</div>
+            </div>
+            <div class="call-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+          <div class="contact-row">
+            <div class="contact-avatar" style="background:#F0FDF4;color:#16A34A;">أب</div>
+            <div style="flex:1;">
+              <div class="contact-name">أبو أحمد الخالدي</div>
+              <div class="contact-relation">الأب · +962 79 987 6543</div>
+            </div>
+            <div class="call-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">معلومات الطالب — عربي</div>
+</div>
+
+<!-- ===== ENGLISH VERSION ===== -->
+<div class="sw" dir="ltr" style="font-family:'Inter',sans-serif;">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="page-title en-font">Student Info</div>
+        <div class="edit-btn" style="margin-left:auto;margin-right:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span class="en-font">Edit</span>
+        </div>
+      </div>
+
+
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="profile-card">
+          <div class="student-avatar en-font">AH</div>
+          <div>
+            <div class="student-name en-font">Ahmed M. Khaldi</div>
+            <div class="student-id en-font">Student ID: SE2024001</div>
+            <div class="student-grade-badge"><span class="en-font">Kindergarten B</span></div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <div class="info-section-title en-font">General Information</div>
+          <div class="info-row">
+            <span class="info-label en-font">Date of Birth</span>
+            <span class="info-value en-font">3 / 15 / 2020</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label en-font">School</span>
+            <span class="info-value en-font">Al-Noor International School</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label en-font">Grade</span>
+            <span class="info-value en-font">Kindergarten B</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label en-font">Class</span>
+            <span class="info-value en-font">A</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label en-font">Address</span>
+            <span class="info-value en-font">Al-Zeitoun St, Amman</span>
+          </div>
+        </div>
+
+        <div class="medical-card">
+          <div class="medical-title-row">
+            <div class="medical-dot"></div>
+            <span class="medical-title en-font">Medical Alerts</span>
+          </div>
+          <div class="allergy-tags">
+            <div class="allergy-tag"><span class="en-font">Allergy: Nuts</span></div>
+            <div class="allergy-tag"><span class="en-font">Allergy: Dust</span></div>
+            <div class="allergy-tag"><span class="en-font">Mild Asthma</span></div>
+          </div>
+        </div>
+
+        <div class="notes-card">
+          <div class="notes-title-row">
+            <div class="notes-dot"></div>
+            <span class="notes-title en-font">Parent Notes</span>
+          </div>
+          <div class="notes-body en-font">Ahmed needs extra time to adjust in new situations. Please give him a few minutes when boarding.</div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-title en-font">Emergency Contacts</div>
+          <div class="contact-row">
+            <div class="contact-avatar en-font">MO</div>
+            <div style="flex:1;">
+              <div class="contact-name en-font">Sarah Khaldi (Mother)</div>
+              <div class="contact-relation en-font">+962 79 123 4567</div>
+            </div>
+            <div class="call-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+          <div class="contact-row">
+            <div class="contact-avatar en-font" style="background:#F0FDF4;color:#16A34A;">FA</div>
+            <div style="flex:1;">
+              <div class="contact-name en-font">Ahmad Khaldi (Father)</div>
+              <div class="contact-relation en-font">+962 79 987 6543</div>
+            </div>
+            <div class="call-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Student Info — English</div>
+</div>
+</div>
+
+<div class="ps" id="pg_student_edit">
+<!-- ===== ARABIC EDIT ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="page-title">تعديل معلومات الطالب</div>
+        <div class="save-btn"><span>حفظ</span></div>
+      </div>
+
+      <div class="scroll-body">
+
+        <!-- AVATAR -->
+        <div class="avatar-section">
+          <div class="edit-avatar">
+            أح
+            <div class="camera-badge">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+          </div>
+          <div class="change-photo-txt">تغيير الصورة</div>
+        </div>
+
+        <!-- GENERAL INFO -->
+        <div class="form-section">
+          <div class="form-section-title">المعلومات الأساسية</div>
+          <div class="form-row">
+            <div class="form-label">الاسم الكامل</div>
+            <input class="form-input" type="text" value="أحمد محمد الخالدي" readonly/>
+          </div>
+          <div class="form-row">
+            <div class="form-label">تاريخ الميلاد</div>
+            <input class="form-input" type="text" value="15 / 3 / 2020" readonly/>
+          </div>
+          <div class="form-row">
+            <div class="form-label">الصف</div>
+            <select class="form-select">
+              <option selected>روضة ب</option>
+              <option>روضة أ</option>
+              <option>الصف الأول</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label">الفصل</div>
+            <select class="form-select">
+              <option selected>أ</option>
+              <option>ب</option>
+              <option>ج</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label">العنوان</div>
+            <input class="form-input" type="text" value="شارع الزيتون، عمان" readonly/>
+          </div>
+        </div>
+
+        <!-- MEDICAL -->
+        <div class="form-section">
+          <div class="form-section-title">المعلومات الطبية</div>
+          <div class="form-row">
+            <div class="form-label">الحساسيات والتنبيهات</div>
+            <div class="allergy-edit">
+              <div class="allergy-tag-edit">
+                <span>حساسية: مكسرات</span>
+                <div class="tag-remove"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+              <div class="allergy-tag-edit">
+                <span>حساسية: غبار</span>
+                <div class="tag-remove"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+              <div class="allergy-tag-edit">
+                <span>ربو خفيف</span>
+                <div class="tag-remove"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+              <div class="add-tag-btn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>إضافة</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PARENT NOTES -->
+        <div class="form-section">
+          <div class="form-section-title">ملاحظات الوالدين</div>
+          <div class="form-row">
+            <div class="form-label">ملاحظة للسائق</div>
+            <textarea class="form-textarea" readonly>أحمد يحتاج وقتاً إضافياً للتكيف في المواقف الجديدة. يرجى إعطاؤه بعض الوقت عند الصعود.</textarea>
+          </div>
+        </div>
+
+        <!-- EMERGENCY CONTACTS -->
+        <div class="form-section">
+          <div class="form-section-title">جهات الطوارئ</div>
+          <div style="padding:10px 16px;">
+            <div class="contact-edit-row">
+              <div class="contact-avatar-sm">أم</div>
+              <div class="contact-fields">
+                <input class="contact-input" type="text" value="أم أحمد الخالدي" readonly/>
+                <input class="contact-input" type="text" value="+962 79 123 4567" readonly style="direction:ltr;text-align:right;"/>
+              </div>
+              <div class="remove-contact">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </div>
+            </div>
+            <div class="contact-edit-row">
+              <div class="contact-avatar-sm" style="background:#F0FDF4;color:#16A34A;">أب</div>
+              <div class="contact-fields">
+                <input class="contact-input" type="text" value="أبو أحمد الخالدي" readonly/>
+                <input class="contact-input" type="text" value="+962 79 987 6543" readonly style="direction:ltr;text-align:right;"/>
+              </div>
+              <div class="remove-contact">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </div>
+            </div>
+            <button class="add-contact-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>إضافة جهة طوارئ</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- DELETE -->
+        <div class="delete-btn">
+          <span>حذف بيانات الطالب</span>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl">تعديل معلومات الطالب — عربي</div>
+</div>
+
+<!-- ===== ENGLISH EDIT ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="page-title en-font">Edit Student Info</div>
+        <div class="save-btn" style="margin-left:auto;margin-right:0;"><span class="en-font">Save</span></div>
+      </div>
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="avatar-section">
+          <div class="edit-avatar en-font">
+            AH
+            <div class="camera-badge">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+          </div>
+          <div class="change-photo-txt en-font">Change Photo</div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title en-font">General Information</div>
+          <div class="form-row">
+            <div class="form-label en-font">Full Name</div>
+            <input class="form-input en-font" type="text" value="Ahmed M. Khaldi" readonly/>
+          </div>
+          <div class="form-row">
+            <div class="form-label en-font">Date of Birth</div>
+            <input class="form-input en-font" type="text" value="3 / 15 / 2020" readonly/>
+          </div>
+          <div class="form-row">
+            <div class="form-label en-font">Grade</div>
+            <select class="form-select en-font">
+              <option selected>Kindergarten B</option>
+              <option>Kindergarten A</option>
+              <option>Grade 1</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label en-font">Class</div>
+            <select class="form-select en-font">
+              <option selected>A</option>
+              <option>B</option>
+              <option>C</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label en-font">Address</div>
+            <input class="form-input en-font" type="text" value="Al-Zeitoun St, Amman" readonly/>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title en-font">Medical Information</div>
+          <div class="form-row">
+            <div class="form-label en-font">Allergies & Alerts</div>
+            <div class="allergy-edit">
+              <div class="allergy-tag-edit">
+                <span class="en-font">Allergy: Nuts</span>
+                <div class="tag-remove"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+              <div class="allergy-tag-edit">
+                <span class="en-font">Allergy: Dust</span>
+                <div class="tag-remove"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+              <div class="allergy-tag-edit">
+                <span class="en-font">Mild Asthma</span>
+                <div class="tag-remove"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+              <div class="add-tag-btn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span class="en-font">Add</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title en-font">Parent Notes</div>
+          <div class="form-row">
+            <div class="form-label en-font">Note for driver</div>
+            <textarea class="form-textarea en-font" readonly>Ahmed needs extra time to adjust in new situations. Please give him a few minutes when boarding.</textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title en-font">Emergency Contacts</div>
+          <div style="padding:10px 16px;">
+            <div class="contact-edit-row">
+              <div class="contact-avatar-sm en-font">MO</div>
+              <div class="contact-fields">
+                <input class="contact-input en-font" type="text" value="Sarah Khaldi (Mother)" readonly/>
+                <input class="contact-input en-font" type="text" value="+962 79 123 4567" readonly/>
+              </div>
+              <div class="remove-contact">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </div>
+            </div>
+            <div class="contact-edit-row">
+              <div class="contact-avatar-sm en-font" style="background:#F0FDF4;color:#16A34A;">FA</div>
+              <div class="contact-fields">
+                <input class="contact-input en-font" type="text" value="Ahmad Khaldi (Father)" readonly/>
+                <input class="contact-input en-font" type="text" value="+962 79 987 6543" readonly/>
+              </div>
+              <div class="remove-contact">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </div>
+            </div>
+            <button class="add-contact-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span class="en-font">Add Emergency Contact</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="delete-btn">
+          <span class="en-font">Delete Student Profile</span>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Edit Student Info — English</div>
+</div>
+</div>
+
+<div class="ps" id="pg_attendance">
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title">الحضور</div>
+          <div class="page-sub">أحمد محمد</div>
+        </div>
+      </div>
+
+      <div class="scroll-body">
+
+        <!-- BIG STATS -->
+        <div class="stats-row">
+          <div class="stat-card" style="background:var(--green);color:#fff;">
+            <div class="stat-num">86%</div>
+            <div class="stat-lbl" style="color:#BBF7D0;">نسبة الحضور</div>
+            <div class="stat-sub" style="color:#BBF7D0;">18 من 21 يوم</div>
+          </div>
+          <div class="stat-card" style="background:var(--blue);color:#fff;">
+            <div class="stat-num">90%</div>
+            <div class="stat-lbl" style="color:#BFDBFE;">استخدام الباص</div>
+            <div class="stat-sub" style="color:#BFDBFE;">19 من 21 يوم</div>
+          </div>
+        </div>
+
+        <!-- MINI STATS -->
+        <div class="mini-stats">
+          <div class="mini-card">
+            <div class="mini-icon" style="background:var(--green-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="mini-num" style="color:var(--green);">18</div>
+            <div class="mini-lbl">حاضر</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-icon" style="background:var(--orange-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="mini-num" style="color:var(--orange);">1</div>
+            <div class="mini-lbl">متأخر</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-icon" style="background:var(--red-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="mini-num" style="color:var(--red);">2</div>
+            <div class="mini-lbl">غائب</div>
+          </div>
+        </div>
+
+        <!-- CALENDAR -->
+        <div class="calendar-card">
+          <div class="cal-header">
+            <div class="cal-nav"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+            <div class="cal-title">أبريل 2026</div>
+            <div class="cal-nav"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+          </div>
+          <div class="cal-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div><span class="legend-lbl">حاضر</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--orange);"></div><span class="legend-lbl">متأخر</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div><span class="legend-lbl">غائب</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--yellow);"></div><span class="legend-lbl">اليوم</span></div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-days-header">
+              <div class="cal-day-name">أح</div>
+              <div class="cal-day-name">اث</div>
+              <div class="cal-day-name">ث</div>
+              <div class="cal-day-name">أر</div>
+              <div class="cal-day-name">خ</div>
+              <div class="cal-day-name">ج</div>
+              <div class="cal-day-name">س</div>
+            </div>
+            <div class="cal-days">
+              <!-- row 1 -->
+              <div class="cal-day other-month">29</div>
+              <div class="cal-day other-month">30</div>
+              <div class="cal-day present">1</div>
+              <div class="cal-day late">2</div>
+              <div class="cal-day present">3</div>
+              <div class="cal-day present">4</div>
+              <div class="cal-day empty"></div>
+              <!-- row 2 -->
+              <div class="cal-day present">6</div>
+              <div class="cal-day absent">7</div>
+              <div class="cal-day present">8</div>
+              <div class="cal-day present">9</div>
+              <div class="cal-day present">10</div>
+              <div class="cal-day present">11</div>
+              <div class="cal-day empty"></div>
+              <!-- row 3 -->
+              <div class="cal-day today">13</div>
+              <div class="cal-day">14</div>
+              <div class="cal-day">15</div>
+              <div class="cal-day">16</div>
+              <div class="cal-day">17</div>
+              <div class="cal-day">18</div>
+              <div class="cal-day empty"></div>
+              <!-- row 4 -->
+              <div class="cal-day absent">20</div>
+              <div class="cal-day present">21</div>
+              <div class="cal-day present">22</div>
+              <div class="cal-day present">23</div>
+              <div class="cal-day present">24</div>
+              <div class="cal-day present">25</div>
+              <div class="cal-day empty"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTICE -->
+        <div class="notice-card">
+          <div class="notice-row"><div class="notice-dot"></div><span class="notice-title">تنبيه الحضور</span></div>
+          <div class="notice-body">غاب أحمد يومين هذا الشهر. يرجى الحرص على انتظامه لضمان أفضل تجربة تعليمية.</div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="history-section">
+          <div class="history-title">السجل الأخير</div>
+          <div class="history-row">
+            <div class="history-status-dot" style="background:var(--green);"></div>
+            <div class="history-info">
+              <div class="history-date">الأحد، 13 أبريل</div>
+              <div class="history-detail">ركب الباص — 7:31 ص</div>
+            </div>
+            <div class="history-badge" style="background:var(--green-light);"><span style="color:var(--green-dark);">حاضر</span></div>
+          </div>
+          <div class="history-row">
+            <div class="history-status-dot" style="background:var(--orange);"></div>
+            <div class="history-info">
+              <div class="history-date">السبت، 12 أبريل</div>
+              <div class="history-detail">ركب الباص — 7:52 ص</div>
+            </div>
+            <div class="history-badge" style="background:var(--orange-light);"><span style="color:#C2410C;">متأخر</span></div>
+          </div>
+          <div class="history-row">
+            <div class="history-status-dot" style="background:var(--red);"></div>
+            <div class="history-info">
+              <div class="history-date">الخميس، 10 أبريل</div>
+              <div class="history-detail">أبلغ الأهل بالغياب</div>
+            </div>
+            <div class="history-badge" style="background:var(--red-light);"><span style="color:#DC2626;">غائب</span></div>
+          </div>
+          <div class="history-row">
+            <div class="history-status-dot" style="background:var(--green);"></div>
+            <div class="history-info">
+              <div class="history-date">الأربعاء، 9 أبريل</div>
+              <div class="history-detail">ركب الباص — 7:28 ص</div>
+            </div>
+            <div class="history-badge" style="background:var(--green-light);"><span style="color:var(--green-dark);">حاضر</span></div>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl">الحضور — عربي</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title en-font">Attendance</div>
+          <div class="page-sub en-font">Ahmed Mohammad</div>
+        </div>
+      </div>
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="stats-row">
+          <div class="stat-card" style="background:var(--green);color:#fff;">
+            <div class="stat-num en-font">86%</div>
+            <div class="stat-lbl en-font" style="color:#BBF7D0;">Attendance Rate</div>
+            <div class="stat-sub en-font" style="color:#BBF7D0;">18 of 21 days</div>
+          </div>
+          <div class="stat-card" style="background:var(--blue);color:#fff;">
+            <div class="stat-num en-font">90%</div>
+            <div class="stat-lbl en-font" style="color:#BFDBFE;">Bus Usage</div>
+            <div class="stat-sub en-font" style="color:#BFDBFE;">19 of 21 days</div>
+          </div>
+        </div>
+
+        <div class="mini-stats">
+          <div class="mini-card">
+            <div class="mini-icon" style="background:var(--green-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="mini-num en-font" style="color:var(--green);">18</div>
+            <div class="mini-lbl en-font">Present</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-icon" style="background:var(--orange-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="mini-num en-font" style="color:var(--orange);">1</div>
+            <div class="mini-lbl en-font">Late</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-icon" style="background:var(--red-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="mini-num en-font" style="color:var(--red);">2</div>
+            <div class="mini-lbl en-font">Absent</div>
+          </div>
+        </div>
+
+        <div class="calendar-card">
+          <div class="cal-header">
+            <div class="cal-nav"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="cal-title en-font">April 2026</div>
+            <div class="cal-nav"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="cal-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div><span class="legend-lbl en-font">Present</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--orange);"></div><span class="legend-lbl en-font">Late</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div><span class="legend-lbl en-font">Absent</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--yellow);"></div><span class="legend-lbl en-font">Today</span></div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-days-header">
+              <div class="cal-day-name en-font">Su</div>
+              <div class="cal-day-name en-font">Mo</div>
+              <div class="cal-day-name en-font">Tu</div>
+              <div class="cal-day-name en-font">We</div>
+              <div class="cal-day-name en-font">Th</div>
+              <div class="cal-day-name en-font">Fr</div>
+              <div class="cal-day-name en-font">Sa</div>
+            </div>
+            <div class="cal-days">
+              <div class="cal-day other-month en-font">29</div>
+              <div class="cal-day other-month en-font">30</div>
+              <div class="cal-day present en-font">1</div>
+              <div class="cal-day late en-font">2</div>
+              <div class="cal-day present en-font">3</div>
+              <div class="cal-day present en-font">4</div>
+              <div class="cal-day empty"></div>
+              <div class="cal-day present en-font">6</div>
+              <div class="cal-day absent en-font">7</div>
+              <div class="cal-day present en-font">8</div>
+              <div class="cal-day present en-font">9</div>
+              <div class="cal-day present en-font">10</div>
+              <div class="cal-day present en-font">11</div>
+              <div class="cal-day empty"></div>
+              <div class="cal-day today en-font">13</div>
+              <div class="cal-day en-font">14</div>
+              <div class="cal-day en-font">15</div>
+              <div class="cal-day en-font">16</div>
+              <div class="cal-day en-font">17</div>
+              <div class="cal-day en-font">18</div>
+              <div class="cal-day empty"></div>
+              <div class="cal-day absent en-font">20</div>
+              <div class="cal-day present en-font">21</div>
+              <div class="cal-day present en-font">22</div>
+              <div class="cal-day present en-font">23</div>
+              <div class="cal-day present en-font">24</div>
+              <div class="cal-day present en-font">25</div>
+              <div class="cal-day empty"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="notice-card">
+          <div class="notice-row"><div class="notice-dot"></div><span class="notice-title en-font">Attendance Notice</span></div>
+          <div class="notice-body en-font">Ahmed has been absent 2 days this month. Please ensure regular attendance for optimal learning.</div>
+        </div>
+
+        <div class="history-section">
+          <div class="history-title en-font">Recent History</div>
+          <div class="history-row">
+            <div class="history-status-dot" style="background:var(--green);"></div>
+            <div class="history-info">
+              <div class="history-date en-font">Sun, April 13</div>
+              <div class="history-detail en-font">Boarded bus — 7:31 AM</div>
+            </div>
+            <div class="history-badge" style="background:var(--green-light);"><span class="en-font" style="color:var(--green-dark);">Present</span></div>
+          </div>
+          <div class="history-row">
+            <div class="history-status-dot" style="background:var(--orange);"></div>
+            <div class="history-info">
+              <div class="history-date en-font">Sat, April 12</div>
+              <div class="history-detail en-font">Boarded bus — 7:52 AM</div>
+            </div>
+            <div class="history-badge" style="background:var(--orange-light);"><span class="en-font" style="color:#C2410C;">Late</span></div>
+          </div>
+          <div class="history-row">
+            <div class="history-status-dot" style="background:var(--red);"></div>
+            <div class="history-info">
+              <div class="history-date en-font">Thu, April 10</div>
+              <div class="history-detail en-font">Parent reported absence</div>
+            </div>
+            <div class="history-badge" style="background:var(--red-light);"><span class="en-font" style="color:#DC2626;">Absent</span></div>
+          </div>
+          <div class="history-row">
+            <div class="history-status-dot" style="background:var(--green);"></div>
+            <div class="history-info">
+              <div class="history-date en-font">Wed, April 9</div>
+              <div class="history-detail en-font">Boarded bus — 7:28 AM</div>
+            </div>
+            <div class="history-badge" style="background:var(--green-light);"><span class="en-font" style="color:var(--green-dark);">Present</span></div>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Attendance — English</div>
+</div>
+</div>
+
+<div class="ps" id="pg_report_absence">
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title">تسجيل غياب</div>
+          <div class="page-sub">سيتم إبلاغ السائق والمدرسة</div>
+        </div>
+      </div>
+
+      <div class="scroll-body">
+
+        <!-- STUDENT -->
+        <div class="section-lbl">اختر الطالب</div>
+        <div class="student-selector">
+          <div class="sel-avatar">أح</div>
+          <div>
+            <div class="sel-name">أحمد محمد</div>
+            <div class="sel-grade">روضة ب · الباص #42</div>
+          </div>
+          <div class="sel-chev">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <!-- DATE -->
+        <div class="section-lbl">تاريخ الغياب</div>
+        <div class="date-chips">
+          <div class="date-chip past"><div class="chip-day">أحد</div><div class="chip-num">11</div></div>
+          <div class="date-chip past"><div class="chip-day">اثن</div><div class="chip-num">12</div></div>
+          <div class="date-chip active"><div class="chip-day">ثلا</div><div class="chip-num">13</div></div>
+          <div class="date-chip"><div class="chip-day">أرب</div><div class="chip-num">14</div></div>
+          <div class="date-chip"><div class="chip-day">خمس</div><div class="chip-num">15</div></div>
+          <div class="date-chip"><div class="chip-day">جمع</div><div class="chip-num">16</div></div>
+          <div class="date-chip"><div class="chip-day">سبت</div><div class="chip-num">17</div></div>
+        </div>
+
+        <!-- TRIP TYPE -->
+        <div class="section-lbl">نوع الغياب</div>
+        <div class="trip-btns">
+          <div class="trip-btn active">
+            <div class="trip-btn-icon" style="background:var(--yellow-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div class="trip-btn-lbl">اليوم كامل</div>
+          </div>
+          <div class="trip-btn">
+            <div class="trip-btn-icon" style="background:var(--blue-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M12 2L12 12"/><path d="M17 7l-5 5-5-5"/></svg>
+            </div>
+            <div class="trip-btn-lbl">ذهاب فقط</div>
+          </div>
+          <div class="trip-btn">
+            <div class="trip-btn-icon" style="background:var(--orange-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M12 22L12 12"/><path d="M7 17l5-5 5 5"/></svg>
+            </div>
+            <div class="trip-btn-lbl">إياب فقط</div>
+          </div>
+        </div>
+
+        <!-- REASON -->
+        <div class="section-lbl">سبب الغياب</div>
+        <div class="reason-grid">
+          <div class="reason-btn active">
+            <div class="reason-icon" style="background:var(--red-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div class="reason-lbl">مرض</div>
+            <div class="reason-radio"><div class="reason-radio-fill"></div></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--blue-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="reason-lbl">موعد طبي</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--orange-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="reason-lbl">ظرف عائلي</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--gray-100);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="reason-lbl">سبب آخر</div>
+            <div class="reason-radio"></div>
+          </div>
+        </div>
+
+        <!-- PICKUP -->
+        <div class="section-lbl">اسم المستلم (اختياري)</div>
+        <div class="form-card">
+          <div class="form-lbl">اسم الشخص الذي سيستلم الطالب</div>
+          <input class="form-input" type="text" placeholder="مثال: الجدة أم أحمد" readonly/>
+          <div class="form-lbl">العلاقة بالطالب</div>
+          <input class="form-input" type="text" placeholder="مثال: جدة" readonly/>
+        </div>
+
+        <!-- NOTES -->
+        <div class="section-lbl">ملاحظة للسائق (اختياري)</div>
+        <div class="form-card" style="margin-bottom:14px;">
+          <textarea class="form-textarea" placeholder="اكتب ملاحظة للسائق..." readonly></textarea>
+        </div>
+
+        <!-- NOTIFY TOGGLES -->
+        <div class="section-lbl">الإشعارات</div>
+        <div class="form-card" style="margin-bottom:14px;">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">إبلاغ السائق</div>
+              <div class="toggle-sub">يصل إشعار للسائق فوراً</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">إبلاغ المدرسة</div>
+              <div class="toggle-sub">يصل إشعار لإدارة المدرسة</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <!-- INFO -->
+        <div class="info-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="info-box-txt">يمكن إلغاء طلب الغياب قبل انطلاق الباص بـ 30 دقيقة على الأقل</div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="submit-btn"><span>إرسال طلب الغياب</span></div>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl">تسجيل غياب — عربي</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title en-font">Report Absence</div>
+          <div class="page-sub en-font">Driver & school will be notified</div>
+        </div>
+      </div>
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="section-lbl en-font">Select Student</div>
+        <div class="student-selector">
+          <div class="sel-avatar en-font">AH</div>
+          <div>
+            <div class="sel-name en-font">Ahmed Mohammad</div>
+            <div class="sel-grade en-font">Kindergarten B · Bus #42</div>
+          </div>
+          <div class="sel-chev" style="margin-right:0;margin-left:auto;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <div class="section-lbl en-font">Absence Date</div>
+        <div class="date-chips">
+          <div class="date-chip past"><div class="chip-day en-font">Sun</div><div class="chip-num en-font">11</div></div>
+          <div class="date-chip past"><div class="chip-day en-font">Mon</div><div class="chip-num en-font">12</div></div>
+          <div class="date-chip active"><div class="chip-day en-font">Tue</div><div class="chip-num en-font">13</div></div>
+          <div class="date-chip"><div class="chip-day en-font">Wed</div><div class="chip-num en-font">14</div></div>
+          <div class="date-chip"><div class="chip-day en-font">Thu</div><div class="chip-num en-font">15</div></div>
+          <div class="date-chip"><div class="chip-day en-font">Fri</div><div class="chip-num en-font">16</div></div>
+          <div class="date-chip"><div class="chip-day en-font">Sat</div><div class="chip-num en-font">17</div></div>
+        </div>
+
+        <div class="section-lbl en-font">Absence Type</div>
+        <div class="trip-btns">
+          <div class="trip-btn active">
+            <div class="trip-btn-icon" style="background:var(--yellow-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div class="trip-btn-lbl en-font">Full Day</div>
+          </div>
+          <div class="trip-btn">
+            <div class="trip-btn-icon" style="background:var(--blue-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M12 2L12 12"/><path d="M17 7l-5 5-5-5"/></svg>
+            </div>
+            <div class="trip-btn-lbl en-font">Morning Only</div>
+          </div>
+          <div class="trip-btn">
+            <div class="trip-btn-icon" style="background:var(--orange-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M12 22L12 12"/><path d="M7 17l5-5 5 5"/></svg>
+            </div>
+            <div class="trip-btn-lbl en-font">Return Only</div>
+          </div>
+        </div>
+
+        <div class="section-lbl en-font">Reason for Absence</div>
+        <div class="reason-grid">
+          <div class="reason-btn active">
+            <div class="reason-icon" style="background:var(--red-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div class="reason-lbl en-font">Illness</div>
+            <div class="reason-radio"><div class="reason-radio-fill"></div></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--blue-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="reason-lbl en-font">Medical Appt</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--orange-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="reason-lbl en-font">Family Matter</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--gray-100);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="reason-lbl en-font">Other</div>
+            <div class="reason-radio"></div>
+          </div>
+        </div>
+
+        <div class="section-lbl en-font">Pickup Person (optional)</div>
+        <div class="form-card">
+          <div class="form-lbl en-font">Name of person picking up</div>
+          <input class="form-input en-font" type="text" placeholder="e.g. Grandma Sarah" readonly/>
+          <div class="form-lbl en-font">Relation to student</div>
+          <input class="form-input en-font" type="text" placeholder="e.g. Grandmother" readonly/>
+        </div>
+
+        <div class="section-lbl en-font">Note for Driver (optional)</div>
+        <div class="form-card" style="margin-bottom:14px;">
+          <textarea class="form-textarea en-font" placeholder="Write a note for the driver..." readonly></textarea>
+        </div>
+
+        <div class="section-lbl en-font">Notifications</div>
+        <div class="form-card" style="margin-bottom:14px;">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl en-font">Notify Driver</div>
+              <div class="toggle-sub en-font">Driver gets instant notification</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl en-font">Notify School</div>
+              <div class="toggle-sub en-font">School admin gets notified</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="info-box-txt en-font">Absence requests can be cancelled at least 30 minutes before the bus departs</div>
+        </div>
+
+        <button class="submit-btn"><span class="en-font">Submit Absence Request</span></button>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Report Absence — English</div>
+</div>
+</div>
+
+<div class="ps" id="pg_trip_history">
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title">سجل الرحلات</div>
+          <div class="page-sub">أحمد محمد</div>
+        </div>
+      </div>
+
+      <div class="scroll-body">
+
+        <!-- STATS -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num">30</div>
+            <div class="stat-lbl">إجمالي الرحلات</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-num">93%</div>
+            <div class="stat-lbl">في الموعد</div>
+          </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filter-card">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <div class="filter-lbl">الحالة</div>
+              <select class="filter-select">
+                <option>كل الحالات</option>
+                <option>في الموعد</option>
+                <option>متأخر</option>
+              </select>
+            </div>
+            <div>
+              <div class="filter-lbl">نوع الرحلة</div>
+              <select class="filter-select">
+                <option>كل الرحلات</option>
+                <option>ذهاب</option>
+                <option>إياب</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIP 1 -->
+        <div class="trip-card">
+          <div class="trip-card-top">
+            <div class="trip-type-row">
+              <div class="trip-type-icon" style="background:var(--green-light);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="trip-type-lbl">ركوب الصباح</div>
+            </div>
+            <div class="trip-status" style="background:var(--green-light);"><span style="color:var(--green-dark);">في الموعد</span></div>
+          </div>
+          <div class="trip-date">الجمعة، 10 أبريل · الباص #42</div>
+          <div class="trip-timeline">
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--yellow);"></div>
+              <div class="tl-time">7:31 ص</div>
+              <div class="tl-place">المنزل</div>
+            </div>
+            <div style="flex:1;">
+              <div class="tl-line"></div>
+              <div class="tl-duration">37 دقيقة</div>
+            </div>
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--blue);"></div>
+              <div class="tl-time">8:08 ص</div>
+              <div class="tl-place">المدرسة</div>
+            </div>
+          </div>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>محطة الزيتون</span>
+            </div>
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>السائق: أبو محمد</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIP 2 -->
+        <div class="trip-card">
+          <div class="trip-card-top">
+            <div class="trip-type-row">
+              <div class="trip-type-icon" style="background:var(--green-light);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="trip-type-lbl">إياب المساء</div>
+            </div>
+            <div class="trip-status" style="background:var(--green-light);"><span style="color:var(--green-dark);">في الموعد</span></div>
+          </div>
+          <div class="trip-date">الجمعة، 10 أبريل · الباص #42</div>
+          <div class="trip-timeline">
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--blue);"></div>
+              <div class="tl-time">2:05 م</div>
+              <div class="tl-place">المدرسة</div>
+            </div>
+            <div style="flex:1;">
+              <div class="tl-line"></div>
+              <div class="tl-duration">34 دقيقة</div>
+            </div>
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--yellow);"></div>
+              <div class="tl-time">2:39 م</div>
+              <div class="tl-place">المنزل</div>
+            </div>
+          </div>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>محطة الزيتون</span>
+            </div>
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>السائق: أبو محمد</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIP 3 — late -->
+        <div class="trip-card">
+          <div class="trip-card-top">
+            <div class="trip-type-row">
+              <div class="trip-type-icon" style="background:var(--orange-light);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="trip-type-lbl">ركوب الصباح</div>
+            </div>
+            <div class="trip-status" style="background:var(--orange-light);"><span style="color:#C2410C;">متأخر</span></div>
+          </div>
+          <div class="trip-date">الخميس، 9 أبريل · الباص #42</div>
+          <div class="trip-timeline">
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--yellow);"></div>
+              <div class="tl-time">7:52 ص</div>
+              <div class="tl-place">المنزل</div>
+            </div>
+            <div style="flex:1;">
+              <div class="tl-line"></div>
+              <div class="tl-duration">41 دقيقة</div>
+            </div>
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--blue);"></div>
+              <div class="tl-time">8:33 ص</div>
+              <div class="tl-place">المدرسة</div>
+            </div>
+          </div>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>محطة الزيتون</span>
+            </div>
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>السائق: أبو محمد</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIP 4 -->
+        <div class="trip-card">
+          <div class="trip-card-top">
+            <div class="trip-type-row">
+              <div class="trip-type-icon" style="background:var(--green-light);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="trip-type-lbl">إياب المساء</div>
+            </div>
+            <div class="trip-status" style="background:var(--green-light);"><span style="color:var(--green-dark);">في الموعد</span></div>
+          </div>
+          <div class="trip-date">الخميس، 9 أبريل · الباص #42</div>
+          <div class="trip-timeline">
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--blue);"></div>
+              <div class="tl-time">2:00 م</div>
+              <div class="tl-place">المدرسة</div>
+            </div>
+            <div style="flex:1;">
+              <div class="tl-line"></div>
+              <div class="tl-duration">36 دقيقة</div>
+            </div>
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--yellow);"></div>
+              <div class="tl-time">2:36 م</div>
+              <div class="tl-place">المنزل</div>
+            </div>
+          </div>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>محطة الزيتون</span>
+            </div>
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>السائق: أبو محمد</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl">سجل الرحلات — عربي</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title en-font">Trip History</div>
+          <div class="page-sub en-font">Ahmed Mohammad</div>
+        </div>
+      </div>
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num en-font">30</div>
+            <div class="stat-lbl en-font" style="color:#7a6200;">Total Trips</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-num en-font">93%</div>
+            <div class="stat-lbl en-font">On-Time Rate</div>
+          </div>
+        </div>
+
+        <div class="filter-card">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <div class="filter-lbl en-font">Status</div>
+              <select class="filter-select en-font" style="background-position:right 10px center;">
+                <option>All Status</option>
+                <option>On Time</option>
+                <option>Late</option>
+              </select>
+            </div>
+            <div>
+              <div class="filter-lbl en-font">Trip Type</div>
+              <select class="filter-select en-font" style="background-position:right 10px center;">
+                <option>All Trips</option>
+                <option>Morning</option>
+                <option>Afternoon</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIP 1 -->
+        <div class="trip-card">
+          <div class="trip-card-top">
+            <div class="trip-type-row">
+              <div class="trip-type-icon" style="background:var(--green-light);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="trip-type-lbl en-font">Morning Pickup</div>
+            </div>
+            <div class="trip-status" style="background:var(--green-light);"><span class="en-font" style="color:var(--green-dark);">On Time</span></div>
+          </div>
+          <div class="trip-date en-font">Fri, Apr 10 · Bus #42</div>
+          <div class="trip-timeline">
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--yellow);"></div>
+              <div class="tl-time en-font">7:31 AM</div>
+              <div class="tl-place en-font">Home</div>
+            </div>
+            <div style="flex:1;">
+              <div class="tl-line"></div>
+              <div class="tl-duration en-font">37 min</div>
+            </div>
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--blue);"></div>
+              <div class="tl-time en-font">8:08 AM</div>
+              <div class="tl-place en-font">School</div>
+            </div>
+          </div>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="en-font">Al-Zeitoun Stop</span>
+            </div>
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span class="en-font">Driver: Abu Mohammad</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIP 2 -->
+        <div class="trip-card">
+          <div class="trip-card-top">
+            <div class="trip-type-row">
+              <div class="trip-type-icon" style="background:var(--green-light);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="trip-type-lbl en-font">Afternoon Drop-off</div>
+            </div>
+            <div class="trip-status" style="background:var(--green-light);"><span class="en-font" style="color:var(--green-dark);">On Time</span></div>
+          </div>
+          <div class="trip-date en-font">Fri, Apr 10 · Bus #42</div>
+          <div class="trip-timeline">
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--blue);"></div>
+              <div class="tl-time en-font">2:05 PM</div>
+              <div class="tl-place en-font">School</div>
+            </div>
+            <div style="flex:1;">
+              <div class="tl-line"></div>
+              <div class="tl-duration en-font">34 min</div>
+            </div>
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--yellow);"></div>
+              <div class="tl-time en-font">2:39 PM</div>
+              <div class="tl-place en-font">Home</div>
+            </div>
+          </div>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="en-font">Al-Zeitoun Stop</span>
+            </div>
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span class="en-font">Driver: Abu Mohammad</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIP 3 — late -->
+        <div class="trip-card">
+          <div class="trip-card-top">
+            <div class="trip-type-row">
+              <div class="trip-type-icon" style="background:var(--orange-light);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="trip-type-lbl en-font">Morning Pickup</div>
+            </div>
+            <div class="trip-status" style="background:var(--orange-light);"><span class="en-font" style="color:#C2410C;">Late</span></div>
+          </div>
+          <div class="trip-date en-font">Thu, Apr 9 · Bus #42</div>
+          <div class="trip-timeline">
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--yellow);"></div>
+              <div class="tl-time en-font">7:52 AM</div>
+              <div class="tl-place en-font">Home</div>
+            </div>
+            <div style="flex:1;">
+              <div class="tl-line"></div>
+              <div class="tl-duration en-font">41 min</div>
+            </div>
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--blue);"></div>
+              <div class="tl-time en-font">8:33 AM</div>
+              <div class="tl-place en-font">School</div>
+            </div>
+          </div>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="en-font">Al-Zeitoun Stop</span>
+            </div>
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span class="en-font">Driver: Abu Mohammad</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIP 4 -->
+        <div class="trip-card">
+          <div class="trip-card-top">
+            <div class="trip-type-row">
+              <div class="trip-type-icon" style="background:var(--green-light);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="trip-type-lbl en-font">Afternoon Drop-off</div>
+            </div>
+            <div class="trip-status" style="background:var(--green-light);"><span class="en-font" style="color:var(--green-dark);">On Time</span></div>
+          </div>
+          <div class="trip-date en-font">Thu, Apr 9 · Bus #42</div>
+          <div class="trip-timeline">
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--blue);"></div>
+              <div class="tl-time en-font">2:00 PM</div>
+              <div class="tl-place en-font">School</div>
+            </div>
+            <div style="flex:1;">
+              <div class="tl-line"></div>
+              <div class="tl-duration en-font">36 min</div>
+            </div>
+            <div class="tl-point">
+              <div class="tl-circle" style="background:var(--yellow);"></div>
+              <div class="tl-time en-font">2:36 PM</div>
+              <div class="tl-place en-font">Home</div>
+            </div>
+          </div>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="en-font">Al-Zeitoun Stop</span>
+            </div>
+            <div class="trip-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span class="en-font">Driver: Abu Mohammad</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Trip History — English</div>
+</div>
+</div>
+
+<div class="ps" id="pg_notifications">
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="page-title">الإشعارات</div>
+        <button class="read-all-btn">تعيين الكل كمقروء</button>
+      </div>
+
+      <!-- FILTER CHIPS -->
+      <div class="filter-bar">
+        <div class="filter-chip active">
+          <span>الكل</span>
+          <div class="chip-count"><span>3</span></div>
+        </div>
+        <div class="filter-chip">
+          <span>الركوب</span>
+        </div>
+        <div class="filter-chip">
+          <span>التتبع</span>
+        </div>
+        <div class="filter-chip">
+          <span>الغياب</span>
+        </div>
+        <div class="filter-chip">
+          <span>المدرسة</span>
+        </div>
+      </div>
+
+      <div class="scroll-body">
+
+        <!-- TODAY -->
+        <div class="day-divider">اليوم</div>
+
+        <!-- unread: bus approaching -->
+        <div class="notif-item unread">
+          <div class="notif-icon-wrap" style="background:var(--yellow-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">الباص على بعد 5 دقائق</div>
+            <div class="notif-desc">الباص #42 سيصل إلى محطة الزيتون قريباً — استعد للنزول</div>
+            <div class="notif-time">7:26 ص</div>
+          </div>
+          <div class="notif-right">
+            <div class="unread-dot"></div>
+          </div>
+        </div>
+
+        <!-- unread: boarded -->
+        <div class="notif-item unread">
+          <div class="notif-icon-wrap" style="background:var(--green-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">ركب أحمد الباص بسلامة</div>
+            <div class="notif-desc">صعد أحمد من محطة الزيتون — الباص #42</div>
+            <div class="notif-time">7:31 ص</div>
+          </div>
+          <div class="notif-right">
+            <div class="unread-dot"></div>
+          </div>
+        </div>
+
+        <!-- unread: arrived school -->
+        <div class="notif-item unread">
+          <div class="notif-icon-wrap" style="background:var(--blue-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">وصل الباص إلى المدرسة</div>
+            <div class="notif-desc">وصل أحمد إلى المدرسة بأمان — 7:52 ص</div>
+            <div class="notif-time">7:52 ص</div>
+          </div>
+          <div class="notif-right">
+            <div class="unread-dot"></div>
+          </div>
+        </div>
+
+        <!-- read: driver msg -->
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--purple-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">رسالة من السائق أبو محمد</div>
+            <div class="notif-desc">سأكون متأخراً 5 دقائق اليوم بسبب الازدحام</div>
+            <div class="notif-time">7:10 ص</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <!-- YESTERDAY -->
+        <div class="day-divider">أمس</div>
+
+        <!-- read: late bus -->
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--orange-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">تأخير في الباص #42</div>
+            <div class="notif-desc">الباص متأخر 10 دقائق بسبب الازدحام في منطقة الزيتون</div>
+            <div class="notif-time">7:44 ص</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <!-- read: absence confirmed -->
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--yellow-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">تم تأكيد طلب الغياب</div>
+            <div class="notif-desc">غياب سارة يوم الخميس 10 أبريل تم قبوله</div>
+            <div class="notif-time">أمس 8:10 م</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <!-- read: return trip -->
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--green-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">وصل أحمد إلى المنزل</div>
+            <div class="notif-desc">رحلة الإياب اكتملت — نزل في محطة الزيتون 2:39 م</div>
+            <div class="notif-time">أمس 2:39 م</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <!-- 2 DAYS AGO -->
+        <div class="day-divider">منذ يومين</div>
+
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--blue-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">إشعار من المدرسة</div>
+            <div class="notif-desc">غداً إجازة رسمية — لن يكون هناك باص يوم الخميس</div>
+            <div class="notif-time">منذ يومين 3:00 م</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <div style="height:14px;"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">الإشعارات — عربي</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="page-title en-font">Notifications</div>
+        <button class="read-all-btn en-font" style="margin-right:0;margin-left:auto;">Mark all read</button>
+      </div>
+
+      <div class="filter-bar" style="direction:ltr;">
+        <div class="filter-chip active">
+          <span class="en-font">All</span>
+          <div class="chip-count"><span class="en-font">3</span></div>
+        </div>
+        <div class="filter-chip"><span class="en-font">Boarding</span></div>
+        <div class="filter-chip"><span class="en-font">Tracking</span></div>
+        <div class="filter-chip"><span class="en-font">Absence</span></div>
+        <div class="filter-chip"><span class="en-font">School</span></div>
+      </div>
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="day-divider en-font">Today</div>
+
+        <div class="notif-item unread">
+          <div class="notif-icon-wrap" style="background:var(--yellow-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title en-font">Bus is 5 minutes away</div>
+            <div class="notif-desc en-font">Bus #42 is approaching Al-Zeitoun stop — get ready</div>
+            <div class="notif-time en-font">7:26 AM</div>
+          </div>
+          <div class="notif-right"><div class="unread-dot"></div></div>
+        </div>
+
+        <div class="notif-item unread">
+          <div class="notif-icon-wrap" style="background:var(--green-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title en-font">Ahmed boarded safely</div>
+            <div class="notif-desc en-font">Ahmed boarded from Al-Zeitoun stop — Bus #42</div>
+            <div class="notif-time en-font">7:31 AM</div>
+          </div>
+          <div class="notif-right"><div class="unread-dot"></div></div>
+        </div>
+
+        <div class="notif-item unread">
+          <div class="notif-icon-wrap" style="background:var(--blue-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title en-font">Bus arrived at school</div>
+            <div class="notif-desc en-font">Ahmed arrived safely at school — 7:52 AM</div>
+            <div class="notif-time en-font">7:52 AM</div>
+          </div>
+          <div class="notif-right"><div class="unread-dot"></div></div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--purple-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title en-font">Message from Driver Abu Mohammad</div>
+            <div class="notif-desc en-font">I'll be 5 minutes late today due to traffic</div>
+            <div class="notif-time en-font">7:10 AM</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <div class="day-divider en-font">Yesterday</div>
+
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--orange-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title en-font">Bus #42 delayed</div>
+            <div class="notif-desc en-font">Bus is 10 minutes late due to traffic near Al-Zeitoun area</div>
+            <div class="notif-time en-font">7:44 AM</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--yellow-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title en-font">Absence request confirmed</div>
+            <div class="notif-desc en-font">Sara's absence on Thursday Apr 10 was accepted</div>
+            <div class="notif-time en-font">Yesterday 8:10 PM</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--green-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title en-font">Ahmed arrived home</div>
+            <div class="notif-desc en-font">Return trip completed — dropped off at Al-Zeitoun 2:39 PM</div>
+            <div class="notif-time en-font">Yesterday 2:39 PM</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <div class="day-divider en-font">2 days ago</div>
+
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:var(--blue-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title en-font">School notice</div>
+            <div class="notif-desc en-font">Tomorrow is a public holiday — no bus service on Thursday</div>
+            <div class="notif-time en-font">2 days ago 3:00 PM</div>
+          </div>
+          <div class="notif-right"></div>
+        </div>
+
+        <div style="height:14px;"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Notifications — English</div>
+</div>
+</div>
+
+<div class="ps" id="pg_settings">
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="page-title">الإعدادات</div>
+      </div>
+
+      <div class="scroll-body">
+
+        <!-- PROFILE -->
+        <div class="profile-card">
+          <div class="profile-avatar">أم</div>
+          <div style="flex:1;">
+            <div class="profile-name">أم أحمد الخالدي</div>
+            <div class="profile-phone">+962 79 123 4567</div>
+          </div>
+          <div class="profile-edit-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div class="settings-group">
+          <div class="group-title">الإشعارات</div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--yellow-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">إشعارات الركوب</div>
+              <div class="setting-sub">عند صعود الطالب للباص</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--blue-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">تنبيه اقتراب الباص</div>
+              <div class="setting-sub">قبل وصول الباص بـ 5 دقائق</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--orange-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">تنبيهات التأخير</div>
+              <div class="setting-sub">عند تأخر الباص عن الموعد</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--purple-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">رسائل السائق</div>
+              <div class="setting-sub">إشعار عند وصول رسالة جديدة</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--gray-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">إشعارات المدرسة</div>
+              <div class="setting-sub">الإجازات والأحداث المدرسية</div>
+            </div>
+            <div class="toggle off"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <!-- APP -->
+        <div class="settings-group">
+          <div class="group-title">التطبيق</div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--blue-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl">اللغة</div></div>
+            <div class="setting-right">
+              <span class="setting-value">العربية</span>
+              <div class="chev" style="transform:rotate(135deg);border-color:var(--gray-300);border-left:2px solid var(--gray-300);border-top:2px solid var(--gray-300);border-bottom:none;border-right:none;"></div>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--gray-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">الوضع الليلي</div>
+              <div class="setting-sub">تغيير مظهر التطبيق</div>
+            </div>
+            <div class="toggle off"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--yellow-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">القفل التلقائي</div>
+              <div class="setting-sub">قفل التطبيق عند عدم الاستخدام</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--green-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">بصمة الإصبع / Face ID</div>
+              <div class="setting-sub">لفتح التطبيق بأمان</div>
+            </div>
+            <div class="toggle off"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <!-- SUPPORT -->
+        <div class="settings-group">
+          <div class="group-title">الدعم</div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--blue-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl">مركز المساعدة</div></div>
+            <div class="setting-right"><div class="chev" style="transform:rotate(225deg);border-color:var(--gray-300);border-right:2px solid var(--gray-300);border-top:2px solid var(--gray-300);border-bottom:none;border-left:none;"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--purple-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl">إرسال ملاحظة</div></div>
+            <div class="setting-right"><div class="chev" style="transform:rotate(225deg);border-color:var(--gray-300);border-right:2px solid var(--gray-300);border-top:2px solid var(--gray-300);border-bottom:none;border-left:none;"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--gray-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl">سياسة الخصوصية</div></div>
+            <div class="setting-right"><div class="chev" style="transform:rotate(225deg);border-color:var(--gray-300);border-right:2px solid var(--gray-300);border-top:2px solid var(--gray-300);border-bottom:none;border-left:none;"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--gray-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl">حول التطبيق</div>
+            </div>
+            <div class="setting-right">
+              <span class="setting-value">v1.0.0</span>
+              <div class="chev" style="transform:rotate(225deg);border-color:var(--gray-300);border-right:2px solid var(--gray-300);border-top:2px solid var(--gray-300);border-bottom:none;border-left:none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DANGER -->
+        <div class="danger-btn">
+          <div class="danger-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </div>
+          <div>
+            <div class="danger-lbl">تسجيل الخروج</div>
+            <div class="danger-sub">الخروج من الحساب الحالي</div>
+          </div>
+        </div>
+
+        <div class="version-txt">School Bus Tracker · v1.0.0</div>
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl">الإعدادات — عربي</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="page-title en-font">Settings</div>
+      </div>
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="profile-card">
+          <div class="profile-avatar en-font">SA</div>
+          <div style="flex:1;">
+            <div class="profile-name en-font">Sarah Khaldi</div>
+            <div class="profile-phone en-font" style="text-align:left;">+962 79 123 4567</div>
+          </div>
+          <div class="profile-edit-btn" style="margin-right:0;margin-left:auto;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="group-title en-font">NOTIFICATIONS</div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--yellow-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl en-font">Boarding Alerts</div>
+              <div class="setting-sub en-font">When student boards the bus</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--blue-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl en-font">Bus Approaching Alert</div>
+              <div class="setting-sub en-font">5 minutes before bus arrives</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--orange-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl en-font">Delay Alerts</div>
+              <div class="setting-sub en-font">When bus is running late</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--purple-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl en-font">Driver Messages</div>
+              <div class="setting-sub en-font">Alert when new message arrives</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--gray-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl en-font">School Notifications</div>
+              <div class="setting-sub en-font">Holidays and school events</div>
+            </div>
+            <div class="toggle off"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="group-title en-font">APP</div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--blue-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl en-font">Language</div></div>
+            <div class="setting-right">
+              <span class="setting-value en-font">English</span>
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--gray-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl en-font">Dark Mode</div>
+              <div class="setting-sub en-font">Change app appearance</div>
+            </div>
+            <div class="toggle off"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--yellow-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl en-font">Auto Lock</div>
+              <div class="setting-sub en-font">Lock app when not in use</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--green-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            </div>
+            <div class="setting-main">
+              <div class="setting-lbl en-font">Fingerprint / Face ID</div>
+              <div class="setting-sub en-font">Secure app unlock</div>
+            </div>
+            <div class="toggle off"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="group-title en-font">SUPPORT</div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--blue-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl en-font">Help Center</div></div>
+            <div class="setting-right"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--purple-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl en-font">Send Feedback</div></div>
+            <div class="setting-right"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--gray-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl en-font">Privacy Policy</div></div>
+            <div class="setting-right"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-icon" style="background:var(--gray-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="setting-main"><div class="setting-lbl en-font">About App</div></div>
+            <div class="setting-right">
+              <span class="setting-value en-font">v1.0.0</span>
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="danger-btn">
+          <div class="danger-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </div>
+          <div>
+            <div class="danger-lbl en-font">Sign Out</div>
+            <div class="danger-sub en-font">Log out of current account</div>
+          </div>
+        </div>
+
+        <div class="version-txt en-font">School Bus Tracker · v1.0.0</div>
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Settings — English</div>
+</div>
+</div>
+
+<div class="ps" id="pg_live_tracking">
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title">تتبع مباشر</div>
+          <div class="page-sub">أحمد محمد</div>
+        </div>
+        <div class="refresh-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </div>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="status-row">
+          <div>
+            <div class="bus-label">الباص #42</div>
+            <div class="status-pill"><span>في الطريق للمدرسة</span></div>
+          </div>
+          <div style="text-align:left;">
+            <div class="eta-num">8</div>
+            <div class="eta-lbl">دقائق للوصول</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="map-area">
+        <!-- Grid -->
+        <div class="map-grid-h" style="top:25%;"></div>
+        <div class="map-grid-h" style="top:50%;"></div>
+        <div class="map-grid-h" style="top:75%;"></div>
+        <div class="map-grid-v" style="left:25%;"></div>
+        <div class="map-grid-v" style="left:50%;"></div>
+        <div class="map-grid-v" style="left:75%;"></div>
+
+        <!-- Roads -->
+        <div class="road-h" style="top:24%;height:8px;"></div>
+        <div class="road-h" style="top:49%;height:8px;"></div>
+        <div class="road-h" style="top:72%;height:8px;"></div>
+        <div class="road-v" style="left:24%;width:8px;"></div>
+        <div class="road-v" style="left:49%;width:8px;"></div>
+        <div class="road-v" style="left:72%;width:8px;"></div>
+
+        <!-- Route -->
+        <div class="route-path" style="top:38%;left:18%;width:50%;transform:rotate(-18deg);"></div>
+
+        <!-- Home pin -->
+        <div class="loc-pin" style="bottom:18%;left:12%;">
+          <div class="pin-lbl-box"><span>المنزل</span></div>
+          <div class="loc-pin-circle" style="background:var(--yellow);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+        </div>
+
+        <!-- Bus pulse + pin -->
+        <div class="bus-pulse" style="top:44%;left:38%;"></div>
+        <div class="bus-pin" style="top:44%;left:38%;">
+          <svg width="20" height="14" viewBox="0 0 24 16" fill="none">
+            <rect x="1" y="1" width="22" height="12" rx="3" fill="white" opacity="0.9"/>
+            <circle cx="6" cy="14" r="2" fill="white"/>
+            <circle cx="18" cy="14" r="2" fill="white"/>
+          </svg>
+        </div>
+
+        <!-- School pin -->
+        <div class="loc-pin" style="top:10%;right:10%;">
+          <div class="pin-lbl-box"><span>المدرسة</span></div>
+          <div class="loc-pin-circle" style="background:var(--blue);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+
+        <!-- Map bus label -->
+        <div style="position:absolute;top:50%;left:24%;transform:translateX(-50%);background:#fff;border-radius:6px;padding:2px 7px;border:1px solid var(--gray-200);box-shadow:0 1px 4px rgba(0,0,0,.1);">
+          <span style="font-size:10px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;">الباص #42</span>
+        </div>
+
+        <!-- Zoom controls -->
+        <div class="map-controls">
+          <div class="map-ctrl-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="map-ctrl-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <!-- My location -->
+        <div style="position:absolute;bottom:14px;right:14px;" class="map-ctrl-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+        </div>
+      </div>
+
+      <!-- BOTTOM SHEET -->
+      <div class="bottom-sheet">
+        <div class="bs-handle"></div>
+
+        <div class="stats-row">
+          <div class="stat-c">
+            <div class="stat-v">7:31 ص</div>
+            <div class="stat-l">وقت الركوب</div>
+          </div>
+          <div class="stat-c">
+            <div class="stat-v">2.3 كم</div>
+            <div class="stat-l">المسافة المتبقية</div>
+          </div>
+          <div class="stat-c">
+            <div class="stat-v">37 كم/س</div>
+            <div class="stat-l">السرعة</div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <div class="action-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <span>تفاصيل الباص</span>
+          </div>
+          <div class="action-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>تواصل مع السائق</span>
+          </div>
+        </div>
+
+        <div class="notify-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>أشعرني عند الوصول قبل 5 دقائق</span>
+        </div>
+
+        <div class="last-upd">
+          <span class="live-dot"></span>
+          آخر تحديث: 7:39:15 ص
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">التتبع المباشر — عربي</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title en-font">Live Tracking</div>
+          <div class="page-sub en-font">Ahmed Mohammad</div>
+        </div>
+        <div class="refresh-btn" style="margin-right:0;margin-left:auto;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <div class="status-row">
+          <div>
+            <div class="bus-label en-font">Bus #42</div>
+            <div class="status-pill"><span class="en-font">On the way to school</span></div>
+          </div>
+          <div style="text-align:right;">
+            <div class="eta-num en-font">8</div>
+            <div class="eta-lbl en-font">minutes to arrive</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-area">
+        <div class="map-grid-h" style="top:25%;"></div>
+        <div class="map-grid-h" style="top:50%;"></div>
+        <div class="map-grid-h" style="top:75%;"></div>
+        <div class="map-grid-v" style="left:25%;"></div>
+        <div class="map-grid-v" style="left:50%;"></div>
+        <div class="map-grid-v" style="left:75%;"></div>
+        <div class="road-h" style="top:24%;height:8px;"></div>
+        <div class="road-h" style="top:49%;height:8px;"></div>
+        <div class="road-h" style="top:72%;height:8px;"></div>
+        <div class="road-v" style="left:24%;width:8px;"></div>
+        <div class="road-v" style="left:49%;width:8px;"></div>
+        <div class="road-v" style="left:72%;width:8px;"></div>
+        <div class="route-path" style="top:38%;left:18%;width:50%;transform:rotate(-18deg);"></div>
+
+        <div class="loc-pin" style="bottom:18%;left:12%;">
+          <div class="pin-lbl-box"><span class="en-font">Home</span></div>
+          <div class="loc-pin-circle" style="background:var(--yellow);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+        </div>
+
+        <div class="bus-pulse" style="top:44%;left:38%;"></div>
+        <div class="bus-pin" style="top:44%;left:38%;">
+          <svg width="20" height="14" viewBox="0 0 24 16" fill="none">
+            <rect x="1" y="1" width="22" height="12" rx="3" fill="white" opacity="0.9"/>
+            <circle cx="6" cy="14" r="2" fill="white"/>
+            <circle cx="18" cy="14" r="2" fill="white"/>
+          </svg>
+        </div>
+
+        <div class="loc-pin" style="top:10%;right:10%;">
+          <div class="pin-lbl-box"><span class="en-font">School</span></div>
+          <div class="loc-pin-circle" style="background:var(--blue);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+
+        <div style="position:absolute;top:50%;left:24%;transform:translateX(-50%);background:#fff;border-radius:6px;padding:2px 7px;border:1px solid var(--gray-200);box-shadow:0 1px 4px rgba(0,0,0,.1);">
+          <span class="en-font" style="font-size:10px;font-weight:700;color:var(--gray-900);">Bus #42</span>
+        </div>
+
+        <div class="map-controls">
+          <div class="map-ctrl-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="map-ctrl-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:14px;right:14px;" class="map-ctrl-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+        </div>
+      </div>
+
+      <div class="bottom-sheet">
+        <div class="bs-handle"></div>
+
+        <div class="stats-row">
+          <div class="stat-c">
+            <div class="stat-v en-font">7:31 AM</div>
+            <div class="stat-l en-font">Boarded</div>
+          </div>
+          <div class="stat-c">
+            <div class="stat-v en-font">2.3 km</div>
+            <div class="stat-l en-font">Remaining</div>
+          </div>
+          <div class="stat-c">
+            <div class="stat-v en-font">37 km/h</div>
+            <div class="stat-l en-font">Speed</div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <div class="action-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <span class="en-font">Bus Details</span>
+          </div>
+          <div class="action-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="en-font">Call Driver</span>
+          </div>
+        </div>
+
+        <div class="notify-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="en-font">Notify me 5 min before arrival</span>
+        </div>
+
+        <div class="last-upd en-font">
+          <span class="live-dot"></span>
+          Last updated: 7:39:15 AM
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Live Tracking — English</div>
+</div>
+</div>
+
+
+</div>
+
+<script>
+const ALL = ['pg_login_ar', 'pg_login_en', 'pg_home_multichildren_ar', 'pg_home_multichildren_en', 'pg_student_info', 'pg_student_edit', 'pg_attendance', 'pg_report_absence', 'pg_trip_history', 'pg_notifications', 'pg_settings', 'pg_live_tracking'];
+
+function sp(id) {
+  ALL.forEach(p => {
+    const el = document.getElementById(p);
+    const btn = document.getElementById('b_' + p);
+    if (el)  el.classList.toggle('active', p === id);
+    if (btn) btn.classList.toggle('active', p === id);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Init: show first page
+sp('pg_login_ar');
+
+// ── Scripts from source files ──
+/* home-multichildren-ar */
+const children = [
+  { name: 'أحمد', avatar: 'أح', statusColor: '#22C55E' },
+  { name: 'سارة', avatar: 'سا', statusColor: '#F59E0B' },
+  { name: 'يوسف', avatar: 'يو', statusColor: '#9CA3AF' },
+];
+
+function switchChild(idx) {
+  document.querySelectorAll('.child-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.child-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
+}
+
+/* home-multichildren-en */
+function switchChild(idx) {
+  document.querySelectorAll('.child-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.child-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
+}
+
+
+</script>
+</body>
+</html>

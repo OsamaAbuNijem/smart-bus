@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>السائق — الرحلات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#FFD700; --yellow-light:#FFFDE7; --yellow-dark:#B8960C;
+    --blue:#3B82F6; --blue-light:#EFF6FF;
+    --green:#22C55E; --green-light:#F0FDF4; --green-dark:#16A34A;
+    --red:#EF4444; --red-light:#FFF0F0; --red-border:#FECACA;
+    --orange:#F97316; --orange-light:#FFF7ED;
+    --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB;
+    --gray-300:#D1D5DB; --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-900:#111111;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Cairo',sans-serif;background:#E5E5E5;
+    display:flex;justify-content:center;align-items:flex-start;
+    min-height:100vh;padding:48px 32px;gap:48px;flex-wrap:wrap;
+  }
+  .sw{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .sl{font-size:13px;font-weight:700;color:#555;font-family:'Cairo',sans-serif;}
+  .phone{width:375px;height:812px;background:#fff;border-radius:56px;border:10px solid #1a1a1a;overflow:hidden;display:flex;flex-direction:column;}
+  .sb{height:44px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;}
+  .sb span{font-size:13px;color:#333;font-family:'Cairo',sans-serif;}
+  .screen{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+  /* views */
+  .view{flex:1;display:none;flex-direction:column;overflow:hidden;background:var(--gray-50);}
+  .view.active{display:flex;}
+
+  /* SHARED header */
+  .pheader{background:#fff;padding:12px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--gray-100);flex-shrink:0;}
+  .back-btn{width:32px;height:32px;border-radius:50%;background:var(--gray-100);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .ptitle{font-size:16px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .psub{font-size:11px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:1px;}
+  .scroll{flex:1;overflow-y:auto;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  /* ══ TRIPS LIST VIEW ══ */
+  .driver-card{background:var(--yellow);margin:14px 14px 0;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+  .drv-av{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;flex-shrink:0;}
+  .drv-name{font-size:16px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;}
+  .drv-bus{font-size:12px;color:#7a6200;font-family:'Cairo',sans-serif;margin-top:2px;}
+  .drv-emer{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-right:auto;flex-shrink:0;}
+
+  .section-lbl{font-size:11px;font-weight:700;color:var(--gray-400);padding:12px 16px 6px;letter-spacing:.04em;font-family:'Cairo',sans-serif;}
+
+  .trip-card{background:#fff;margin:0 14px 10px;border-radius:16px;border:1px solid var(--gray-200);overflow:hidden;cursor:pointer;}
+  .trip-card:active{background:var(--gray-50);}
+  .trip-top{padding:13px 14px;display:flex;align-items:flex-start;gap:12px;}
+  .trip-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .trip-info{flex:1;}
+  .trip-title{font-size:14px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .trip-time{font-size:11px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:2px;}
+  .status-badge{border-radius:20px;padding:4px 10px;flex-shrink:0;align-self:flex-start;}
+  .status-badge span{font-size:11px;font-weight:700;font-family:'Cairo',sans-serif;}
+  .trip-bottom{display:flex;border-top:1px solid var(--gray-100);}
+  .trip-stat{flex:1;padding:9px;text-align:center;border-left:1px solid var(--gray-100);}
+  .trip-stat:last-child{border-left:none;}
+  .trip-stat-v{font-size:14px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .trip-stat-l{font-size:10px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:1px;}
+
+  /* ══ TRIP DETAIL VIEW ══ */
+  .trip-hero{padding:14px;flex-shrink:0;}
+  .hero-card{border-radius:16px;padding:16px;}
+  .hc-title{font-size:18px;font-weight:700;font-family:'Cairo',sans-serif;margin-bottom:3px;}
+  .hc-sub{font-size:12px;font-family:'Cairo',sans-serif;margin-bottom:12px;}
+  .hc-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .hc-stat{background:rgba(0,0,0,.08);border-radius:10px;padding:10px;text-align:center;}
+  .hc-stat-v{font-size:20px;font-weight:700;font-family:'Cairo',sans-serif;line-height:1;}
+  .hc-stat-l{font-size:10px;font-family:'Cairo',sans-serif;margin-top:3px;}
+
+  /* student list */
+  .std-row{background:#fff;margin:0 14px 8px;border-radius:12px;border:1px solid var(--gray-200);padding:11px 13px;display:flex;align-items:center;gap:11px;}
+  .std-av{width:36px;height:36px;border-radius:50%;background:var(--yellow-light);border:2px solid var(--yellow);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--yellow-dark);font-family:'Cairo',sans-serif;flex-shrink:0;}
+  .std-name{font-size:13px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .std-stop{font-size:11px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:1px;}
+  .std-time{font-size:12px;font-weight:700;color:var(--gray-400);font-family:'Cairo',sans-serif;flex-shrink:0;}
+  .std-status{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+  /* start / view map btn */
+  .action-btn{margin:0 14px 10px;border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:none;width:calc(100% - 28px);}
+  .action-btn span{font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;}
+
+  /* ══ MAP VIEW ══ */
+  .status-strip{background:var(--green);padding:9px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .ss-left{display:flex;align-items:center;gap:8px;}
+  .live-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:p 1.5s infinite;}
+  @keyframes p{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .ss-t{font-size:13px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;}
+  .ss-s{font-size:10px;color:#BBF7D0;font-family:'Cairo',sans-serif;margin-top:1px;}
+  .ss-n{font-size:20px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;line-height:1;}
+  .ss-l{font-size:10px;color:#BBF7D0;font-family:'Cairo',sans-serif;}
+
+  .map-area{flex:1;background:#DCF2EF;position:relative;overflow:hidden;min-height:0;}
+  .mg-h{position:absolute;left:0;right:0;border-top:1px solid #B2DFDB;opacity:.5;}
+  .mg-v{position:absolute;top:0;bottom:0;border-left:1px solid #B2DFDB;opacity:.5;}
+  .road-h{position:absolute;left:0;right:0;background:#fff;opacity:.85;}
+  .road-v{position:absolute;top:0;bottom:0;background:#fff;opacity:.85;}
+  .route-done{position:absolute;border-top:3px solid var(--green);opacity:.9;}
+  .route-ahead{position:absolute;border-top:3px solid var(--blue);opacity:.6;border-top-style:dashed;}
+  .m-stop{position:absolute;transform:translate(-50%,-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .m-sc{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'Cairo',sans-serif;}
+  .m-st{background:#fff;border-radius:5px;padding:1px 5px;font-size:9px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+  .bus-pin{position:absolute;width:44px;height:44px;border-radius:50%;background:var(--yellow);border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:6;}
+  .bus-pulse{position:absolute;width:64px;height:64px;border-radius:50%;background:rgba(255,215,0,.2);transform:translate(-50%,-50%);z-index:5;animation:bp 2s infinite;}
+  @keyframes bp{0%,100%{opacity:.8;transform:translate(-50%,-50%) scale(1);}50%{opacity:.2;transform:translate(-50%,-50%) scale(1.2);}}
+  .school-pin{position:absolute;z-index:5;transform:translate(-50%,-50%);}
+  .school-c{width:30px;height:30px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;}
+  .school-lb{background:#fff;border-radius:5px;padding:1px 6px;font-size:9px;font-weight:700;color:var(--blue);font-family:'Cairo',sans-serif;margin-bottom:2px;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+  .map-ctrl{position:absolute;bottom:12px;left:12px;display:flex;flex-direction:column;gap:3px;z-index:10;}
+  .map-btn{width:30px;height:30px;background:#fff;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .nav-btn{position:absolute;bottom:12px;right:12px;background:var(--blue);border-radius:12px;padding:7px 12px;display:flex;align-items:center;gap:5px;cursor:pointer;z-index:10;box-shadow:0 2px 8px rgba(59,130,246,.4);}
+  .nav-btn span{font-size:11px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;}
+  .map-panel{background:#fff;border-top:1px solid var(--gray-100);padding:11px 16px 13px;flex-shrink:0;}
+  .mp-handle{width:36px;height:4px;border-radius:2px;background:var(--gray-200);margin:0 auto 10px;}
+  .next-card{background:var(--yellow);border-radius:14px;padding:12px 14px;margin-bottom:9px;}
+  .nc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+  .nc-lbl{font-size:11px;color:#7a6200;font-family:'Cairo',sans-serif;}
+  .nc-name{font-size:16px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;display:inline;}
+  .nc-val{font-size:13px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;}
+  .arrived-btn{background:rgba(0,0,0,.12);border-radius:10px;padding:9px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;margin-top:7px;}
+  .arrived-btn span{font-size:12px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;}
+  .map-2btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .m2btn{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:11px;padding:9px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;}
+  .m2btn span{font-size:12px;font-weight:600;color:var(--gray-500);font-family:'Cairo',sans-serif;}
+
+  .en-font{font-family:'Inter',sans-serif !important;}
+</style>
+</head>
+<body>
+
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="sb"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <!-- ══ VIEW 1: TRIPS LIST ══ -->
+      <div class="view active" id="ar-trips">
+        <div class="pheader">
+          <div style="flex:1;">
+            <div class="ptitle">رحلاتي اليوم</div>
+            <div class="psub">الأحد، 13 أبريل 2026</div>
+          </div>
+          <div class="back-btn" onclick="showView('ar','emer')" style="background:var(--red-light);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+          </div>
+        </div>
+
+        <div class="scroll">
+
+          <!-- Driver card -->
+          <div class="driver-card">
+            <div class="drv-av">أم</div>
+            <div style="flex:1;">
+              <div class="drv-name">أبو محمد</div>
+              <div class="drv-bus">الباص #42 · سائق</div>
+            </div>
+          </div>
+
+          <!-- ACTIVE TRIP -->
+          <div class="section-lbl">جارية الآن</div>
+
+          <div class="trip-card" onclick="showTrip('ar', 'active')">
+            <div class="trip-top">
+              <div class="trip-icon" style="background:var(--green-light);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <div class="trip-info">
+                <div class="trip-title">رحلة الصباح — ذهاب</div>
+                <div class="trip-time">بدأت 7:15 ص · تنتهي ~8:05 ص</div>
+              </div>
+              <div class="status-badge" style="background:var(--green-light);">
+                <span style="color:var(--green-dark);">جارية</span>
+              </div>
+            </div>
+            <div class="trip-bottom">
+              <div class="trip-stat">
+                <div class="trip-stat-v">28</div>
+                <div class="trip-stat-l">طالب</div>
+              </div>
+              <div class="trip-stat">
+                <div class="trip-stat-v" style="color:var(--green);">18</div>
+                <div class="trip-stat-l">كيلومتر</div>
+              </div>
+              <div class="trip-stat">
+                <div class="trip-stat-v">~26</div>
+                <div class="trip-stat-l">دقيقة للانتهاء</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- UPCOMING TRIP -->
+          <div class="section-lbl">قادمة</div>
+
+          <div class="trip-card" onclick="showTrip('ar', 'upcoming')">
+            <div class="trip-top">
+              <div class="trip-icon" style="background:var(--yellow-light);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="trip-info">
+                <div class="trip-title">رحلة العودة — إياب</div>
+                <div class="trip-time">تبدأ 2:00 م · تنتهي ~2:50 م</div>
+              </div>
+              <div class="status-badge" style="background:var(--yellow-light);">
+                <span style="color:var(--yellow-dark);">قادمة</span>
+              </div>
+            </div>
+            <div class="trip-bottom">
+              <div class="trip-stat">
+                <div class="trip-stat-v">28</div>
+                <div class="trip-stat-l">طالب</div>
+              </div>
+              <div class="trip-stat">
+                <div class="trip-stat-v" style="color:var(--yellow-dark);">22</div>
+                <div class="trip-stat-l">كيلومتر</div>
+              </div>
+              <div class="trip-stat">
+                <div class="trip-stat-v">~50</div>
+                <div class="trip-stat-l">دقيقة</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COMPLETED TRIP -->
+          <div class="section-lbl">مكتملة</div>
+
+          <div class="trip-card" onclick="showTrip('ar', 'done')">
+            <div class="trip-top">
+              <div class="trip-icon" style="background:var(--gray-100);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="trip-info">
+                <div class="trip-title">رحلة الصباح — أمس</div>
+                <div class="trip-time">انتهت 7:58 ص</div>
+              </div>
+              <div class="status-badge" style="background:var(--gray-100);">
+                <span style="color:var(--gray-500);">مكتملة</span>
+              </div>
+            </div>
+            <div class="trip-bottom">
+              <div class="trip-stat">
+                <div class="trip-stat-v">26</div>
+                <div class="trip-stat-l">طالب</div>
+              </div>
+              <div class="trip-stat">
+                <div class="trip-stat-v" style="color:var(--gray-400);">18</div>
+                <div class="trip-stat-l">كيلومتر</div>
+              </div>
+              <div class="trip-stat">
+                <div class="trip-stat-v">43</div>
+                <div class="trip-stat-l">دقيقة</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:14px;"></div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW 2: TRIP DETAIL (active) ══ -->
+      <div class="view" id="ar-detail-active">
+        <div class="pheader">
+          <div class="back-btn" onclick="showView('ar','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          <div><div class="ptitle">رحلة الصباح — ذهاب</div><div class="psub">جارية الآن</div></div>
+        </div>
+        <div class="scroll">
+          <div class="trip-hero">
+            <div class="hero-card" style="background:var(--green);">
+              <div class="hc-title" style="color:#fff;">رحلة الصباح — ذهاب</div>
+              <div class="hc-sub" style="color:#BBF7D0;">7:15 ص · الأحد 13 أبريل</div>
+              <div class="hc-stats">
+                <div class="hc-stat"><div class="hc-stat-v" style="color:#fff;">28</div><div class="hc-stat-l" style="color:#BBF7D0;">طالب</div></div>
+                <div class="hc-stat"><div class="hc-stat-v" style="color:#fff;">~26</div><div class="hc-stat-l" style="color:#BBF7D0;">دقيقة للانتهاء</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="section-lbl">قائمة الطلاب</div>
+          <!-- Boarded -->
+          <div class="std-row"><div class="std-av">أح</div><div style="flex:1;"><div class="std-name">أحمد محمد</div><div class="std-stop">محطة الجامعة · 7:15 ص</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av">مح</div><div style="flex:1;"><div class="std-name">محمد خالد</div><div class="std-stop">محطة الشميساني · 7:22 ص</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av">لي</div><div style="flex:1;"><div class="std-name">ليلى سامر</div><div class="std-stop">محطة الرابية · 7:31 ص</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <!-- Waiting -->
+          <div class="std-row"><div class="std-av" style="border-color:var(--yellow);">عم</div><div style="flex:1;"><div class="std-name">عمر يوسف</div><div class="std-stop">محطة الزيتون · ~7:41 ص</div></div><div class="std-status" style="background:var(--yellow);border:1px solid var(--yellow-dark);"></div></div>
+          <div class="std-row"><div class="std-av" style="border-color:var(--gray-200);color:var(--gray-400);">سل</div><div style="flex:1;"><div class="std-name" style="color:var(--gray-400);">سلمى أحمد</div><div class="std-stop">محطة العبدلي · ~7:50 ص</div></div><div class="std-status" style="background:var(--gray-300);"></div></div>
+          <div class="std-row"><div class="std-av" style="border-color:var(--gray-200);color:var(--gray-400);">با</div><div style="flex:1;"><div class="std-name" style="color:var(--gray-400);">باسل عمر</div><div class="std-stop">محطة الدوار الثالث · ~7:57 ص</div></div><div class="std-status" style="background:var(--gray-300);"></div></div>
+          <div style="height:4px;"></div>
+          <!-- Legend -->
+          <div style="display:flex;gap:14px;padding:4px 16px 10px;">
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);"></div><span style="font-size:10px;color:var(--gray-400);font-family:'Cairo',sans-serif;">ركب</span></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--yellow);border:1px solid var(--yellow-dark);"></div><span style="font-size:10px;color:var(--gray-400);font-family:'Cairo',sans-serif;">التالي</span></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--gray-300);"></div><span style="font-size:10px;color:var(--gray-400);font-family:'Cairo',sans-serif;">في الانتظار</span></div>
+          </div>
+          <div style="height:4px;"></div>
+        </div>
+        <button class="action-btn" style="background:var(--yellow);" onclick="showView('ar','map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span style="color:#111;">متابعة الرحلة على الخريطة</span>
+        </button>
+        <div style="height:12px;"></div>
+      </div>
+
+      <!-- ══ VIEW 3: TRIP DETAIL (upcoming) ══ -->
+      <div class="view" id="ar-detail-upcoming">
+        <div class="pheader">
+          <div class="back-btn" onclick="showView('ar','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          <div><div class="ptitle">رحلة العودة — إياب</div><div class="psub">تبدأ 2:00 م</div></div>
+        </div>
+        <div class="scroll">
+          <div class="trip-hero">
+            <div class="hero-card" style="background:var(--yellow);">
+              <div class="hc-title" style="color:#111;">رحلة العودة — إياب</div>
+              <div class="hc-sub" style="color:#7a6200;">2:00 م · الأحد 13 أبريل</div>
+              <div class="hc-stats">
+                <div class="hc-stat"><div class="hc-stat-v" style="color:#111;">28</div><div class="hc-stat-l" style="color:#7a6200;">طالب</div></div>
+                <div class="hc-stat"><div class="hc-stat-v" style="color:#111;">~50</div><div class="hc-stat-l" style="color:#7a6200;">دقيقة مدة الرحلة</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="section-lbl">قائمة الطلاب</div>
+          <div class="std-row"><div class="std-av" style="border-color:var(--gray-200);color:var(--gray-400);">أح</div><div style="flex:1;"><div class="std-name" style="color:var(--gray-500);">أحمد محمد</div><div class="std-stop">ينزل محطة الجامعة</div></div><div class="std-time">~2:48 م</div></div>
+          <div class="std-row"><div class="std-av" style="border-color:var(--gray-200);color:var(--gray-400);">مح</div><div style="flex:1;"><div class="std-name" style="color:var(--gray-500);">محمد خالد</div><div class="std-stop">ينزل محطة الشميساني</div></div><div class="std-time">~2:42 م</div></div>
+          <div class="std-row"><div class="std-av" style="border-color:var(--gray-200);color:var(--gray-400);">لي</div><div style="flex:1;"><div class="std-name" style="color:var(--gray-500);">ليلى سامر</div><div class="std-stop">ينزل محطة الرابية</div></div><div class="std-time">~2:35 م</div></div>
+          <div class="std-row"><div class="std-av" style="border-color:var(--gray-200);color:var(--gray-400);">عم</div><div style="flex:1;"><div class="std-name" style="color:var(--gray-500);">عمر يوسف</div><div class="std-stop">ينزل محطة الزيتون</div></div><div class="std-time">~2:28 م</div></div>
+          <div class="std-row"><div class="std-av" style="border-color:var(--gray-200);color:var(--gray-400);">سل</div><div style="flex:1;"><div class="std-name" style="color:var(--gray-500);">سلمى أحمد</div><div class="std-stop">ينزل محطة العبدلي</div></div><div class="std-time">~2:20 م</div></div>
+          <div style="height:4px;"></div>
+        </div>
+        <button class="action-btn" style="background:var(--yellow);" onclick="showView('ar','map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span style="color:#111;">بدء الرحلة</span>
+        </button>
+        <div style="height:12px;"></div>
+      </div>
+
+      <!-- ══ VIEW 4: TRIP DETAIL (done) ══ -->
+      <div class="view" id="ar-detail-done">
+        <div class="pheader">
+          <div class="back-btn" onclick="showView('ar','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          <div><div class="ptitle">رحلة الصباح — أمس</div><div class="psub">مكتملة · 7:58 ص</div></div>
+        </div>
+        <div class="scroll">
+          <div class="trip-hero">
+            <div class="hero-card" style="background:var(--gray-100);border:1px solid var(--gray-200);">
+              <div class="hc-title" style="color:var(--gray-900);">رحلة الصباح — ذهاب</div>
+              <div class="hc-sub" style="color:var(--gray-400);">السبت 12 أبريل · 7:15 – 7:58 ص</div>
+              <div class="hc-stats">
+                <div class="hc-stat" style="background:rgba(0,0,0,.05);"><div class="hc-stat-v">26</div><div class="hc-stat-l" style="color:var(--gray-400);">طالب</div></div>
+                <div class="hc-stat" style="background:rgba(0,0,0,.05);"><div class="hc-stat-v">43</div><div class="hc-stat-l" style="color:var(--gray-400);">دقيقة</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="section-lbl">سجل الطلاب</div>
+          <div class="std-row"><div class="std-av">أح</div><div style="flex:1;"><div class="std-name">أحمد محمد</div><div class="std-stop">محطة الجامعة</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av">مح</div><div style="flex:1;"><div class="std-name">محمد خالد</div><div class="std-stop">محطة الشميساني</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av">لي</div><div style="flex:1;"><div class="std-name">ليلى سامر</div><div class="std-stop">محطة الرابية</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av" style="border-color:var(--red-border);color:#DC2626;">عم</div><div style="flex:1;"><div class="std-name">عمر يوسف</div><div class="std-stop">غائب — أبلغ مسبقاً</div></div><div class="std-status" style="background:var(--red);"></div></div>
+          <div class="std-row"><div class="std-av">سل</div><div style="flex:1;"><div class="std-name">سلمى أحمد</div><div class="std-stop">محطة العبدلي</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div style="height:4px;"></div>
+          <div style="display:flex;gap:14px;padding:4px 16px 14px;">
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);"></div><span style="font-size:10px;color:var(--gray-400);font-family:'Cairo',sans-serif;">ركب</span></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--red);"></div><span style="font-size:10px;color:var(--gray-400);font-family:'Cairo',sans-serif;">غائب</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW 5: MAP ══ -->
+      <div class="view" id="ar-map">
+        <div class="status-strip">
+          <div class="ss-left"><div class="live-dot"></div><div><div class="ss-t">الرحلة جارية</div><div class="ss-s">التوجه لـ عمر يوسف</div></div></div>
+          <div style="text-align:left;"><div class="ss-n">3/7</div><div class="ss-l">محطات</div></div>
+        </div>
+        <div class="map-area">
+          <div class="mg-h" style="top:22%;"></div><div class="mg-h" style="top:48%;"></div><div class="mg-h" style="top:74%;"></div>
+          <div class="mg-v" style="left:22%;"></div><div class="mg-v" style="left:48%;"></div><div class="mg-v" style="left:74%;"></div>
+          <div class="road-h" style="top:21%;height:7px;"></div><div class="road-h" style="top:47%;height:7px;"></div><div class="road-h" style="top:73%;height:7px;"></div>
+          <div class="road-v" style="left:21%;width:7px;"></div><div class="road-v" style="left:47%;width:7px;"></div><div class="road-v" style="left:73%;width:7px;"></div>
+          <div class="route-done" style="bottom:20%;left:6%;width:32%;transform:rotate(-6deg);"></div>
+          <div class="route-ahead" style="top:47%;left:36%;width:42%;transform:rotate(-20deg);"></div>
+          <div class="route-ahead" style="top:24%;left:60%;width:28%;transform:rotate(4deg);"></div>
+          <div class="m-stop" style="bottom:22%;left:8%;"><div class="m-sc" style="background:var(--green);color:#fff;">1</div><div class="m-st" style="color:var(--green-dark);">7:15</div></div>
+          <div class="m-stop" style="bottom:22%;left:24%;"><div class="m-sc" style="background:var(--green);color:#fff;">2</div><div class="m-st" style="color:var(--green-dark);">7:22</div></div>
+          <div class="m-stop" style="top:50%;left:34%;"><div class="m-sc" style="background:var(--green);color:#fff;">3</div><div class="m-st" style="color:var(--green-dark);">7:31</div></div>
+          <div class="bus-pulse" style="top:44%;left:42%;"></div>
+          <div class="bus-pin" style="top:44%;left:42%;"><svg width="22" height="14" viewBox="0 0 24 16" fill="none"><rect x="1" y="1" width="22" height="12" rx="3" fill="white" opacity="0.9"/><circle cx="6" cy="14" r="2" fill="white"/><circle cx="18" cy="14" r="2" fill="white"/></svg></div>
+          <div class="m-stop" style="top:26%;left:62%;"><div class="m-sc" style="background:var(--yellow);color:#111;border:2px solid var(--yellow-dark);">4</div><div class="m-st" style="color:var(--yellow-dark);">~7:41</div></div>
+          <div class="m-stop" style="top:20%;left:78%;"><div class="m-sc" style="background:#fff;color:var(--gray-400);">5</div><div class="m-st">~7:50</div></div>
+          <div class="m-stop" style="top:14%;left:86%;"><div class="m-sc" style="background:#fff;color:var(--gray-400);">6</div><div class="m-st">~7:57</div></div>
+          <div class="school-pin" style="top:8%;right:6%;"><div class="school-lb">المدرسة</div><div class="school-c"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div style="font-size:9px;font-weight:700;color:var(--blue);font-family:'Cairo',sans-serif;margin-top:1px;">~8:05</div></div>
+          <div class="map-ctrl"><div class="map-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><div class="map-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          <div class="nav-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg><span>توجيه</span></div>
+        </div>
+        <div class="map-panel">
+          <div class="mp-handle"></div>
+          <div class="next-card">
+            <div class="nc-row"><span class="nc-lbl">التوجه نحو</span><div class="nc-name">عمر يوسف</div></div>
+            <div class="nc-row"><span class="nc-lbl">المسافة</span><span class="nc-val">1.2 كم</span></div>
+            <div class="nc-row"><span class="nc-lbl">وقت الوصول</span><span class="nc-val">4 دقائق · 7:41 ص</span></div>
+            <div class="arrived-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>وصلت للمحطة</span></div>
+          </div>
+          <div class="map-2btns">
+            <div class="m2btn" onclick="showView('ar','detail-active')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><span>تفاصيل الرحلة</span></div>
+            <div class="m2btn" onclick="showView('ar','emer')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><span style="color:#DC2626;">طوارئ</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW 6: EMERGENCY ══ -->
+      <div class="view" id="ar-emer">
+        <div class="pheader">
+          <div class="back-btn" onclick="showView('ar','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          <div class="ptitle">الطوارئ</div>
+        </div>
+        <div class="scroll" style="padding:14px;">
+          <div style="background:var(--red);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;margin-bottom:13px;box-shadow:0 4px 16px rgba(239,68,68,.4);">
+            <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <div style="font-size:20px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;">SOS — طوارئ فورية</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.8);font-family:'Cairo',sans-serif;">اضغط لإرسال تنبيه عاجل للإدارة والأهل</div>
+          </div>
+          <div style="background:#fff;border-radius:14px;border:1px solid var(--gray-200);overflow:hidden;">
+            <div style="font-size:11px;font-weight:700;color:var(--gray-500);padding:8px 14px 5px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);letter-spacing:.04em;font-family:'Cairo',sans-serif;">جهات الاتصال السريع</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--gray-100);">
+              <div style="width:38px;height:38px;border-radius:11px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;">إدارة المدرسة</div><div style="font-size:11px;color:var(--gray-400);font-family:'Cairo',sans-serif;direction:ltr;text-align:right;">+962 6 123 4567</div></div>
+              <div style="width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;">
+              <div style="width:38px;height:38px;border-radius:11px;background:var(--red-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/><path d="M1 1l22 22"/></svg></div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;">الإسعاف / 911</div><div style="font-size:11px;color:var(--gray-400);font-family:'Cairo',sans-serif;direction:ltr;text-align:right;">911</div></div>
+              <div style="width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+            </div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">السائق — قائمة الرحلات (عربي)</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="sb" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <!-- EN TRIPS LIST -->
+      <div class="view active" id="en-trips" style="direction:ltr;">
+        <div class="pheader" style="direction:ltr;">
+          <div style="flex:1;"><div class="ptitle en-font">My Trips Today</div><div class="psub en-font">Sunday, April 13 2026</div></div>
+          <div class="back-btn" onclick="showView('en','emer')" style="background:var(--red-light);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div>
+        </div>
+        <div class="scroll">
+          <div class="driver-card"><div class="drv-av en-font">AM</div><div style="flex:1;"><div class="drv-name en-font">Abu Mohammad</div><div class="drv-bus en-font">Bus #42 · Driver</div></div></div>
+
+          <div class="section-lbl en-font">IN PROGRESS</div>
+          <div class="trip-card" onclick="showTrip('en', 'active')">
+            <div class="trip-top">
+              <div class="trip-icon" style="background:var(--green-light);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+              <div class="trip-info"><div class="trip-title en-font">Morning Route — Pickup</div><div class="trip-time en-font">Started 7:15 AM · Ends ~8:05 AM</div></div>
+              <div class="status-badge" style="background:var(--green-light);"><span class="en-font" style="color:var(--green-dark);">Active</span></div>
+            </div>
+            <div class="trip-bottom">
+              <div class="trip-stat"><div class="trip-stat-v en-font">28</div><div class="trip-stat-l en-font">Students</div></div>
+              <div class="trip-stat"><div class="trip-stat-v en-font" style="color:var(--green);">18</div><div class="trip-stat-l en-font">km</div></div>
+              <div class="trip-stat"><div class="trip-stat-v en-font">~26</div><div class="trip-stat-l en-font">min left</div></div>
+            </div>
+          </div>
+
+          <div class="section-lbl en-font">UPCOMING</div>
+          <div class="trip-card" onclick="showTrip('en', 'upcoming')">
+            <div class="trip-top">
+              <div class="trip-icon" style="background:var(--yellow-light);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="trip-info"><div class="trip-title en-font">Afternoon Route — Dropoff</div><div class="trip-time en-font">Starts 2:00 PM · Ends ~2:50 PM</div></div>
+              <div class="status-badge" style="background:var(--yellow-light);"><span class="en-font" style="color:var(--yellow-dark);">Upcoming</span></div>
+            </div>
+            <div class="trip-bottom">
+              <div class="trip-stat"><div class="trip-stat-v en-font">28</div><div class="trip-stat-l en-font">Students</div></div>
+              <div class="trip-stat"><div class="trip-stat-v en-font" style="color:var(--yellow-dark);">22</div><div class="trip-stat-l en-font">km</div></div>
+              <div class="trip-stat"><div class="trip-stat-v en-font">~50</div><div class="trip-stat-l en-font">min</div></div>
+            </div>
+          </div>
+
+          <div class="section-lbl en-font">COMPLETED</div>
+          <div class="trip-card" onclick="showTrip('en', 'done')">
+            <div class="trip-top">
+              <div class="trip-icon" style="background:var(--gray-100);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="trip-info"><div class="trip-title en-font">Morning Route — Yesterday</div><div class="trip-time en-font">Completed at 7:58 AM</div></div>
+              <div class="status-badge" style="background:var(--gray-100);"><span class="en-font" style="color:var(--gray-500);">Done</span></div>
+            </div>
+            <div class="trip-bottom">
+              <div class="trip-stat"><div class="trip-stat-v en-font">26</div><div class="trip-stat-l en-font">Students</div></div>
+              <div class="trip-stat"><div class="trip-stat-v en-font" style="color:var(--gray-400);">18</div><div class="trip-stat-l en-font">km</div></div>
+              <div class="trip-stat"><div class="trip-stat-v en-font">43</div><div class="trip-stat-l en-font">min</div></div>
+            </div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+      </div>
+
+      <!-- EN DETAIL ACTIVE -->
+      <div class="view" id="en-detail-active" style="direction:ltr;">
+        <div class="pheader" style="direction:ltr;">
+          <div class="back-btn" onclick="showView('en','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+          <div><div class="ptitle en-font">Morning Route — Pickup</div><div class="psub en-font">In progress</div></div>
+        </div>
+        <div class="scroll">
+          <div class="trip-hero"><div class="hero-card" style="background:var(--green);"><div class="hc-title en-font" style="color:#fff;">Morning Route — Pickup</div><div class="hc-sub en-font" style="color:#BBF7D0;">7:15 AM · Sunday Apr 13</div><div class="hc-stats"><div class="hc-stat"><div class="hc-stat-v en-font" style="color:#fff;">28</div><div class="hc-stat-l en-font" style="color:#BBF7D0;">Students</div></div><div class="hc-stat"><div class="hc-stat-v en-font" style="color:#fff;">~26</div><div class="hc-stat-l en-font" style="color:#BBF7D0;">min remaining</div></div></div></div></div>
+          <div class="section-lbl en-font">STUDENTS LIST</div>
+          <div class="std-row"><div class="std-av en-font">AH</div><div style="flex:1;"><div class="std-name en-font">Ahmed Mohammad</div><div class="std-stop en-font">University Stop · 7:15 AM</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av en-font">MH</div><div style="flex:1;"><div class="std-name en-font">Mohammad Khaled</div><div class="std-stop en-font">Shmeisani Stop · 7:22 AM</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av en-font">LA</div><div style="flex:1;"><div class="std-name en-font">Layla Samer</div><div class="std-stop en-font">Rabia Stop · 7:31 AM</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av en-font" style="border-color:var(--yellow);">OM</div><div style="flex:1;"><div class="std-name en-font">Omar Yousef</div><div class="std-stop en-font">Al-Zeitoun Stop · ~7:41 AM</div></div><div class="std-status" style="background:var(--yellow);border:1px solid var(--yellow-dark);"></div></div>
+          <div class="std-row"><div class="std-av en-font" style="border-color:var(--gray-200);color:var(--gray-400);">SL</div><div style="flex:1;"><div class="std-name en-font" style="color:var(--gray-400);">Salma Ahmad</div><div class="std-stop en-font">Abdali Stop · ~7:50 AM</div></div><div class="std-status" style="background:var(--gray-300);"></div></div>
+          <div class="std-row"><div class="std-av en-font" style="border-color:var(--gray-200);color:var(--gray-400);">BA</div><div style="flex:1;"><div class="std-name en-font" style="color:var(--gray-400);">Basel Omar</div><div class="std-stop en-font">3rd Circle · ~7:57 AM</div></div><div class="std-status" style="background:var(--gray-300);"></div></div>
+          <div style="height:4px;"></div>
+          <div style="display:flex;gap:14px;padding:4px 16px 10px;"><div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);"></div><span class="en-font" style="font-size:10px;color:var(--gray-400);">Boarded</span></div><div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--yellow);border:1px solid var(--yellow-dark);"></div><span class="en-font" style="font-size:10px;color:var(--gray-400);">Next</span></div><div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--gray-300);"></div><span class="en-font" style="font-size:10px;color:var(--gray-400);">Waiting</span></div></div>
+        </div>
+        <button class="action-btn" style="background:var(--yellow);" onclick="showView('en','map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span class="en-font" style="color:#111;">Continue Trip on Map</span>
+        </button>
+        <div style="height:12px;"></div>
+      </div>
+
+      <!-- EN DETAIL UPCOMING -->
+      <div class="view" id="en-detail-upcoming" style="direction:ltr;">
+        <div class="pheader" style="direction:ltr;"><div class="back-btn" onclick="showView('en','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><div><div class="ptitle en-font">Afternoon Route — Dropoff</div><div class="psub en-font">Starts 2:00 PM</div></div></div>
+        <div class="scroll">
+          <div class="trip-hero"><div class="hero-card" style="background:var(--yellow);"><div class="hc-title en-font" style="color:#111;">Afternoon Route — Dropoff</div><div class="hc-sub en-font" style="color:#7a6200;">2:00 PM · Sunday Apr 13</div><div class="hc-stats"><div class="hc-stat"><div class="hc-stat-v en-font" style="color:#111;">28</div><div class="hc-stat-l en-font" style="color:#7a6200;">Students</div></div><div class="hc-stat"><div class="hc-stat-v en-font" style="color:#111;">~50</div><div class="hc-stat-l en-font" style="color:#7a6200;">min duration</div></div></div></div></div>
+          <div class="section-lbl en-font">STUDENTS LIST</div>
+          <div class="std-row"><div class="std-av en-font" style="border-color:var(--gray-200);color:var(--gray-400);">AH</div><div style="flex:1;"><div class="std-name en-font" style="color:var(--gray-500);">Ahmed Mohammad</div><div class="std-stop en-font">Drops at University Stop</div></div><div class="std-time en-font">~2:48 PM</div></div>
+          <div class="std-row"><div class="std-av en-font" style="border-color:var(--gray-200);color:var(--gray-400);">MH</div><div style="flex:1;"><div class="std-name en-font" style="color:var(--gray-500);">Mohammad Khaled</div><div class="std-stop en-font">Drops at Shmeisani Stop</div></div><div class="std-time en-font">~2:42 PM</div></div>
+          <div class="std-row"><div class="std-av en-font" style="border-color:var(--gray-200);color:var(--gray-400);">LA</div><div style="flex:1;"><div class="std-name en-font" style="color:var(--gray-500);">Layla Samer</div><div class="std-stop en-font">Drops at Rabia Stop</div></div><div class="std-time en-font">~2:35 PM</div></div>
+          <div class="std-row"><div class="std-av en-font" style="border-color:var(--gray-200);color:var(--gray-400);">OM</div><div style="flex:1;"><div class="std-name en-font" style="color:var(--gray-500);">Omar Yousef</div><div class="std-stop en-font">Drops at Al-Zeitoun Stop</div></div><div class="std-time en-font">~2:28 PM</div></div>
+          <div style="height:4px;"></div>
+        </div>
+        <button class="action-btn" style="background:var(--yellow);" onclick="showView('en','map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span class="en-font" style="color:#111;">Start Trip</span>
+        </button>
+        <div style="height:12px;"></div>
+      </div>
+
+      <!-- EN DETAIL DONE -->
+      <div class="view" id="en-detail-done" style="direction:ltr;">
+        <div class="pheader" style="direction:ltr;"><div class="back-btn" onclick="showView('en','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><div><div class="ptitle en-font">Morning Route — Yesterday</div><div class="psub en-font">Completed · 7:58 AM</div></div></div>
+        <div class="scroll">
+          <div class="trip-hero"><div class="hero-card" style="background:var(--gray-100);border:1px solid var(--gray-200);"><div class="hc-title en-font">Morning Route — Pickup</div><div class="hc-sub en-font" style="color:var(--gray-400);">Sat Apr 12 · 7:15 – 7:58 AM</div><div class="hc-stats"><div class="hc-stat" style="background:rgba(0,0,0,.05);"><div class="hc-stat-v en-font">26</div><div class="hc-stat-l en-font" style="color:var(--gray-400);">Students</div></div><div class="hc-stat" style="background:rgba(0,0,0,.05);"><div class="hc-stat-v en-font">43</div><div class="hc-stat-l en-font" style="color:var(--gray-400);">Minutes</div></div></div></div></div>
+          <div class="section-lbl en-font">STUDENTS RECORD</div>
+          <div class="std-row"><div class="std-av en-font">AH</div><div style="flex:1;"><div class="std-name en-font">Ahmed Mohammad</div><div class="std-stop en-font">University Stop</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av en-font">MH</div><div style="flex:1;"><div class="std-name en-font">Mohammad Khaled</div><div class="std-stop en-font">Shmeisani Stop</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div class="std-row"><div class="std-av en-font" style="border-color:var(--red-border);color:#DC2626;">OM</div><div style="flex:1;"><div class="std-name en-font">Omar Yousef</div><div class="std-stop en-font">Absent — pre-reported</div></div><div class="std-status" style="background:var(--red);"></div></div>
+          <div class="std-row"><div class="std-av en-font">SL</div><div style="flex:1;"><div class="std-name en-font">Salma Ahmad</div><div class="std-stop en-font">Abdali Stop</div></div><div class="std-status" style="background:var(--green);"></div></div>
+          <div style="display:flex;gap:14px;padding:8px 16px 14px;"><div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);"></div><span class="en-font" style="font-size:10px;color:var(--gray-400);">Boarded</span></div><div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--red);"></div><span class="en-font" style="font-size:10px;color:var(--gray-400);">Absent</span></div></div>
+        </div>
+      </div>
+
+      <!-- EN MAP -->
+      <div class="view" id="en-map" style="direction:ltr;">
+        <div class="status-strip">
+          <div class="ss-left"><div class="live-dot"></div><div><div class="ss-t en-font">Trip in progress</div><div class="ss-s en-font">Heading to Omar Yousef</div></div></div>
+          <div style="text-align:right;"><div class="ss-n en-font">3/7</div><div class="ss-l en-font">stops</div></div>
+        </div>
+        <div class="map-area">
+          <div class="mg-h" style="top:22%;"></div><div class="mg-h" style="top:48%;"></div><div class="mg-h" style="top:74%;"></div>
+          <div class="mg-v" style="left:22%;"></div><div class="mg-v" style="left:48%;"></div><div class="mg-v" style="left:74%;"></div>
+          <div class="road-h" style="top:21%;height:7px;"></div><div class="road-h" style="top:47%;height:7px;"></div><div class="road-v" style="left:21%;width:7px;"></div><div class="road-v" style="left:47%;width:7px;"></div>
+          <div class="route-done" style="bottom:20%;left:6%;width:32%;transform:rotate(-6deg);"></div>
+          <div class="route-ahead" style="top:47%;left:36%;width:42%;transform:rotate(-20deg);"></div>
+          <div class="route-ahead" style="top:24%;left:60%;width:28%;transform:rotate(4deg);"></div>
+          <div class="m-stop" style="bottom:22%;left:8%;"><div class="m-sc" style="background:var(--green);color:#fff;">1</div><div class="m-st en-font" style="color:var(--green-dark);">7:15</div></div>
+          <div class="m-stop" style="bottom:22%;left:24%;"><div class="m-sc" style="background:var(--green);color:#fff;">2</div><div class="m-st en-font" style="color:var(--green-dark);">7:22</div></div>
+          <div class="m-stop" style="top:50%;left:34%;"><div class="m-sc" style="background:var(--green);color:#fff;">3</div><div class="m-st en-font" style="color:var(--green-dark);">7:31</div></div>
+          <div class="bus-pulse" style="top:44%;left:42%;"></div>
+          <div class="bus-pin" style="top:44%;left:42%;"><svg width="22" height="14" viewBox="0 0 24 16" fill="none"><rect x="1" y="1" width="22" height="12" rx="3" fill="white" opacity="0.9"/><circle cx="6" cy="14" r="2" fill="white"/><circle cx="18" cy="14" r="2" fill="white"/></svg></div>
+          <div class="m-stop" style="top:26%;left:62%;"><div class="m-sc" style="background:var(--yellow);color:#111;border:2px solid var(--yellow-dark);">4</div><div class="m-st en-font" style="color:var(--yellow-dark);">~7:41</div></div>
+          <div class="m-stop" style="top:20%;left:78%;"><div class="m-sc" style="background:#fff;color:var(--gray-400);">5</div><div class="m-st en-font">~7:50</div></div>
+          <div class="m-stop" style="top:14%;left:86%;"><div class="m-sc" style="background:#fff;color:var(--gray-400);">6</div><div class="m-st en-font">~7:57</div></div>
+          <div class="school-pin" style="top:8%;right:6%;"><div class="school-lb en-font">School</div><div class="school-c"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div class="en-font" style="font-size:9px;font-weight:700;color:var(--blue);margin-top:1px;">~8:05</div></div>
+          <div class="map-ctrl"><div class="map-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><div class="map-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          <div class="nav-btn" style="left:12px;right:auto;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg><span class="en-font">Navigate</span></div>
+        </div>
+        <div class="map-panel" style="direction:ltr;">
+          <div class="mp-handle"></div>
+          <div class="next-card">
+            <div class="nc-row"><span class="nc-lbl en-font">Heading to</span><div class="nc-name en-font">Omar Yousef</div></div>
+            <div class="nc-row"><span class="nc-lbl en-font">Distance</span><span class="nc-val en-font">1.2 km</span></div>
+            <div class="nc-row"><span class="nc-lbl en-font">ETA</span><span class="nc-val en-font">4 min · 7:41 AM</span></div>
+            <div class="arrived-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span class="en-font">Arrived at stop</span></div>
+          </div>
+          <div class="map-2btns">
+            <div class="m2btn" onclick="showView('en','detail-active')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><span class="en-font">Trip Details</span></div>
+            <div class="m2btn" onclick="showView('en','emer')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><span class="en-font" style="color:#DC2626;">Emergency</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EN EMERGENCY -->
+      <div class="view" id="en-emer" style="direction:ltr;">
+        <div class="pheader" style="direction:ltr;"><div class="back-btn" onclick="showView('en','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><div class="ptitle en-font">Emergency</div></div>
+        <div class="scroll" style="padding:14px;">
+          <div style="background:var(--red);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;margin-bottom:13px;box-shadow:0 4px 16px rgba(239,68,68,.4);">
+            <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div>
+            <div class="en-font" style="font-size:20px;font-weight:700;color:#fff;">SOS — Emergency Alert</div>
+            <div class="en-font" style="font-size:12px;color:rgba(255,255,255,.8);">Tap to instantly notify admin and parents</div>
+          </div>
+          <div style="background:#fff;border-radius:14px;border:1px solid var(--gray-200);overflow:hidden;">
+            <div class="en-font" style="font-size:11px;font-weight:700;color:var(--gray-500);padding:8px 14px 5px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);letter-spacing:.04em;">QUICK CONTACTS</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--gray-100);"><div style="width:38px;height:38px;border-radius:11px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div style="flex:1;"><div class="en-font" style="font-size:13px;font-weight:700;color:var(--gray-900);">School Admin</div><div class="en-font" style="font-size:11px;color:var(--gray-400);">+962 6 123 4567</div></div><div style="width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;"><div style="width:38px;height:38px;border-radius:11px;background:var(--red-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/><path d="M1 1l22 22"/></svg></div><div style="flex:1;"><div class="en-font" style="font-size:13px;font-weight:700;color:var(--gray-900);">Ambulance / 911</div><div class="en-font" style="font-size:11px;color:var(--gray-400);">911</div></div><div style="width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div></div>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Driver — Trips List (English)</div>
+</div>
+
+<script>
+function showView(lang, view) {
+  const all = ['trips','detail-active','detail-upcoming','detail-done','map','emer'];
+  all.forEach(v => {
+    const el = document.getElementById(`${lang}-${v}`);
+    if (el) el.classList.toggle('active', v === view);
+  });
+}
+function showTrip(lang, type) {
+  showView(lang, `detail-${type}`);
+}
+</script>
+</body>
+</html>

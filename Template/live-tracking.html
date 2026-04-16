@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>التتبع المباشر — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#FFD700; --yellow-light:#FFFDE7; --yellow-dark:#B8960C;
+    --blue:#3B82F6; --blue-light:#EFF6FF; --blue-dark:#1D4ED8;
+    --green:#22C55E; --green-light:#F0FDF4; --green-dark:#16A34A;
+    --red:#EF4444; --red-light:#FFF0F0;
+    --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB;
+    --gray-300:#D1D5DB; --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-900:#111111;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Cairo',sans-serif;background:#E5E5E5;
+    display:flex;justify-content:center;align-items:flex-start;
+    min-height:100vh;padding:48px 32px;gap:48px;flex-wrap:wrap;
+  }
+  .sw{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .sl{font-size:13px;font-weight:700;color:#555;font-family:'Cairo',sans-serif;}
+  .phone{
+    width:375px;height:812px;background:#fff;
+    border-radius:56px;border:10px solid #1a1a1a;
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+  .statusbar{
+    height:44px;background:#fff;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 24px;flex-shrink:0;
+  }
+  .statusbar span{font-size:13px;color:#333;font-family:'Cairo',sans-serif;}
+  .screen{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff;}
+
+  /* HEADER */
+  .page-header{
+    background:#fff;padding:14px 20px 12px;
+    display:flex;align-items:center;gap:12px;
+    border-bottom:1px solid var(--gray-100);flex-shrink:0;
+    position:relative;z-index:10;
+  }
+  .back-btn{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--gray-100);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+  .page-title{font-size:17px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .page-sub{font-size:12px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:1px;}
+  .refresh-btn{
+    margin-right:auto;width:34px;height:34px;border-radius:50%;
+    background:var(--gray-100);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+
+  /* STATUS BAR (blue) */
+  .status-bar{
+    background:var(--blue);padding:12px 18px;flex-shrink:0;
+  }
+  .status-row{display:flex;align-items:center;justify-content:space-between;}
+  .bus-label{font-size:15px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;}
+  .status-pill{background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;margin-top:4px;display:inline-block;}
+  .status-pill span{font-size:11px;color:#fff;font-family:'Cairo',sans-serif;}
+  .eta-num{font-size:28px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;line-height:1;}
+  .eta-lbl{font-size:11px;color:#BFDBFE;font-family:'Cairo',sans-serif;margin-top:2px;}
+
+  /* MAP */
+  .map-area{
+    flex:1;background:#DCF2EF;position:relative;overflow:hidden;
+    min-height:0;
+  }
+
+  /* Map grid lines */
+  .map-grid-h{position:absolute;left:0;right:0;border-top:1px solid #B2DFDB;opacity:.5;}
+  .map-grid-v{position:absolute;top:0;bottom:0;border-left:1px solid #B2DFDB;opacity:.5;}
+
+  /* Roads */
+  .road-h{position:absolute;left:0;right:0;background:#fff;opacity:.85;}
+  .road-v{position:absolute;top:0;bottom:0;background:#fff;opacity:.85;}
+
+  /* Route dashed line */
+  .route-path{
+    position:absolute;
+    border-top:2.5px dashed var(--yellow);
+    opacity:.9;
+  }
+
+  /* Bus pin */
+  .bus-pin{
+    position:absolute;
+    width:44px;height:44px;border-radius:50%;
+    background:var(--yellow);border:3px solid #fff;
+    box-shadow:0 3px 10px rgba(0,0,0,.25);
+    display:flex;align-items:center;justify-content:center;
+    transform:translate(-50%,-50%);
+    z-index:5;
+  }
+  .bus-pulse{
+    position:absolute;
+    width:60px;height:60px;border-radius:50%;
+    background:rgba(255,215,0,.25);
+    transform:translate(-50%,-50%);
+    z-index:4;
+  }
+
+  /* Location pins */
+  .loc-pin{
+    position:absolute;transform:translate(-50%,-50%);z-index:5;
+  }
+  .loc-pin-circle{
+    width:32px;height:32px;border-radius:50%;
+    border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .pin-lbl-box{
+    position:absolute;background:#fff;border-radius:8px;
+    padding:3px 8px;border:1px solid var(--gray-200);
+    box-shadow:0 1px 4px rgba(0,0,0,.1);
+    white-space:nowrap;top:-32px;left:50%;transform:translateX(-50%);
+  }
+  .pin-lbl-box span{font-size:10px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+
+  /* Map zoom controls */
+  .map-controls{
+    position:absolute;bottom:14px;left:14px;
+    display:flex;flex-direction:column;gap:2px;z-index:10;
+  }
+  .map-ctrl-btn{
+    width:32px;height:32px;background:#fff;border-radius:8px;
+    box-shadow:0 1px 6px rgba(0,0,0,.15);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+
+  /* BOTTOM SHEET */
+  .bottom-sheet{
+    background:#fff;border-top:1px solid var(--gray-100);
+    padding:14px 16px;flex-shrink:0;
+  }
+  .bs-handle{width:36px;height:4px;border-radius:2px;background:var(--gray-200);margin:0 auto 12px;}
+
+  /* STATS ROW */
+  .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+  .stat-c{background:var(--gray-50);border-radius:10px;padding:10px;text-align:center;}
+  .stat-v{font-size:14px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .stat-l{font-size:10px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:2px;}
+
+  /* ACTION BUTTONS */
+  .action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+  .action-btn{
+    background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;
+    padding:10px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+  }
+  .action-btn span{font-size:12px;font-weight:600;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+
+  /* NOTIFY BTN */
+  .notify-btn{
+    background:var(--yellow);border-radius:12px;padding:12px;
+    display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  }
+  .notify-btn span{font-size:13px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;}
+
+  /* LAST UPDATE */
+  .last-upd{font-size:10px;color:var(--gray-400);text-align:center;margin-top:8px;font-family:'Cairo',sans-serif;}
+  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-left:4px;}
+
+  .en-font{font-family:'Inter',sans-serif !important;}
+</style>
+</head>
+<body>
+
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title">تتبع مباشر</div>
+          <div class="page-sub">أحمد محمد</div>
+        </div>
+        <div class="refresh-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </div>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="status-row">
+          <div>
+            <div class="bus-label">الباص #42</div>
+            <div class="status-pill"><span>في الطريق للمدرسة</span></div>
+          </div>
+          <div style="text-align:left;">
+            <div class="eta-num">8</div>
+            <div class="eta-lbl">دقائق للوصول</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="map-area">
+        <!-- Grid -->
+        <div class="map-grid-h" style="top:25%;"></div>
+        <div class="map-grid-h" style="top:50%;"></div>
+        <div class="map-grid-h" style="top:75%;"></div>
+        <div class="map-grid-v" style="left:25%;"></div>
+        <div class="map-grid-v" style="left:50%;"></div>
+        <div class="map-grid-v" style="left:75%;"></div>
+
+        <!-- Roads -->
+        <div class="road-h" style="top:24%;height:8px;"></div>
+        <div class="road-h" style="top:49%;height:8px;"></div>
+        <div class="road-h" style="top:72%;height:8px;"></div>
+        <div class="road-v" style="left:24%;width:8px;"></div>
+        <div class="road-v" style="left:49%;width:8px;"></div>
+        <div class="road-v" style="left:72%;width:8px;"></div>
+
+        <!-- Route -->
+        <div class="route-path" style="top:38%;left:18%;width:50%;transform:rotate(-18deg);"></div>
+
+        <!-- Home pin -->
+        <div class="loc-pin" style="bottom:18%;left:12%;">
+          <div class="pin-lbl-box"><span>المنزل</span></div>
+          <div class="loc-pin-circle" style="background:var(--yellow);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+        </div>
+
+        <!-- Bus pulse + pin -->
+        <div class="bus-pulse" style="top:44%;left:38%;"></div>
+        <div class="bus-pin" style="top:44%;left:38%;">
+          <svg width="20" height="14" viewBox="0 0 24 16" fill="none">
+            <rect x="1" y="1" width="22" height="12" rx="3" fill="white" opacity="0.9"/>
+            <circle cx="6" cy="14" r="2" fill="white"/>
+            <circle cx="18" cy="14" r="2" fill="white"/>
+          </svg>
+        </div>
+
+        <!-- School pin -->
+        <div class="loc-pin" style="top:10%;right:10%;">
+          <div class="pin-lbl-box"><span>المدرسة</span></div>
+          <div class="loc-pin-circle" style="background:var(--blue);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+
+        <!-- Map bus label -->
+        <div style="position:absolute;top:50%;left:24%;transform:translateX(-50%);background:#fff;border-radius:6px;padding:2px 7px;border:1px solid var(--gray-200);box-shadow:0 1px 4px rgba(0,0,0,.1);">
+          <span style="font-size:10px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;">الباص #42</span>
+        </div>
+
+        <!-- Zoom controls -->
+        <div class="map-controls">
+          <div class="map-ctrl-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="map-ctrl-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <!-- My location -->
+        <div style="position:absolute;bottom:14px;right:14px;" class="map-ctrl-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+        </div>
+      </div>
+
+      <!-- BOTTOM SHEET -->
+      <div class="bottom-sheet">
+        <div class="bs-handle"></div>
+
+        <div class="stats-row">
+          <div class="stat-c">
+            <div class="stat-v">7:31 ص</div>
+            <div class="stat-l">وقت الركوب</div>
+          </div>
+          <div class="stat-c">
+            <div class="stat-v">2.3 كم</div>
+            <div class="stat-l">المسافة المتبقية</div>
+          </div>
+          <div class="stat-c">
+            <div class="stat-v">37 كم/س</div>
+            <div class="stat-l">السرعة</div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <div class="action-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <span>تفاصيل الباص</span>
+          </div>
+          <div class="action-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>تواصل مع السائق</span>
+          </div>
+        </div>
+
+        <div class="notify-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>أشعرني عند الوصول قبل 5 دقائق</span>
+        </div>
+
+        <div class="last-upd">
+          <span class="live-dot"></span>
+          آخر تحديث: 7:39:15 ص
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">التتبع المباشر — عربي</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title en-font">Live Tracking</div>
+          <div class="page-sub en-font">Ahmed Mohammad</div>
+        </div>
+        <div class="refresh-btn" style="margin-right:0;margin-left:auto;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <div class="status-row">
+          <div>
+            <div class="bus-label en-font">Bus #42</div>
+            <div class="status-pill"><span class="en-font">On the way to school</span></div>
+          </div>
+          <div style="text-align:right;">
+            <div class="eta-num en-font">8</div>
+            <div class="eta-lbl en-font">minutes to arrive</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-area">
+        <div class="map-grid-h" style="top:25%;"></div>
+        <div class="map-grid-h" style="top:50%;"></div>
+        <div class="map-grid-h" style="top:75%;"></div>
+        <div class="map-grid-v" style="left:25%;"></div>
+        <div class="map-grid-v" style="left:50%;"></div>
+        <div class="map-grid-v" style="left:75%;"></div>
+        <div class="road-h" style="top:24%;height:8px;"></div>
+        <div class="road-h" style="top:49%;height:8px;"></div>
+        <div class="road-h" style="top:72%;height:8px;"></div>
+        <div class="road-v" style="left:24%;width:8px;"></div>
+        <div class="road-v" style="left:49%;width:8px;"></div>
+        <div class="road-v" style="left:72%;width:8px;"></div>
+        <div class="route-path" style="top:38%;left:18%;width:50%;transform:rotate(-18deg);"></div>
+
+        <div class="loc-pin" style="bottom:18%;left:12%;">
+          <div class="pin-lbl-box"><span class="en-font">Home</span></div>
+          <div class="loc-pin-circle" style="background:var(--yellow);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+        </div>
+
+        <div class="bus-pulse" style="top:44%;left:38%;"></div>
+        <div class="bus-pin" style="top:44%;left:38%;">
+          <svg width="20" height="14" viewBox="0 0 24 16" fill="none">
+            <rect x="1" y="1" width="22" height="12" rx="3" fill="white" opacity="0.9"/>
+            <circle cx="6" cy="14" r="2" fill="white"/>
+            <circle cx="18" cy="14" r="2" fill="white"/>
+          </svg>
+        </div>
+
+        <div class="loc-pin" style="top:10%;right:10%;">
+          <div class="pin-lbl-box"><span class="en-font">School</span></div>
+          <div class="loc-pin-circle" style="background:var(--blue);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+
+        <div style="position:absolute;top:50%;left:24%;transform:translateX(-50%);background:#fff;border-radius:6px;padding:2px 7px;border:1px solid var(--gray-200);box-shadow:0 1px 4px rgba(0,0,0,.1);">
+          <span class="en-font" style="font-size:10px;font-weight:700;color:var(--gray-900);">Bus #42</span>
+        </div>
+
+        <div class="map-controls">
+          <div class="map-ctrl-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="map-ctrl-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:14px;right:14px;" class="map-ctrl-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+        </div>
+      </div>
+
+      <div class="bottom-sheet">
+        <div class="bs-handle"></div>
+
+        <div class="stats-row">
+          <div class="stat-c">
+            <div class="stat-v en-font">7:31 AM</div>
+            <div class="stat-l en-font">Boarded</div>
+          </div>
+          <div class="stat-c">
+            <div class="stat-v en-font">2.3 km</div>
+            <div class="stat-l en-font">Remaining</div>
+          </div>
+          <div class="stat-c">
+            <div class="stat-v en-font">37 km/h</div>
+            <div class="stat-l en-font">Speed</div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <div class="action-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <span class="en-font">Bus Details</span>
+          </div>
+          <div class="action-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="en-font">Call Driver</span>
+          </div>
+        </div>
+
+        <div class="notify-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="en-font">Notify me 5 min before arrival</span>
+        </div>
+
+        <div class="last-upd en-font">
+          <span class="live-dot"></span>
+          Last updated: 7:39:15 AM
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Live Tracking — English</div>
+</div>
+
+</body>
+</html>

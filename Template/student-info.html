@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>معلومات الطالب — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#FFD700; --yellow-light:#FFFDE7; --yellow-dark:#B8960C;
+    --blue:#3B82F6; --blue-light:#EFF6FF;
+    --purple:#A855F7; --purple-light:#FDF4FF;
+    --red:#EF4444; --red-light:#FFF0F0; --red-border:#FECACA;
+    --green:#22C55E; --green-light:#F0FDF4;
+    --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB;
+    --gray-300:#D1D5DB; --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-900:#111111;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Cairo',sans-serif;background:#E5E5E5;
+    display:flex;justify-content:center;align-items:flex-start;
+    min-height:100vh;padding:48px 32px;gap:48px;flex-wrap:wrap;
+  }
+  .sw{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .sl{font-size:13px;font-weight:700;color:#555;font-family:'Cairo',sans-serif;}
+
+  /* PHONE */
+  .phone{
+    width:375px;height:812px;background:#fff;
+    border-radius:56px;border:10px solid #1a1a1a;
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+  .statusbar{
+    height:44px;background:#fff;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 24px;flex-shrink:0;
+  }
+  .statusbar span{font-size:13px;color:#333;font-family:'Cairo',sans-serif;}
+  .screen{background:var(--gray-50);flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+  /* PAGE HEADER */
+  .page-header{
+    background:#fff;padding:14px 20px 12px;
+    display:flex;align-items:center;gap:12px;
+    border-bottom:1px solid var(--gray-100);flex-shrink:0;
+  }
+  .back-btn{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--gray-100);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+  .page-title{font-size:17px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .edit-btn{
+    margin-right:auto;display:flex;align-items:center;gap:5px;
+    background:var(--yellow-light);border:1px solid var(--yellow);
+    border-radius:20px;padding:5px 12px;cursor:pointer;
+  }
+  .edit-btn span{font-size:12px;font-weight:700;color:var(--yellow-dark);font-family:'Cairo',sans-serif;}
+
+  /* TABS */
+  .tabs{
+    display:flex;background:#fff;
+    border-bottom:1px solid var(--gray-100);flex-shrink:0;
+    overflow-x:auto;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:1;padding:12px 8px;text-align:center;
+    font-size:12px;font-weight:600;color:var(--gray-400);
+    font-family:'Cairo',sans-serif;cursor:pointer;
+    border-bottom:2.5px solid transparent;white-space:nowrap;
+  }
+  .tab.active{color:var(--yellow-dark);border-bottom-color:var(--yellow);}
+
+  /* SCROLLABLE BODY */
+  .scroll-body{flex:1;overflow-y:auto;padding:14px;}
+  .scroll-body::-webkit-scrollbar{display:none;}
+
+  /* PROFILE CARD */
+  .profile-card{
+    background:#fff;border-radius:16px;border:1px solid var(--gray-200);
+    padding:16px;margin-bottom:12px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .student-avatar{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--yellow-light);border:3px solid var(--yellow);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:700;color:var(--yellow-dark);
+    font-family:'Cairo',sans-serif;flex-shrink:0;
+  }
+  .student-name{font-size:18px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .student-id{font-size:12px;color:var(--gray-400);margin-top:3px;font-family:'Cairo',sans-serif;}
+  .student-grade-badge{
+    display:inline-flex;align-items:center;margin-top:6px;
+    background:var(--blue-light);border-radius:20px;padding:3px 10px;
+  }
+  .student-grade-badge span{font-size:11px;font-weight:700;color:var(--blue);font-family:'Cairo',sans-serif;}
+
+  /* INFO SECTION */
+  .info-section{
+    background:#fff;border-radius:16px;border:1px solid var(--gray-200);
+    margin-bottom:12px;overflow:hidden;
+  }
+  .info-section-title{
+    font-size:12px;font-weight:700;color:var(--gray-500);
+    padding:10px 16px 6px;background:var(--gray-50);
+    border-bottom:1px solid var(--gray-100);
+    letter-spacing:0.04em;font-family:'Cairo',sans-serif;
+  }
+  .info-row{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    padding:11px 16px;border-bottom:1px solid var(--gray-100);
+    gap:12px;
+  }
+  .info-row:last-child{border-bottom:none;}
+  .info-label{font-size:12px;color:var(--gray-400);font-family:'Cairo',sans-serif;flex-shrink:0;}
+  .info-value{font-size:13px;font-weight:600;color:var(--gray-900);font-family:'Cairo',sans-serif;text-align:left;}
+
+  /* BUS CARD */
+  .bus-card{
+    background:var(--yellow);border-radius:16px;
+    padding:14px 16px;margin-bottom:12px;
+  }
+  .bus-card-title{font-size:12px;color:#7a6200;font-family:'Cairo',sans-serif;margin-bottom:10px;}
+  .bus-info-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+  .bus-info-lbl{font-size:12px;color:#7a6200;font-family:'Cairo',sans-serif;}
+  .bus-info-val{font-size:14px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;}
+  .bus-stop-tag{
+    background:rgba(0,0,0,.1);border-radius:20px;padding:3px 10px;
+  }
+  .bus-stop-tag span{font-size:11px;color:#111;font-family:'Cairo',sans-serif;}
+
+  /* MEDICAL CARD */
+  .medical-card{
+    background:var(--red-light);border-radius:16px;
+    border:1px solid var(--red-border);padding:14px 16px;margin-bottom:12px;
+  }
+  .medical-title-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+  .medical-dot{width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;}
+  .medical-title{font-size:13px;font-weight:700;color:#DC2626;font-family:'Cairo',sans-serif;}
+  .allergy-tags{display:flex;gap:6px;flex-wrap:wrap;}
+  .allergy-tag{
+    background:#fff;border:1px solid var(--red-border);border-radius:20px;
+    padding:4px 10px;
+  }
+  .allergy-tag span{font-size:11px;font-weight:600;color:#DC2626;font-family:'Cairo',sans-serif;}
+
+  /* EMERGENCY CONTACT */
+  .contact-card{
+    background:#fff;border-radius:16px;border:1px solid var(--gray-200);
+    padding:14px 16px;margin-bottom:12px;
+  }
+  .contact-title{font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:10px;font-family:'Cairo',sans-serif;}
+  .contact-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100);}
+  .contact-row:last-child{border-bottom:none;}
+  .contact-avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:var(--blue-light);display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0;
+    font-family:'Cairo',sans-serif;
+  }
+  .contact-name{font-size:13px;font-weight:600;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .contact-relation{font-size:11px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:1px;}
+  .call-btn{
+    width:32px;height:32px;border-radius:50%;background:var(--yellow);
+    display:flex;align-items:center;justify-content:center;
+    margin-right:auto;cursor:pointer;flex-shrink:0;
+  }
+
+  /* NOTES */
+  .notes-card{
+    background:var(--blue-light);border-radius:16px;
+    border:1px solid #BFDBFE;padding:14px 16px;margin-bottom:12px;
+  }
+  .notes-title-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .notes-dot{width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+  .notes-title{font-size:13px;font-weight:700;color:#1D4ED8;font-family:'Cairo',sans-serif;}
+  .notes-body{font-size:12px;color:#1E40AF;line-height:1.6;font-family:'Cairo',sans-serif;}
+
+  /* EN overrides */
+  .en-font{font-family:'Inter',sans-serif !important;}
+</style>
+</head>
+<body>
+
+<!-- ===== ARABIC VERSION ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="page-title">معلومات الطالب</div>
+        <div class="edit-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span>تعديل</span>
+        </div>
+      </div>
+
+
+
+      <div class="scroll-body">
+
+        <!-- PROFILE -->
+        <div class="profile-card">
+          <div class="student-avatar">أح</div>
+          <div>
+            <div class="student-name">أحمد محمد الخالدي</div>
+            <div class="student-id">رقم الطالب: SE2024001</div>
+            <div class="student-grade-badge"><span>روضة ب</span></div>
+          </div>
+        </div>
+
+        <!-- GENERAL INFO -->
+        <div class="info-section">
+          <div class="info-section-title">المعلومات الأساسية</div>
+          <div class="info-row">
+            <span class="info-label">تاريخ الميلاد</span>
+            <span class="info-value">15 / 3 / 2020</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">المدرسة</span>
+            <span class="info-value">مدرسة النور الدولية</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">الصف</span>
+            <span class="info-value">روضة ب</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">الفصل</span>
+            <span class="info-value">أ</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">العنوان</span>
+            <span class="info-value">شارع الزيتون، عمان</span>
+          </div>
+        </div>
+
+                <!-- MEDICAL -->
+        <div class="medical-card">
+          <div class="medical-title-row">
+            <div class="medical-dot"></div>
+            <span class="medical-title">تنبيهات طبية</span>
+          </div>
+          <div class="allergy-tags">
+            <div class="allergy-tag"><span>حساسية: مكسرات</span></div>
+            <div class="allergy-tag"><span>حساسية: غبار</span></div>
+            <div class="allergy-tag"><span>ربو خفيف</span></div>
+          </div>
+        </div>
+
+        <!-- PARENT NOTES -->
+        <div class="notes-card">
+          <div class="notes-title-row">
+            <div class="notes-dot"></div>
+            <span class="notes-title">ملاحظات الوالدين</span>
+          </div>
+          <div class="notes-body">أحمد يحتاج وقتاً إضافياً للتكيف في المواقف الجديدة. يرجى إعطاؤه بعض الوقت عند الصعود.</div>
+        </div>
+
+        <!-- EMERGENCY -->
+        <div class="contact-card">
+          <div class="contact-title">جهات الطوارئ</div>
+          <div class="contact-row">
+            <div class="contact-avatar">أم</div>
+            <div style="flex:1;">
+              <div class="contact-name">أم أحمد الخالدي</div>
+              <div class="contact-relation">الأم · +962 79 123 4567</div>
+            </div>
+            <div class="call-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+          <div class="contact-row">
+            <div class="contact-avatar" style="background:#F0FDF4;color:#16A34A;">أب</div>
+            <div style="flex:1;">
+              <div class="contact-name">أبو أحمد الخالدي</div>
+              <div class="contact-relation">الأب · +962 79 987 6543</div>
+            </div>
+            <div class="call-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">معلومات الطالب — عربي</div>
+</div>
+
+<!-- ===== ENGLISH VERSION ===== -->
+<div class="sw" dir="ltr" style="font-family:'Inter',sans-serif;">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="page-title en-font">Student Info</div>
+        <div class="edit-btn" style="margin-left:auto;margin-right:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span class="en-font">Edit</span>
+        </div>
+      </div>
+
+
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="profile-card">
+          <div class="student-avatar en-font">AH</div>
+          <div>
+            <div class="student-name en-font">Ahmed M. Khaldi</div>
+            <div class="student-id en-font">Student ID: SE2024001</div>
+            <div class="student-grade-badge"><span class="en-font">Kindergarten B</span></div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <div class="info-section-title en-font">General Information</div>
+          <div class="info-row">
+            <span class="info-label en-font">Date of Birth</span>
+            <span class="info-value en-font">3 / 15 / 2020</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label en-font">School</span>
+            <span class="info-value en-font">Al-Noor International School</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label en-font">Grade</span>
+            <span class="info-value en-font">Kindergarten B</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label en-font">Class</span>
+            <span class="info-value en-font">A</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label en-font">Address</span>
+            <span class="info-value en-font">Al-Zeitoun St, Amman</span>
+          </div>
+        </div>
+
+        <div class="medical-card">
+          <div class="medical-title-row">
+            <div class="medical-dot"></div>
+            <span class="medical-title en-font">Medical Alerts</span>
+          </div>
+          <div class="allergy-tags">
+            <div class="allergy-tag"><span class="en-font">Allergy: Nuts</span></div>
+            <div class="allergy-tag"><span class="en-font">Allergy: Dust</span></div>
+            <div class="allergy-tag"><span class="en-font">Mild Asthma</span></div>
+          </div>
+        </div>
+
+        <div class="notes-card">
+          <div class="notes-title-row">
+            <div class="notes-dot"></div>
+            <span class="notes-title en-font">Parent Notes</span>
+          </div>
+          <div class="notes-body en-font">Ahmed needs extra time to adjust in new situations. Please give him a few minutes when boarding.</div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-title en-font">Emergency Contacts</div>
+          <div class="contact-row">
+            <div class="contact-avatar en-font">MO</div>
+            <div style="flex:1;">
+              <div class="contact-name en-font">Sarah Khaldi (Mother)</div>
+              <div class="contact-relation en-font">+962 79 123 4567</div>
+            </div>
+            <div class="call-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+          <div class="contact-row">
+            <div class="contact-avatar en-font" style="background:#F0FDF4;color:#16A34A;">FA</div>
+            <div style="flex:1;">
+              <div class="contact-name en-font">Ahmad Khaldi (Father)</div>
+              <div class="contact-relation en-font">+962 79 987 6543</div>
+            </div>
+            <div class="call-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Student Info — English</div>
+</div>
+
+</body>
+</html>

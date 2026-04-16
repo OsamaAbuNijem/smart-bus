@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>المساعد</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--y:#FFD700;--yl:#FFFDE7;--yd:#B8960C;--bl:#3B82F6;--bll:#EFF6FF;--bld:#1D4ED8;--g:#22C55E;--gl:#F0FDF4;--gd:#16A34A;--r:#EF4444;--rl:#FFF0F0;--rb:#FECACA;--o:#F97316;--ol:#FFF7ED;--g5:#F9FAFB;--g1:#F3F4F6;--g2:#E5E7EB;--g3:#D1D5DB;--g4:#9CA3AF;--g6:#6B7280;--g9:#111111;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Cairo',sans-serif;background:#E5E5E5;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:48px 32px;gap:48px;flex-wrap:wrap;}
+.sw{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.lbl2{font-size:13px;font-weight:700;color:#555;}
+.phone{width:375px;height:812px;background:#fff;border-radius:56px;border:10px solid #1a1a1a;overflow:hidden;display:flex;flex-direction:column;}
+.sb{height:44px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;}
+.sb span{font-size:13px;color:#333;font-family:'Cairo',sans-serif;}
+.screen{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.view{flex:1;display:none;flex-direction:column;overflow:hidden;background:var(--g5);}
+.view.active{display:flex;}
+.sc{flex:1;overflow-y:auto;}.sc::-webkit-scrollbar{display:none;}
+.ph{background:#fff;padding:12px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--g1);flex-shrink:0;}
+.bb{width:32px;height:32px;border-radius:50%;background:var(--g1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.pt{font-size:16px;font-weight:700;color:var(--g9);font-family:'Cairo',sans-serif;}
+.ps{font-size:11px;color:var(--g4);font-family:'Cairo',sans-serif;margin-top:1px;}
+.ef{font-family:'Inter',sans-serif !important;}
+
+/* ASSISTANT CARD */
+.ac{background:var(--bl);margin:14px 14px 0;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.aa{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;flex-shrink:0;}
+.an{font-size:16px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;}
+.ar{font-size:12px;color:#BFDBFE;font-family:'Cairo',sans-serif;margin-top:2px;}
+
+.slbl{font-size:11px;font-weight:700;color:var(--g4);padding:12px 16px 6px;letter-spacing:.04em;font-family:'Cairo',sans-serif;}
+
+/* TRIP CARD */
+.tc{background:#fff;margin:0 14px 10px;border-radius:16px;border:1px solid var(--g2);overflow:hidden;cursor:pointer;}
+.tt{padding:13px 14px;display:flex;align-items:flex-start;gap:12px;}
+.ti{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tn{flex:1;}
+.ttl{font-size:14px;font-weight:700;color:var(--g9);font-family:'Cairo',sans-serif;}
+.ttm{font-size:11px;color:var(--g4);font-family:'Cairo',sans-serif;margin-top:2px;}
+.sbg{border-radius:20px;padding:4px 10px;flex-shrink:0;align-self:flex-start;}
+.sbg span{font-size:11px;font-weight:700;font-family:'Cairo',sans-serif;}
+.tb{display:flex;border-top:1px solid var(--g1);}
+.ts{flex:1;padding:9px;text-align:center;border-left:1px solid var(--g1);}
+.ts:last-child{border-left:none;}
+.tsv{font-size:14px;font-weight:700;color:var(--g9);font-family:'Cairo',sans-serif;}
+.tsl{font-size:10px;color:var(--g4);font-family:'Cairo',sans-serif;margin-top:1px;}
+
+/* PROGRESS */
+.pw{padding:7px 16px 9px;background:#fff;border-bottom:1px solid var(--g1);flex-shrink:0;}
+.pr{display:flex;justify-content:space-between;margin-bottom:5px;}
+.pr span{font-size:11px;color:var(--g4);font-family:'Cairo',sans-serif;}
+.pr b{font-size:11px;font-weight:700;color:var(--g9);font-family:'Cairo',sans-serif;}
+.pt2{height:5px;background:var(--g1);border-radius:3px;overflow:hidden;}
+.pf{height:100%;background:var(--g);border-radius:3px;}
+
+/* STUDENT CARD */
+.std{background:#fff;margin:0 14px 8px;border-radius:14px;border:1px solid var(--g2);overflow:hidden;}
+.std.bd{border-color:var(--g);}
+.std.ab{border-color:var(--r);opacity:.78;}
+.std-top{display:flex;align-items:center;gap:10px;padding:11px 13px;}
+.sav{width:36px;height:36px;border-radius:50%;background:var(--bll);border:2px solid var(--bl);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bld);font-family:'Cairo',sans-serif;flex-shrink:0;}
+.sav.b{background:var(--gl);border-color:var(--g);color:var(--gd);}
+.sav.a{background:var(--rl);border-color:var(--r);color:#DC2626;}
+.sn{font-size:13px;font-weight:700;color:var(--g9);font-family:'Cairo',sans-serif;}
+.sst{font-size:11px;color:var(--g4);font-family:'Cairo',sans-serif;margin-top:1px;}
+.sdot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* STUDENT ACTIONS */
+.sact{border-top:1px solid var(--g1);display:flex;}
+.sab{flex:1;padding:9px 0;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-left:1px solid var(--g1);}
+.sab:last-child{border-left:none;}
+.sab:active{background:var(--g5);}
+.sai{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.sal{font-size:9px;font-weight:700;color:var(--g6);font-family:'Cairo',sans-serif;}
+.cbar{padding:8px 13px;display:flex;align-items:center;gap:6px;border-top:1px solid var(--g1);}
+.ctxt{font-size:11px;font-weight:700;font-family:'Cairo',sans-serif;}
+
+/* QR MODAL */
+.modal{display:none;position:absolute;inset:0;background:rgba(0,0,0,.65);z-index:20;align-items:flex-end;}
+.modal.open{display:flex;}
+.msheet{background:#fff;border-radius:22px 22px 0 0;padding:16px;width:100%;}
+.mhandle{width:36px;height:4px;border-radius:2px;background:var(--g2);margin:0 auto 12px;}
+.mtitle{font-size:15px;font-weight:700;color:var(--g9);font-family:'Cairo',sans-serif;margin-bottom:10px;text-align:center;}
+.mtabs{display:flex;gap:8px;margin-bottom:12px;}
+.mtab{flex:1;background:var(--g1);border-radius:10px;padding:8px;text-align:center;cursor:pointer;}
+.mtab.on{background:var(--bl);}
+.mtab span{font-size:11px;font-weight:700;font-family:'Cairo',sans-serif;color:var(--g6);}
+.mtab.on span{color:#fff;}
+.qrf{width:180px;height:170px;border-radius:14px;background:var(--g5);border:1.5px solid var(--g2);margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.qrc{position:absolute;width:22px;height:22px;border-color:var(--bl);border-style:solid;}
+.qr-tl{top:8px;right:8px;border-width:2px 0 0 2px;border-radius:2px 0 0 0;}
+.qr-tr{top:8px;left:8px;border-width:2px 2px 0 0;border-radius:0 2px 0 0;}
+.qr-bl{bottom:8px;right:8px;border-width:0 0 2px 2px;border-radius:0 0 0 2px;}
+.qr-br{bottom:8px;left:8px;border-width:0 2px 2px 0;border-radius:0 0 2px 0;}
+.qrl{position:absolute;width:164px;height:2px;background:var(--bl);opacity:.7;animation:scan 2s ease-in-out infinite;}
+@keyframes scan{0%,100%{top:12px;}50%{top:148px;}}
+.qrhint{font-size:11px;color:var(--bl);font-family:'Cairo',sans-serif;text-align:center;margin-top:8px;}
+.nfcw{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 0;}
+.nfcr{width:80px;height:80px;border-radius:50%;background:var(--bl);display:flex;align-items:center;justify-content:center;animation:nfcp 2s infinite;}
+@keyframes nfcp{0%{box-shadow:0 0 0 0 rgba(59,130,246,.5);}70%{box-shadow:0 0 0 18px rgba(59,130,246,0);}100%{box-shadow:0 0 0 0 rgba(59,130,246,0);}}
+.mclose{background:var(--g1);border-radius:11px;padding:10px;text-align:center;cursor:pointer;margin-top:10px;}
+.mclose span{font-size:13px;font-weight:700;color:var(--g6);font-family:'Cairo',sans-serif;}
+
+/* NOTES */
+.nc{background:#fff;border-radius:14px;border:1px solid var(--g2);margin:0 14px 10px;padding:13px;}
+.nl{font-size:11px;font-weight:600;color:var(--g4);font-family:'Cairo',sans-serif;margin-bottom:6px;}
+.nchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.np{background:var(--g5);border:1.5px solid var(--g2);border-radius:20px;padding:4px 11px;cursor:pointer;}
+.np.on{background:var(--bll);border-color:var(--bl);}
+.np span{font-size:11px;font-weight:600;font-family:'Cairo',sans-serif;color:var(--g9);}
+.np.on span{color:var(--bld);}
+.nta{width:100%;background:var(--g5);border:1px solid var(--g2);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--g9);font-family:'Cairo',sans-serif;resize:none;height:72px;outline:none;line-height:1.5;}
+.nsend{background:var(--y);border-radius:11px;padding:11px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;border:none;width:100%;margin-top:8px;}
+.nsend span{font-size:13px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;}
+.pn{background:#fff;margin:0 14px 8px;border-radius:12px;border:1px solid var(--g2);padding:10px 13px;}
+.pnt{display:flex;justify-content:space-between;margin-bottom:4px;}
+.pns{font-size:12px;font-weight:700;color:var(--g9);font-family:'Cairo',sans-serif;}
+.pnti{font-size:10px;color:var(--g4);font-family:'Cairo',sans-serif;}
+.pntx{font-size:11px;color:var(--g6);font-family:'Cairo',sans-serif;line-height:1.4;}
+.pnb{border-radius:20px;padding:2px 8px;margin-top:4px;display:inline-block;}
+.pnb span{font-size:10px;font-weight:700;font-family:'Cairo',sans-serif;}
+
+/* EMERGENCY */
+.sos{background:var(--r);border-radius:18px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;margin:14px;box-shadow:0 4px 16px rgba(239,68,68,.4);}
+.sosc{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;}
+.sost{font-size:19px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;}
+.soss{font-size:11px;color:rgba(255,255,255,.8);font-family:'Cairo',sans-serif;}
+.crow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--g1);}
+.crow:last-child{border-bottom:none;}
+.cic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cn{font-size:13px;font-weight:700;color:var(--g9);font-family:'Cairo',sans-serif;}
+.cp{font-size:11px;color:var(--g4);font-family:'Cairo',sans-serif;margin-top:1px;}
+.ccl{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-right:auto;}
+</style>
+</head>
+<body>
+
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+<div class="phone">
+<div class="sb"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+<div class="screen">
+
+<!-- TRIPS LIST -->
+<div class="view active" id="ar-trips">
+  <div class="ph">
+    <div style="flex:1;"><div class="pt">رحلاتي اليوم</div><div class="ps">الأحد، 13 أبريل</div></div>
+    <div class="bb" onclick="sv('ar','emer')" style="background:var(--rl);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div>
+  </div>
+  <div class="sc">
+    <div class="ac"><div class="aa">سم</div><div><div class="an">سمر أحمد</div><div class="ar">مساعد · الباص #42</div></div></div>
+    <div class="slbl">جارية الآن</div>
+    <div class="tc" onclick="sv('ar','active')">
+      <div class="tt"><div class="ti" style="background:var(--gl);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="tn"><div class="ttl">رحلة الصباح — ذهاب</div><div class="ttm">بدأت 7:15 ص · تنتهي ~8:05 ص</div></div><div class="sbg" style="background:var(--gl);"><span style="color:var(--gd);">جارية</span></div></div>
+      <div class="tb"><div class="ts"><div class="tsv">28</div><div class="tsl">طالب</div></div><div class="ts"><div class="tsv" style="color:var(--g);">12</div><div class="tsl">ركبوا</div></div><div class="ts"><div class="tsv" style="color:var(--o);">~26</div><div class="tsl">دقيقة</div></div></div>
+    </div>
+    <div class="slbl">قادمة</div>
+    <div class="tc" onclick="sv('ar','upcoming')">
+      <div class="tt"><div class="ti" style="background:var(--yl);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="tn"><div class="ttl">رحلة العودة — إياب</div><div class="ttm">تبدأ 2:00 م · تنتهي ~2:50 م</div></div><div class="sbg" style="background:var(--yl);"><span style="color:var(--yd);">قادمة</span></div></div>
+      <div class="tb"><div class="ts"><div class="tsv">28</div><div class="tsl">طالب</div></div><div class="ts"><div class="tsv" style="color:var(--yd);">22</div><div class="tsl">كيلومتر</div></div><div class="ts"><div class="tsv">~50</div><div class="tsl">دقيقة</div></div></div>
+    </div>
+    <div class="slbl">مكتملة</div>
+    <div class="tc" onclick="sv('ar','done')">
+      <div class="tt"><div class="ti" style="background:var(--g1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tn"><div class="ttl">رحلة الصباح — أمس</div><div class="ttm">انتهت 7:58 ص</div></div><div class="sbg" style="background:var(--g1);"><span style="color:var(--g6);">مكتملة</span></div></div>
+      <div class="tb"><div class="ts"><div class="tsv">26</div><div class="tsl">طالب</div></div><div class="ts"><div class="tsv" style="color:var(--g4);">24</div><div class="tsl">ركبوا</div></div><div class="ts"><div class="tsv">43</div><div class="tsl">دقيقة</div></div></div>
+    </div>
+    <div style="height:14px;"></div>
+  </div>
+</div>
+
+<!-- ACTIVE TRIP -->
+<div class="view" id="ar-active" style="position:relative;">
+  <div class="ph">
+    <div class="bb" onclick="sv('ar','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div style="flex:1;"><div class="pt">رحلة الصباح — ذهاب</div><div class="ps">جارية · 12 من 28 ركبوا</div></div>
+    <div class="bb" onclick="sv('ar','notes')" style="background:var(--yl);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+  </div>
+  <!-- QR / NFC shared bar -->
+  <div style="display:flex;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid var(--g1);flex-shrink:0;">
+    <div onclick="openM('ar','qr')" style="flex:1;background:var(--bll);border:1.5px solid var(--bl);border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="4" y="4" width="4" height="4" fill="#3B82F6"/><rect x="16" y="4" width="4" height="4" fill="#3B82F6"/><rect x="4" y="16" width="4" height="4" fill="#3B82F6"/></svg>
+      <span style="font-size:13px;font-weight:700;color:var(--bld);font-family:'Cairo',sans-serif;">مسح QR</span>
+    </div>
+    <div onclick="openM('ar','nfc')" style="flex:1;background:var(--bll);border:1.5px solid var(--bl);border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#3B82F6"/></svg>
+      <span style="font-size:13px;font-weight:700;color:var(--bld);font-family:'Cairo',sans-serif;">NFC</span>
+    </div>
+  </div>
+  <div class="pw"><div class="pr"><span>التقدم</span><b>12 من 28</b></div><div class="pt2"><div class="pf" style="width:43%;"></div></div></div>
+  <div style="display:flex;gap:8px;padding:8px 16px 9px;background:#fff;border-bottom:1px solid var(--g1);flex-shrink:0;">
+    <div style="flex:1;text-align:center;background:var(--gl);border-radius:8px;padding:7px;"><div style="font-size:16px;font-weight:700;color:var(--gd);font-family:'Cairo',sans-serif;">12</div><div style="font-size:10px;color:var(--gd);font-family:'Cairo',sans-serif;">ركبوا</div></div>
+    <div style="flex:1;text-align:center;background:var(--rl);border-radius:8px;padding:7px;"><div style="font-size:16px;font-weight:700;color:#DC2626;font-family:'Cairo',sans-serif;">3</div><div style="font-size:10px;color:#DC2626;font-family:'Cairo',sans-serif;">غائبون</div></div>
+    <div style="flex:1;text-align:center;background:var(--g1);border-radius:8px;padding:7px;"><div style="font-size:16px;font-weight:700;color:var(--g6);font-family:'Cairo',sans-serif;">13</div><div style="font-size:10px;color:var(--g6);font-family:'Cairo',sans-serif;">انتظار</div></div>
+  </div>
+  <div class="sc">
+    <div class="slbl">ركبوا ✅</div>
+    <div class="std bd"><div class="std-top"><div class="sav b">أح</div><div style="flex:1;"><div class="sn">أحمد محمد</div><div class="sst">محطة الجامعة · 7:15 ص</div></div><div class="sdot" style="background:var(--g);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="cbar"><span class="ctxt" style="color:var(--gd);">ركب · 7:15 ص</span></div></div>
+    <div class="std ab"><div class="std-top"><div class="sav a">لي</div><div style="flex:1;"><div class="sn">ليلى سامر</div><div class="sst">أبلغت بالغياب مسبقاً</div></div><div class="sdot" style="background:var(--r);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div></div><div class="cbar"><span class="ctxt" style="color:#DC2626;">غائبة — مسبقاً ❌</span></div></div>
+    <div class="slbl">في الانتظار 🕐</div>
+    <div class="std" id="ar-s-omar"><div class="std-top"><div class="sav">عم</div><div style="flex:1;"><div class="sn">عمر يوسف</div><div class="sst">محطة الزيتون · ~7:41 ص</div></div><div class="sdot" style="background:var(--g3);"></div></div><div class="sact"><div class="sab" onclick="mkB('ar','omar')"><div class="sai" style="background:var(--gl);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="sal" style="color:var(--gd);">صعد ✅</div></div><div class="sab" onclick="mkA('ar','omar')"><div class="sai" style="background:var(--rl);border:1px solid var(--rb);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="sal" style="color:#DC2626;">غائب ❌</div></div></div></div>
+    <div class="std" id="ar-s-salma"><div class="std-top"><div class="sav">سل</div><div style="flex:1;"><div class="sn">سلمى أحمد</div><div class="sst">محطة العبدلي · ~7:50 ص</div></div><div class="sdot" style="background:var(--g3);"></div></div><div class="sact"><div class="sab" onclick="mkB('ar','salma')"><div class="sai" style="background:var(--gl);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="sal" style="color:var(--gd);">صعد ✅</div></div><div class="sab" onclick="mkA('ar','salma')"><div class="sai" style="background:var(--rl);border:1px solid var(--rb);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="sal" style="color:#DC2626;">غائب ❌</div></div></div></div>
+    <div class="std" id="ar-s-basel"><div class="std-top"><div class="sav">با</div><div style="flex:1;"><div class="sn">باسل عمر</div><div class="sst">محطة الدوار · ~7:57 ص</div></div><div class="sdot" style="background:var(--g3);"></div></div><div class="sact"><div class="sab" onclick="mkB('ar','basel')"><div class="sai" style="background:var(--gl);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="sal" style="color:var(--gd);">صعد ✅</div></div><div class="sab" onclick="mkA('ar','basel')"><div class="sai" style="background:var(--rl);border:1px solid var(--rb);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="sal" style="color:#DC2626;">غائب ❌</div></div></div></div>
+    <div style="height:14px;"></div>
+  </div>
+  <!-- Shared QR/NFC Modal -->
+  <div class="modal" id="ar-modal">
+    <div class="msheet">
+      <div class="mhandle"></div>
+      <div class="mtitle">مسح بطاقة الطالب</div>
+      <div style="font-size:11px;color:var(--g4);font-family:'Cairo',sans-serif;text-align:center;margin-bottom:10px;">بعد المسح يصبح الطالب حاضراً تلقائياً</div>
+      <div class="mtabs"><div class="mtab on" id="ar-mt-qr" onclick="swM('ar','qr')"><span>📷 QR</span></div><div class="mtab" id="ar-mt-nfc" onclick="swM('ar','nfc')"><span>📡 NFC</span></div></div>
+      <div id="ar-mqr"><div class="qrf"><div class="qrc qr-tl"></div><div class="qrc qr-tr"></div><div class="qrc qr-bl"></div><div class="qrc qr-br"></div><div class="qrl"></div><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="4" y="4" width="4" height="4" fill="#9CA3AF"/><rect x="16" y="4" width="4" height="4" fill="#9CA3AF"/><rect x="4" y="16" width="4" height="4" fill="#9CA3AF"/></svg></div><div class="qrhint">وجّه الكاميرا نحو بطاقة الطالب</div></div>
+      <div id="ar-mnfc" style="display:none;"><div class="nfcw"><div class="nfcr"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#fff"/></svg></div><div style="font-size:13px;font-weight:700;color:var(--bld);font-family:'Cairo',sans-serif;">قرّب البطاقة</div><div style="font-size:11px;color:var(--bl);font-family:'Cairo',sans-serif;">ضع بطاقة الطالب بالقرب من الهاتف</div></div></div>
+      <!-- Demo: simulate scan -->
+      <div onclick="simScan('ar')" style="background:var(--g);border-radius:11px;padding:10px;text-align:center;cursor:pointer;margin-top:8px;"><span style="font-size:13px;font-weight:700;color:#fff;font-family:'Cairo',sans-serif;">✅ محاكاة مسح ناجح</span></div>
+      <div class="mclose" onclick="closeM('ar')"><span>إغلاق</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- UPCOMING -->
+<div class="view" id="ar-upcoming">
+  <div class="ph"><div class="bb" onclick="sv('ar','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div><div><div class="pt">رحلة العودة — إياب</div><div class="ps">تبدأ 2:00 م · 28 طالب</div></div></div>
+  <div class="pw"><div class="pr"><span>الطلاب</span><b>28 سينزلون</b></div><div class="pt2"><div class="pf" style="width:0%;"></div></div></div>
+  <div class="sc">
+    <div class="slbl">قائمة الطلاب</div>
+    <div class="std"><div class="std-top"><div class="sav">أح</div><div style="flex:1;"><div class="sn">أحمد محمد</div><div class="sst">ينزل محطة الجامعة · ~2:48 م</div></div><div style="font-size:11px;font-weight:700;color:var(--g4);font-family:'Cairo',sans-serif;flex-shrink:0;">~2:48</div></div><div class="sact"><div class="sab" onclick="openM('ar2','a1','qr')"><div class="sai" style="background:var(--bll);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="4" y="4" width="4" height="4" fill="#3B82F6"/></svg></div><div class="sal">QR</div></div><div class="sab" onclick="openM('ar2','a1','nfc')"><div class="sai" style="background:var(--bll);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><circle cx="12" cy="20" r="1" fill="#3B82F6"/></svg></div><div class="sal">NFC</div></div><div class="sab"><div class="sai" style="background:var(--gl);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="sal" style="color:var(--gd);">نزل</div></div><div class="sab"><div class="sai" style="background:var(--rl);border:1px solid var(--rb);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="sal" style="color:#DC2626;">غائب</div></div></div></div>
+    <div class="std"><div class="std-top"><div class="sav">مح</div><div style="flex:1;"><div class="sn">محمد خالد</div><div class="sst">ينزل محطة الشميساني · ~2:42 م</div></div><div style="font-size:11px;font-weight:700;color:var(--g4);font-family:'Cairo',sans-serif;flex-shrink:0;">~2:42</div></div><div class="sact"><div class="sab"><div class="sai" style="background:var(--bll);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="4" y="4" width="4" height="4" fill="#3B82F6"/></svg></div><div class="sal">QR</div></div><div class="sab"><div class="sai" style="background:var(--bll);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><circle cx="12" cy="20" r="1" fill="#3B82F6"/></svg></div><div class="sal">NFC</div></div><div class="sab"><div class="sai" style="background:var(--gl);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="sal" style="color:var(--gd);">نزل</div></div><div class="sab"><div class="sai" style="background:var(--rl);border:1px solid var(--rb);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="sal" style="color:#DC2626;">غائب</div></div></div></div>
+    <div style="height:14px;"></div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div class="view" id="ar-done">
+  <div class="ph"><div class="bb" onclick="sv('ar','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div><div><div class="pt">رحلة الصباح — أمس</div><div class="ps">مكتملة · 7:58 ص</div></div></div>
+  <div class="pw"><div class="pr"><span>الإجمالي</span><b>24 من 26 ركبوا</b></div><div class="pt2"><div class="pf" style="width:92%;"></div></div></div>
+  <div class="sc">
+    <div class="slbl">سجل الطلاب</div>
+    <div class="std bd"><div class="std-top"><div class="sav b">أح</div><div style="flex:1;"><div class="sn">أحمد محمد</div><div class="sst">محطة الجامعة</div></div><div class="sdot" style="background:var(--g);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="cbar"><span class="ctxt" style="color:var(--gd);">ركب · 7:15 ص</span></div></div>
+    <div class="std bd"><div class="std-top"><div class="sav b">مح</div><div style="flex:1;"><div class="sn">محمد خالد</div><div class="sst">محطة الشميساني</div></div><div class="sdot" style="background:var(--g);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="cbar"><span class="ctxt" style="color:var(--gd);">ركب · 7:22 ص</span></div></div>
+    <div class="std ab"><div class="std-top"><div class="sav a">لي</div><div style="flex:1;"><div class="sn">ليلى سامر</div><div class="sst">غائبة</div></div><div class="sdot" style="background:var(--r);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div></div><div class="cbar"><span class="ctxt" style="color:#DC2626;">غائبة</span></div></div>
+    <div class="std bd"><div class="std-top"><div class="sav b">عم</div><div style="flex:1;"><div class="sn">عمر يوسف</div><div class="sst">محطة الزيتون</div></div><div class="sdot" style="background:var(--g);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="cbar"><span class="ctxt" style="color:var(--gd);">ركب · 7:41 ص</span></div></div>
+    <div style="height:14px;"></div>
+  </div>
+</div>
+
+<!-- NOTES -->
+<div class="view" id="ar-notes">
+  <div class="ph"><div class="bb" onclick="sv('ar','active')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div><div><div class="pt">ملاحظة للأهل</div><div class="ps">رحلة الصباح</div></div></div>
+  <div class="sc">
+    <div class="nc">
+      <div class="nl">اختر الطالب</div>
+      <div class="nchips"><div class="np on"><span>أحمد</span></div><div class="np"><span>محمد</span></div><div class="np"><span>عمر</span></div><div class="np"><span>سلمى</span></div><div class="np"><span>باسل</span></div></div>
+      <div class="nl">النوع</div>
+      <div style="display:flex;gap:7px;margin-bottom:10px;">
+        <div style="flex:1;background:var(--yl);border:1.5px solid var(--y);border-radius:10px;padding:7px;text-align:center;cursor:pointer;"><div style="font-size:14px;margin-bottom:2px;">⚠️</div><div style="font-size:10px;font-weight:700;color:var(--yd);font-family:'Cairo',sans-serif;">تنبيه</div></div>
+        <div style="flex:1;background:var(--g1);border:1.5px solid var(--g2);border-radius:10px;padding:7px;text-align:center;cursor:pointer;"><div style="font-size:14px;margin-bottom:2px;">ℹ️</div><div style="font-size:10px;font-weight:700;color:var(--g6);font-family:'Cairo',sans-serif;">معلومة</div></div>
+        <div style="flex:1;background:var(--g1);border:1.5px solid var(--g2);border-radius:10px;padding:7px;text-align:center;cursor:pointer;"><div style="font-size:14px;margin-bottom:2px;">✅</div><div style="font-size:10px;font-weight:700;color:var(--g6);font-family:'Cairo',sans-serif;">إيجابية</div></div>
+      </div>
+      <div class="nl">الرسالة</div>
+      <textarea class="nta" placeholder="اكتب ملاحظتك...">أحمد نسي حقيبته في الباص، يحتاج استلامها من المدرسة</textarea>
+      <button class="nsend"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>إرسال للأهل</span></button>
+    </div>
+    <div class="slbl">السابقة</div>
+    <div class="pn"><div class="pnt"><span class="pns">محمد خالد</span><span class="pnti">7:25 ص</span></div><div class="pntx">تصرف ممتاز، ساعد الطلاب الجدد</div><div class="pnb" style="background:var(--gl);"><span style="color:var(--gd);">✅ إيجابية</span></div></div>
+    <div class="pn"><div class="pnt"><span class="pns">سارة علي</span><span class="pnti">أمس 7:40</span></div><div class="pntx">وصلت متأخرة 5 دقائق للمحطة</div><div class="pnb" style="background:var(--yl);"><span style="color:var(--yd);">⚠️ تنبيه</span></div></div>
+    <div style="height:14px;"></div>
+  </div>
+</div>
+
+<!-- EMERGENCY -->
+<div class="view" id="ar-emer">
+  <div class="ph"><div class="bb" onclick="sv('ar','trips')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div><div class="pt">الطوارئ</div></div>
+  <div class="sc">
+    <div class="sos"><div class="sosc"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="sost">SOS — تنبيه فوري</div><div class="soss">اضغط لإبلاغ الإدارة وأهالي جميع الطلاب</div></div>
+    <div style="background:var(--ol);border-radius:14px;border:1px solid #FED7AA;padding:13px;margin:0 14px 12px;">
+      <div style="font-size:13px;font-weight:700;color:#C2410C;font-family:'Cairo',sans-serif;margin-bottom:8px;">إبلاغ سريع</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+        <div style="background:#fff;border:1px solid #FED7AA;border-radius:10px;padding:9px 8px;display:flex;align-items:center;gap:6px;cursor:pointer;"><span>🚌</span><span style="font-size:11px;font-weight:600;color:#C2410C;font-family:'Cairo',sans-serif;">حادث</span></div>
+        <div style="background:#fff;border:1px solid #FED7AA;border-radius:10px;padding:9px 8px;display:flex;align-items:center;gap:6px;cursor:pointer;"><span>🤕</span><span style="font-size:11px;font-weight:600;color:#C2410C;font-family:'Cairo',sans-serif;">إصابة طالب</span></div>
+        <div style="background:#fff;border:1px solid #FED7AA;border-radius:10px;padding:9px 8px;display:flex;align-items:center;gap:6px;cursor:pointer;"><span>🔎</span><span style="font-size:11px;font-weight:600;color:#C2410C;font-family:'Cairo',sans-serif;">طالب مفقود</span></div>
+        <div style="background:#fff;border:1px solid #FED7AA;border-radius:10px;padding:9px 8px;display:flex;align-items:center;gap:6px;cursor:pointer;"><span>⚠️</span><span style="font-size:11px;font-weight:600;color:#C2410C;font-family:'Cairo',sans-serif;">حالة أخرى</span></div>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:14px;border:1px solid var(--g2);margin:0 14px;overflow:hidden;">
+      <div style="font-size:11px;font-weight:700;color:var(--g4);padding:7px 14px 4px;background:var(--g5);border-bottom:1px solid var(--g1);letter-spacing:.04em;font-family:'Cairo',sans-serif;">جهات الاتصال</div>
+      <div class="crow"><div class="cic" style="background:var(--bll);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div style="flex:1;"><div class="cn">إدارة المدرسة</div><div class="cp">+962 6 123 4567</div></div><div class="ccl" style="background:var(--g);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div></div>
+      <div class="crow"><div class="cic" style="background:var(--yl);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/></svg></div><div style="flex:1;"><div class="cn">السائق أبو محمد</div><div class="cp">+962 79 123 4567</div></div><div class="ccl" style="background:var(--g);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div></div>
+      <div class="crow"><div class="cic" style="background:var(--rl);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/><path d="M1 1l22 22"/></svg></div><div style="flex:1;"><div class="cn">الإسعاف / 911</div><div class="cp" style="direction:ltr;text-align:right;">911</div></div><div class="ccl" style="background:var(--r);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div></div>
+    </div>
+    <div style="height:14px;"></div>
+  </div>
+</div>
+
+</div></div>
+<div class="lbl2">المساعد — الرئيسية (عربي)</div>
+</div>
+
+<script>
+const VS=['trips','active','upcoming','done','notes','emer'];
+function sv(l,v){VS.forEach(x=>{const e=document.getElementById(l+'-'+x);if(e)e.classList.toggle('active',x===v);});}
+
+// Shared QR/NFC modal — opens without targeting a specific student
+function openM(l,t){
+  document.getElementById('ar-modal').classList.add('open');
+  swM('ar',t);
+}
+function closeM(l){document.getElementById('ar-modal').classList.remove('open');}
+function swM(l,t){
+  document.getElementById('ar-mqr').style.display=t==='qr'?'block':'none';
+  document.getElementById('ar-mnfc').style.display=t==='nfc'?'block':'none';
+  document.getElementById('ar-mt-qr').classList.toggle('on',t==='qr');
+  document.getElementById('ar-mt-nfc').classList.toggle('on',t==='nfc');
+}
+
+// Simulate a scan — marks the first waiting student as boarded
+const waitingOrder=['omar','salma','basel'];
+function simScan(l){
+  for(const id of waitingOrder){
+    const c=document.getElementById(l+'-s-'+id);
+    if(c && !c.classList.contains('bd') && !c.classList.contains('ab')){
+      mkB(l,id);
+      closeM(l);
+      return;
+    }
+  }
+  closeM(l);
+}
+
+function mkB(l,id){
+  const c=document.getElementById(l+'-s-'+id);if(!c)return;
+  c.className='std bd';
+  c.querySelector('.sav').className='sav b';
+  const d=c.querySelector('.sdot');d.style.background='var(--g)';d.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const act=c.querySelector('.sact');if(act)act.outerHTML='<div class="cbar"><span class="ctxt" style="color:var(--gd);">ركب ✅</span></div>';
+}
+function mkA(l,id){
+  const c=document.getElementById(l+'-s-'+id);if(!c)return;
+  c.className='std ab';
+  c.querySelector('.sav').className='sav a';
+  const d=c.querySelector('.sdot');d.style.background='var(--r)';d.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  const act=c.querySelector('.sact');if(act)act.outerHTML='<div class="cbar"><span class="ctxt" style="color:#DC2626;">غائب ❌</span></div>';
+}
+</script>
+</body>
+</html>

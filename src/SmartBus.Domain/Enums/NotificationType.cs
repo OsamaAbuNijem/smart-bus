@@ -8,5 +8,10 @@ public enum NotificationType
     TripCancelled = 3,
     BusArriving = 4,
     BusArrived = 5,
-    SystemAlert = 6
+    SystemAlert = 6,
+    StudentBoarded = 7,
+    StudentArrived = 8,
+    AbsenceConfirmed = 9,
+    DriverMessage = 10,
+    SchoolNotice = 11
 }

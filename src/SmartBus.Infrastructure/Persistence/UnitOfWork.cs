@@ -15,6 +15,12 @@ public class UnitOfWork : IUnitOfWork
     public IStudentRepository Students { get; }
     public ITripRepository Trips { get; }
     public INotificationRepository Notifications { get; }
+    public IParentRepository Parents { get; }
+    public IAssistantRepository Assistants { get; }
+    public IAttendanceRepository Attendances { get; }
+    public IAbsenceRequestRepository AbsenceRequests { get; }
+    public IStudentTripRepository StudentTrips { get; }
+    public IAlertRepository Alerts { get; }
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -25,6 +31,12 @@ public class UnitOfWork : IUnitOfWork
         Students = new StudentRepository(context);
         Trips = new TripRepository(context);
         Notifications = new NotificationRepository(context);
+        Parents = new ParentRepository(context);
+        Assistants = new AssistantRepository(context);
+        Attendances = new AttendanceRepository(context);
+        AbsenceRequests = new AbsenceRequestRepository(context);
+        StudentTrips = new StudentTripRepository(context);
+        Alerts = new AlertRepository(context);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -6,6 +6,8 @@ namespace SmartBus.Domain.Entities;
 
 public class Trip : BaseEntity
 {
+    public string Name { get; set; } = default!;
+    public TripType Type { get; set; }
     public Guid BusId { get; set; }
     public Bus Bus { get; set; } = default!;
     public Guid RouteId { get; set; }
@@ -14,7 +16,14 @@ public class Trip : BaseEntity
     public DateTime? ActualDeparture { get; set; }
     public DateTime? ActualArrival { get; set; }
     public TripStatus Status { get; set; } = TripStatus.Scheduled;
+
+    /// <summary>Bitmask: 1=Sun,2=Mon,4=Tue,8=Wed,16=Thu,32=Fri,64=Sat</summary>
+    public byte RepeatDays { get; set; }
+
     public string? Notes { get; set; }
+
+    public ICollection<StudentTrip> StudentTrips { get; set; } = new List<StudentTrip>();
+    public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 
     public void Start()
     {

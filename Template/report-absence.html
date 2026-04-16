@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>تسجيل غياب — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#FFD700; --yellow-light:#FFFDE7; --yellow-dark:#B8960C;
+    --blue:#3B82F6; --blue-light:#EFF6FF;
+    --green:#22C55E; --green-light:#F0FDF4; --green-dark:#16A34A;
+    --red:#EF4444; --red-light:#FFF0F0; --red-border:#FECACA;
+    --orange:#F97316; --orange-light:#FFF7ED;
+    --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB;
+    --gray-300:#D1D5DB; --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-900:#111111;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Cairo',sans-serif;background:#E5E5E5;
+    display:flex;justify-content:center;align-items:flex-start;
+    min-height:100vh;padding:48px 32px;gap:48px;flex-wrap:wrap;
+  }
+  .sw{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .sl{font-size:13px;font-weight:700;color:#555;font-family:'Cairo',sans-serif;}
+  .phone{
+    width:375px;height:812px;background:#fff;
+    border-radius:56px;border:10px solid #1a1a1a;
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+  .statusbar{
+    height:44px;background:#fff;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 24px;flex-shrink:0;
+  }
+  .statusbar span{font-size:13px;color:#333;font-family:'Cairo',sans-serif;}
+  .screen{background:var(--gray-50);flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+  /* HEADER */
+  .page-header{
+    background:#fff;padding:14px 20px 12px;
+    display:flex;align-items:center;gap:12px;
+    border-bottom:1px solid var(--gray-100);flex-shrink:0;
+  }
+  .back-btn{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--gray-100);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+  .page-title{font-size:17px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .page-sub{font-size:12px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:1px;}
+
+  /* SCROLL */
+  .scroll-body{flex:1;overflow-y:auto;padding:14px;}
+  .scroll-body::-webkit-scrollbar{display:none;}
+
+  /* SECTION LABEL */
+  .section-lbl{
+    font-size:12px;font-weight:700;color:var(--gray-500);
+    margin-bottom:8px;font-family:'Cairo',sans-serif;
+    letter-spacing:.03em;
+  }
+
+  /* STUDENT SELECTOR */
+  .student-selector{
+    background:#fff;border-radius:14px;border:1px solid var(--gray-200);
+    padding:12px 14px;display:flex;align-items:center;gap:10px;
+    margin-bottom:14px;cursor:pointer;
+  }
+  .sel-avatar{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--yellow-light);border:2px solid var(--yellow);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;color:var(--yellow-dark);
+    font-family:'Cairo',sans-serif;flex-shrink:0;
+  }
+  .sel-name{font-size:14px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .sel-grade{font-size:11px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:1px;}
+  .sel-chev{margin-right:auto;color:var(--gray-400);}
+
+  /* DATE CHIPS */
+  .date-chips{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+  .date-chips::-webkit-scrollbar{display:none;}
+  .date-chip{
+    display:flex;flex-direction:column;align-items:center;
+    min-width:44px;padding:8px 6px;
+    border-radius:12px;border:1.5px solid var(--gray-200);
+    background:#fff;cursor:pointer;flex-shrink:0;
+  }
+  .date-chip.active{background:var(--yellow);border-color:var(--yellow);}
+  .date-chip.past{background:var(--gray-50);border-color:var(--gray-200);}
+  .chip-day{font-size:10px;color:var(--gray-400);font-family:'Cairo',sans-serif;}
+  .chip-num{font-size:16px;font-weight:700;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .date-chip.active .chip-day{color:#7a6200;}
+  .date-chip.active .chip-num{color:#111;}
+  .date-chip.past .chip-day{color:var(--gray-300);}
+  .date-chip.past .chip-num{color:var(--gray-300);}
+
+  /* TRIP TYPE */
+  .trip-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+  .trip-btn{
+    background:#fff;border:1.5px solid var(--gray-200);border-radius:12px;
+    padding:10px 6px;text-align:center;cursor:pointer;
+  }
+  .trip-btn.active{background:var(--yellow-light);border-color:var(--yellow);}
+  .trip-btn-icon{width:28px;height:28px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;}
+  .trip-btn-lbl{font-size:11px;font-weight:600;color:var(--gray-500);font-family:'Cairo',sans-serif;}
+  .trip-btn.active .trip-btn-lbl{color:var(--yellow-dark);}
+
+  /* REASON GRID */
+  .reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  .reason-btn{
+    background:#fff;border:1.5px solid var(--gray-200);border-radius:12px;
+    padding:12px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;
+  }
+  .reason-btn.active{background:var(--yellow-light);border-color:var(--yellow);}
+  .reason-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .reason-lbl{font-size:12px;font-weight:600;color:var(--gray-900);font-family:'Cairo',sans-serif;flex:1;}
+  .reason-btn.active .reason-lbl{color:var(--yellow-dark);}
+  .reason-radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--gray-300);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .reason-btn.active .reason-radio{border-color:var(--yellow);}
+  .reason-radio-fill{width:8px;height:8px;border-radius:50%;background:var(--yellow);}
+
+  /* PICKUP PERSON */
+  .form-card{background:#fff;border-radius:14px;border:1px solid var(--gray-200);padding:12px 14px;margin-bottom:14px;}
+  .form-lbl{font-size:11px;font-weight:600;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-bottom:6px;}
+  .form-input{
+    width:100%;background:var(--gray-50);border:1px solid var(--gray-200);
+    border-radius:10px;padding:10px 13px;font-size:13px;color:var(--gray-900);
+    font-family:'Cairo',sans-serif;outline:none;margin-bottom:10px;
+  }
+  .form-input:last-child{margin-bottom:0;}
+  .form-textarea{
+    width:100%;background:var(--gray-50);border:1px solid var(--gray-200);
+    border-radius:10px;padding:10px 13px;font-size:13px;color:var(--gray-400);
+    font-family:'Cairo',sans-serif;outline:none;resize:none;height:68px;line-height:1.5;
+  }
+
+  /* TOGGLE ROW */
+  .toggle-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 0;border-bottom:1px solid var(--gray-100);
+  }
+  .toggle-row:last-child{border-bottom:none;}
+  .toggle-lbl{font-size:13px;font-weight:600;color:var(--gray-900);font-family:'Cairo',sans-serif;}
+  .toggle-sub{font-size:11px;color:var(--gray-400);font-family:'Cairo',sans-serif;margin-top:1px;}
+  .toggle{width:36px;height:20px;border-radius:10px;position:relative;flex-shrink:0;cursor:pointer;}
+  .toggle.on{background:var(--yellow);}
+  .toggle.off{background:var(--gray-300);}
+  .toggle-knob{position:absolute;top:2.5px;width:15px;height:15px;background:#fff;border-radius:50%;}
+  .toggle.on .toggle-knob{right:2.5px;}
+  .toggle.off .toggle-knob{left:2.5px;}
+
+  /* SUBMIT */
+  .submit-btn{
+    background:var(--yellow);border-radius:14px;padding:14px;
+    text-align:center;cursor:pointer;border:none;width:100%;margin-bottom:10px;
+  }
+  .submit-btn span{font-size:15px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;}
+
+  /* INFO BOX */
+  .info-box{
+    background:var(--blue-light);border-radius:12px;border:1px solid #BFDBFE;
+    padding:10px 14px;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start;
+  }
+  .info-box-txt{font-size:11px;color:#1E40AF;font-family:'Cairo',sans-serif;line-height:1.5;}
+
+  .en-font{font-family:'Inter',sans-serif !important;}
+</style>
+</head>
+<body>
+
+<!-- ===== ARABIC ===== -->
+<div class="sw">
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen">
+
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title">تسجيل غياب</div>
+          <div class="page-sub">سيتم إبلاغ السائق والمدرسة</div>
+        </div>
+      </div>
+
+      <div class="scroll-body">
+
+        <!-- STUDENT -->
+        <div class="section-lbl">اختر الطالب</div>
+        <div class="student-selector">
+          <div class="sel-avatar">أح</div>
+          <div>
+            <div class="sel-name">أحمد محمد</div>
+            <div class="sel-grade">روضة ب · الباص #42</div>
+          </div>
+          <div class="sel-chev">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <!-- DATE -->
+        <div class="section-lbl">تاريخ الغياب</div>
+        <div class="date-chips">
+          <div class="date-chip past"><div class="chip-day">أحد</div><div class="chip-num">11</div></div>
+          <div class="date-chip past"><div class="chip-day">اثن</div><div class="chip-num">12</div></div>
+          <div class="date-chip active"><div class="chip-day">ثلا</div><div class="chip-num">13</div></div>
+          <div class="date-chip"><div class="chip-day">أرب</div><div class="chip-num">14</div></div>
+          <div class="date-chip"><div class="chip-day">خمس</div><div class="chip-num">15</div></div>
+          <div class="date-chip"><div class="chip-day">جمع</div><div class="chip-num">16</div></div>
+          <div class="date-chip"><div class="chip-day">سبت</div><div class="chip-num">17</div></div>
+        </div>
+
+        <!-- TRIP TYPE -->
+        <div class="section-lbl">نوع الغياب</div>
+        <div class="trip-btns">
+          <div class="trip-btn active">
+            <div class="trip-btn-icon" style="background:var(--yellow-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div class="trip-btn-lbl">اليوم كامل</div>
+          </div>
+          <div class="trip-btn">
+            <div class="trip-btn-icon" style="background:var(--blue-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M12 2L12 12"/><path d="M17 7l-5 5-5-5"/></svg>
+            </div>
+            <div class="trip-btn-lbl">ذهاب فقط</div>
+          </div>
+          <div class="trip-btn">
+            <div class="trip-btn-icon" style="background:var(--orange-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M12 22L12 12"/><path d="M7 17l5-5 5 5"/></svg>
+            </div>
+            <div class="trip-btn-lbl">إياب فقط</div>
+          </div>
+        </div>
+
+        <!-- REASON -->
+        <div class="section-lbl">سبب الغياب</div>
+        <div class="reason-grid">
+          <div class="reason-btn active">
+            <div class="reason-icon" style="background:var(--red-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div class="reason-lbl">مرض</div>
+            <div class="reason-radio"><div class="reason-radio-fill"></div></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--blue-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="reason-lbl">موعد طبي</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--orange-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="reason-lbl">ظرف عائلي</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--gray-100);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="reason-lbl">سبب آخر</div>
+            <div class="reason-radio"></div>
+          </div>
+        </div>
+
+        <!-- PICKUP -->
+        <div class="section-lbl">اسم المستلم (اختياري)</div>
+        <div class="form-card">
+          <div class="form-lbl">اسم الشخص الذي سيستلم الطالب</div>
+          <input class="form-input" type="text" placeholder="مثال: الجدة أم أحمد" readonly/>
+          <div class="form-lbl">العلاقة بالطالب</div>
+          <input class="form-input" type="text" placeholder="مثال: جدة" readonly/>
+        </div>
+
+        <!-- NOTES -->
+        <div class="section-lbl">ملاحظة للسائق (اختياري)</div>
+        <div class="form-card" style="margin-bottom:14px;">
+          <textarea class="form-textarea" placeholder="اكتب ملاحظة للسائق..." readonly></textarea>
+        </div>
+
+        <!-- NOTIFY TOGGLES -->
+        <div class="section-lbl">الإشعارات</div>
+        <div class="form-card" style="margin-bottom:14px;">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">إبلاغ السائق</div>
+              <div class="toggle-sub">يصل إشعار للسائق فوراً</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">إبلاغ المدرسة</div>
+              <div class="toggle-sub">يصل إشعار لإدارة المدرسة</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <!-- INFO -->
+        <div class="info-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="info-box-txt">يمكن إلغاء طلب الغياب قبل انطلاق الباص بـ 30 دقيقة على الأقل</div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="submit-btn"><span>إرسال طلب الغياب</span></div>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl">تسجيل غياب — عربي</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="statusbar" style="direction:ltr;"><span>9:41</span><span>●●● ▲ 🔋</span></div>
+    <div class="screen" style="direction:ltr;">
+
+      <div class="page-header" style="direction:ltr;">
+        <div class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div>
+          <div class="page-title en-font">Report Absence</div>
+          <div class="page-sub en-font">Driver & school will be notified</div>
+        </div>
+      </div>
+
+      <div class="scroll-body" style="direction:ltr;">
+
+        <div class="section-lbl en-font">Select Student</div>
+        <div class="student-selector">
+          <div class="sel-avatar en-font">AH</div>
+          <div>
+            <div class="sel-name en-font">Ahmed Mohammad</div>
+            <div class="sel-grade en-font">Kindergarten B · Bus #42</div>
+          </div>
+          <div class="sel-chev" style="margin-right:0;margin-left:auto;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <div class="section-lbl en-font">Absence Date</div>
+        <div class="date-chips">
+          <div class="date-chip past"><div class="chip-day en-font">Sun</div><div class="chip-num en-font">11</div></div>
+          <div class="date-chip past"><div class="chip-day en-font">Mon</div><div class="chip-num en-font">12</div></div>
+          <div class="date-chip active"><div class="chip-day en-font">Tue</div><div class="chip-num en-font">13</div></div>
+          <div class="date-chip"><div class="chip-day en-font">Wed</div><div class="chip-num en-font">14</div></div>
+          <div class="date-chip"><div class="chip-day en-font">Thu</div><div class="chip-num en-font">15</div></div>
+          <div class="date-chip"><div class="chip-day en-font">Fri</div><div class="chip-num en-font">16</div></div>
+          <div class="date-chip"><div class="chip-day en-font">Sat</div><div class="chip-num en-font">17</div></div>
+        </div>
+
+        <div class="section-lbl en-font">Absence Type</div>
+        <div class="trip-btns">
+          <div class="trip-btn active">
+            <div class="trip-btn-icon" style="background:var(--yellow-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div class="trip-btn-lbl en-font">Full Day</div>
+          </div>
+          <div class="trip-btn">
+            <div class="trip-btn-icon" style="background:var(--blue-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M12 2L12 12"/><path d="M17 7l-5 5-5-5"/></svg>
+            </div>
+            <div class="trip-btn-lbl en-font">Morning Only</div>
+          </div>
+          <div class="trip-btn">
+            <div class="trip-btn-icon" style="background:var(--orange-light);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M12 22L12 12"/><path d="M7 17l5-5 5 5"/></svg>
+            </div>
+            <div class="trip-btn-lbl en-font">Return Only</div>
+          </div>
+        </div>
+
+        <div class="section-lbl en-font">Reason for Absence</div>
+        <div class="reason-grid">
+          <div class="reason-btn active">
+            <div class="reason-icon" style="background:var(--red-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div class="reason-lbl en-font">Illness</div>
+            <div class="reason-radio"><div class="reason-radio-fill"></div></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--blue-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="reason-lbl en-font">Medical Appt</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--orange-light);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="reason-lbl en-font">Family Matter</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-btn">
+            <div class="reason-icon" style="background:var(--gray-100);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="reason-lbl en-font">Other</div>
+            <div class="reason-radio"></div>
+          </div>
+        </div>
+
+        <div class="section-lbl en-font">Pickup Person (optional)</div>
+        <div class="form-card">
+          <div class="form-lbl en-font">Name of person picking up</div>
+          <input class="form-input en-font" type="text" placeholder="e.g. Grandma Sarah" readonly/>
+          <div class="form-lbl en-font">Relation to student</div>
+          <input class="form-input en-font" type="text" placeholder="e.g. Grandmother" readonly/>
+        </div>
+
+        <div class="section-lbl en-font">Note for Driver (optional)</div>
+        <div class="form-card" style="margin-bottom:14px;">
+          <textarea class="form-textarea en-font" placeholder="Write a note for the driver..." readonly></textarea>
+        </div>
+
+        <div class="section-lbl en-font">Notifications</div>
+        <div class="form-card" style="margin-bottom:14px;">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl en-font">Notify Driver</div>
+              <div class="toggle-sub en-font">Driver gets instant notification</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl en-font">Notify School</div>
+              <div class="toggle-sub en-font">School admin gets notified</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="info-box-txt en-font">Absence requests can be cancelled at least 30 minutes before the bus departs</div>
+        </div>
+
+        <button class="submit-btn"><span class="en-font">Submit Absence Request</span></button>
+
+        <div style="height:10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sl" style="font-family:'Inter',sans-serif;">Report Absence — English</div>
+</div>
+
+</body>
+</html>
