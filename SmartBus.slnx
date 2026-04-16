@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmartBus.API/SmartBus.API.csproj" />
+    <Project Path="src/SmartBus.Application/SmartBus.Application.csproj" />
+    <Project Path="src/SmartBus.Domain/SmartBus.Domain.csproj" />
+    <Project Path="src/SmartBus.Infrastructure/SmartBus.Infrastructure.csproj" />
+    <Project Path="src/SmartBus.Web/SmartBus.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmartBus.Application.Tests/SmartBus.Application.Tests.csproj" />
+  </Folder>
+</Solution>
