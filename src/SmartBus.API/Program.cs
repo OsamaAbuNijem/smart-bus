@@ -67,11 +67,12 @@ try
 
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            Description = "JWT Authorization. Enter: Bearer {token}",
+            Description = "Paste your JWT token here (without 'Bearer ' prefix)",
             Name = "Authorization",
             In = ParameterLocation.Header,
-            Type = SecuritySchemeType.ApiKey,
-            Scheme = "Bearer"
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT"
         });
 
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -97,6 +98,10 @@ try
     });
 
     var app = builder.Build();
+
+    // Seed database
+    using (var scope = app.Services.CreateScope())
+        await SmartBus.Infrastructure.Persistence.DbSeeder.SeedAsync(scope.ServiceProvider);
 
     app.UseMiddleware<ExceptionHandlingMiddleware>();
     app.UseSerilogRequestLogging();

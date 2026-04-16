@@ -49,6 +49,7 @@ public static class DependencyInjection
         })
         .AddJwtBearer(options =>
         {
+            options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -57,10 +58,10 @@ public static class DependencyInjection
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = configuration["Jwt:Issuer"],
                 ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+                ClockSkew = TimeSpan.FromMinutes(5)
             };
 
-            // Allow JWT in SignalR query string
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
@@ -69,6 +70,16 @@ public static class DependencyInjection
                     var path = context.HttpContext.Request.Path;
                     if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
                         context.Token = accessToken;
+                    return Task.CompletedTask;
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    Console.WriteLine($"[JWT] Authentication failed: {context.Exception.GetType().Name}: {context.Exception.Message}");
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    Console.WriteLine($"[JWT] Challenge: {context.Error} - {context.ErrorDescription}");
                     return Task.CompletedTask;
                 }
             };
