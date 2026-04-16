@@ -104,6 +104,7 @@ try
         await SmartBus.Infrastructure.Persistence.DbSeeder.SeedAsync(scope.ServiceProvider);
 
     app.UseMiddleware<ExceptionHandlingMiddleware>();
+    app.UseMiddleware<RequestResponseLoggingMiddleware>();
     app.UseSerilogRequestLogging();
 
     if (app.Environment.IsDevelopment())
