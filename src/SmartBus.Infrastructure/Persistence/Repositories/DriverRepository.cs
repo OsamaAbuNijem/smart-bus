@@ -10,4 +10,7 @@ public class DriverRepository : GenericRepository<Driver>, IDriverRepository
 
     public async Task<Driver?> GetByLicenseNumberAsync(string licenseNumber, CancellationToken cancellationToken = default)
         => await _dbSet.FirstOrDefaultAsync(d => d.LicenseNumber == licenseNumber, cancellationToken);
+
+    public async Task<Driver?> GetByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken = default)
+        => await _dbSet.FirstOrDefaultAsync(d => d.PhoneNumber == phoneNumber, cancellationToken);
 }

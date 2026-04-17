@@ -86,6 +86,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IOtpSender, DevOtpSender>();
 
         // Redis
         var redisConnection = configuration.GetConnectionString("Redis") ?? "localhost:6379";

@@ -16,7 +16,7 @@ public static class DbSeeder
         var db          = services.GetRequiredService<ApplicationDbContext>();
 
         // ── Roles ──────────────────────────────────────────────────────────
-        string[] roles = ["SuperAdmin", "Admin", "Driver", "Parent"];
+        string[] roles = ["SuperAdmin", "Admin", "Driver", "Parent", "Assistant"];
         foreach (var role in roles)
             if (!await roleManager.RoleExistsAsync(role))
                 await roleManager.CreateAsync(new IdentityRole(role));
