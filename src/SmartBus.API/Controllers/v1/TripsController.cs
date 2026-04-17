@@ -3,6 +3,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Trips.Commands.CreateTrip;
+using SmartBus.Application.Features.Trips.Commands.DeleteTrip;
+using SmartBus.Application.Features.Trips.Commands.UpdateTrip;
 using SmartBus.Application.Features.Trips.Commands.UpdateTripStatus;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Domain.Enums;
@@ -35,6 +37,16 @@ public class TripsController : ControllerBase
         return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
     }
 
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTripRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new UpdateTripCommand(id, request.Name, request.Type, request.BusId, request.RouteId, request.ScheduledDeparture, request.RepeatDays, request.Notes),
+            cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
+
     [HttpPatch("{id:guid}/status")]
     [Authorize(Roles = "Admin,Driver")]
     public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateStatusRequest request, CancellationToken cancellationToken)
@@ -42,6 +54,15 @@ public class TripsController : ControllerBase
         var result = await _mediator.Send(new UpdateTripStatusCommand(id, request.Status, request.Notes), cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new DeleteTripCommand(id), cancellationToken);
+        return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
+    }
 }
 
 public record UpdateStatusRequest(TripStatus Status, string? Notes);
+public record UpdateTripRequest(string Name, TripType Type, Guid BusId, Guid RouteId, DateTime ScheduledDeparture, byte RepeatDays, string? Notes);

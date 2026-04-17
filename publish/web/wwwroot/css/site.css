@@ -1,0 +1,26 @@
+/* SmartBus Admin Panel Styles */
+
+html { font-size: 14px; position: relative; min-height: 100%; }
+@media (min-width: 768px) { html { font-size: 16px; } }
+
+body { font-family: 'Segoe UI', system-ui, sans-serif; margin-bottom: 60px; }
+
+.btn:focus, .btn:active:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.navbar-brand { letter-spacing: 0.5px; }
+
+.card { transition: box-shadow 0.2s; }
+.card:hover { box-shadow: 0 .5rem 1rem rgba(0,0,0,.12) !important; }
+
+.table th { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; font-weight: 600; }
+
+#map, #bus-detail-map { z-index: 0; }
+
+.badge { font-weight: 500; }
+
+.footer { font-size: .85rem; }
+
+#notification-feed::-webkit-scrollbar { width: 4px; }
+#notification-feed::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 2px; }

@@ -1,125 +1,355 @@
 @{
-    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "لوحة المراقبة";
 }
 
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white">
-            <div class="card-body d-flex align-items-center p-4">
-                <i class="bi bi-bus-front-fill fs-1 me-3 opacity-75"></i>
-                <div>
-                    <div class="fs-2 fw-bold">@ViewBag.TotalBuses</div>
-                    <div class="opacity-75">Total Buses</div>
-                </div>
-            </div>
-        </div>
+<!-- ══ DASHBOARD PAGE ══ -->
+<div class="page active" id="page-dashboard">
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon" style="background:#EFF6FF;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="stat-num" id="stat-students">@(ViewBag.TotalStudents ?? 0)</div>
+      <div class="stat-label">إجمالي الطلاب</div>
+      <div class="stat-change up">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+        مسجلون في النظام
+      </div>
     </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm rounded-4 bg-success text-white">
-            <div class="card-body d-flex align-items-center p-4">
-                <i class="bi bi-map-fill fs-1 me-3 opacity-75"></i>
-                <div>
-                    <div class="fs-2 fw-bold">@ViewBag.TotalTrips</div>
-                    <div class="opacity-75">Total Trips</div>
-                </div>
-            </div>
-        </div>
+    <div class="stat-card green">
+      <div class="stat-icon" style="background:#F0FDF4;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <div class="stat-num" id="stat-buses">@(ViewBag.TotalBuses ?? 0)</div>
+      <div class="stat-label">إجمالي الباصات</div>
+      <div class="stat-change up">من أصل @(ViewBag.TotalBuses ?? 0) باص</div>
     </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm rounded-4 bg-info text-white">
-            <div class="card-body d-flex align-items-center p-4">
-                <i class="bi bi-activity fs-1 me-3 opacity-75"></i>
-                <div>
-                    <div class="fs-2 fw-bold" id="active-buses">--</div>
-                    <div class="opacity-75">Active Now</div>
-                </div>
-            </div>
-        </div>
+    <div class="stat-card yellow">
+      <div class="stat-icon" style="background:#FFFDE7;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <div class="stat-num" id="stat-trips">@(ViewBag.TotalTrips ?? 0)</div>
+      <div class="stat-label">الرحلات المسجلة</div>
+      <div class="stat-change up">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+        رحلات في النظام
+      </div>
     </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm rounded-4 bg-warning text-white">
-            <div class="card-body d-flex align-items-center p-4">
-                <i class="bi bi-bell-fill fs-1 me-3 opacity-75"></i>
-                <div>
-                    <div class="fs-2 fw-bold" id="notification-count">0</div>
-                    <div class="opacity-75">Notifications</div>
-                </div>
-            </div>
-        </div>
+    <div class="stat-card red">
+      <div class="stat-icon" style="background:#FEF2F2;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+      </div>
+      <div class="stat-num" id="stat-alerts">@(ViewBag.PendingAlerts ?? 0)</div>
+      <div class="stat-label">تنبيهات معلقة</div>
+      <div class="stat-change down">تحتاج مراجعة</div>
     </div>
+  </div>
+
+  <!-- Map + Today's Trips -->
+  <div class="grid-3">
+    <div class="map-card">
+      <div class="card-header">
+        <div><div class="card-title">خريطة الباصات المباشرة</div><div class="card-sub" id="active-buses-sub">جاري التحميل...</div></div>
+        <div class="card-action">عرض موسع ↗</div>
+      </div>
+      <div class="map-area" id="live-map">
+        <div class="map-grid-h" style="top:20%;"></div><div class="map-grid-h" style="top:40%;"></div>
+        <div class="map-grid-h" style="top:60%;"></div><div class="map-grid-h" style="top:80%;"></div>
+        <div class="map-grid-v" style="left:20%;"></div><div class="map-grid-v" style="left:40%;"></div>
+        <div class="map-grid-v" style="left:60%;"></div><div class="map-grid-v" style="left:80%;"></div>
+        <div class="map-road-h" style="top:19%;height:6px;"></div><div class="map-road-h" style="top:39%;height:6px;"></div><div class="map-road-h" style="top:59%;height:6px;"></div>
+        <div class="map-road-v" style="left:19%;width:6px;"></div><div class="map-road-v" style="left:39%;width:6px;"></div><div class="map-road-v" style="left:59%;width:6px;"></div><div class="map-road-v" style="left:79%;width:6px;"></div>
+        <!-- School marker -->
+        <div style="position:absolute;top:12%;right:12%;z-index:5;">
+          <div style="width:32px;height:32px;border-radius:8px;background:#3B82F6;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+          <div style="background:#fff;border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;color:#1E40AF;margin-top:3px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.1);">المدرسة</div>
+        </div>
+        <!-- Bus markers rendered by JS -->
+        <div id="map-buses"></div>
+        <div class="map-controls">
+          <div class="mctrl"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="mctrl"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        </div>
+      </div>
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#FFD700;"></div>الباصات الجارية</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>وصلت للمدرسة</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>رحلة إياب</div>
+      </div>
+    </div>
+
+    <!-- Today's trips -->
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">رحلات اليوم</div><div class="card-sub" id="today-trips-sub">جاري التحميل...</div></div>
+        <div class="card-action" onclick="showPage('trips', document.querySelector('[onclick*=trips]'))">عرض الكل</div>
+      </div>
+      <div class="card-body" style="padding:0 20px;" id="today-trips-list">
+        <div style="padding:20px 0;text-align:center;color:var(--text3);font-size:13px;">جاري تحميل الرحلات...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom grid: Attendance + Alerts -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">الحضور — آخر 7 أيام</div></div></div>
+      <div class="card-body">
+        <div style="display:flex;gap:10px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:10px;height:10px;border-radius:3px;background:#3B82F6;"></div>ركبوا</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);"><div style="width:10px;height:10px;border-radius:3px;background:#EF4444;opacity:.4;"></div>غائبون</div>
+        </div>
+        <div class="chart-bars">
+          <div class="bar-group"><div class="bar-wrap"><div class="bar" style="background:#3B82F6;height:72px;"></div><div class="bar" style="background:rgba(239,68,68,.3);height:10px;"></div></div><div class="bar-label">أحد</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar" style="background:#3B82F6;height:68px;"></div><div class="bar" style="background:rgba(239,68,68,.3);height:14px;"></div></div><div class="bar-label">اثن</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar" style="background:#3B82F6;height:75px;"></div><div class="bar" style="background:rgba(239,68,68,.3);height:8px;"></div></div><div class="bar-label">ثلا</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar" style="background:#3B82F6;height:70px;"></div><div class="bar" style="background:rgba(239,68,68,.3);height:12px;"></div></div><div class="bar-label">أرب</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar" style="background:#3B82F6;height:65px;"></div><div class="bar" style="background:rgba(239,68,68,.3);height:18px;"></div></div><div class="bar-label">خمس</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar" style="background:#3B82F6;height:78px;opacity:.4;"></div><div class="bar" style="background:rgba(239,68,68,.3);height:5px;opacity:.4;"></div></div><div class="bar-label">جمع</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar" style="background:#FFD700;height:74px;"></div><div class="bar" style="background:rgba(239,68,68,.3);height:9px;"></div></div><div class="bar-label">سبت</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">التنبيهات الأخيرة</div></div>
+        <div class="card-action" onclick="showPage('alerts', document.querySelector('[onclick*=alerts]'))">عرض الكل</div>
+      </div>
+      <div class="card-body" style="padding:0 20px;" id="dashboard-alerts">
+        <div style="padding:20px 0;text-align:center;color:var(--text3);font-size:13px;">جاري تحميل التنبيهات...</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="row g-4">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white border-0 pt-4 px-4">
-                <h5 class="fw-bold mb-0"><i class="bi bi-geo-alt-fill text-primary me-2"></i>Live Bus Map</h5>
-            </div>
-            <div class="card-body p-0">
-                <div id="map" style="height: 450px; border-radius: 0 0 1rem 1rem;"></div>
-            </div>
-        </div>
+<!-- ══ STUDENTS PAGE ══ -->
+<div class="page" id="page-students">
+  <div class="filter-bar">
+    <div class="filter-btn active" onclick="filterStudents('all', this)">الكل (<span id="students-count">0</span>)</div>
+    <div class="filter-btn" onclick="filterStudents('active', this)">نشط</div>
+    <button class="add-btn" onclick="openEdit('student', null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>إضافة طالب
+    </button>
+  </div>
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>الطالب</th><th>الصف</th><th>المسار</th><th>ولي الأمر</th><th>الهاتف</th><th>تاريخ التسجيل</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="students-tbody">
+        <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">جاري تحميل البيانات...</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--text3);" id="students-pager-info"></span>
+      <div style="display:flex;gap:6px;">
+        <button class="filter-btn" id="students-prev" onclick="loadStudents(studentsPage-1)">‹ السابق</button>
+        <button class="filter-btn" id="students-next" onclick="loadStudents(studentsPage+1)">التالي ›</button>
+      </div>
     </div>
-    <div class="col-lg-4">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-white border-0 pt-4 px-4">
-                <h5 class="fw-bold mb-0"><i class="bi bi-bell text-warning me-2"></i>Live Notifications</h5>
-            </div>
-            <div class="card-body p-3" id="notification-feed" style="max-height: 420px; overflow-y: auto;">
-                <p class="text-muted text-center mt-4">Waiting for real-time updates...</p>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
-<div class="row g-4 mt-2">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between">
-                <h5 class="fw-bold mb-0"><i class="bi bi-bus-front text-primary me-2"></i>Recent Buses</h5>
-                <a asp-controller="Buses" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-4">Plate Number</th>
-                                <th>Model</th>
-                                <th>Capacity</th>
-                                <th>Status</th>
-                                <th>Driver</th>
-                                <th class="pe-4">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var bus in ViewBag.RecentBuses)
-                            {
-                                <tr>
-                                    <td class="ps-4 fw-semibold">@bus.PlateNumber</td>
-                                    <td>@bus.Model</td>
-                                    <td>@bus.Capacity</td>
-                                    <td>
-                                        <span class="badge @(bus.Status == "OnRoute" ? "bg-success" : bus.Status == "Active" ? "bg-primary" : "bg-secondary")">
-                                            @bus.Status
-                                        </span>
-                                    </td>
-                                    <td>@(bus.DriverName ?? "Unassigned")</td>
-                                    <td class="pe-4">
-                                        <a asp-controller="Buses" asp-action="Details" asp-route-id="@bus.Id" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<!-- ══ DRIVERS PAGE ══ -->
+<div class="page" id="page-drivers">
+  <div class="filter-bar">
+    <div class="filter-btn active">الكل</div>
+    <div class="filter-btn">السائقون</div>
+    <div class="filter-btn">المساعدون</div>
+    <button class="add-btn" onclick="alert('قريباً: إضافة سائق')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>إضافة موظف
+    </button>
+  </div>
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr><th>الموظف</th><th>الدور</th><th>رقم الرخصة</th><th>رقم التواصل</th><th>الحالة</th><th></th></tr>
+      </thead>
+      <tbody id="drivers-tbody">
+        <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">جاري تحميل البيانات...</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--text3);" id="drivers-pager-info"></span>
+      <div style="display:flex;gap:6px;">
+        <button class="filter-btn" id="drivers-prev" onclick="loadDrivers(driversPage-1)">‹ السابق</button>
+        <button class="filter-btn" id="drivers-next" onclick="loadDrivers(driversPage+1)">التالي ›</button>
+      </div>
     </div>
+  </div>
 </div>
 
-@section Scripts {
-    <script src="~/js/bus-tracking.js" asp-append-version="true"></script>
-}
+<!-- ══ TRIPS PAGE ══ -->
+<div class="page" id="page-trips">
+  <div class="filter-bar">
+    <div class="filter-btn active">الكل</div>
+    <div class="filter-btn">جارية</div>
+    <div class="filter-btn">مكتملة</div>
+    <button class="add-btn" onclick="openEdit('trip', null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>رحلة جديدة
+    </button>
+  </div>
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr><th>الرحلة</th><th>الباص</th><th>المسار</th><th>موعد الانطلاق</th><th>الحالة</th><th></th></tr>
+      </thead>
+      <tbody id="trips-tbody">
+        <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">جاري تحميل البيانات...</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--text3);" id="trips-pager-info"></span>
+      <div style="display:flex;gap:6px;">
+        <button class="filter-btn" id="trips-prev" onclick="loadTrips(tripsPage-1)">‹ السابق</button>
+        <button class="filter-btn" id="trips-next" onclick="loadTrips(tripsPage+1)">التالي ›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BUSES PAGE ══ -->
+<div class="page" id="page-buses">
+  <div class="filter-bar">
+    <button class="add-btn" onclick="openEdit('bus', null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>إضافة باص
+    </button>
+  </div>
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr><th>الباص</th><th>الموديل</th><th>الطاقة</th><th>الحالة</th><th></th></tr>
+      </thead>
+      <tbody id="buses-tbody">
+        <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text3);">جاري تحميل البيانات...</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--text3);" id="buses-pager-info"></span>
+      <div style="display:flex;gap:6px;">
+        <button class="filter-btn" id="buses-prev" onclick="loadBuses(busesPage-1)">‹ السابق</button>
+        <button class="filter-btn" id="buses-next" onclick="loadBuses(busesPage+1)">التالي ›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REPORTS PAGE ══ -->
+<div class="page" id="page-reports">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+    <div class="report-stat"><div class="report-num" style="color:#3B82F6;" id="rpt-students">@(ViewBag.TotalStudents ?? 0)</div><div class="report-lbl">إجمالي الطلاب</div><div class="report-sub" style="color:#16A34A;">مسجلون في النظام</div></div>
+    <div class="report-stat"><div class="report-num" style="color:#22C55E;" id="rpt-buses">@(ViewBag.TotalBuses ?? 0)</div><div class="report-lbl">إجمالي الباصات</div><div class="report-sub" style="color:#16A34A;">في الأسطول</div></div>
+    <div class="report-stat"><div class="report-num" style="color:#FFD700;" id="rpt-trips">@(ViewBag.TotalTrips ?? 0)</div><div class="report-lbl">إجمالي الرحلات</div><div class="report-sub" style="color:#16A34A;">مسجلة في النظام</div></div>
+    <div class="report-stat"><div class="report-num" style="color:#F97316;" id="rpt-alerts">@(ViewBag.PendingAlerts ?? 0)</div><div class="report-lbl">تنبيهات معلقة</div><div class="report-sub" style="color:#DC2626;">تحتاج مراجعة</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">أداء الرحلات</div></div>
+      <div class="card-body" style="padding:0 20px;" id="report-trips-perf">
+        <div style="padding:20px 0;text-align:center;color:var(--text3);font-size:13px;">جاري تحميل التقرير...</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">أداء الباصات</div></div>
+      <div class="card-body" style="padding:0 20px;" id="report-buses-perf">
+        <div style="padding:20px 0;text-align:center;color:var(--text3);font-size:13px;">جاري تحميل التقرير...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ALERTS PAGE ══ -->
+<div class="page" id="page-alerts">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">جميع التنبيهات</div>
+      <div style="font-size:12px;color:var(--text3);" id="alerts-header-sub">جاري التحميل...</div>
+    </div>
+    <div class="card-body" style="padding:0 20px;" id="alerts-list">
+      <div style="padding:30px 0;text-align:center;color:var(--text3);font-size:13px;">جاري تحميل التنبيهات...</div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:6px;justify-content:flex-end;">
+      <button class="filter-btn" id="alerts-prev" onclick="loadAlerts(alertsPage-1)">‹ السابق</button>
+      <button class="filter-btn" id="alerts-next" onclick="loadAlerts(alertsPage+1)">التالي ›</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS PAGE ══ -->
+<div class="page" id="page-settings">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div>
+      <div class="settings-section">
+        <div class="settings-section-title">الإشعارات</div>
+        <div class="setting-row">
+          <div class="setting-icon" style="background:#FFFDE7;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div>
+          <div style="flex:1;"><div class="setting-title">تنبيهات SOS</div><div class="setting-sub">إشعار فوري عند أي طارئ</div></div>
+          <div class="toggle on" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-icon" style="background:#FFF7ED;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94"/></svg></div>
+          <div style="flex:1;"><div class="setting-title">تنبيهات التأخير</div><div class="setting-sub">عند تأخر الباص أكثر من 5 دقائق</div></div>
+          <div class="toggle on" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-icon" style="background:#EFF6FF;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/></svg></div>
+          <div style="flex:1;"><div class="setting-title">تقرير يومي</div><div class="setting-sub">إرسال تقرير يومي بالبريد</div></div>
+          <div class="toggle off" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">المدرسة</div>
+        <div class="setting-row">
+          <div class="setting-icon" style="background:#F0FDF4;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+          <div style="flex:1;"><div class="setting-title">معلومات المدرسة</div><div class="setting-sub">مدرسة النور الدولية</div></div>
+          <div class="setting-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-icon" style="background:#F5F3FF;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div style="flex:1;"><div class="setting-title">إدارة المستخدمين</div><div class="setting-sub">حسابات النظام</div></div>
+          <div class="setting-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="settings-section">
+        <div class="settings-section-title">النظام</div>
+        <div class="setting-row">
+          <div class="setting-icon" style="background:#EFF6FF;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/></svg></div>
+          <div style="flex:1;"><div class="setting-title">اللغة</div></div>
+          <div class="setting-value">العربية</div>
+          <div class="setting-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-icon" style="background:#F1F5F9;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg></div>
+          <div style="flex:1;"><div class="setting-title">الوضع الليلي</div></div>
+          <div class="toggle off" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-icon" style="background:#F0FDF4;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div style="flex:1;"><div class="setting-title">النسخ الاحتياطي</div><div class="setting-sub">آخر نسخة: اليوم 6:00 ص</div></div>
+          <div class="setting-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">الباقة</div>
+        <div style="background:linear-gradient(135deg,#111111,#1a1a2e);border-radius:14px;padding:18px;color:#fff;">
+          <div style="font-size:11px;color:#94A3B8;margin-bottom:4px;">الباقة الحالية</div>
+          <div style="font-size:18px;font-weight:800;color:#FFD700;margin-bottom:8px;">Premium Plan</div>
+          <div style="font-size:12px;color:#94A3B8;margin-bottom:12px;">تنتهي 30 يونيو 2026</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div style="background:rgba(255,255,255,.1);border-radius:7px;padding:3px 10px;font-size:11px;color:#CBD5E1;">✓ طلاب غير محدود</div>
+            <div style="background:rgba(255,255,255,.1);border-radius:7px;padding:3px 10px;font-size:11px;color:#CBD5E1;">✓ تتبع GPS</div>
+            <div style="background:rgba(255,255,255,.1);border-radius:7px;padding:3px 10px;font-size:11px;color:#CBD5E1;">✓ تقارير متقدمة</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

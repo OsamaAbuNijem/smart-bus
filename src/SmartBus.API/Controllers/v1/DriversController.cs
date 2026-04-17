@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Drivers.Commands.CreateDriver;
 using SmartBus.Application.Features.Drivers.Commands.DeleteDriver;
+using SmartBus.Application.Features.Drivers.Commands.UpdateDriver;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Drivers.Queries.GetDriverById;
 
@@ -40,6 +41,16 @@ public class DriversController : ControllerBase
             : BadRequest(new { error = result.Error });
     }
 
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDriverRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new UpdateDriverCommand(id, request.FullName, request.PhoneNumber, request.LicenseNumber, request.IsActive),
+            cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
+
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
@@ -48,3 +59,5 @@ public class DriversController : ControllerBase
         return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
     }
 }
+
+public record UpdateDriverRequest(string FullName, string PhoneNumber, string LicenseNumber, bool IsActive = true);

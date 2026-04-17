@@ -2,7 +2,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using SmartBus.Application.Common.Models;
+using SmartBus.Application.Features.Alerts.Queries.GetAllAlerts;
 using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
+using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
+using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 
 namespace SmartBus.Web.Services;
@@ -66,6 +69,35 @@ public class ApiClient : IApiClient
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<PagedResult<TripDto>>(json, _jsonOptions);
+    }
+
+    public async Task<PagedResult<StudentDto>?> GetStudentsAsync(int pageNumber = 1, int pageSize = 10)
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetAsync($"api/v1/students?pageNumber={pageNumber}&pageSize={pageSize}");
+        if (!response.IsSuccessStatusCode) return null;
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<PagedResult<StudentDto>>(json, _jsonOptions);
+    }
+
+    public async Task<PagedResult<DriverDto>?> GetDriversAsync(int pageNumber = 1, int pageSize = 10)
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetAsync($"api/v1/drivers?pageNumber={pageNumber}&pageSize={pageSize}");
+        if (!response.IsSuccessStatusCode) return null;
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<PagedResult<DriverDto>>(json, _jsonOptions);
+    }
+
+    public async Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null)
+    {
+        SetAuthHeader();
+        var url = $"api/v1/alerts?pageNumber={pageNumber}&pageSize={pageSize}";
+        if (status.HasValue) url += $"&status={status.Value}";
+        var response = await _httpClient.GetAsync(url);
+        if (!response.IsSuccessStatusCode) return null;
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<PagedResult<AlertDto>>(json, _jsonOptions);
     }
 
     private record LoginResult(string Token, string Email, IEnumerable<string> Roles, DateTime ExpiresAt);

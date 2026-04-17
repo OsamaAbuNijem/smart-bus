@@ -15,13 +15,20 @@ public class DashboardController : Controller
         if (string.IsNullOrEmpty(HttpContext.Session.GetString("JwtToken")))
             return RedirectToAction("Login", "Account");
 
-        var buses = await _apiClient.GetBusesAsync(1, 5);
-        var trips = await _apiClient.GetTripsAsync(1, 5);
+        var busesTask = _apiClient.GetBusesAsync(1, 1);
+        var tripsTask = _apiClient.GetTripsAsync(1, 1);
+        var studentsTask = _apiClient.GetStudentsAsync(1, 1);
+        var alertsTask = _apiClient.GetAlertsAsync(1, 1, status: 0);
+        await Task.WhenAll(busesTask, tripsTask, studentsTask, alertsTask);
+        var buses = busesTask.Result;
+        var trips = tripsTask.Result;
+        var students = studentsTask.Result;
+        var alerts = alertsTask.Result;
 
         ViewBag.TotalBuses = buses?.TotalCount ?? 0;
         ViewBag.TotalTrips = trips?.TotalCount ?? 0;
-        ViewBag.RecentBuses = buses?.Items ?? [];
-        ViewBag.RecentTrips = trips?.Items ?? [];
+        ViewBag.TotalStudents = students?.TotalCount ?? 0;
+        ViewBag.PendingAlerts = alerts?.TotalCount ?? 0;
 
         return View();
     }

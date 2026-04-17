@@ -16,6 +16,10 @@ try
         .WriteTo.Console()
         .WriteTo.Seq(context.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341"));
 
+    // Serve static files from the source wwwroot in all environments
+    // (by default UseStaticWebAssets only runs in Development; this makes it work under IIS Production too)
+    builder.WebHost.UseStaticWebAssets();
+
     builder.Services.AddControllersWithViews();
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddSession(options =>
@@ -28,6 +32,14 @@ try
     builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
     {
         client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7100/");
+    });
+
+    builder.Services.AddHttpClient("ApiProxy", client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(30);
+    }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
     });
 
     var app = builder.Build();
