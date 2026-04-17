@@ -21,6 +21,7 @@ public class UnitOfWork : IUnitOfWork
     public IAbsenceRequestRepository AbsenceRequests { get; }
     public IStudentTripRepository StudentTrips { get; }
     public IAlertRepository Alerts { get; }
+    public ISchoolRepository Schools { get; }
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -37,6 +38,7 @@ public class UnitOfWork : IUnitOfWork
         AbsenceRequests = new AbsenceRequestRepository(context);
         StudentTrips = new StudentTripRepository(context);
         Alerts = new AlertRepository(context);
+        Schools = new SchoolRepository(context);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

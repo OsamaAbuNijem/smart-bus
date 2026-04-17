@@ -26,6 +26,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Alert> Alerts => Set<Alert>();
     public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
     public DbSet<StudentAllergy> StudentAllergies => Set<StudentAllergy>();
+    public DbSet<School> Schools => Set<School>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -49,6 +50,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<Alert>().HasQueryFilter(a => !a.IsDeleted);
         builder.Entity<EmergencyContact>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<StudentAllergy>().HasQueryFilter(a => !a.IsDeleted);
+        builder.Entity<School>().HasQueryFilter(s => !s.IsDeleted);
 
         // Bus → Assistant: Bus owns the FK (AssistantId)
         builder.Entity<Bus>()

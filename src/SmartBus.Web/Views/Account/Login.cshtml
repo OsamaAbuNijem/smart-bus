@@ -1,59 +1,163 @@
 @model SmartBus.Web.Models.LoginViewModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "تسجيل الدخول";
     Layout = null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SmartBus - Admin Login</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartBus — تسجيل الدخول</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --y:#FFD700;--yd:#B8960C;--yl:#FFFDE7;
+  --bg:#0F1117;--card:#1A1D27;--card2:#22263A;
+  --border:#2A2F45;--text:#F1F5F9;--text2:#94A3B8;--text3:#475569;
+  --input:#161923;--input-border:#2D3250;
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+
+/* ── Background decoration ── */
+.bg-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;}
+.bg-orb.o1{width:500px;height:500px;background:rgba(255,215,0,.07);top:-150px;right:-150px;}
+.bg-orb.o2{width:400px;height:400px;background:rgba(59,130,246,.05);bottom:-100px;left:-100px;}
+.bg-orb.o3{width:300px;height:300px;background:rgba(139,92,246,.04);top:50%;left:50%;transform:translate(-50%,-50%);}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:40px 40px;z-index:0;}
+
+/* ── Wrapper ── */
+.login-wrap{position:relative;z-index:1;width:100%;max-width:440px;padding:24px 16px;}
+
+/* ── Logo / header ── */
+.login-logo{text-align:center;margin-bottom:32px;}
+.logo-ring{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 32px rgba(255,215,0,.3);}
+.logo-ring svg{width:38px;height:38px;}
+.login-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
+.login-sub{font-size:14px;color:var(--text2);margin-top:4px;}
+
+/* ── Card ── */
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;box-shadow:0 24px 64px rgba(0,0,0,.4);}
+
+/* ── Fields ── */
+.field{margin-bottom:20px;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;}
+.field-wrap{position:relative;}
+.field-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text3);}
+.field input{width:100%;background:var(--input);border:1.5px solid var(--input-border);border-radius:12px;padding:13px 44px 13px 14px;font-size:14px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;}
+.field input::placeholder{color:var(--text3);}
+.field input:focus{border-color:var(--y);box-shadow:0 0 0 3px rgba(255,215,0,.12);}
+.field-err{font-size:12px;color:#EF4444;margin-top:6px;}
+
+/* ── Error summary ── */
+.err-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#FCA5A5;}
+
+/* ── Submit ── */
+.btn-login{width:100%;background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:800;font-family:'Cairo',sans-serif;color:#111;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,215,0,.4);}
+.btn-login:active{transform:translateY(0);}
+
+/* ── Divider ── */
+.login-divider{display:flex;align-items:center;gap:12px;margin:22px 0;}
+.login-divider span{font-size:12px;color:var(--text3);}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── Super admin link ── */
+.sa-link{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:13px;font-size:13px;font-weight:600;font-family:'Cairo',sans-serif;color:var(--text2);text-decoration:none;transition:border-color .2s,color .2s;}
+.sa-link:hover{border-color:var(--y);color:var(--y);}
+.sa-link svg{flex-shrink:0;}
+
+/* ── Footer ── */
+.login-footer{text-align:center;margin-top:24px;font-size:12px;color:var(--text3);}
+.login-footer strong{color:var(--y);}
+
+/* Validation */
+.field-validation-error{font-size:12px;color:#EF4444;margin-top:5px;display:block;}
+</style>
 </head>
-<body class="bg-primary d-flex align-items-center" style="min-height:100vh;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <i class="bi bi-bus-front-fill fs-1 text-primary"></i>
-                            <h3 class="fw-bold mt-2">SmartBus Admin</h3>
-                            <p class="text-muted">School Bus Tracker</p>
-                        </div>
-                        <form asp-action="Login" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
-                            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
-                            <div class="mb-3">
-                                <label asp-for="Email" class="form-label fw-semibold">Email</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                    <input asp-for="Email" class="form-control" placeholder="admin@smartbus.com" />
-                                </div>
-                                <span asp-validation-for="Email" class="text-danger small"></span>
-                            </div>
-                            <div class="mb-4">
-                                <label asp-for="Password" class="form-label fw-semibold">Password</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input asp-for="Password" class="form-control" placeholder="••••••••" />
-                                </div>
-                                <span asp-validation-for="Password" class="text-danger small"></span>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-orb o1"></div>
+<div class="bg-orb o2"></div>
+<div class="bg-orb o3"></div>
+
+<div class="login-wrap">
+  <!-- Logo -->
+  <div class="login-logo">
+    <div class="logo-ring">
+      <svg viewBox="0 0 48 32" fill="none">
+        <rect x="2" y="2" width="44" height="24" rx="6" fill="rgba(0,0,0,0.15)"/>
+        <rect x="2" y="2" width="44" height="24" rx="6" fill="rgba(0,0,0,0.1)" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
+        <circle cx="12" cy="30" r="4" fill="rgba(0,0,0,0.3)"/>
+        <circle cx="36" cy="30" r="4" fill="rgba(0,0,0,0.3)"/>
+        <rect x="8" y="8" width="12" height="9" rx="2" fill="rgba(255,255,255,0.4)"/>
+        <rect x="24" y="8" width="12" height="9" rx="2" fill="rgba(255,255,255,0.4)"/>
+      </svg>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="login-title">SmartBus</div>
+    <div class="login-sub">نظام تتبع حافلات المدرسة</div>
+  </div>
+
+  <!-- Card -->
+  <div class="login-card">
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey(string.Empty))
+    {
+      <div class="err-box">
+        @foreach (var err in ViewData.ModelState[string.Empty]!.Errors)
+        {
+          <div>@err.ErrorMessage</div>
+        }
+      </div>
+    }
+
+    <form asp-action="Login" method="post" autocomplete="off">
+      @Html.AntiForgeryToken()
+      <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <div class="field-wrap">
+          <span class="field-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+          <input asp-for="Email" type="email" placeholder="admin@smartbus.com" autocomplete="username" />
+        </div>
+        <span asp-validation-for="Email" class="field-validation-error"></span>
+      </div>
+
+      <div class="field">
+        <label>كلمة المرور</label>
+        <div class="field-wrap">
+          <span class="field-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input asp-for="Password" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <span asp-validation-for="Password" class="field-validation-error"></span>
+      </div>
+
+      <button type="submit" class="btn-login">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        تسجيل الدخول
+      </button>
+    </form>
+
+    <div class="login-divider"><span>أو</span></div>
+
+    <a href="/SuperAdmin/Login" class="sa-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      دخول المشرف العام (Super Admin)
+    </a>
+  </div>
+
+  <div class="login-footer">
+    مدعوم بواسطة <strong>SmartBus Platform</strong> &nbsp;·&nbsp; جميع الحقوق محفوظة © @DateTime.Now.Year
+  </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 </body>
 </html>

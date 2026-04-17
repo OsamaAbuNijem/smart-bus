@@ -1,6 +1,9 @@
+using System.Security.Claims;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartBus.Application.Features.Auth.Commands.ChangePassword;
 using SmartBus.Application.Features.Auth.Commands.Login;
 
 namespace SmartBus.API.Controllers.v1;
@@ -25,4 +28,26 @@ public class AuthController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess ? Ok(result.Data) : Unauthorized(new { error = result.Error });
     }
+
+    /// <summary>Change the authenticated user's password.</summary>
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ChangePassword(
+        [FromBody] ChangePasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var result = await _mediator.Send(
+            new ChangePasswordCommand(userId, request.CurrentPassword, request.NewPassword),
+            cancellationToken);
+
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
 }
+
+public record ChangePasswordRequest(string CurrentPassword, string NewPassword);

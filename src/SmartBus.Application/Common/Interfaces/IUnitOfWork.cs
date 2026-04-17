@@ -14,6 +14,7 @@ public interface IUnitOfWork : IDisposable
     IAbsenceRequestRepository AbsenceRequests { get; }
     IStudentTripRepository StudentTrips { get; }
     IAlertRepository Alerts { get; }
+    ISchoolRepository Schools { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync();

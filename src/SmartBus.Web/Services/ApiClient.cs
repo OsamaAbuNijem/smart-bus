@@ -32,16 +32,16 @@ public class ApiClient : IApiClient
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
-    public async Task<string?> LoginAsync(string email, string password)
+    public async Task<(string? Token, IEnumerable<string> Roles)> LoginAsync(string email, string password)
     {
         var body = JsonSerializer.Serialize(new { email, password });
         var content = new StringContent(body, Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync("api/v1/auth/login", content);
 
-        if (!response.IsSuccessStatusCode) return null;
+        if (!response.IsSuccessStatusCode) return (null, []);
         var json = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<LoginResult>(json, _jsonOptions);
-        return result?.Token;
+        return (result?.Token, result?.Roles ?? []);
     }
 
     public async Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10)

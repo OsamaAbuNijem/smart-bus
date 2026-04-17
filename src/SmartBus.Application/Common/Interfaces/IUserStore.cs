@@ -5,6 +5,16 @@ public interface IUserStore
     Task<AppUser?> FindByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<bool> CheckPasswordAsync(string userId, string password, CancellationToken cancellationToken = default);
     Task<IEnumerable<string>> GetRolesAsync(string userId, CancellationToken cancellationToken = default);
+
+    /// <summary>Creates an Identity user with the given role if one does not already exist.</summary>
+    Task<(bool Created, string? Error)> CreateUserIfNotExistsAsync(
+        string email, string fullName, string password, string role,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Changes a user's password after verifying the current password.</summary>
+    Task<(bool Succeeded, string? Error)> ChangePasswordAsync(
+        string userId, string currentPassword, string newPassword,
+        CancellationToken cancellationToken = default);
 }
 
 public record AppUser(string Id, string Email, string FullName);

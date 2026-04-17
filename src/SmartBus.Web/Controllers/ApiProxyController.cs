@@ -41,15 +41,25 @@ public class ApiProxyController : ControllerBase
         // Forward body for POST/PUT/PATCH
         if (Request.ContentLength > 0 || Request.Method == "POST")
         {
-            var body = await new StreamReader(Request.Body).ReadToEndAsync(ct);
-            upstream.Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+            var requestBody = await new StreamReader(Request.Body).ReadToEndAsync(ct);
+            upstream.Content = new StringContent(requestBody, System.Text.Encoding.UTF8, "application/json");
         }
 
         HttpResponseMessage response;
         try { response = await _httpClient.SendAsync(upstream, ct); }
         catch (Exception ex) { return StatusCode(502, new { error = ex.Message }); }
 
-        var json = await response.Content.ReadAsStringAsync(ct);
-        return Content(json, "application/json", System.Text.Encoding.UTF8);
+        var body = await response.Content.ReadAsStringAsync(ct);
+        var statusCode = (int)response.StatusCode;
+
+        if (string.IsNullOrWhiteSpace(body))
+            return StatusCode(statusCode);
+
+        return new ContentResult
+        {
+            StatusCode  = statusCode,
+            Content     = body,
+            ContentType = "application/json; charset=utf-8"
+        };
     }
 }

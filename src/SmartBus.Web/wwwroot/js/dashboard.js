@@ -762,9 +762,66 @@ Object.defineProperty(window, 'tripsPage',    { get: () => tripsPage });
 Object.defineProperty(window, 'busesPage',    { get: () => busesPage });
 Object.defineProperty(window, 'alertsPage',   { get: () => alertsPage });
 
+// ── Change Password ────────────────────────────────────────────────────────
+function openChangePassword() {
+  // clear previous state
+  ['cp-current', 'cp-new', 'cp-confirm'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('form-control-err'); el.style.borderColor = ''; }
+  });
+  ['err-cp-current', 'err-cp-new', 'err-cp-confirm'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const srv = document.getElementById('cp-server-err');
+  if (srv) srv.style.display = 'none';
+  openModal('modal-change-password');
+}
+
+async function changePassword() {
+  const current  = document.getElementById('cp-current')?.value  ?? '';
+  const newPwd   = document.getElementById('cp-new')?.value      ?? '';
+  const confirm  = document.getElementById('cp-confirm')?.value  ?? '';
+
+  let valid = true;
+  const setErr = (errId, inputId, show) => {
+    const err = document.getElementById(errId);
+    const inp = document.getElementById(inputId);
+    if (err) err.style.display = show ? 'block' : 'none';
+    if (inp) inp.style.borderColor = show ? '#EF4444' : '';
+    if (show) valid = false;
+  };
+
+  setErr('err-cp-current', 'cp-current', !current);
+  setErr('err-cp-new',     'cp-new',     newPwd.length < 8);
+  setErr('err-cp-confirm', 'cp-confirm', newPwd !== confirm);
+  if (!valid) return;
+
+  const btn = document.getElementById('btn-save-password');
+  if (btn) { btn.disabled = true; btn.textContent = 'جاري الحفظ...'; }
+
+  const res = await apiPost('/auth/change-password', {
+    currentPassword: current,
+    newPassword: newPwd
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'حفظ كلمة المرور'; }
+
+  const srv = document.getElementById('cp-server-err');
+  if (res?.ok) {
+    if (srv) srv.style.display = 'none';
+    closeModal('modal-change-password');
+    showToast('تم تغيير كلمة المرور بنجاح ✓');
+  } else {
+    if (srv) { srv.textContent = res?.data?.error || 'فشل تغيير كلمة المرور.'; srv.style.display = 'block'; }
+  }
+}
+
 window.showPage        = showPage;
 window.openModal       = openModal;
 window.closeModal      = closeModal;
+window.openChangePassword = openChangePassword;
+window.changePassword     = changePassword;
 window.openEdit        = openEdit;
 window.confirmDelete   = confirmDelete;
 window.saveTrip        = saveTrip;

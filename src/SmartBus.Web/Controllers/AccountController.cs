@@ -24,14 +24,17 @@ public class AccountController : Controller
     {
         if (!ModelState.IsValid) return View(model);
 
-        var token = await _apiClient.LoginAsync(model.Email, model.Password);
+        var (token, roles) = await _apiClient.LoginAsync(model.Email, model.Password);
         if (token is null)
         {
-            ModelState.AddModelError(string.Empty, "Invalid email or password.");
+            ModelState.AddModelError(string.Empty, "البريد الإلكتروني أو كلمة المرور غير صحيحة.");
             return View(model);
         }
 
         HttpContext.Session.SetString("JwtToken", token);
+
+        if (roles.Contains("SuperAdmin"))
+            return RedirectToAction("Dashboard", "SuperAdmin");
 
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
