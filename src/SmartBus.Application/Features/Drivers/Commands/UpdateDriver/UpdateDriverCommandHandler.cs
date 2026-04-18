@@ -19,10 +19,12 @@ public class UpdateDriverCommandHandler : IRequestHandler<UpdateDriverCommand, R
         if (existing is not null && existing.Id != request.DriverId)
             return Result.Failure($"License number '{request.LicenseNumber}' is already used by another driver.");
 
-        driver.FullName = request.FullName;
-        driver.PhoneNumber = request.PhoneNumber;
+        driver.FullName      = request.FullName;
+        driver.FullNameEn    = request.FullNameEn;
+        driver.PhoneNumber   = request.PhoneNumber;
         driver.LicenseNumber = request.LicenseNumber;
-        driver.IsActive = request.IsActive;
+        driver.IsActive      = request.IsActive;
+        driver.DriverType    = request.DriverType;
 
         await _unitOfWork.Drivers.UpdateAsync(driver);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

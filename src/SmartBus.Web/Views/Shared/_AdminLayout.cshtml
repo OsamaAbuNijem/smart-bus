@@ -1,5 +1,12 @@
+@{
+    var _isRtl  = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var _dir    = _isRtl ? "rtl" : "ltr";
+    var _culture        = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var _toggleCulture  = _isRtl ? "en" : "ar";
+    var _returnUrl      = Context.Request.Path + Context.Request.QueryString;
+}
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="@_culture" dir="@_dir">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -212,6 +219,22 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ══ LANGUAGE BUTTON ══ */
+.lang-btn{height:32px;min-width:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:var(--text2);cursor:pointer;padding:0 10px;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
+.lang-btn:hover{background:var(--y);border-color:var(--yd);color:#111;}
+
+/* ══ LTR OVERRIDES ══ */
+[dir="ltr"] .sidebar{right:auto;left:0;border-left:none;border-right:1px solid var(--border);}
+[dir="ltr"] .main{margin-right:0;margin-left:240px;}
+[dir="ltr"] .nav-item.active::before{right:auto;left:0;border-radius:0 2px 2px 0;}
+[dir="ltr"] .nav-badge{margin-right:unset;margin-left:auto;}
+[dir="ltr"] .add-btn{margin-right:0;margin-left:auto;}
+[dir="ltr"] .table th{text-align:left;}
+[dir="ltr"] .toggle.on  .toggle-knob{right:auto;left:3px;}
+[dir="ltr"] .toggle.off .toggle-knob{right:auto;left:21px;}
+[dir="ltr"] .setting-value,.setting-arrow{margin-right:unset;}
+[dir="ltr"] .toggle{margin-right:0;margin-left:auto;}
 </style>
 </head>
 <body>
@@ -226,7 +249,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
           <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
         </svg>
       </div>
-      <div><div class="logo-name">SmartBus</div><div class="logo-sub">لوحة الإدارة</div></div>
+      <div><div class="logo-name">SmartBus</div><div class="logo-sub">@(_isRtl ? "لوحة الإدارة" : "Admin Panel")</div></div>
     </div>
   </div>
   <div class="sidebar-school">
@@ -234,65 +257,65 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
     <div><div class="school-name">مدرسة النور الدولية</div><div class="school-plan">خطة Premium</div></div>
   </div>
   <div class="sidebar-nav">
-    <div class="nav-section">الرئيسية</div>
+    <div class="nav-section">@L["Nav_Main"]</div>
     <div class="nav-item active" onclick="showPage('dashboard', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round">
         <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
         <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
       </svg>
-      <span class="nav-label">لوحة المراقبة</span>
+      <span class="nav-label">@L["Nav_Dashboard"]</span>
     </div>
     <div class="nav-item" onclick="showPage('trips', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
         <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/>
         <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
       </svg>
-      <span class="nav-label">الرحلات</span>
+      <span class="nav-label">@L["Nav_Trips"]</span>
       <div class="nav-badge y" id="trips-badge">0</div>
     </div>
-    <div class="nav-section">الإدارة</div>
+    <div class="nav-section">@L["Nav_Mgmt"]</div>
     <div class="nav-item" onclick="showPage('students', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
         <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
       </svg>
-      <span class="nav-label">الطلاب</span>
+      <span class="nav-label">@L["Nav_Students"]</span>
     </div>
     <div class="nav-item" onclick="showPage('drivers', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
       </svg>
-      <span class="nav-label">السائقون والمساعدون</span>
+      <span class="nav-label">@L["Nav_Drivers"]</span>
     </div>
     <div class="nav-item" onclick="showPage('buses', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
         <rect x="1" y="3" width="15" height="13" rx="2"/>
         <circle cx="5.5" cy="18.5" r="2.5"/>
       </svg>
-      <span class="nav-label">الباصات</span>
+      <span class="nav-label">@L["Nav_Buses"]</span>
     </div>
-    <div class="nav-section">التحليل</div>
+    <div class="nav-section">@L["Nav_Analysis"]</div>
     <div class="nav-item" onclick="showPage('reports', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
         <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
       </svg>
-      <span class="nav-label">التقارير</span>
+      <span class="nav-label">@L["Nav_Reports"]</span>
     </div>
     <div class="nav-item" onclick="showPage('alerts', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
       </svg>
-      <span class="nav-label">التنبيهات</span>
+      <span class="nav-label">@L["Nav_Alerts"]</span>
       <div class="nav-badge" id="alerts-badge">0</div>
     </div>
-    <div class="nav-section">النظام</div>
+    <div class="nav-section">@L["Nav_System"]</div>
     <div class="nav-item" onclick="showPage('settings', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
         <circle cx="12" cy="12" r="3"/>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 9 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68"/>
       </svg>
-      <span class="nav-label">الإعدادات</span>
+      <span class="nav-label">@L["Nav_Settings"]</span>
     </div>
   </div>
   <div class="sidebar-bottom">
@@ -318,14 +341,15 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
 <!-- ══════ MAIN ══════ -->
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title" id="page-title">لوحة المراقبة</div>
+    <div class="topbar-title" id="page-title">@L["Nav_Dashboard"]</div>
     <div class="topbar-right">
       <div class="tb-search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input placeholder="بحث..." id="search-input"/>
+        <input placeholder="@L["SearchShort"]" id="search-input"/>
       </div>
       <div class="date-chip" id="date-chip"></div>
-      <div class="tb-btn" title="التنبيهات" onclick="showPage('alerts', document.querySelector('.nav-item:nth-child(8)'))">
+      <a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)" title="@L["LangName"]">@L["SwitchLang"]</a>
+      <div class="tb-btn" title="@L["Nav_Alerts"]" onclick="showPage('alerts', document.querySelector('.nav-item:nth-child(8)'))">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
         <div class="tb-badge"></div>
       </div>
@@ -390,39 +414,62 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
 <div class="modal-overlay" id="modal-student">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-header-title" id="std-modal-title">إضافة طالب جديد</div>
+      <div class="modal-header-title" id="std-modal-title">@L["Std_AddTitle"]</div>
       <button class="modal-close-btn" onclick="closeModal('modal-student')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-group"><label class="form-label">اسم الطالب كاملاً</label><input class="form-input" id="sf-name" placeholder="أحمد محمد الخالدي"/></div>
-        <div class="form-group"><label class="form-label">الصف الدراسي</label>
-          <select class="form-select" id="sf-grade">
-            <option>الصف الأول</option><option>الصف الثاني</option><option>الصف الثالث</option>
-            <option>الصف الرابع</option><option>الصف الخامس</option><option>الصف السادس</option>
-            <option>الصف السابع</option><option>الصف الثامن</option><option>الصف التاسع</option>
+        <div class="form-group"><label class="form-label">@L["Std_Name"]</label><input class="form-input" id="sf-name" placeholder="أحمد محمد الخالدي"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_Grade"]</label>
+          <select class="form-input" id="sf-grade">
+            <option id="sf-g1">@L["Std_Grade1"]</option>
+            <option id="sf-g2">@L["Std_Grade2"]</option>
+            <option id="sf-g3">@L["Std_Grade3"]</option>
+            <option id="sf-g4">@L["Std_Grade4"]</option>
+            <option id="sf-g5">@L["Std_Grade5"]</option>
+            <option id="sf-g6">@L["Std_Grade6"]</option>
+            <option id="sf-g7">@L["Std_Grade7"]</option>
+            <option id="sf-g8">@L["Std_Grade8"]</option>
+            <option id="sf-g9">@L["Std_Grade9"]</option>
           </select>
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">الباص المخصص</label>
-          <select class="form-select" id="sf-route"><option value="">— اختر مساراً —</option></select>
+        <div class="form-group"><label class="form-label">@L["Std_City"]</label>
+          <select class="form-input" id="sf-city">
+            <option value="">—</option>
+            <option value="Amman"    id="sf-city-amman">@L["City_Amman"]</option>
+            <option value="Zarqa"    id="sf-city-zarqa">@L["City_Zarqa"]</option>
+            <option value="Irbid"    id="sf-city-irbid">@L["City_Irbid"]</option>
+            <option value="Aqaba"    id="sf-city-aqaba">@L["City_Aqaba"]</option>
+            <option value="Salt"     id="sf-city-salt">@L["City_Salt"]</option>
+            <option value="Madaba"   id="sf-city-madaba">@L["City_Madaba"]</option>
+            <option value="Karak"    id="sf-city-karak">@L["City_Karak"]</option>
+            <option value="Jerash"   id="sf-city-jerash">@L["City_Jerash"]</option>
+            <option value="Ajloun"   id="sf-city-ajloun">@L["City_Ajloun"]</option>
+            <option value="Mafraq"   id="sf-city-mafraq">@L["City_Mafraq"]</option>
+            <option value="Tafilah"  id="sf-city-tafilah">@L["City_Tafilah"]</option>
+            <option value="Maan"     id="sf-city-maan">@L["City_Maan"]</option>
+            <option value="Russeifa" id="sf-city-russeifa">@L["City_Russeifa"]</option>
+            <option value="Ramtha"   id="sf-city-ramtha">@L["City_Ramtha"]</option>
+            <option value="WadiMusa" id="sf-city-wadimusa">@L["City_WadiMusa"]</option>
+          </select>
         </div>
-        <div class="form-group"><label class="form-label">محطة الركوب</label><input class="form-input" id="sf-stop" placeholder="محطة الزيتون"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_Address"]</label><input class="form-input" id="sf-address" placeholder="شارع المدينة، بناية 12"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">اسم ولي الأمر</label><input class="form-input" id="sf-parent" placeholder="محمد الخالدي"/></div>
-        <div class="form-group"><label class="form-label">رقم الهاتف</label><input class="form-input" id="sf-phone" placeholder="+962 79 123 4567" dir="ltr"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_Parent"]</label><input class="form-input" id="sf-parent" placeholder="محمد الخالدي"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_Phone"]</label><input class="form-input" id="sf-phone" placeholder="+962 79 123 4567" dir="ltr"/></div>
       </div>
       <div class="form-row full">
-        <div class="form-group"><label class="form-label">ملاحظات طبية أو خاصة</label><input class="form-input" id="sf-notes" placeholder="اختياري — مثال: حساسية من الغبار"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_Notes"]</label><input class="form-input" id="sf-notes" placeholder="اختياري"/></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-primary" onclick="saveStudent()">💾 حفظ الطالب</button>
-      <button class="btn-secondary" onclick="closeModal('modal-student')">إلغاء</button>
+      <button class="btn-primary" onclick="saveStudent()">@L["Std_SaveBtn"]</button>
+      <button class="btn-secondary" onclick="closeModal('modal-student')">@L["Std_Cancel"]</button>
     </div>
   </div>
 </div>
@@ -465,7 +512,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
 <div class="modal-overlay" id="modal-driver">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-header-title" id="driver-modal-title">إضافة سائق جديد</div>
+      <div class="modal-header-title" id="driver-modal-title">@L["Driver_AddTitle"]</div>
       <button class="modal-close-btn" onclick="closeModal('modal-driver')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -474,31 +521,44 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
       <input type="hidden" id="df-id" />
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">الاسم الكامل *</label>
-          <input type="text" id="df-name" class="form-control" placeholder="اسم السائق" />
+          <label class="form-label">@L["Driver_NameAr"]</label>
+          <input type="text" id="df-name" class="form-input" placeholder="اسم السائق بالعربية" dir="rtl" />
         </div>
         <div class="form-group">
-          <label class="form-label">رقم الهاتف *</label>
-          <input type="text" id="df-phone" class="form-control" placeholder="05xxxxxxxx" />
+          <label class="form-label">@L["Driver_NameEn"]</label>
+          <input type="text" id="df-name-en" class="form-input" placeholder="Driver name in English" dir="ltr" />
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">رقم الرخصة *</label>
-          <input type="text" id="df-license" class="form-control" placeholder="رقم رخصة القيادة" />
+          <label class="form-label">@L["Driver_Phone"]</label>
+          <input type="text" id="df-phone" class="form-input" placeholder="05xxxxxxxx" />
         </div>
         <div class="form-group">
-          <label class="form-label">الحالة</label>
-          <select id="df-active" class="form-control">
-            <option value="true">نشط</option>
-            <option value="false">غير نشط</option>
+          <label class="form-label">@L["Driver_License"]</label>
+          <input type="text" id="df-license" class="form-input" placeholder="رقم رخصة القيادة" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["Driver_Type"]</label>
+          <select id="df-type" class="form-input">
+            <option value="Driver"    id="df-type-opt-driver">@L["Driver_TypeDriver"]</option>
+            <option value="Assistant" id="df-type-opt-assist">@L["Driver_TypeAssist"]</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["Driver_Status"]</label>
+          <select id="df-active" class="form-input">
+            <option value="true" id="df-active-opt-true">@L["Driver_Active"]</option>
+            <option value="false" id="df-active-opt-false">@L["Driver_Inactive"]</option>
           </select>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-primary" onclick="saveDriver()">حفظ السائق</button>
-      <button class="btn-secondary" onclick="closeModal('modal-driver')">إلغاء</button>
+      <button class="btn-primary" onclick="saveDriver()">@L["Driver_SaveBtn"]</button>
+      <button class="btn-secondary" onclick="closeModal('modal-driver')">@L["Driver_Cancel"]</button>
     </div>
   </div>
 </div>
@@ -507,7 +567,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
 <div class="modal-overlay" id="modal-delete">
   <div class="modal-box" style="max-width:380px;">
     <div class="modal-header">
-      <div class="modal-header-title" style="color:#DC2626;">تأكيد الحذف</div>
+      <div class="modal-header-title" style="color:#DC2626;">@L["Del_Title"]</div>
       <button class="modal-close-btn" onclick="closeModal('modal-delete')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -516,14 +576,14 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
       <div style="width:56px;height:56px;border-radius:50%;background:#FEF2F2;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
       </div>
-      <div style="font-size:15px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;margin-bottom:8px;">هل أنت متأكد؟</div>
-      <div style="font-size:13px;color:#475569;font-family:'Cairo',sans-serif;line-height:1.5;">
-        سيتم حذف <strong id="del-item-type"></strong> "<span id="del-item-name" style="color:#DC2626;"></span>" بشكل نهائي ولا يمكن التراجع عن هذا الإجراء.
+      <div style="font-size:15px;font-weight:700;color:#111;font-family:'Cairo',sans-serif;margin-bottom:8px;" id="del-heading">@L["Del_Heading"]</div>
+      <div style="font-size:13px;color:#475569;font-family:'Cairo',sans-serif;line-height:1.5;" id="del-body-text">
+        @L["Del_Body"] <strong id="del-item-type"></strong> "<span id="del-item-name" style="color:#DC2626;"></span>" @L["Del_BodySuffix"]
       </div>
     </div>
     <div class="modal-footer" style="justify-content:center;">
-      <button class="btn-danger" id="del-confirm-btn">🗑️ نعم، احذف</button>
-      <button class="btn-secondary" onclick="closeModal('modal-delete')">إلغاء</button>
+      <button class="btn-danger" id="del-confirm-btn">@L["Del_Confirm"]</button>
+      <button class="btn-secondary" id="del-cancel-btn" onclick="closeModal('modal-delete')">@L["Del_Cancel"]</button>
     </div>
   </div>
 </div>
@@ -570,6 +630,53 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
   </div>
 </div>
 
+<script>
+window.T = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+    studentSaved    = L["JS_StudentSaved"].Value,
+    driverSaved     = L["JS_DriverSaved"].Value,
+    tripSaved       = L["JS_TripSaved"].Value,
+    busSaved        = L["JS_BusSaved"].Value,
+    alertResolved   = L["JS_AlertResolved"].Value,
+    alertDismissed  = L["JS_AlertDismissed"].Value,
+    deletedSuccess  = L["JS_DeletedSuccess"].Value,
+    passwordChanged = L["JS_PasswordChanged"].Value,
+    saveFailed      = L["JS_SaveFailed"].Value,
+    saving          = L["JS_Saving"].Value,
+    pageDashboard   = L["JS_PageDashboard"].Value,
+    pageTrips       = L["JS_PageTrips"].Value,
+    pageStudents    = L["JS_PageStudents"].Value,
+    pageDrivers     = L["JS_PageDrivers"].Value,
+    pageBuses       = L["JS_PageBuses"].Value,
+    pageReports     = L["JS_PageReports"].Value,
+    pageAlerts      = L["JS_PageAlerts"].Value,
+    pageSettings    = L["JS_PageSettings"].Value,
+    stdAddTitle  = L["Std_AddTitle"].Value,
+    stdEditTitle = L["Std_EditTitle"].Value,
+    stdGrade1    = L["Std_Grade1"].Value,
+    stdGrade2    = L["Std_Grade2"].Value,
+    stdGrade3    = L["Std_Grade3"].Value,
+    stdGrade4    = L["Std_Grade4"].Value,
+    stdGrade5    = L["Std_Grade5"].Value,
+    stdGrade6    = L["Std_Grade6"].Value,
+    stdGrade7    = L["Std_Grade7"].Value,
+    stdGrade8    = L["Std_Grade8"].Value,
+    stdGrade9    = L["Std_Grade9"].Value,
+    delTitle       = L["Del_Title"].Value,
+    delHeading     = L["Del_Heading"].Value,
+    delBody        = L["Del_Body"].Value,
+    delBodySuffix  = L["Del_BodySuffix"].Value,
+    delConfirm     = L["Del_Confirm"].Value,
+    delCancel      = L["Del_Cancel"].Value,
+    driverActive    = L["Driver_Active"].Value,
+    driverInactive  = L["Driver_Inactive"].Value,
+    driverAddTitle  = L["Driver_AddTitle"].Value,
+    driverEditTitle = L["Driver_EditTitle"].Value,
+    driverTypeDriver = L["Driver_TypeDriver"].Value,
+    driverTypeAssist = L["Driver_TypeAssist"].Value,
+    isRtl = _isRtl,
+    dir   = _dir,
+}));
+</script>
 <script src="~/js/dashboard.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

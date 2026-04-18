@@ -38,6 +38,10 @@ public class ApiProxyController : ControllerBase
         using var upstream = new HttpRequestMessage(new HttpMethod(Request.Method), targetUrl);
         upstream.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+        // Forward the UI culture so the API returns messages in the correct language
+        var lang = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        upstream.Headers.TryAddWithoutValidation("Accept-Language", lang);
+
         // Forward body for POST/PUT/PATCH
         if (Request.ContentLength > 0 || Request.Method == "POST")
         {

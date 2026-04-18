@@ -2,9 +2,14 @@
 @{
     ViewData["Title"] = "تسجيل الدخول";
     Layout = null;
+    var _isRtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var _dir   = _isRtl ? "rtl" : "ltr";
+    var _culture       = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var _toggleCulture = _isRtl ? "en" : "ar";
+    var _returnUrl     = Context.Request.Path + Context.Request.QueryString;
 }
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="@_culture" dir="@_dir">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -74,6 +79,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
 
 /* Validation */
 .field-validation-error{font-size:12px;color:#EF4444;margin-top:5px;display:block;}
+/* Language button */
+.lang-btn{position:fixed;top:16px;left:16px;height:32px;min-width:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:var(--text2);cursor:pointer;padding:0 10px;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;z-index:100;}
+.lang-btn:hover{background:var(--y);border-color:var(--yd);color:#111;}
+[dir="ltr"] .lang-btn{left:auto;right:16px;}
 </style>
 </head>
 <body>
@@ -81,6 +90,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
 <div class="bg-orb o1"></div>
 <div class="bg-orb o2"></div>
 <div class="bg-orb o3"></div>
+<a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)">@L["SwitchLang"]</a>
 
 <div class="login-wrap">
   <!-- Logo -->
@@ -96,7 +106,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
       </svg>
     </div>
     <div class="login-title">SmartBus</div>
-    <div class="login-sub">نظام تتبع حافلات المدرسة</div>
+    <div class="login-sub">@L["Login_SchoolSub"]</div>
   </div>
 
   <!-- Card -->
@@ -116,7 +126,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
       <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
 
       <div class="field">
-        <label>البريد الإلكتروني</label>
+        <label>@L["Login_Email"]</label>
         <div class="field-wrap">
           <span class="field-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -127,7 +137,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
       </div>
 
       <div class="field">
-        <label>كلمة المرور</label>
+        <label>@L["Login_Password"]</label>
         <div class="field-wrap">
           <span class="field-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -139,15 +149,15 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
 
       <button type="submit" class="btn-login">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        تسجيل الدخول
+        @L["Login_Submit"]
       </button>
     </form>
 
-    <div class="login-divider"><span>أو</span></div>
+    <div class="login-divider"><span>@L["Login_Or"]</span></div>
 
     <a href="/SuperAdmin/Login" class="sa-link">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      دخول المشرف العام (Super Admin)
+      @L["Login_SALink"]
     </a>
   </div>
 

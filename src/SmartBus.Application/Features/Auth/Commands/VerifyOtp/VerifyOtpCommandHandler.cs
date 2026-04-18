@@ -25,6 +25,9 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         _userStore  = userStore;
     }
 
+    private static string T(string ar, string en) =>
+        System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar" ? ar : en;
+
     public async Task<Result<OtpLoginResponse>> Handle(
         VerifyOtpCommand request, CancellationToken cancellationToken)
     {
@@ -36,14 +39,16 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         var record = await _cache.GetAsync<OtpRecord>(cacheKey, cancellationToken);
         if (record is null)
             return Result<OtpLoginResponse>.Failure(
-                "رمز التحقق منتهي الصلاحية أو غير موجود. يرجى طلب رمز جديد.");
+                T("رمز التحقق منتهي الصلاحية أو غير موجود. يرجى طلب رمز جديد.",
+                  "Verification code expired or not found. Please request a new code."));
 
         // ── Check attempt limit ────────────────────────────────────────────
         if (record.Attempts >= MaxAttempts)
         {
             await _cache.RemoveAsync(cacheKey, cancellationToken);
             return Result<OtpLoginResponse>.Failure(
-                "تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.");
+                T("تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.",
+                  "Maximum attempts exceeded. Please request a new code."));
         }
 
         // ── Validate OTP ───────────────────────────────────────────────────
@@ -57,7 +62,8 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
 
             var attemptsLeft = MaxAttempts - updated.Attempts;
             return Result<OtpLoginResponse>.Failure(
-                $"رمز التحقق غير صحيح. المحاولات المتبقية: {attemptsLeft}");
+                T($"رمز التحقق غير صحيح. المحاولات المتبقية: {attemptsLeft}",
+                  $"Invalid verification code. Remaining attempts: {attemptsLeft}"));
         }
 
         // ── OTP valid → remove from cache ──────────────────────────────────
@@ -69,7 +75,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
             "parent"    => await HandleParentAsync(phone, cancellationToken),
             "driver"    => await HandleDriverAsync(phone, cancellationToken),
             "assistant" => await HandleAssistantAsync(phone, cancellationToken),
-            _           => Result<OtpLoginResponse>.Failure("دور غير معروف.")
+            _           => Result<OtpLoginResponse>.Failure(T("دور غير معروف.", "Unknown role."))
         };
     }
 
@@ -79,7 +85,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         string phone, CancellationToken ct)
     {
         var parent = await _unitOfWork.Parents.GetByPhoneNumberAsync(phone, ct);
-        if (parent is null) return Result<OtpLoginResponse>.Failure("لم يتم العثور على ولي الأمر.");
+        if (parent is null) return Result<OtpLoginResponse>.Failure(T("لم يتم العثور على ولي الأمر.", "Parent not found."));
 
         var (userId, err) = await EnsureUserAsync(parent.UserId, phone, parent.FullName, "Parent", ct);
         if (err is not null) return Result<OtpLoginResponse>.Failure(err);
@@ -98,7 +104,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         string phone, CancellationToken ct)
     {
         var driver = await _unitOfWork.Drivers.GetByPhoneNumberAsync(phone, ct);
-        if (driver is null) return Result<OtpLoginResponse>.Failure("لم يتم العثور على السائق.");
+        if (driver is null) return Result<OtpLoginResponse>.Failure(T("لم يتم العثور على السائق.", "Driver not found."));
 
         var (userId, err) = await EnsureUserAsync(driver.UserId, phone, driver.FullName, "Driver", ct);
         if (err is not null) return Result<OtpLoginResponse>.Failure(err);
@@ -116,7 +122,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         string phone, CancellationToken ct)
     {
         var assistant = await _unitOfWork.Assistants.GetByPhoneNumberAsync(phone, ct);
-        if (assistant is null) return Result<OtpLoginResponse>.Failure("لم يتم العثور على المساعد.");
+        if (assistant is null) return Result<OtpLoginResponse>.Failure(T("لم يتم العثور على المساعد.", "Assistant not found."));
 
         var (userId, err) = await EnsureUserAsync(assistant.UserId, phone, assistant.FullName, "Assistant", ct);
         if (err is not null) return Result<OtpLoginResponse>.Failure(err);
@@ -155,7 +161,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         if (createErr is not null) return (null, createErr);
 
         var user = await _userStore.FindByEmailAsync(email, ct);
-        return user is not null ? (user.Id, null) : (null, "فشل إنشاء حساب المستخدم.");
+        return user is not null ? (user.Id, null) : (null, T("فشل إنشاء حساب المستخدم.", "Failed to create user account."));
     }
 
     private Result<OtpLoginResponse> BuildResponse(

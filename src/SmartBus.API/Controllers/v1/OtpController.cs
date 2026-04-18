@@ -1,6 +1,8 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using SmartBus.API.Resources;
 using SmartBus.Application.Features.Auth.Commands.RequestOtp;
 using SmartBus.Application.Features.Auth.Commands.VerifyOtp;
 
@@ -14,13 +16,15 @@ namespace SmartBus.API.Controllers.v1;
 [Route("api/v{version:apiVersion}/auth/otp")]
 public class OtpController : ControllerBase
 {
-    private readonly IMediator        _mediator;
-    private readonly IHostEnvironment _env;
+    private readonly IMediator                    _mediator;
+    private readonly IHostEnvironment             _env;
+    private readonly IStringLocalizer<ApiMessages> _L;
 
-    public OtpController(IMediator mediator, IHostEnvironment env)
+    public OtpController(IMediator mediator, IHostEnvironment env, IStringLocalizer<ApiMessages> localizer)
     {
         _mediator = mediator;
         _env      = env;
+        _L        = localizer;
     }
 
     /// <summary>
@@ -46,7 +50,7 @@ public class OtpController : ControllerBase
         CancellationToken cancellationToken)
     {
         if (!IsValidRole(dto.Role))
-            return BadRequest(new { error = "الدور يجب أن يكون أحد: Parent, Driver, Assistant" });
+            return BadRequest(new { error = _L["Otp_RoleInvalid"].Value });
 
         var result = await _mediator.Send(
             new RequestOtpCommand(dto.PhoneNumber, dto.Role), cancellationToken);
@@ -86,7 +90,7 @@ public class OtpController : ControllerBase
         CancellationToken cancellationToken)
     {
         if (!IsValidRole(dto.Role))
-            return BadRequest(new { error = "الدور يجب أن يكون أحد: Parent, Driver, Assistant" });
+            return BadRequest(new { error = _L["Otp_RoleInvalid"].Value });
 
         var result = await _mediator.Send(
             new VerifyOtpCommand(dto.PhoneNumber, dto.Otp, dto.Role), cancellationToken);

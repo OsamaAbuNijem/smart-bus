@@ -2,9 +2,14 @@
 @{
     ViewData["Title"] = "Super Admin — تسجيل الدخول";
     Layout = null;
+    var _isRtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var _dir   = _isRtl ? "rtl" : "ltr";
+    var _culture       = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var _toggleCulture = _isRtl ? "en" : "ar";
+    var _returnUrl     = Context.Request.Path + Context.Request.QueryString;
 }
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="@_culture" dir="@_dir">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -76,6 +81,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
 .login-footer strong{color:var(--pu);}
 
 .field-validation-error{font-size:12px;color:#EF4444;margin-top:5px;display:block;}
+/* Language button */
+.lang-btn{position:fixed;top:16px;left:16px;height:32px;min-width:36px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:rgba(255,255,255,.7);cursor:pointer;padding:0 10px;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;z-index:100;}
+.lang-btn:hover{background:var(--pu);border-color:var(--pu);color:#fff;}
+[dir="ltr"] .lang-btn{left:auto;right:16px;}
 </style>
 </head>
 <body>
@@ -83,6 +92,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
 <div class="bg-orb o1"></div>
 <div class="bg-orb o2"></div>
 <div class="bg-orb o3"></div>
+<a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)">@L["SwitchLang"]</a>
 <div class="particle" style="left:10%;animation-duration:8s;animation-delay:0s;"></div>
 <div class="particle" style="left:25%;animation-duration:10s;animation-delay:2s;width:4px;height:4px;"></div>
 <div class="particle" style="left:50%;animation-duration:7s;animation-delay:4s;"></div>
@@ -100,7 +110,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
       </div>
     </div>
     <div class="login-title">SmartBus Platform</div>
-    <div class="login-sub">بوابة المشرف العام</div>
+    <div class="login-sub">@L["Login_SASub"]</div>
     <div><span class="sa-pill">⚡ Super Admin Access</span></div>
   </div>
 
@@ -121,7 +131,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
       @Html.AntiForgeryToken()
 
       <div class="field">
-        <label>البريد الإلكتروني</label>
+        <label>@L["Login_Email"]</label>
         <div class="field-wrap">
           <span class="field-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -132,7 +142,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
       </div>
 
       <div class="field">
-        <label>كلمة المرور</label>
+        <label>@L["Login_Password"]</label>
         <div class="field-wrap">
           <span class="field-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -144,13 +154,13 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
 
       <button type="submit" class="btn-login">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        دخول المشرف العام
+        @L["Login_SASubmit"]
       </button>
     </form>
 
     <a href="/Account/Login" class="back-link">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-      العودة لتسجيل دخول المدرسة
+      @L["Login_SABack"]
     </a>
   </div>
 

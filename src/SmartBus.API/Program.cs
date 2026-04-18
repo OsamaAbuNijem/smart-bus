@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Hangfire;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using SmartBus.API.Hubs;
@@ -35,8 +36,14 @@ try
         SmartBus.API.Services.CurrentUserService>();
     builder.Services.AddHttpContextAccessor();
 
+    // Localization (reads Accept-Language from proxy)
+    builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
+
     // Controllers
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(opts =>
+            opts.JsonSerializerOptions.Converters.Add(
+                new System.Text.Json.Serialization.JsonStringEnumConverter()));
 
     // API Versioning
     builder.Services.AddApiVersioning(options =>
@@ -82,6 +89,8 @@ try
                 Array.Empty<string>()
             }
         });
+
+        c.OperationFilter<SmartBus.API.Extensions.AcceptLanguageOperationFilter>();
     });
 
     // SignalR
@@ -119,6 +128,17 @@ try
 
     app.UseHttpsRedirection();
     app.UseCors("SmartBusPolicy");
+
+    // Honour Accept-Language header forwarded by the Web proxy
+    var apiCultures = new[] { "ar", "en" };
+    var apiLocOpts  = new RequestLocalizationOptions()
+        .SetDefaultCulture("ar")
+        .AddSupportedCultures(apiCultures)
+        .AddSupportedUICultures(apiCultures);
+    apiLocOpts.RequestCultureProviders.Clear();
+    apiLocOpts.RequestCultureProviders.Add(new AcceptLanguageHeaderRequestCultureProvider());
+    app.UseRequestLocalization(apiLocOpts);
+
     app.UseAuthentication();
     app.UseAuthorization();
 

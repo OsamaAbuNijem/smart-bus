@@ -3,6 +3,7 @@
 // ── State ──────────────────────────────────────────────────────────────────
 let studentsPage = 1, studentsTotalPages = 1;
 let driversPage = 1, driversTotalPages = 1;
+let driversTypeFilter = '';
 let tripsPage = 1, tripsTotalPages = 1;
 let busesPage = 1, busesTotalPages = 1;
 let alertsPage = 1, alertsTotalPages = 1;
@@ -35,9 +36,14 @@ function setDateChip() {
 
 // ── Page Navigation ────────────────────────────────────────────────────────
 const pageNames = {
-  'dashboard': 'لوحة المراقبة', 'trips': 'الرحلات', 'students': 'الطلاب',
-  'drivers': 'السائقون والمساعدون', 'buses': 'الباصات',
-  'reports': 'التقارير', 'alerts': 'التنبيهات', 'settings': 'الإعدادات'
+  'dashboard': window.T?.pageDashboard || 'لوحة المراقبة',
+  'trips':     window.T?.pageTrips     || 'الرحلات',
+  'students':  window.T?.pageStudents  || 'الطلاب',
+  'drivers':   window.T?.pageDrivers   || 'السائقون والمساعدون',
+  'buses':     window.T?.pageBuses     || 'الباصات',
+  'reports':   window.T?.pageReports   || 'التقارير',
+  'alerts':    window.T?.pageAlerts    || 'التنبيهات',
+  'settings':  window.T?.pageSettings  || 'الإعدادات'
 };
 
 function showPage(id, navEl) {
@@ -224,14 +230,17 @@ async function loadStudents(page) {
 }
 
 async function saveStudent() {
-  const name = document.getElementById('sf-name').value.trim();
-  const grade = document.getElementById('sf-grade').value;
-  const parentName = document.getElementById('sf-parent').value.trim();
+  const name        = document.getElementById('sf-name').value.trim();
+  const grade       = document.getElementById('sf-grade').value;
+  const city        = document.getElementById('sf-city').value.trim();
+  const address     = document.getElementById('sf-address').value.trim();
+  const parentName  = document.getElementById('sf-parent').value.trim();
   const parentPhone = document.getElementById('sf-phone').value.trim();
+  const notes       = document.getElementById('sf-notes').value.trim() || null;
   if (!name || !parentName || !parentPhone) { alert('الرجاء تعبئة الحقول الإلزامية'); return; }
 
-  const routeId = document.getElementById('sf-route').value || null;
-  const body = { fullName: name, grade, class: null, parentName, parentPhone, routeId };
+  const body = { fullName: name, grade, city: city || null, address: address || null,
+                 parentName, parentPhone, notes };
 
   let res;
   if (editingId) {
@@ -242,7 +251,7 @@ async function saveStudent() {
   if (res?.ok) {
     closeModal('modal-student');
     loadStudents(studentsPage);
-    showToast('تم حفظ الطالب بنجاح ✓');
+    showToast(window.T?.studentSaved || 'تم حفظ الطالب بنجاح ✓');
   } else { alert('فشل الحفظ. تحقق من البيانات.'); }
 }
 
@@ -250,7 +259,8 @@ async function saveStudent() {
 async function loadDrivers(page) {
   if (page < 1 || page > driversTotalPages) return;
   driversPage = page;
-  const data = await apiGet(`/drivers?pageNumber=${page}&pageSize=10`);
+  const typeParam = driversTypeFilter ? `&driverType=${driversTypeFilter}` : '';
+  const data = await apiGet(`/drivers?pageNumber=${page}&pageSize=10${typeParam}`);
   const tbody = document.getElementById('drivers-tbody');
   const info = document.getElementById('drivers-pager-info');
   if (!data || !tbody) return;
@@ -262,20 +272,26 @@ async function loadDrivers(page) {
     return;
   }
   tbody.innerHTML = data.items.map(d => {
-    const initials = getInitials(d.fullName);
+    const displayName = (window.T?.isRtl === false && d.fullNameEn) ? d.fullNameEn : d.fullName;
+    const initials = getInitials(displayName);
     const colors = getAvatarColor(d.id);
     const isActive = d.isActive;
+    const isAssistant = d.driverType === 'Assistant';
+    const typeLabel  = isAssistant ? (window.T?.driverTypeAssist || 'مساعد سائق') : (window.T?.driverTypeDriver || 'سائق');
+    const typeBg     = isAssistant ? '#F5F3FF' : '#EFF6FF';
+    const typeColor  = isAssistant ? '#6D28D9'  : '#1E40AF';
+    const activeLabel = isActive ? (window.T?.driverActive || 'نشط') : (window.T?.driverInactive || 'غير نشط');
     return `
       <tr>
         <td><div style="display:flex;align-items:center;gap:10px;">
           <div class="table-av" style="background:${colors.bg};color:${colors.text};">${initials}</div>
-          <div><div class="td-name">${escHtml(d.fullName)}</div></div>
+          <div><div class="td-name">${escHtml(displayName)}</div></div>
         </div></td>
-        <td><div class="td-badge" style="background:#EFF6FF;"><span style="color:#1E40AF;">سائق</span></div></td>
+        <td><div class="td-badge" style="background:${typeBg};"><span style="color:${typeColor};">${typeLabel}</span></div></td>
         <td>${escHtml(d.licenseNumber || '—')}</td>
         <td>${escHtml(d.phoneNumber)}</td>
         <td><div class="td-badge" style="background:${isActive ? '#F0FDF4' : '#F1F5F9'};">
-          <span style="color:${isActive ? '#15803D' : '#475569'};">${isActive ? 'نشط 🟢' : 'غير نشط'}</span>
+          <span style="color:${isActive ? '#15803D' : '#475569'};">${activeLabel}${isActive ? ' 🟢' : ''}</span>
         </div></td>
         <td><div class="tbl-actions">
           <button class="tbl-btn tbl-edit" title="تعديل" onclick="openEdit('driver',${JSON.stringify(d).replace(/"/g,'&quot;')})">
@@ -290,13 +306,15 @@ async function loadDrivers(page) {
 }
 
 async function saveDriver() {
-  const name = document.getElementById('df-name').value.trim();
-  const phone = document.getElementById('df-phone').value.trim();
+  const name   = document.getElementById('df-name').value.trim();
+  const nameEn = document.getElementById('df-name-en').value.trim();
+  const phone   = document.getElementById('df-phone').value.trim();
   const license = document.getElementById('df-license').value.trim();
-  if (!name || !phone || !license) { alert('الرجاء تعبئة جميع الحقول الإلزامية'); return; }
+  if (!name || !nameEn || !phone || !license) { alert('الرجاء تعبئة جميع الحقول الإلزامية'); return; }
 
-  const isActive = document.getElementById('df-active').value === 'true';
-  const body = { fullName: name, phoneNumber: phone, licenseNumber: license, isActive };
+  const isActive  = document.getElementById('df-active').value === 'true';
+  const driverType = document.getElementById('df-type').value;
+  const body = { fullName: name, fullNameEn: nameEn, phoneNumber: phone, licenseNumber: license, isActive, driverType };
 
   let res;
   if (editingId) {
@@ -308,7 +326,7 @@ async function saveDriver() {
     closeModal('modal-driver');
     _driversCache = [];
     loadDrivers(driversPage);
-    showToast('تم حفظ السائق بنجاح ✓');
+    showToast(window.T?.driverSaved || 'تم حفظ السائق بنجاح ✓');
   } else { alert('فشل الحفظ. تحقق من البيانات.'); }
 }
 
@@ -376,7 +394,7 @@ async function saveTrip() {
   if (res?.ok) {
     closeModal('modal-trip');
     loadTrips(tripsPage);
-    showToast('تم حفظ الرحلة بنجاح ✓');
+    showToast(window.T?.tripSaved || 'تم حفظ الرحلة بنجاح ✓');
   } else { alert('فشل الحفظ. تحقق من البيانات.'); }
 }
 
@@ -441,7 +459,7 @@ async function saveBus() {
   if (res?.ok) {
     closeModal('modal-bus');
     loadBuses(busesPage);
-    showToast('تم حفظ الباص بنجاح ✓');
+    showToast(window.T?.busSaved || 'تم حفظ الباص بنجاح ✓');
   } else { alert('فشل الحفظ. تحقق من البيانات.'); }
 }
 
@@ -485,12 +503,12 @@ function renderAlertItem(a, full = false) {
 
 async function resolveAlert(id) {
   const res = await apiPost(`/alerts/${id}/status`, { status: 1 });
-  if (res?.ok) { loadAlerts(alertsPage); showToast('تم حل التنبيه ✓'); }
+  if (res?.ok) { loadAlerts(alertsPage); showToast(window.T?.alertResolved || 'تم حل التنبيه ✓'); }
 }
 
 async function ignoreAlert(id) {
   const res = await apiPost(`/alerts/${id}/status`, { status: 2 });
-  if (res?.ok) { loadAlerts(alertsPage); showToast('تم تجاهل التنبيه'); }
+  if (res?.ok) { loadAlerts(alertsPage); showToast(window.T?.alertDismissed || 'تم تجاهل التنبيه'); }
 }
 
 // ── Reports ────────────────────────────────────────────────────────────────
@@ -533,7 +551,7 @@ function closeModal(id) { document.getElementById(id)?.classList.remove('open');
 function openEdit(type, data) {
   editingId = data?.id || null;
   if (type === 'trip') { fillTripForm(data); openModal('modal-trip'); }
-  if (type === 'student') { fillStudentForm(data); loadRoutesForModal(); openModal('modal-student'); }
+  if (type === 'student') { fillStudentForm(data); openModal('modal-student'); }
   if (type === 'bus') { fillBusForm(data); openModal('modal-bus'); }
   if (type === 'driver') { fillDriverForm(data); openModal('modal-driver'); }
 }
@@ -551,20 +569,50 @@ function fillTripForm(d) {
 }
 
 function fillDriverForm(d) {
-  document.getElementById('driver-modal-title').textContent = d ? 'تعديل بيانات سائق' : 'إضافة سائق جديد';
-  document.getElementById('df-name').value = d?.fullName || '';
-  document.getElementById('df-phone').value = d?.phoneNumber || '';
+  document.getElementById('driver-modal-title').textContent =
+    d ? (window.T?.driverEditTitle || 'تعديل بيانات سائق')
+      : (window.T?.driverAddTitle  || 'إضافة سائق جديد');
+  document.getElementById('df-name').value    = d?.fullName   || '';
+  document.getElementById('df-name-en').value = d?.fullNameEn || '';
+  document.getElementById('df-phone').value   = d?.phoneNumber  || '';
   document.getElementById('df-license').value = d?.licenseNumber || '';
+
+  document.getElementById('df-type').value   = d?.driverType || 'Driver';
   document.getElementById('df-active').value = d ? String(d.isActive !== false) : 'true';
+
+  // Localise dropdown option labels
+  const optDriver = document.getElementById('df-type-opt-driver');
+  const optAssist = document.getElementById('df-type-opt-assist');
+  if (optDriver) optDriver.textContent = window.T?.driverTypeDriver || 'سائق';
+  if (optAssist) optAssist.textContent = window.T?.driverTypeAssist || 'مساعد سائق';
+
+  const optTrue  = document.getElementById('df-active-opt-true');
+  const optFalse = document.getElementById('df-active-opt-false');
+  if (optTrue)  optTrue.textContent  = window.T?.driverActive   || 'نشط';
+  if (optFalse) optFalse.textContent = window.T?.driverInactive || 'غير نشط';
 }
 
 function fillStudentForm(d) {
-  document.getElementById('std-modal-title').textContent = d ? 'تعديل بيانات طالب' : 'إضافة طالب جديد';
-  document.getElementById('sf-name').value = d?.fullName || '';
-  document.getElementById('sf-grade').value = d?.grade || 'الصف الأول';
-  document.getElementById('sf-parent').value = d?.parentName || '';
-  document.getElementById('sf-phone').value = d?.parentPhone || '';
-  document.getElementById('sf-notes').value = '';
+  document.getElementById('std-modal-title').textContent =
+    d ? (window.T?.stdEditTitle || 'تعديل بيانات طالب')
+      : (window.T?.stdAddTitle  || 'إضافة طالب جديد');
+
+  document.getElementById('sf-name').value    = d?.fullName    || '';
+  document.getElementById('sf-city').value    = d?.city        || '';
+  document.getElementById('sf-address').value = d?.address     || '';
+  document.getElementById('sf-parent').value  = d?.parentName  || '';
+  document.getElementById('sf-phone').value   = d?.parentPhone || '';
+  document.getElementById('sf-notes').value   = d?.notes       || '';
+
+  // Localise grade options then set value
+  const grades = ['stdGrade1','stdGrade2','stdGrade3','stdGrade4','stdGrade5',
+                  'stdGrade6','stdGrade7','stdGrade8','stdGrade9'];
+  grades.forEach((key, i) => {
+    const opt = document.getElementById(`sf-g${i + 1}`);
+    if (opt) opt.textContent = window.T?.[key] || opt.textContent;
+  });
+  const gradeVal = d?.grade || document.getElementById('sf-g1')?.textContent || '';
+  document.getElementById('sf-grade').value = gradeVal;
 }
 
 function fillBusForm(d) {
@@ -632,7 +680,7 @@ function confirmDelete(type, name, entity, id) {
     if (entity === 'trip') ok = await apiDelete(`/trips/${id}`);
     closeModal('modal-delete');
     if (ok) {
-      showToast('تم الحذف بنجاح');
+      showToast(window.T?.deletedSuccess || 'تم الحذف بنجاح');
       if (entity === 'student') loadStudents(studentsPage);
       if (entity === 'bus') loadBuses(busesPage);
       if (entity === 'driver') loadDrivers(driversPage);
@@ -653,6 +701,15 @@ function filterStudents(filter, btn) {
   document.querySelectorAll('#page-students .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   loadStudents(1);
+}
+
+// ── Driver Type Filter ─────────────────────────────────────────────────────
+function filterDrivers(type, btn) {
+  document.querySelectorAll('#page-drivers .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  driversTypeFilter = type;
+  driversTotalPages = 1;
+  loadDrivers(1);
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -798,7 +855,7 @@ async function changePassword() {
   if (!valid) return;
 
   const btn = document.getElementById('btn-save-password');
-  if (btn) { btn.disabled = true; btn.textContent = 'جاري الحفظ...'; }
+  if (btn) { btn.disabled = true; btn.textContent = window.T?.saving || 'جاري الحفظ...'; }
 
   const res = await apiPost('/auth/change-password', {
     currentPassword: current,
@@ -811,7 +868,7 @@ async function changePassword() {
   if (res?.ok) {
     if (srv) srv.style.display = 'none';
     closeModal('modal-change-password');
-    showToast('تم تغيير كلمة المرور بنجاح ✓');
+    showToast(window.T?.passwordChanged || 'تم تغيير كلمة المرور بنجاح ✓');
   } else {
     if (srv) { srv.textContent = res?.data?.error || 'فشل تغيير كلمة المرور.'; srv.style.display = 'block'; }
   }
@@ -832,6 +889,7 @@ window.resolveAlert    = resolveAlert;
 window.ignoreAlert     = ignoreAlert;
 window.toggleSwitch    = toggleSwitch;
 window.filterStudents  = filterStudents;
+window.filterDrivers   = filterDrivers;
 window.loadStudents    = loadStudents;
 window.loadDrivers     = loadDrivers;
 window.loadTrips       = loadTrips;

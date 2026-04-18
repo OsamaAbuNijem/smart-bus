@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+
+  <!-- Language switcher -->
+  <data name="SwitchLang" xml:space="preserve"><value>EN</value></data>
+  <data name="LangName"   xml:space="preserve"><value>العربية</value></data>
+  <data name="SearchShort" xml:space="preserve"><value>بحث...</value></data>
+
+  <!-- Admin sidebar nav -->
+  <data name="Nav_Main"       xml:space="preserve"><value>الرئيسية</value></data>
+  <data name="Nav_Mgmt"       xml:space="preserve"><value>الإدارة</value></data>
+  <data name="Nav_Analysis"   xml:space="preserve"><value>التحليل</value></data>
+  <data name="Nav_System"     xml:space="preserve"><value>النظام</value></data>
+  <data name="Nav_Dashboard"  xml:space="preserve"><value>لوحة المراقبة</value></data>
+  <data name="Nav_Trips"      xml:space="preserve"><value>الرحلات</value></data>
+  <data name="Nav_Students"   xml:space="preserve"><value>الطلاب</value></data>
+  <data name="Nav_Drivers"    xml:space="preserve"><value>السائقون والمساعدون</value></data>
+  <data name="Nav_Buses"      xml:space="preserve"><value>الباصات</value></data>
+  <data name="Nav_Reports"    xml:space="preserve"><value>التقارير</value></data>
+  <data name="Nav_Alerts"     xml:space="preserve"><value>التنبيهات</value></data>
+  <data name="Nav_Settings"   xml:space="preserve"><value>الإعدادات</value></data>
+
+  <!-- Super-admin sidebar nav -->
+  <data name="Nav_Overview"   xml:space="preserve"><value>نظرة عامة</value></data>
+  <data name="Nav_Schools"    xml:space="preserve"><value>المدارس</value></data>
+  <data name="Nav_Admins"     xml:space="preserve"><value>المديرون</value></data>
+  <data name="Nav_Plans"      xml:space="preserve"><value>خطط الاشتراك</value></data>
+  <data name="SA_Badge_Title" xml:space="preserve"><value>المشرف العام</value></data>
+  <data name="SA_Badge_Sub"   xml:space="preserve"><value>صلاحيات كاملة للمنصة</value></data>
+
+  <!-- Login pages -->
+  <data name="Login_Email"    xml:space="preserve"><value>البريد الإلكتروني</value></data>
+  <data name="Login_Password" xml:space="preserve"><value>كلمة المرور</value></data>
+  <data name="Login_Submit"   xml:space="preserve"><value>تسجيل الدخول</value></data>
+  <data name="Login_SchoolSub" xml:space="preserve"><value>نظام تتبع حافلات المدرسة</value></data>
+  <data name="Login_Or"       xml:space="preserve"><value>أو</value></data>
+  <data name="Login_SALink"   xml:space="preserve"><value>دخول المشرف العام (Super Admin)</value></data>
+  <data name="Login_SASub"    xml:space="preserve"><value>بوابة المشرف العام</value></data>
+  <data name="Login_SABack"   xml:space="preserve"><value>العودة لتسجيل دخول المدرسة</value></data>
+  <data name="Login_SASubmit" xml:space="preserve"><value>دخول المشرف العام</value></data>
+
+  <!-- Student modal labels -->
+  <data name="Std_AddTitle"     xml:space="preserve"><value>إضافة طالب جديد</value></data>
+  <data name="Std_EditTitle"    xml:space="preserve"><value>تعديل بيانات طالب</value></data>
+  <data name="Std_Name"         xml:space="preserve"><value>اسم الطالب كاملاً</value></data>
+  <data name="Std_Grade"        xml:space="preserve"><value>الصف الدراسي</value></data>
+  <data name="Std_Grade1"       xml:space="preserve"><value>الصف الأول</value></data>
+  <data name="Std_Grade2"       xml:space="preserve"><value>الصف الثاني</value></data>
+  <data name="Std_Grade3"       xml:space="preserve"><value>الصف الثالث</value></data>
+  <data name="Std_Grade4"       xml:space="preserve"><value>الصف الرابع</value></data>
+  <data name="Std_Grade5"       xml:space="preserve"><value>الصف الخامس</value></data>
+  <data name="Std_Grade6"       xml:space="preserve"><value>الصف السادس</value></data>
+  <data name="Std_Grade7"       xml:space="preserve"><value>الصف السابع</value></data>
+  <data name="Std_Grade8"       xml:space="preserve"><value>الصف الثامن</value></data>
+  <data name="Std_Grade9"       xml:space="preserve"><value>الصف التاسع</value></data>
+  <data name="Std_City"         xml:space="preserve"><value>المدينة</value></data>
+  <data name="City_Amman"      xml:space="preserve"><value>عمّان</value></data>
+  <data name="City_Zarqa"      xml:space="preserve"><value>الزرقاء</value></data>
+  <data name="City_Irbid"      xml:space="preserve"><value>إربد</value></data>
+  <data name="City_Aqaba"      xml:space="preserve"><value>العقبة</value></data>
+  <data name="City_Salt"       xml:space="preserve"><value>السلط</value></data>
+  <data name="City_Madaba"     xml:space="preserve"><value>مادبا</value></data>
+  <data name="City_Karak"      xml:space="preserve"><value>الكرك</value></data>
+  <data name="City_Jerash"     xml:space="preserve"><value>جرش</value></data>
+  <data name="City_Ajloun"     xml:space="preserve"><value>عجلون</value></data>
+  <data name="City_Mafraq"     xml:space="preserve"><value>المفرق</value></data>
+  <data name="City_Tafilah"    xml:space="preserve"><value>الطفيلة</value></data>
+  <data name="City_Maan"       xml:space="preserve"><value>معان</value></data>
+  <data name="City_Russeifa"   xml:space="preserve"><value>رصيفة</value></data>
+  <data name="City_Ramtha"     xml:space="preserve"><value>الرمثا</value></data>
+  <data name="City_WadiMusa"   xml:space="preserve"><value>وادي موسى</value></data>
+  <data name="Std_Address"      xml:space="preserve"><value>العنوان</value></data>
+  <data name="Std_Parent"       xml:space="preserve"><value>اسم ولي الأمر</value></data>
+  <data name="Std_Phone"        xml:space="preserve"><value>رقم الهاتف</value></data>
+  <data name="Std_Notes"        xml:space="preserve"><value>ملاحظات طبية أو خاصة</value></data>
+  <data name="Std_SaveBtn"      xml:space="preserve"><value>💾 حفظ الطالب</value></data>
+  <data name="Std_Cancel"       xml:space="preserve"><value>إلغاء</value></data>
+
+  <!-- Delete confirmation modal -->
+  <data name="Del_Title"       xml:space="preserve"><value>تأكيد الحذف</value></data>
+  <data name="Del_Heading"     xml:space="preserve"><value>هل أنت متأكد؟</value></data>
+  <data name="Del_Body"        xml:space="preserve"><value>سيتم حذف</value></data>
+  <data name="Del_BodySuffix"  xml:space="preserve"><value>بشكل نهائي ولا يمكن التراجع عن هذا الإجراء.</value></data>
+  <data name="Del_Confirm"     xml:space="preserve"><value>🗑️ نعم، احذف</value></data>
+  <data name="Del_Cancel"      xml:space="preserve"><value>إلغاء</value></data>
+
+  <!-- Driver modal labels -->
+  <data name="Driver_NameAr"      xml:space="preserve"><value>الاسم بالعربية *</value></data>
+  <data name="Driver_NameEn"      xml:space="preserve"><value>الاسم بالإنجليزية *</value></data>
+  <data name="Driver_Phone"       xml:space="preserve"><value>رقم الهاتف *</value></data>
+  <data name="Driver_License"     xml:space="preserve"><value>رقم الرخصة *</value></data>
+  <data name="Driver_Status"      xml:space="preserve"><value>الحالة</value></data>
+  <data name="Driver_Active"      xml:space="preserve"><value>نشط</value></data>
+  <data name="Driver_Inactive"    xml:space="preserve"><value>غير نشط</value></data>
+  <data name="Driver_Type"        xml:space="preserve"><value>نوع الموظف</value></data>
+  <data name="Driver_TypeDriver"  xml:space="preserve"><value>سائق</value></data>
+  <data name="Driver_TypeAssist"  xml:space="preserve"><value>مساعد سائق</value></data>
+  <data name="Driver_SaveBtn"     xml:space="preserve"><value>حفظ السائق</value></data>
+  <data name="Driver_Cancel"      xml:space="preserve"><value>إلغاء</value></data>
+  <data name="Driver_AddTitle"    xml:space="preserve"><value>إضافة سائق جديد</value></data>
+  <data name="Driver_EditTitle"   xml:space="preserve"><value>تعديل بيانات سائق</value></data>
+
+  <!-- JS toast messages (admin dashboard) -->
+  <data name="JS_StudentSaved"    xml:space="preserve"><value>تم حفظ الطالب بنجاح ✓</value></data>
+  <data name="JS_DriverSaved"     xml:space="preserve"><value>تم حفظ السائق بنجاح ✓</value></data>
+  <data name="JS_TripSaved"       xml:space="preserve"><value>تم حفظ الرحلة بنجاح ✓</value></data>
+  <data name="JS_BusSaved"        xml:space="preserve"><value>تم حفظ الباص بنجاح ✓</value></data>
+  <data name="JS_AlertResolved"   xml:space="preserve"><value>تم حل التنبيه ✓</value></data>
+  <data name="JS_AlertDismissed"  xml:space="preserve"><value>تم تجاهل التنبيه</value></data>
+  <data name="JS_DeletedSuccess"  xml:space="preserve"><value>تم الحذف بنجاح</value></data>
+  <data name="JS_PasswordChanged" xml:space="preserve"><value>تم تغيير كلمة المرور بنجاح ✓</value></data>
+  <data name="JS_SaveFailed"      xml:space="preserve"><value>فشل الحفظ. تحقق من البيانات.</value></data>
+  <data name="JS_Saving"          xml:space="preserve"><value>جاري الحفظ...</value></data>
+
+  <!-- JS toast messages (superadmin dashboard) -->
+  <data name="JS_SchoolSaved"       xml:space="preserve"><value>تمت إضافة المدرسة بنجاح ✓</value></data>
+  <data name="JS_SchoolUpdated"     xml:space="preserve"><value>تم تحديث بيانات المدرسة ✓</value></data>
+  <data name="JS_SchoolDeleted"     xml:space="preserve"><value>تم حذف المدرسة بنجاح</value></data>
+  <data name="JS_SchoolDeleteFailed" xml:space="preserve"><value>فشل الحذف. حاول مرة أخرى.</value></data>
+  <data name="JS_StatusActivated"   xml:space="preserve"><value>تم تفعيل المدرسة</value></data>
+  <data name="JS_StatusDeactivated" xml:space="preserve"><value>تم إيقاف المدرسة</value></data>
+  <data name="JS_StatusFailed"      xml:space="preserve"><value>فشل تغيير الحالة</value></data>
+  <data name="JS_PlanChanged"       xml:space="preserve"><value>تم تغيير الخطة إلى</value></data>
+  <data name="JS_PlanFailed"        xml:space="preserve"><value>فشل تغيير الخطة</value></data>
+  <data name="JS_ExportNoData"      xml:space="preserve"><value>لا توجد بيانات للتصدير</value></data>
+  <data name="JS_ExportDone"        xml:space="preserve"><value>تم تصدير</value></data>
+  <data name="JS_ExportCSV"         xml:space="preserve"><value>مدارس كـ CSV</value></data>
+  <data name="JS_SaveSchoolBtn"     xml:space="preserve"><value>حفظ المدرسة</value></data>
+
+  <!-- JS page names -->
+  <data name="JS_PageDashboard" xml:space="preserve"><value>لوحة المراقبة</value></data>
+  <data name="JS_PageTrips"     xml:space="preserve"><value>الرحلات</value></data>
+  <data name="JS_PageStudents"  xml:space="preserve"><value>الطلاب</value></data>
+  <data name="JS_PageDrivers"   xml:space="preserve"><value>السائقون والمساعدون</value></data>
+  <data name="JS_PageBuses"     xml:space="preserve"><value>الباصات</value></data>
+  <data name="JS_PageReports"   xml:space="preserve"><value>التقارير</value></data>
+  <data name="JS_PageAlerts"    xml:space="preserve"><value>التنبيهات</value></data>
+  <data name="JS_PageSettings"  xml:space="preserve"><value>الإعدادات</value></data>
+  <data name="JS_PageOverview"  xml:space="preserve"><value>نظرة عامة</value></data>
+  <data name="JS_PageSchools"   xml:space="preserve"><value>إدارة المدارس</value></data>
+  <data name="JS_PageAdmins"    xml:space="preserve"><value>المديرون</value></data>
+  <data name="JS_PagePlans"     xml:space="preserve"><value>خطط الاشتراك</value></data>
+</root>

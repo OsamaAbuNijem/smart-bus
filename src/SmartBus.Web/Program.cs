@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Localization;
 using Serilog;
 using SmartBus.Web.Services;
 
@@ -20,7 +21,10 @@ try
     // (by default UseStaticWebAssets only runs in Development; this makes it work under IIS Production too)
     builder.WebHost.UseStaticWebAssets();
 
-    builder.Services.AddControllersWithViews();
+    builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
+    builder.Services.AddControllersWithViews()
+        .AddViewLocalization()
+        .AddDataAnnotationsLocalization();
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddSession(options =>
     {
@@ -54,6 +58,16 @@ try
     app.UseStaticFiles();
     app.UseSerilogRequestLogging();
     app.UseRouting();
+
+    var webCultures = new[] { "ar", "en" };
+    var webLocOpts  = new RequestLocalizationOptions()
+        .SetDefaultCulture("ar")
+        .AddSupportedCultures(webCultures)
+        .AddSupportedUICultures(webCultures);
+    webLocOpts.RequestCultureProviders.Insert(
+        0, new CookieRequestCultureProvider());
+    app.UseRequestLocalization(webLocOpts);
+
     app.UseSession();
     app.UseAuthentication();
     app.UseAuthorization();

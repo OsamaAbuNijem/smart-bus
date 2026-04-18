@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+
+  <data name="Otp_RoleInvalid"      xml:space="preserve"><value>الدور يجب أن يكون أحد: Parent, Driver, Assistant</value></data>
+  <data name="Otp_PhoneNotFound"    xml:space="preserve"><value>لم يتم العثور على رقم الجوال في النظام للدور '{0}'.</value></data>
+  <data name="Otp_RateLimited"      xml:space="preserve"><value>يرجى الانتظار دقيقة قبل طلب رمز جديد.</value></data>
+  <data name="Otp_SentSuccess"      xml:space="preserve"><value>تم إرسال رمز التحقق بنجاح.</value></data>
+  <data name="Otp_Expired"          xml:space="preserve"><value>رمز التحقق منتهي الصلاحية أو غير موجود. يرجى طلب رمز جديد.</value></data>
+  <data name="Otp_MaxAttempts"      xml:space="preserve"><value>تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.</value></data>
+  <data name="Otp_Invalid"          xml:space="preserve"><value>رمز التحقق غير صحيح. المحاولات المتبقية: {0}</value></data>
+  <data name="Otp_ParentNotFound"   xml:space="preserve"><value>لم يتم العثور على ولي الأمر.</value></data>
+  <data name="Otp_DriverNotFound"   xml:space="preserve"><value>لم يتم العثور على السائق.</value></data>
+  <data name="Otp_AssistantNotFound" xml:space="preserve"><value>لم يتم العثور على المساعد.</value></data>
+  <data name="Otp_UnknownRole"      xml:space="preserve"><value>دور غير معروف.</value></data>
+  <data name="Otp_CreateUserFailed" xml:space="preserve"><value>فشل إنشاء حساب المستخدم.</value></data>
+  <data name="CP_TooShort"          xml:space="preserve"><value>كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل.</value></data>
+  <data name="CP_Failed"            xml:space="preserve"><value>فشل تغيير كلمة المرور.</value></data>
+</root>

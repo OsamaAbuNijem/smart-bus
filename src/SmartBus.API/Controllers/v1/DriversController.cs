@@ -7,6 +7,7 @@ using SmartBus.Application.Features.Drivers.Commands.DeleteDriver;
 using SmartBus.Application.Features.Drivers.Commands.UpdateDriver;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Drivers.Queries.GetDriverById;
+using SmartBus.Domain.Enums;
 
 namespace SmartBus.API.Controllers.v1;
 
@@ -21,8 +22,12 @@ public class DriversController : ControllerBase
     public DriversController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
-        => Ok(await _mediator.Send(new GetAllDriversQuery(pageNumber, pageSize), cancellationToken));
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] DriverType? driverType = null,
+        CancellationToken cancellationToken = default)
+        => Ok(await _mediator.Send(new GetAllDriversQuery(pageNumber, pageSize, driverType), cancellationToken));
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
@@ -46,7 +51,7 @@ public class DriversController : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDriverRequest request, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
-            new UpdateDriverCommand(id, request.FullName, request.PhoneNumber, request.LicenseNumber, request.IsActive),
+            new UpdateDriverCommand(id, request.FullName, request.FullNameEn, request.PhoneNumber, request.LicenseNumber, request.IsActive, request.DriverType),
             cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
@@ -60,4 +65,11 @@ public class DriversController : ControllerBase
     }
 }
 
-public record UpdateDriverRequest(string FullName, string PhoneNumber, string LicenseNumber, bool IsActive = true);
+public record UpdateDriverRequest(
+    string FullName,
+    string? FullNameEn,
+    string PhoneNumber,
+    string LicenseNumber,
+    bool IsActive = true,
+    DriverType DriverType = DriverType.Driver
+);

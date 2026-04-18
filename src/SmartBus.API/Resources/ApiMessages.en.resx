@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+
+  <data name="Otp_RoleInvalid"      xml:space="preserve"><value>Role must be one of: Parent, Driver, Assistant</value></data>
+  <data name="Otp_PhoneNotFound"    xml:space="preserve"><value>Phone number not found in the system for role '{0}'.</value></data>
+  <data name="Otp_RateLimited"      xml:space="preserve"><value>Please wait a minute before requesting a new code.</value></data>
+  <data name="Otp_SentSuccess"      xml:space="preserve"><value>Verification code sent successfully.</value></data>
+  <data name="Otp_Expired"          xml:space="preserve"><value>Verification code expired or not found. Please request a new code.</value></data>
+  <data name="Otp_MaxAttempts"      xml:space="preserve"><value>Maximum attempts exceeded. Please request a new code.</value></data>
+  <data name="Otp_Invalid"          xml:space="preserve"><value>Invalid verification code. Remaining attempts: {0}</value></data>
+  <data name="Otp_ParentNotFound"   xml:space="preserve"><value>Parent not found.</value></data>
+  <data name="Otp_DriverNotFound"   xml:space="preserve"><value>Driver not found.</value></data>
+  <data name="Otp_AssistantNotFound" xml:space="preserve"><value>Assistant not found.</value></data>
+  <data name="Otp_UnknownRole"      xml:space="preserve"><value>Unknown role.</value></data>
+  <data name="Otp_CreateUserFailed" xml:space="preserve"><value>Failed to create user account.</value></data>
+  <data name="CP_TooShort"          xml:space="preserve"><value>New password must be at least 8 characters.</value></data>
+  <data name="CP_Failed"            xml:space="preserve"><value>Failed to change password.</value></data>
+</root>

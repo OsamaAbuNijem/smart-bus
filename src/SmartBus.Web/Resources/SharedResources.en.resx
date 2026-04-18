@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+
+  <!-- Language switcher -->
+  <data name="SwitchLang"  xml:space="preserve"><value>ع</value></data>
+  <data name="LangName"    xml:space="preserve"><value>English</value></data>
+  <data name="SearchShort" xml:space="preserve"><value>Search...</value></data>
+
+  <!-- Admin sidebar nav -->
+  <data name="Nav_Main"       xml:space="preserve"><value>MAIN</value></data>
+  <data name="Nav_Mgmt"       xml:space="preserve"><value>MANAGEMENT</value></data>
+  <data name="Nav_Analysis"   xml:space="preserve"><value>ANALYTICS</value></data>
+  <data name="Nav_System"     xml:space="preserve"><value>SYSTEM</value></data>
+  <data name="Nav_Dashboard"  xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Nav_Trips"      xml:space="preserve"><value>Trips</value></data>
+  <data name="Nav_Students"   xml:space="preserve"><value>Students</value></data>
+  <data name="Nav_Drivers"    xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
+  <data name="Nav_Buses"      xml:space="preserve"><value>Buses</value></data>
+  <data name="Nav_Reports"    xml:space="preserve"><value>Reports</value></data>
+  <data name="Nav_Alerts"     xml:space="preserve"><value>Alerts</value></data>
+  <data name="Nav_Settings"   xml:space="preserve"><value>Settings</value></data>
+
+  <!-- Super-admin sidebar nav -->
+  <data name="Nav_Overview"   xml:space="preserve"><value>Overview</value></data>
+  <data name="Nav_Schools"    xml:space="preserve"><value>Schools</value></data>
+  <data name="Nav_Admins"     xml:space="preserve"><value>Admins</value></data>
+  <data name="Nav_Plans"      xml:space="preserve"><value>Subscription Plans</value></data>
+  <data name="SA_Badge_Title" xml:space="preserve"><value>Super Admin</value></data>
+  <data name="SA_Badge_Sub"   xml:space="preserve"><value>Full platform access</value></data>
+
+  <!-- Login pages -->
+  <data name="Login_Email"    xml:space="preserve"><value>Email</value></data>
+  <data name="Login_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Login_Submit"   xml:space="preserve"><value>Sign In</value></data>
+  <data name="Login_SchoolSub" xml:space="preserve"><value>School Bus Tracking System</value></data>
+  <data name="Login_Or"       xml:space="preserve"><value>or</value></data>
+  <data name="Login_SALink"   xml:space="preserve"><value>Super Admin Login</value></data>
+  <data name="Login_SASub"    xml:space="preserve"><value>Super Admin Portal</value></data>
+  <data name="Login_SABack"   xml:space="preserve"><value>Back to school login</value></data>
+  <data name="Login_SASubmit" xml:space="preserve"><value>Super Admin Login</value></data>
+
+  <!-- Student modal labels -->
+  <data name="Std_AddTitle"     xml:space="preserve"><value>Add New Student</value></data>
+  <data name="Std_EditTitle"    xml:space="preserve"><value>Edit Student</value></data>
+  <data name="Std_Name"         xml:space="preserve"><value>Full Name</value></data>
+  <data name="Std_Grade"        xml:space="preserve"><value>Grade</value></data>
+  <data name="Std_Grade1"       xml:space="preserve"><value>Grade 1</value></data>
+  <data name="Std_Grade2"       xml:space="preserve"><value>Grade 2</value></data>
+  <data name="Std_Grade3"       xml:space="preserve"><value>Grade 3</value></data>
+  <data name="Std_Grade4"       xml:space="preserve"><value>Grade 4</value></data>
+  <data name="Std_Grade5"       xml:space="preserve"><value>Grade 5</value></data>
+  <data name="Std_Grade6"       xml:space="preserve"><value>Grade 6</value></data>
+  <data name="Std_Grade7"       xml:space="preserve"><value>Grade 7</value></data>
+  <data name="Std_Grade8"       xml:space="preserve"><value>Grade 8</value></data>
+  <data name="Std_Grade9"       xml:space="preserve"><value>Grade 9</value></data>
+  <data name="Std_City"         xml:space="preserve"><value>City</value></data>
+  <data name="City_Amman"      xml:space="preserve"><value>Amman</value></data>
+  <data name="City_Zarqa"      xml:space="preserve"><value>Zarqa</value></data>
+  <data name="City_Irbid"      xml:space="preserve"><value>Irbid</value></data>
+  <data name="City_Aqaba"      xml:space="preserve"><value>Aqaba</value></data>
+  <data name="City_Salt"       xml:space="preserve"><value>Salt</value></data>
+  <data name="City_Madaba"     xml:space="preserve"><value>Madaba</value></data>
+  <data name="City_Karak"      xml:space="preserve"><value>Karak</value></data>
+  <data name="City_Jerash"     xml:space="preserve"><value>Jerash</value></data>
+  <data name="City_Ajloun"     xml:space="preserve"><value>Ajloun</value></data>
+  <data name="City_Mafraq"     xml:space="preserve"><value>Mafraq</value></data>
+  <data name="City_Tafilah"    xml:space="preserve"><value>Tafilah</value></data>
+  <data name="City_Maan"       xml:space="preserve"><value>Ma'an</value></data>
+  <data name="City_Russeifa"   xml:space="preserve"><value>Russeifa</value></data>
+  <data name="City_Ramtha"     xml:space="preserve"><value>Ramtha</value></data>
+  <data name="City_WadiMusa"   xml:space="preserve"><value>Wadi Musa</value></data>
+  <data name="Std_Address"      xml:space="preserve"><value>Address</value></data>
+  <data name="Std_Parent"       xml:space="preserve"><value>Parent Name</value></data>
+  <data name="Std_Phone"        xml:space="preserve"><value>Phone Number</value></data>
+  <data name="Std_Notes"        xml:space="preserve"><value>Medical or Special Notes</value></data>
+  <data name="Std_SaveBtn"      xml:space="preserve"><value>💾 Save Student</value></data>
+  <data name="Std_Cancel"       xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- Delete confirmation modal -->
+  <data name="Del_Title"       xml:space="preserve"><value>Confirm Delete</value></data>
+  <data name="Del_Heading"     xml:space="preserve"><value>Are you sure?</value></data>
+  <data name="Del_Body"        xml:space="preserve"><value>The</value></data>
+  <data name="Del_BodySuffix"  xml:space="preserve"><value>will be permanently deleted and this action cannot be undone.</value></data>
+  <data name="Del_Confirm"     xml:space="preserve"><value>🗑️ Yes, Delete</value></data>
+  <data name="Del_Cancel"      xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- Driver modal labels -->
+  <data name="Driver_NameAr"      xml:space="preserve"><value>Name in Arabic *</value></data>
+  <data name="Driver_NameEn"      xml:space="preserve"><value>Name in English *</value></data>
+  <data name="Driver_Phone"       xml:space="preserve"><value>Phone Number *</value></data>
+  <data name="Driver_License"     xml:space="preserve"><value>License Number *</value></data>
+  <data name="Driver_Status"      xml:space="preserve"><value>Status</value></data>
+  <data name="Driver_Active"      xml:space="preserve"><value>Active</value></data>
+  <data name="Driver_Inactive"    xml:space="preserve"><value>Inactive</value></data>
+  <data name="Driver_Type"        xml:space="preserve"><value>Employee Type</value></data>
+  <data name="Driver_TypeDriver"  xml:space="preserve"><value>Driver</value></data>
+  <data name="Driver_TypeAssist"  xml:space="preserve"><value>Assistant Driver</value></data>
+  <data name="Driver_SaveBtn"     xml:space="preserve"><value>Save Driver</value></data>
+  <data name="Driver_Cancel"      xml:space="preserve"><value>Cancel</value></data>
+  <data name="Driver_AddTitle"    xml:space="preserve"><value>Add New Driver</value></data>
+  <data name="Driver_EditTitle"   xml:space="preserve"><value>Edit Driver</value></data>
+
+  <!-- JS toast messages (admin dashboard) -->
+  <data name="JS_StudentSaved"    xml:space="preserve"><value>Student saved ✓</value></data>
+  <data name="JS_DriverSaved"     xml:space="preserve"><value>Driver saved ✓</value></data>
+  <data name="JS_TripSaved"       xml:space="preserve"><value>Trip saved ✓</value></data>
+  <data name="JS_BusSaved"        xml:space="preserve"><value>Bus saved ✓</value></data>
+  <data name="JS_AlertResolved"   xml:space="preserve"><value>Alert resolved ✓</value></data>
+  <data name="JS_AlertDismissed"  xml:space="preserve"><value>Alert dismissed</value></data>
+  <data name="JS_DeletedSuccess"  xml:space="preserve"><value>Deleted successfully</value></data>
+  <data name="JS_PasswordChanged" xml:space="preserve"><value>Password changed ✓</value></data>
+  <data name="JS_SaveFailed"      xml:space="preserve"><value>Save failed. Check the data.</value></data>
+  <data name="JS_Saving"          xml:space="preserve"><value>Saving...</value></data>
+
+  <!-- JS toast messages (superadmin dashboard) -->
+  <data name="JS_SchoolSaved"       xml:space="preserve"><value>School added ✓</value></data>
+  <data name="JS_SchoolUpdated"     xml:space="preserve"><value>School updated ✓</value></data>
+  <data name="JS_SchoolDeleted"     xml:space="preserve"><value>School deleted</value></data>
+  <data name="JS_SchoolDeleteFailed" xml:space="preserve"><value>Delete failed. Try again.</value></data>
+  <data name="JS_StatusActivated"   xml:space="preserve"><value>School activated</value></data>
+  <data name="JS_StatusDeactivated" xml:space="preserve"><value>School deactivated</value></data>
+  <data name="JS_StatusFailed"      xml:space="preserve"><value>Status change failed</value></data>
+  <data name="JS_PlanChanged"       xml:space="preserve"><value>Plan changed to</value></data>
+  <data name="JS_PlanFailed"        xml:space="preserve"><value>Plan change failed</value></data>
+  <data name="JS_ExportNoData"      xml:space="preserve"><value>No data to export</value></data>
+  <data name="JS_ExportDone"        xml:space="preserve"><value>Exported</value></data>
+  <data name="JS_ExportCSV"         xml:space="preserve"><value>schools as CSV</value></data>
+  <data name="JS_SaveSchoolBtn"     xml:space="preserve"><value>Save School</value></data>
+
+  <!-- JS page names -->
+  <data name="JS_PageDashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="JS_PageTrips"     xml:space="preserve"><value>Trips</value></data>
+  <data name="JS_PageStudents"  xml:space="preserve"><value>Students</value></data>
+  <data name="JS_PageDrivers"   xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
+  <data name="JS_PageBuses"     xml:space="preserve"><value>Buses</value></data>
+  <data name="JS_PageReports"   xml:space="preserve"><value>Reports</value></data>
+  <data name="JS_PageAlerts"    xml:space="preserve"><value>Alerts</value></data>
+  <data name="JS_PageSettings"  xml:space="preserve"><value>Settings</value></data>
+  <data name="JS_PageOverview"  xml:space="preserve"><value>Overview</value></data>
+  <data name="JS_PageSchools"   xml:space="preserve"><value>Schools Management</value></data>
+  <data name="JS_PageAdmins"    xml:space="preserve"><value>Admins</value></data>
+  <data name="JS_PagePlans"     xml:space="preserve"><value>Subscription Plans</value></data>
+</root>

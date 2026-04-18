@@ -21,6 +21,9 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
         _sender     = sender;
     }
 
+    private static string T(string ar, string en) =>
+        System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar" ? ar : en;
+
     public async Task<Result<RequestOtpResponse>> Handle(
         RequestOtpCommand request, CancellationToken cancellationToken)
     {
@@ -38,13 +41,15 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
 
         if (!exists)
             return Result<RequestOtpResponse>.Failure(
-                $"لم يتم العثور على رقم الجوال في النظام للدور '{role}'.");
+                T($"لم يتم العثور على رقم الجوال في النظام للدور '{role}'.",
+                  $"Phone number not found in the system for role '{role}'."));
 
         // ── Rate-limit: block re-request within 60 s ───────────────────────
         var cooldownKey = $"otp:cooldown:{role.ToLower()}:{phone}";
         if (await _cache.ExistsAsync(cooldownKey, cancellationToken))
             return Result<RequestOtpResponse>.Failure(
-                "يرجى الانتظار دقيقة قبل طلب رمز جديد.");
+                T("يرجى الانتظار دقيقة قبل طلب رمز جديد.",
+                  "Please wait a minute before requesting a new code."));
 
         // ── Generate OTP ───────────────────────────────────────────────────
         var otp = GenerateOtp();
@@ -62,7 +67,9 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
 
         // Always include OTP in result — the API controller strips it in Production
         return Result<RequestOtpResponse>.Success(
-            new RequestOtpResponse("تم إرسال رمز التحقق بنجاح.", OtpTtlSeconds, otp));
+            new RequestOtpResponse(
+                T("تم إرسال رمز التحقق بنجاح.", "Verification code sent successfully."),
+                OtpTtlSeconds, otp));
     }
 
     private static string GenerateOtp()

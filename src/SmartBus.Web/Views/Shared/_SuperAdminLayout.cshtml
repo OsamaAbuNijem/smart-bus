@@ -1,5 +1,12 @@
+@{
+    var _isRtl  = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var _dir    = _isRtl ? "rtl" : "ltr";
+    var _culture        = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var _toggleCulture  = _isRtl ? "en" : "ar";
+    var _returnUrl      = Context.Request.Path + Context.Request.QueryString;
+}
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="@_culture" dir="@_dir">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -238,6 +245,23 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
 .toast.success{background:#111;color:#fff;}
 .toast.error{background:#EF4444;color:#fff;}
 .toast-icon{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ══ LANGUAGE BUTTON ══ */
+.lang-btn{height:32px;min-width:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:var(--text2);cursor:pointer;padding:0 10px;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
+.lang-btn:hover{background:var(--y);border-color:var(--yd);color:#111;}
+
+/* ══ LTR OVERRIDES ══ */
+[dir="ltr"] .sidebar{right:auto;left:0;}
+[dir="ltr"] .main{margin-right:0;margin-left:256px;}
+[dir="ltr"] .nav-item.active::before{right:auto;left:0;border-radius:0 2px 2px 0;}
+[dir="ltr"] .nav-badge-pill{margin-right:unset;margin-left:auto;}
+[dir="ltr"] .add-btn{margin-right:0;margin-left:auto;}
+[dir="ltr"] .table th{text-align:left;}
+[dir="ltr"] .st-toggle.on  .st-toggle-knob{right:auto;left:2px;}
+[dir="ltr"] .st-toggle.off .st-toggle-knob{right:auto;left:18px;}
+[dir="ltr"] .logout-btn{margin-right:0;margin-left:auto;}
+[dir="ltr"] .drawer{left:auto;right:0;transform:translateX(100%);box-shadow:-8px 0 40px rgba(0,0,0,.15);}
+[dir="ltr"] .drawer.open{transform:translateX(0);}
 </style>
 </head>
 <body>
@@ -263,32 +287,32 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
     <div class="sa-badge-icon">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
     </div>
-    <div><div class="sa-badge-title">المشرف العام</div><div class="sa-badge-sub">صلاحيات كاملة للمنصة</div></div>
+    <div><div class="sa-badge-title">@L["SA_Badge_Title"]</div><div class="sa-badge-sub">@L["SA_Badge_Sub"]</div></div>
   </div>
   <div class="sidebar-nav">
     <div class="nav-section">OVERVIEW</div>
     <div class="nav-item active" onclick="showPage('overview',this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      <span class="nav-label">نظرة عامة</span>
+      <span class="nav-label">@L["Nav_Overview"]</span>
     </div>
     <div class="nav-section">MANAGEMENT</div>
     <div class="nav-item" onclick="showPage('schools',this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span class="nav-label">المدارس</span>
+      <span class="nav-label">@L["Nav_Schools"]</span>
       <span class="nav-badge-pill" id="schools-count-badge">0</span>
     </div>
     <div class="nav-item" onclick="showPage('admins',this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span class="nav-label">المديرون</span>
+      <span class="nav-label">@L["Nav_Admins"]</span>
     </div>
     <div class="nav-section">SYSTEM</div>
     <div class="nav-item" onclick="showPage('plans',this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="nav-label">خطط الاشتراك</span>
+      <span class="nav-label">@L["Nav_Plans"]</span>
     </div>
     <div class="nav-item" onclick="showPage('settings',this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span class="nav-label">الإعدادات</span>
+      <span class="nav-label">@L["Nav_Settings"]</span>
     </div>
   </div>
   <div class="sidebar-bottom">
@@ -309,10 +333,10 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
 <div class="main">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="topbar-title" id="sa-page-title">نظرة عامة</div>
+      <div class="topbar-title" id="sa-page-title">@L["Nav_Overview"]</div>
       <div class="tb-search" id="topbar-search" style="display:none;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="schools-search-input" placeholder="بحث بالاسم، المدينة، أو البريد..." oninput="onSearchInput(this.value)"/>
+        <input type="text" id="schools-search-input" placeholder="@L["SearchShort"]" oninput="onSearchInput(this.value)"/>
         <button onclick="clearSearch()" id="search-clear" style="display:none;background:none;border:none;cursor:pointer;color:var(--text3);padding:0;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -322,6 +346,7 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
       <button class="tb-icon-btn" id="btn-export" onclick="exportCSV()" title="تصدير CSV" style="display:none;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </button>
+      <a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)" title="@L["LangName"]">@L["SwitchLang"]</a>
       <div class="tb-chip">⚡ Super Admin</div>
       <div id="sa-date-chip" style="font-size:11px;color:var(--text3);"></div>
     </div>
@@ -572,6 +597,34 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
   </div>
 </div>
 
+<script>
+window.T = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+    schoolSaved        = L["JS_SchoolSaved"].Value,
+    schoolUpdated      = L["JS_SchoolUpdated"].Value,
+    schoolDeleted      = L["JS_SchoolDeleted"].Value,
+    schoolDeleteFailed = L["JS_SchoolDeleteFailed"].Value,
+    statusActivated    = L["JS_StatusActivated"].Value,
+    statusDeactivated  = L["JS_StatusDeactivated"].Value,
+    statusFailed       = L["JS_StatusFailed"].Value,
+    planChanged        = L["JS_PlanChanged"].Value,
+    planFailed         = L["JS_PlanFailed"].Value,
+    exportNoData       = L["JS_ExportNoData"].Value,
+    exportDone         = L["JS_ExportDone"].Value,
+    exportCSV          = L["JS_ExportCSV"].Value,
+    passwordChanged    = L["JS_PasswordChanged"].Value,
+    deletedSuccess     = L["JS_DeletedSuccess"].Value,
+    saveFailed         = L["JS_SaveFailed"].Value,
+    saving             = L["JS_Saving"].Value,
+    saveSchoolBtn      = L["JS_SaveSchoolBtn"].Value,
+    pageOverview       = L["JS_PageOverview"].Value,
+    pageSchools        = L["JS_PageSchools"].Value,
+    pageAdmins         = L["JS_PageAdmins"].Value,
+    pagePlans          = L["JS_PagePlans"].Value,
+    pageSettings       = L["JS_PageSettings"].Value,
+    isRtl = _isRtl,
+    dir   = _dir,
+}));
+</script>
 <script src="~/js/superadmin.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

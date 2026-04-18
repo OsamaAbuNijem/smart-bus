@@ -10,11 +10,11 @@ let _drawerSchool = null;    // school object currently in drawer
 let _searchQuery = '';
 
 const pageNames = {
-  overview: 'نظرة عامة',
-  schools: 'إدارة المدارس',
-  admins: 'المديرون',
-  plans: 'خطط الاشتراك',
-  settings: 'الإعدادات'
+  overview: window.T?.pageOverview  || 'نظرة عامة',
+  schools:  window.T?.pageSchools   || 'إدارة المدارس',
+  admins:   window.T?.pageAdmins    || 'المديرون',
+  plans:    window.T?.pagePlans     || 'خطط الاشتراك',
+  settings: window.T?.pageSettings  || 'الإعدادات'
 };
 const planLabels  = { 0: 'أساسية', 1: 'معيارية', 2: 'مميزة ⭐' };
 const planClasses = { 0: 'plan-basic', 1: 'plan-standard', 2: 'plan-premium' };
@@ -390,7 +390,7 @@ async function quickChangePlan(planNum) {
   };
   const res = await apiPut(`/schools/${s.id}`, body);
   if (res?.ok) {
-    showToast(`تم تغيير الخطة إلى ${planLabels[planNum]}`, 'success');
+    showToast(`${window.T?.planChanged || 'تم تغيير الخطة إلى'} ${planLabels[planNum]}`, 'success');
     const updated = { ..._drawerSchool, plan: planNum };
     // update cache
     const idx = _allSchools.findIndex(x => x.id === s.id);
@@ -400,7 +400,7 @@ async function quickChangePlan(planNum) {
     applyFilterAndSearch();
     loadOverview();
   } else {
-    showToast('فشل تغيير الخطة', 'error');
+    showToast(window.T?.planFailed || 'فشل تغيير الخطة', 'error');
   }
 }
 
@@ -420,11 +420,11 @@ async function toggleStatus(id, currentIsActive) {
     const updated = { ...school, isActive: newVal };
     const idx = _allSchools.findIndex(x => x.id === id);
     if (idx >= 0) _allSchools[idx] = updated;
-    showToast(newVal ? 'تم تفعيل المدرسة' : 'تم إيقاف المدرسة', 'success');
+    showToast(newVal ? (window.T?.statusActivated || 'تم تفعيل المدرسة') : (window.T?.statusDeactivated || 'تم إيقاف المدرسة'), 'success');
     applyFilterAndSearch();
     loadOverview();
   } else {
-    showToast('فشل تغيير الحالة', 'error');
+    showToast(window.T?.statusFailed || 'فشل تغيير الحالة', 'error');
   }
 }
 
@@ -542,7 +542,7 @@ async function bulkDelete() {
 // ── CSV Export ─────────────────────────────────────────────────────────────
 function exportCSV() {
   const items = _filteredSchools.length ? _filteredSchools : _allSchools;
-  if (!items.length) { showToast('لا توجد بيانات للتصدير', 'error'); return; }
+  if (!items.length) { showToast(window.T?.exportNoData || 'لا توجد بيانات للتصدير', 'error'); return; }
 
   const headers = ['الاسم', 'المدينة', 'البريد الإلكتروني', 'الهاتف', 'بريد المدير', 'الخطة', 'أقصى باصات', 'الحالة', 'تاريخ الإنشاء'];
   const rows = items.map(s => [
@@ -560,7 +560,7 @@ function exportCSV() {
   a.download = `schools_${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast(`تم تصدير ${items.length} مدارس كـ CSV`, 'success');
+  showToast(`${window.T?.exportDone || 'تم تصدير'} ${items.length} ${window.T?.exportCSV || 'مدارس كـ CSV'}`, 'success');
 }
 
 // ── School Modal ───────────────────────────────────────────────────────────
@@ -647,15 +647,15 @@ async function saveSchool() {
   };
 
   const btn = document.getElementById('btn-save-school');
-  if (btn) { btn.disabled = true; btn.textContent = 'جاري الحفظ...'; }
+  if (btn) { btn.disabled = true; btn.textContent = window.T?.saving || 'جاري الحفظ...'; }
 
   const res = id ? await apiPut(`/schools/${id}`, body) : await apiPost('/schools', body);
 
-  if (btn) { btn.disabled = false; btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>حفظ المدرسة`; }
+  if (btn) { btn.disabled = false; btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>${window.T?.saveSchoolBtn || 'حفظ المدرسة'}`; }
 
   if (res?.ok) {
     closeModal('modal-school');
-    showToast(id ? 'تم تحديث بيانات المدرسة ✓' : 'تمت إضافة المدرسة بنجاح ✓', 'success');
+    showToast(id ? (window.T?.schoolUpdated || 'تم تحديث بيانات المدرسة ✓') : (window.T?.schoolSaved || 'تمت إضافة المدرسة بنجاح ✓'), 'success');
     loadSchools(schoolsPage);
     loadOverview();
   } else {
@@ -673,12 +673,12 @@ function confirmDeleteSchool(name, id) {
     const ok = await apiDelete(`/schools/${id}`);
     closeModal('modal-delete');
     if (ok) {
-      showToast('تم حذف المدرسة بنجاح', 'success');
+      showToast(window.T?.schoolDeleted || 'تم حذف المدرسة بنجاح', 'success');
       _selectedIds.delete(id);
       loadSchools(schoolsPage);
       loadOverview();
     } else {
-      showToast('فشل الحذف. حاول مرة أخرى.', 'error');
+      showToast(window.T?.schoolDeleteFailed || 'فشل الحذف. حاول مرة أخرى.', 'error');
     }
   };
   openModal('modal-delete');
@@ -820,7 +820,7 @@ async function changePassword() {
   if (!valid) return;
 
   const btn = document.getElementById('btn-save-password');
-  if (btn) { btn.disabled = true; btn.textContent = 'جاري الحفظ...'; }
+  if (btn) { btn.disabled = true; btn.textContent = window.T?.saving || 'جاري الحفظ...'; }
 
   const res = await apiPost('/auth/change-password', {
     currentPassword: current,
@@ -833,7 +833,7 @@ async function changePassword() {
   if (res?.ok) {
     if (srv) srv.style.display = 'none';
     closeModal('modal-change-password');
-    showToast('تم تغيير كلمة المرور بنجاح ✓', 'success');
+    showToast(window.T?.passwordChanged || 'تم تغيير كلمة المرور بنجاح ✓', 'success');
   } else {
     const msg = res?.data?.error || 'فشل تغيير كلمة المرور.';
     if (srv) { srv.textContent = msg; srv.style.display = 'block'; }
