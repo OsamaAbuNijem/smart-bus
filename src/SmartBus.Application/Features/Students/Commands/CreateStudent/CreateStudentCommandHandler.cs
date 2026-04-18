@@ -15,16 +15,24 @@ public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand,
     {
         var student = new Student
         {
-            FullName = request.FullName,
-            Grade = request.Grade,
-            Class = request.Class,
-            DateOfBirth = request.DateOfBirth,
-            Address = request.Address,
-            ParentName = request.ParentName,
-            ParentPhone = request.ParentPhone,
-            ParentId = request.ParentId,
-            RouteId = request.RouteId,
-            PickupStopId = request.PickupStopId
+            SchoolId             = request.SchoolId,
+            FullName             = request.FullName,
+            FullNameEn           = request.FullNameEn,
+            Grade                = request.Grade,
+            Class                = request.Class,
+            DateOfBirth          = request.DateOfBirth,
+            Address              = request.Address,
+            ParentName           = request.ParentName,
+            ParentNameEn         = request.ParentNameEn,
+            ParentPhone          = request.ParentPhone,
+            ParentId             = request.ParentId,
+            RouteId              = request.RouteId,
+            PickupStopId         = request.PickupStopId,
+            Latitude             = request.Latitude,
+            Longitude            = request.Longitude,
+            HomeArea             = request.HomeArea,
+            HomeStreet           = request.HomeStreet,
+            HomeBuildingNumber   = request.HomeBuildingNumber
         };
 
         await _unitOfWork.Students.AddAsync(student, cancellationToken);

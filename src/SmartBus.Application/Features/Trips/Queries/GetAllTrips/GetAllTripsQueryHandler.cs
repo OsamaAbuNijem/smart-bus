@@ -15,7 +15,7 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
     public async Task<PagedResult<TripDto>> Handle(GetAllTripsQuery request, CancellationToken cancellationToken)
     {
         var query = _context.Trips
-            .Where(t => !t.IsDeleted)
+            .Where(t => !t.IsDeleted && !t.IsTemplate)
             .Include(t => t.Bus)
             .Include(t => t.Route);
 
@@ -26,12 +26,15 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
             .Take(request.PageSize)
             .Select(t => new TripDto(
                 t.Id,
+                t.BusId,
                 t.Bus.PlateNumber,
-                t.Route.Name,
+                t.Route != null ? t.Route.Name : null,
+                t.Type.ToString(),
                 t.ScheduledDeparture,
                 t.ActualDeparture,
                 t.ActualArrival,
-                t.Status.ToString()))
+                t.Status.ToString(),
+                t.RepeatDays))
             .ToListAsync(cancellationToken);
 
         return PagedResult<TripDto>.Create(trips, totalCount, request.PageNumber, request.PageSize);

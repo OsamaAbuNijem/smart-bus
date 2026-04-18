@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartBus.Application.Features.Schools.Queries.GetMySchool;
 using SmartBus.Application.Features.Students.Commands.CreateStudent;
 using SmartBus.Application.Features.Students.Commands.DeleteStudent;
 using SmartBus.Application.Features.Students.Commands.UpdateStudent;
@@ -33,8 +35,21 @@ public class StudentsController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Create([FromBody] CreateStudentCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromBody] CreateStudentRequest request, CancellationToken cancellationToken)
     {
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        if (string.IsNullOrEmpty(email)) return Unauthorized();
+
+        var schoolResult = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
+        if (!schoolResult.IsSuccess) return BadRequest(new { error = "School not found for this admin." });
+
+        var command = new CreateStudentCommand(
+            schoolResult.Data!.Id.ToString(),
+            request.FullName, request.FullNameEn, request.Grade, request.Class, request.DateOfBirth,
+            request.Address, request.ParentName, request.ParentNameEn, request.ParentPhone,
+            request.ParentId, request.RouteId, request.PickupStopId,
+            request.Latitude, request.Longitude, request.HomeArea, request.HomeStreet, request.HomeBuildingNumber);
+
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Data }, result.Data)
@@ -45,7 +60,11 @@ public class StudentsController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateStudentRequest request, CancellationToken cancellationToken)
     {
-        var command = new UpdateStudentCommand(id, request.FullName, request.Grade, request.Class, request.DateOfBirth, request.Address, request.ParentName, request.ParentPhone, request.RouteId, request.PickupStopId);
+        var command = new UpdateStudentCommand(
+            id, request.FullName, request.FullNameEn, request.Grade, request.Class, request.DateOfBirth,
+            request.Address, request.ParentName, request.ParentNameEn, request.ParentPhone,
+            request.RouteId, request.PickupStopId,
+            request.Latitude, request.Longitude, request.HomeArea, request.HomeStreet, request.HomeBuildingNumber);
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
@@ -59,4 +78,12 @@ public class StudentsController : ControllerBase
     }
 }
 
-public record UpdateStudentRequest(string FullName, string Grade, string? Class, DateOnly? DateOfBirth, string? Address, string ParentName, string ParentPhone, Guid? RouteId, Guid? PickupStopId);
+public record CreateStudentRequest(
+    string FullName, string? FullNameEn, string Grade, string? Class, DateOnly? DateOfBirth, string? Address,
+    string ParentName, string? ParentNameEn, string ParentPhone, Guid? ParentId, Guid? RouteId, Guid? PickupStopId,
+    double? Latitude, double? Longitude, string? HomeArea, string? HomeStreet, string? HomeBuildingNumber);
+
+public record UpdateStudentRequest(
+    string FullName, string? FullNameEn, string Grade, string? Class, DateOnly? DateOfBirth, string? Address,
+    string ParentName, string? ParentNameEn, string ParentPhone, Guid? RouteId, Guid? PickupStopId,
+    double? Latitude, double? Longitude, string? HomeArea, string? HomeStreet, string? HomeBuildingNumber);

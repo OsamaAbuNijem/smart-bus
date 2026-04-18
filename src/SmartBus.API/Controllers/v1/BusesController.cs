@@ -3,6 +3,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Buses.Commands.CreateBus;
+using SmartBus.Application.Features.Buses.Commands.DeleteBus;
+using SmartBus.Application.Features.Buses.Commands.UpdateBus;
 using SmartBus.Application.Features.Buses.Commands.UpdateBusLocation;
 using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Buses.Queries.GetBusById;
@@ -44,12 +46,38 @@ public class BusesController : ControllerBase
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromBody] CreateBusCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromBody] BusRequest request, CancellationToken cancellationToken)
     {
+        var command = new CreateBusCommand(request.PlateNumber, request.Capacity, request.Status,
+            request.DriverId, request.AssistantDriverId, request.StudentIds ?? []);
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Data }, result.Data)
             : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>Update a bus.</summary>
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Update(Guid id, [FromBody] BusRequest request, CancellationToken cancellationToken)
+    {
+        var command = new UpdateBusCommand(id, request.PlateNumber, request.Capacity, request.Status,
+            request.DriverId, request.AssistantDriverId, request.StudentIds ?? []);
+        var result = await _mediator.Send(command, cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>Delete a bus (soft delete).</summary>
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new DeleteBusCommand(id), cancellationToken);
+        return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
     }
 
     /// <summary>Update bus GPS location (called by bus device).</summary>
@@ -65,3 +93,11 @@ public class BusesController : ControllerBase
 }
 
 public record UpdateLocationRequest(double Latitude, double Longitude, double? Speed, double? Heading);
+
+public record BusRequest(
+    string PlateNumber,
+    int Capacity,
+    string Status,
+    Guid? DriverId,
+    Guid? AssistantDriverId,
+    IEnumerable<Guid>? StudentIds);

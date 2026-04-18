@@ -188,17 +188,17 @@
 <!-- ══ TRIPS PAGE ══ -->
 <div class="page" id="page-trips">
   <div class="filter-bar">
-    <div class="filter-btn active">الكل</div>
-    <div class="filter-btn">جارية</div>
-    <div class="filter-btn">مكتملة</div>
-    <button class="add-btn" onclick="openEdit('trip', null)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>رحلة جديدة
+    <button class="add-btn" onclick="openBusScheduleModal(null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>جدول باص
+    </button>
+    <button class="filter-btn" onclick="triggerTripGeneration()" style="display:flex;align-items:center;gap:6px;" title="إنشاء رحلات اليوم يدوياً">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>تشغيل الجدول الآن
     </button>
   </div>
   <div class="card">
     <table class="table">
       <thead>
-        <tr><th>الرحلة</th><th>الباص</th><th>المسار</th><th>موعد الانطلاق</th><th>الحالة</th><th></th></tr>
+        <tr><th>الباص</th><th>النوع</th><th>التاريخ</th><th>وقت الانطلاق</th><th>الحالة</th><th></th></tr>
       </thead>
       <tbody id="trips-tbody">
         <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">جاري تحميل البيانات...</td></tr>
@@ -220,14 +220,17 @@
     <button class="add-btn" onclick="openEdit('bus', null)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>إضافة باص
     </button>
+    <button class="filter-btn" onclick="openBusScheduleModal(null, null)" style="display:flex;align-items:center;gap:6px;color:#7C3AED;font-weight:700;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>جدول باص
+    </button>
   </div>
   <div class="card">
     <table class="table">
       <thead>
-        <tr><th>الباص</th><th>الموديل</th><th>الطاقة</th><th>الحالة</th><th></th></tr>
+        <tr><th>رقم الباص</th><th>الطاقة</th><th>الحالة</th><th>السائق</th><th>المساعد</th><th>الطلاب</th><th></th></tr>
       </thead>
       <tbody id="buses-tbody">
-        <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text3);">جاري تحميل البيانات...</td></tr>
+        <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">جاري تحميل البيانات...</td></tr>
       </tbody>
     </table>
     <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">

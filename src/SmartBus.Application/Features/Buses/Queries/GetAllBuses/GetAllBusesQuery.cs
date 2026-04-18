@@ -9,10 +9,14 @@ public record GetAllBusesQuery(int PageNumber = 1, int PageSize = 10) : IRequest
 public record BusDto(
     Guid Id,
     string PlateNumber,
-    string Model,
     int Capacity,
     string Status,
+    Guid? DriverId,
     string? DriverName,
+    Guid? AssistantDriverId,
+    string? AssistantDriverName,
+    int StudentCount,
+    IReadOnlyList<Guid> StudentIds,
     double? LastLatitude,
     double? LastLongitude,
     DateTime CreatedAt

@@ -11,6 +11,8 @@ let alertsPage = 1, alertsTotalPages = 1;
 let editingId = null;
 let deleteCallback = null;
 let _busesCache = [], _driversCache = [], _routesCache = [];
+let _scheduleBusId = null;   // pre-selected bus ID for the schedule modal
+let _studentMap = null, _studentMarker = null;
 
 const busColors = ['#FFD700', '#22C55E', '#3B82F6', '#F97316', '#8B5CF6', '#EF4444'];
 const mapPositions = [
@@ -212,7 +214,7 @@ async function loadStudents(page) {
           <div class="table-av" style="background:${colors.bg};color:${colors.text};">${initials}</div>
           <div><div class="td-name">${escHtml(s.fullName)}</div></div>
         </div></td>
-        <td>${escHtml(s.grade)}${s.class ? ' ' + escHtml(s.class) : ''}</td>
+        <td>${escHtml(gradeLabel(s.grade))}${s.class ? ' ' + escHtml(s.class) : ''}</td>
         <td>${s.routeName ? `<span style="background:#EFF6FF;color:#1E40AF;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;">${escHtml(s.routeName)}</span>` : '—'}</td>
         <td><div class="td-sub">${escHtml(s.parentName)}</div></td>
         <td><div class="td-sub">${escHtml(s.parentPhone)}</div></td>
@@ -230,17 +232,26 @@ async function loadStudents(page) {
 }
 
 async function saveStudent() {
-  const name        = document.getElementById('sf-name').value.trim();
-  const grade       = document.getElementById('sf-grade').value;
-  const city        = document.getElementById('sf-city').value.trim();
-  const address     = document.getElementById('sf-address').value.trim();
-  const parentName  = document.getElementById('sf-parent').value.trim();
-  const parentPhone = document.getElementById('sf-phone').value.trim();
-  const notes       = document.getElementById('sf-notes').value.trim() || null;
+  const name             = document.getElementById('sf-name').value.trim();
+  const nameEn           = document.getElementById('sf-name-en').value.trim();
+  const grade            = document.getElementById('sf-grade').value;
+  const parentName       = document.getElementById('sf-parent').value.trim();
+  const parentNameEn     = document.getElementById('sf-parent-en').value.trim();
+  const parentPhone      = document.getElementById('sf-phone').value.trim();
+  const buildingNumber   = document.getElementById('sf-building').value.trim() || null;
+  const latVal           = document.getElementById('sf-lat').value;
+  const lngVal           = document.getElementById('sf-lng').value;
+  const homeArea         = document.getElementById('sf-area').value.trim()   || null;
+  const homeStreet       = document.getElementById('sf-street').value.trim() || null;
   if (!name || !parentName || !parentPhone) { alert('الرجاء تعبئة الحقول الإلزامية'); return; }
 
-  const body = { fullName: name, grade, city: city || null, address: address || null,
-                 parentName, parentPhone, notes };
+  const body = {
+    fullName: name, fullNameEn: nameEn || null,
+    grade, parentName, parentNameEn: parentNameEn || null, parentPhone,
+    latitude:  latVal ? parseFloat(latVal) : null,
+    longitude: lngVal ? parseFloat(lngVal) : null,
+    homeArea, homeStreet, homeBuildingNumber: buildingNumber
+  };
 
   let res;
   if (editingId) {
@@ -331,6 +342,25 @@ async function saveDriver() {
 }
 
 // ── Trips ──────────────────────────────────────────────────────────────────
+function tripTypeLabel(type) {
+  if (!type) return '';
+  const t = (typeof type === 'string') ? type.toLowerCase() : '';
+  if (t === 'morning') return { label: 'ذهاب', bg: '#F0FDF4', color: '#15803D' };
+  if (t === 'return')  return { label: 'إياب',  bg: '#EFF6FF', color: '#1D4ED8' };
+  return { label: type, bg: '#F1F5F9', color: '#475569' };
+}
+
+function repeatDaysLabel(mask) {
+  if (!mask) return '—';
+  const names = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const bits  = [1, 2, 4, 8, 16, 32, 64];
+  const days  = bits.filter(b => (mask & b) !== 0).map(b => names[bits.indexOf(b)]);
+  if (days.length === 7) return 'يومي';
+  if (mask === 31)  return 'الأحد — الخميس';
+  if (mask === 62)  return 'الاثنين — الجمعة';
+  return days.join('، ');
+}
+
 async function loadTrips(page) {
   if (page < 1 || page > tripsTotalPages) return;
   tripsPage = page;
@@ -342,25 +372,26 @@ async function loadTrips(page) {
   if (info) info.textContent = `عرض ${data.items.length} من ${data.totalCount} رحلة`;
   updatePager('trips', page, tripsTotalPages);
   if (!data.items.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">لا توجد رحلات مسجلة</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">لا توجد رحلات اليوم. تأكد من تحديد جدول لكل باص (زر الجدول في صفحة الباصات) ثم اضغط "تشغيل الجدول الآن".</td></tr>';
     return;
   }
   tbody.innerHTML = data.items.map(t => {
     const statusInfo = getTripStatus(t.status);
+    const typeInfo   = tripTypeLabel(t.tripType);
+    const dt         = t.scheduledDeparture ? new Date(t.scheduledDeparture) : null;
+    const dateStr    = dt ? dt.toLocaleDateString('ar-SA', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+    const timeStr    = dt ? dt.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false }) : '—';
     return `
       <tr>
-        <td><div><div class="td-name">${escHtml(t.routeName)}</div></div></td>
         <td><span style="background:#EFF6FF;color:#1E40AF;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;">${escHtml(t.busPlateNumber)}</span></td>
-        <td>${escHtml(t.routeName)}</td>
-        <td>${formatDateTime(t.scheduledDeparture)}</td>
+        <td><span style="background:${typeInfo.bg};color:${typeInfo.color};border-radius:6px;padding:2px 10px;font-size:12px;font-weight:700;">${typeInfo.label}</span></td>
+        <td style="font-size:12px;color:var(--text2);">${dateStr}</td>
+        <td style="font-weight:600;">${timeStr}</td>
         <td><div class="td-badge" style="background:${statusInfo.bg};">
           <span style="color:${statusInfo.color};">${statusInfo.label}</span>
         </div></td>
         <td><div class="tbl-actions">
-          <button class="tbl-btn tbl-edit" title="تعديل" onclick="openEdit('trip',${JSON.stringify(t).replace(/"/g,'&quot;')})">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
-          </button>
-          <button class="tbl-btn tbl-del" title="حذف" onclick="confirmDelete('رحلة','${escHtml(t.routeName)}','trip','${t.id}')">
+          <button class="tbl-btn tbl-del" title="حذف" onclick="confirmDelete('رحلة','${escHtml(t.busPlateNumber)}','trip','${t.id}')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div></td>
@@ -368,34 +399,98 @@ async function loadTrips(page) {
   }).join('');
 }
 
-async function saveTrip() {
-  const name = document.getElementById('tf-name').value.trim();
-  const time = document.getElementById('tf-time').value;
-  const busId = document.getElementById('tf-bus').value;
-  const routeId = document.getElementById('tf-route').value;
-  if (!name || !time || !busId || !routeId) { alert('الرجاء تعبئة جميع الحقول الإلزامية'); return; }
+// Open the bus-schedule modal. plateOrNull and busIdOrNull pre-select the bus.
+function openBusScheduleModal(plateOrNull, busIdOrNull) {
+  try {
+    // Reset form to defaults immediately
+    document.querySelectorAll('.sch-day').forEach(cb => { cb.checked = false; });
+    // Default: Sun–Thu
+    [1, 2, 4, 8, 16].forEach(v => {
+      const cb = document.querySelector(`.sch-day[value="${v}"]`);
+      if (cb) cb.checked = true;
+    });
+    const morningEl = document.getElementById('sch-morning-time');
+    const returnEl  = document.getElementById('sch-return-time');
+    const busSel    = document.getElementById('sch-bus');
+    const titleEl   = document.querySelector('#modal-trip .modal-header-title');
+    if (morningEl) morningEl.value = '07:15';
+    if (returnEl)  returnEl.value  = '14:00';
+    if (titleEl)   titleEl.textContent = plateOrNull ? `جدول رحلات — ${plateOrNull}` : 'جدول رحلات الباص';
 
-  const body = {
-    name,
-    type: parseInt(document.getElementById('tf-type').value),
-    busId,
-    routeId,
-    scheduledDeparture: new Date().toISOString().split('T')[0] + 'T' + time + ':00',
-    repeatDays: parseInt(document.getElementById('tf-repeat').value) || 0,
-    notes: document.getElementById('tf-notes').value.trim() || null
-  };
+    // Store bus id for use in saveBusSchedule
+    _scheduleBusId = busIdOrNull || null;
 
-  let res;
-  if (editingId) {
-    res = await apiPut(`/trips/${editingId}`, body);
-  } else {
-    res = await apiPost('/trips', body);
+    // If a bus is already known, hide the dropdown; otherwise show it for selection
+    if (busIdOrNull && busSel) {
+      busSel.closest('.form-group').closest('.form-row').style.display = 'none';
+    } else if (busSel) {
+      busSel.closest('.form-group').closest('.form-row').style.display = '';
+      busSel.innerHTML = '<option value="">جاري التحميل...</option>';
+    }
+
+    // Open modal right away — data loads in background
+    openModal('modal-trip');
+
+    // Load buses async, then load the saved schedule if editing
+    loadBusesForModal('sch-bus', busIdOrNull).then(() => {
+      if (!busIdOrNull) return;
+      return apiGet(`/trips/bus/${busIdOrNull}/schedule`).then(sched => {
+        if (!sched) return;
+        if (sched.morningTime && morningEl) morningEl.value = sched.morningTime;
+        if (sched.returnTime  && returnEl)  returnEl.value  = sched.returnTime;
+        if (sched.repeatDays) {
+          document.querySelectorAll('.sch-day').forEach(cb => {
+            cb.checked = (sched.repeatDays & parseInt(cb.value)) !== 0;
+          });
+        }
+      });
+    }).catch(err => console.error('[schedule modal]', err));
+
+  } catch (e) {
+    console.error('[openBusScheduleModal]', e);
+    alert('حدث خطأ أثناء فتح النافذة: ' + e.message);
   }
+}
+
+async function saveBusSchedule() {
+  const busId      = document.getElementById('sch-bus').value || _scheduleBusId;
+  const morningTime = document.getElementById('sch-morning-time').value;
+  const returnTime  = document.getElementById('sch-return-time').value;
+  if (!busId)      { alert('الرجاء اختيار الباص'); return; }
+  if (!morningTime){ alert('الرجاء تحديد وقت الذهاب'); return; }
+  if (!returnTime) { alert('الرجاء تحديد وقت الإياب'); return; }
+
+  let repeatDays = 0;
+  document.querySelectorAll('.sch-day:checked').forEach(cb => { repeatDays |= parseInt(cb.value); });
+  if (!repeatDays) { alert('الرجاء اختيار يوم واحد على الأقل'); return; }
+
+  const res = await apiPost(`/trips/bus/${busId}/schedule`, { morningTime, returnTime, repeatDays });
   if (res?.ok) {
     closeModal('modal-trip');
     loadTrips(tripsPage);
-    showToast(window.T?.tripSaved || 'تم حفظ الرحلة بنجاح ✓');
-  } else { alert('فشل الحفظ. تحقق من البيانات.'); }
+    showToast('تم حفظ جدول الرحلات بنجاح ✓');
+  } else {
+    const errMsg = res?.data?.error || res?.data?.title || JSON.stringify(res?.data) || 'خطأ غير معروف';
+    alert('فشل الحفظ: ' + errMsg);
+  }
+}
+
+// kept for backward-compat in openEdit but no longer used for trips
+async function saveTrip() { await saveBusSchedule(); }
+
+async function triggerTripGeneration() {
+  const btn = event?.currentTarget;
+  if (btn) { btn.disabled = true; btn.textContent = 'جاري التشغيل...'; }
+  const res = await apiPost('/trips/generate-today', {});
+  if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>تشغيل الجدول الآن'; }
+  if (res?.ok) {
+    loadTrips(1);
+    const msg = res.data?.message || 'تم إنشاء رحلات اليوم بنجاح ✓';
+    showToast(msg);
+  } else {
+    const errMsg = res?.data?.error || res?.data?.message || res?.data?.title || 'فشل التشغيل. تأكد من وجود جدول محدد للباصات.';
+    alert(errMsg);
+  }
 }
 
 // ── Buses ──────────────────────────────────────────────────────────────────
@@ -410,24 +505,35 @@ async function loadBuses(page) {
   if (info) info.textContent = `عرض ${data.items.length} من ${data.totalCount} باص`;
   updatePager('buses', page, busesTotalPages);
   if (!data.items.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text3);">لا توجد باصات مسجلة</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">لا توجد باصات مسجلة</td></tr>';
     return;
   }
+  const isRtl = window.T?.isRtl !== false;
   tbody.innerHTML = data.items.map(b => {
-    const statusInfo = getBusStatus(b.status);
+    const statusInfo   = getBusStatus(b.status);
+    const driverName   = b.driverName   ? escHtml(b.driverName)   : '—';
+    const assistName   = b.assistantDriverName ? escHtml(b.assistantDriverName) : '—';
+    const studentCount = b.studentCount ?? 0;
     return `
       <tr>
-        <td><div><div class="td-name">${escHtml(b.plateNumber)}</div></div></td>
-        <td>${escHtml(b.model || '—')}</td>
+        <td><div class="td-name">${escHtml(b.plateNumber)}</div></td>
         <td>${b.capacity}</td>
         <td><div class="td-badge" style="background:${statusInfo.bg};">
           <span style="color:${statusInfo.color};">${statusInfo.label}</span>
         </div></td>
+        <td><div class="td-sub">${driverName}</div></td>
+        <td><div class="td-sub">${assistName}</div></td>
+        <td>
+          <span style="background:#EFF6FF;color:#1E40AF;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;">${studentCount}</span>
+        </td>
         <td><div class="tbl-actions">
-          <button class="tbl-btn tbl-edit" title="تعديل" onclick="openEdit('bus',${JSON.stringify(b).replace(/"/g,'&quot;')})">
+          <button class="tbl-btn" title="${isRtl ? 'جدول الرحلات' : 'Schedule'}" style="color:#7C3AED;" onclick="openBusScheduleModal('${escHtml(b.plateNumber)}','${b.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </button>
+          <button class="tbl-btn tbl-edit" title="${isRtl ? 'تعديل' : 'Edit'}" onclick="openEditBus('${b.id}')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
           </button>
-          <button class="tbl-btn tbl-del" title="حذف" onclick="confirmDelete('باص','${escHtml(b.plateNumber)}','bus','${b.id}')">
+          <button class="tbl-btn tbl-del" title="${isRtl ? 'حذف' : 'Delete'}" onclick="confirmDelete('${isRtl ? 'باص' : 'Bus'}','${escHtml(b.plateNumber)}','bus','${b.id}')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div></td>
@@ -438,17 +544,22 @@ async function loadBuses(page) {
 async function saveBus() {
   const num = document.getElementById('bf-num').value.trim();
   const cap = document.getElementById('bf-cap').value;
-  const model = document.getElementById('bf-model').value.trim();
-  if (!num || !cap || !model) { alert('الرجاء تعبئة جميع الحقول'); return; }
+  if (!num || !cap) {
+    alert(window.T?.isRtl !== false ? 'الرجاء تعبئة رقم الباص والطاقة الاستيعابية' : 'Please fill in Bus Number and Capacity');
+    return;
+  }
+
+  const driverId          = document.getElementById('bf-driver').value    || null;
+  const assistantDriverId = document.getElementById('bf-assistant').value || null;
 
   const body = {
-    plateNumber: num,
-    capacity: parseInt(cap),
-    model,
-    status: document.getElementById('bf-status').value
+    plateNumber:       num,
+    capacity:          parseInt(cap),
+    status:            document.getElementById('bf-status').value,
+    driverId,
+    assistantDriverId,
+    studentIds:        [..._selectedStudentIds]
   };
-  const maint = document.getElementById('bf-maint').value;
-  if (maint) body.lastMaintenanceDate = maint;
 
   let res;
   if (editingId) {
@@ -458,9 +569,11 @@ async function saveBus() {
   }
   if (res?.ok) {
     closeModal('modal-bus');
+    _busesCache = [];
+    _allStudentsForBus = [];
     loadBuses(busesPage);
     showToast(window.T?.busSaved || 'تم حفظ الباص بنجاح ✓');
-  } else { alert('فشل الحفظ. تحقق من البيانات.'); }
+  } else { alert(window.T?.saveFailed || 'فشل الحفظ. تحقق من البيانات.'); }
 }
 
 // ── Alerts ─────────────────────────────────────────────────────────────────
@@ -550,23 +663,22 @@ function closeModal(id) { document.getElementById(id)?.classList.remove('open');
 
 function openEdit(type, data) {
   editingId = data?.id || null;
-  if (type === 'trip') { fillTripForm(data); openModal('modal-trip'); }
+  if (type === 'trip') { openBusScheduleModal(data?.busPlateNumber || null, data?.busId || null); }
   if (type === 'student') { fillStudentForm(data); openModal('modal-student'); }
-  if (type === 'bus') { fillBusForm(data); openModal('modal-bus'); }
   if (type === 'driver') { fillDriverForm(data); openModal('modal-driver'); }
+  if (type === 'bus') { editingId = null; _selectedStudentIds = new Set(); fillBusForm(null); openModal('modal-bus'); }
 }
 
-function fillTripForm(d) {
-  document.getElementById('trip-modal-title').textContent = d ? 'تعديل رحلة' : 'إضافة رحلة جديدة';
-  document.getElementById('tf-name').value = d?.name || '';
-  document.getElementById('tf-type').value = d?.type ?? 0;
-  document.getElementById('tf-time').value = d?.scheduledDeparture ? new Date(d.scheduledDeparture).toTimeString().slice(0, 5) : '07:15';
-  document.getElementById('tf-repeat').value = d?.repeatDays ?? 0;
-  document.getElementById('tf-notes').value = d?.notes || '';
-  loadBusesForModal('tf-bus', d?.busId);
-  loadDriversForModal('tf-driver', d?.driverId);
-  loadRoutesForTripModal('tf-route', d?.routeId);
+async function openEditBus(id) {
+  editingId = id;
+  _selectedStudentIds = new Set();
+  fillBusForm(null);      // open modal immediately with skeleton
+  openModal('modal-bus');
+  const data = await apiGet(`/buses/${id}`);
+  if (data) fillBusForm(data);
 }
+
+// fillTripForm replaced by openBusScheduleModal
 
 function fillDriverForm(d) {
   document.getElementById('driver-modal-title').textContent =
@@ -592,35 +704,259 @@ function fillDriverForm(d) {
   if (optFalse) optFalse.textContent = window.T?.driverInactive || 'غير نشط';
 }
 
+// Jordan city centre coordinates
+const _jordanCities = {
+  Amman:    [31.9539, 35.9106],
+  Zarqa:    [32.0728, 36.0882],
+  Irbid:    [32.5556, 35.8500],
+  Aqaba:    [29.5321, 35.0063],
+  Salt:     [32.0392, 35.7275],
+  Madaba:   [31.7161, 35.7939],
+  Karak:    [31.1769, 35.7047],
+  Jerash:   [32.2742, 35.9008],
+  Ajloun:   [32.3325, 35.7508],
+  Mafraq:   [32.3419, 36.2061],
+  Tafilah:  [30.8378, 35.6078],
+  Maan:     [30.1928, 35.7342],
+  Russeifa: [32.0167, 36.0833],
+  Ramtha:   [32.5619, 36.0033],
+  WadiMusa: [30.3217, 35.4799],
+};
+
+let _searchDebounce = null;
+
+function initStudentMap(lat, lng) {
+  if (_studentMap) { _studentMap.remove(); _studentMap = null; _studentMarker = null; }
+
+  // Default view: use existing pin coords, else zoom to the school's city, else Amman
+  let defaultLat = lat ?? 31.9539;
+  let defaultLng = lng ?? 35.9106;
+  let zoom = lat ? 15 : 12;
+
+  if (!lat) {
+    const schoolCity = window.T?.schoolCity;
+    const cityCoords = schoolCity ? _jordanCities[schoolCity] : null;
+    if (cityCoords) { defaultLat = cityCoords[0]; defaultLng = cityCoords[1]; zoom = 13; }
+  }
+
+  _studentMap = L.map('sf-map', { zoomControl: true }).setView([defaultLat, defaultLng], zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 19
+  }).addTo(_studentMap);
+
+  if (lat && lng) _studentMarker = L.marker([lat, lng]).addTo(_studentMap);
+
+  // Click → place marker + reverse geocode
+  _studentMap.on('click', (e) => placeStudentPin(e.latlng.lat, e.latlng.lng));
+
+  // Search box
+  const searchEl = document.getElementById('sf-map-search');
+  const resultsEl = document.getElementById('sf-map-search-results');
+  if (searchEl) {
+    searchEl.oninput = () => {
+      clearTimeout(_searchDebounce);
+      const q = searchEl.value.trim();
+      if (!resultsEl) return;
+      if (q.length < 3) { resultsEl.style.display = 'none'; return; }
+      _searchDebounce = setTimeout(async () => {
+        try {
+          const lang = window.T?.isRtl ? 'ar' : 'en';
+          const r = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=jo&limit=5&accept-language=${lang}`
+          );
+          const items = await r.json();
+          if (!items.length) { resultsEl.style.display = 'none'; return; }
+          resultsEl.innerHTML = items.map(it =>
+            `<div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);"
+                  onmousedown="selectSearchResult(${it.lat},${it.lon},'${escHtml(it.display_name.split(',')[0])}')"
+                  onmouseover="this.style.background='var(--card2)'" onmouseout="this.style.background=''"
+             >${escHtml(it.display_name)}</div>`
+          ).join('');
+          resultsEl.style.display = 'block';
+        } catch { resultsEl.style.display = 'none'; }
+      }, 400);
+    };
+    searchEl.onblur = () => setTimeout(() => { if (resultsEl) resultsEl.style.display = 'none'; }, 200);
+  }
+}
+
+function selectSearchResult(lat, lng, label) {
+  const resultsEl = document.getElementById('sf-map-search-results');
+  const searchEl  = document.getElementById('sf-map-search');
+  if (resultsEl) resultsEl.style.display = 'none';
+  if (searchEl)  searchEl.value = label;
+  if (_studentMap) _studentMap.flyTo([lat, lng], 16, { duration: 1 });
+  placeStudentPin(lat, lng);
+}
+
+async function placeStudentPin(lat, lng) {
+  document.getElementById('sf-lat').value    = lat;
+  document.getElementById('sf-lng').value    = lng;
+  document.getElementById('sf-area').value   = window.T?.stdMapLoading || 'جاري تحديد العنوان...';
+  document.getElementById('sf-street').value = '';
+
+  if (_studentMarker) _studentMap.removeLayer(_studentMarker);
+  _studentMarker = L.marker([lat, lng]).addTo(_studentMap);
+
+  try {
+    const lang = window.T?.isRtl ? 'ar' : 'en';
+    const res  = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=${lang}`
+    );
+    const data = await res.json();
+    const addr = data.address || {};
+    document.getElementById('sf-area').value   =
+      addr.suburb || addr.neighbourhood || addr.city_district || addr.county ||
+      (window.T?.stdMapNoResult || 'تعذّر تحديد العنوان');
+    document.getElementById('sf-street').value =
+      addr.road || addr.pedestrian || addr.residential || '';
+  } catch {
+    document.getElementById('sf-area').value = window.T?.stdMapNoResult || 'تعذّر تحديد العنوان';
+  }
+}
+
+function locateStudentMap() {
+  if (!_studentMap) return;
+  const btn = document.getElementById('sf-map-locate');
+  if (btn) btn.style.color = 'var(--y)';
+  _studentMap.locate({ setView: true, maxZoom: 16 });
+  _studentMap.once('locationfound', (e) => {
+    if (btn) btn.style.color = '';
+    placeStudentPin(e.latlng.lat, e.latlng.lng);
+  });
+  _studentMap.once('locationerror', () => { if (btn) btn.style.color = ''; });
+}
+
 function fillStudentForm(d) {
   document.getElementById('std-modal-title').textContent =
     d ? (window.T?.stdEditTitle || 'تعديل بيانات طالب')
       : (window.T?.stdAddTitle  || 'إضافة طالب جديد');
 
-  document.getElementById('sf-name').value    = d?.fullName    || '';
-  document.getElementById('sf-city').value    = d?.city        || '';
-  document.getElementById('sf-address').value = d?.address     || '';
-  document.getElementById('sf-parent').value  = d?.parentName  || '';
-  document.getElementById('sf-phone').value   = d?.parentPhone || '';
-  document.getElementById('sf-notes').value   = d?.notes       || '';
+  document.getElementById('sf-name').value      = d?.fullName          || '';
+  document.getElementById('sf-name-en').value   = d?.fullNameEn        || '';
+  document.getElementById('sf-parent').value    = d?.parentName        || '';
+  document.getElementById('sf-parent-en').value = d?.parentNameEn      || '';
+  document.getElementById('sf-phone').value     = d?.parentPhone       || '';
+  document.getElementById('sf-building').value  = d?.homeBuildingNumber || '';
+  document.getElementById('sf-lat').value       = d?.latitude          ?? '';
+  document.getElementById('sf-lng').value       = d?.longitude         ?? '';
+  document.getElementById('sf-area').value      = d?.homeArea          || '';
+  document.getElementById('sf-street').value    = d?.homeStreet        || '';
 
-  // Localise grade options then set value
-  const grades = ['stdGrade1','stdGrade2','stdGrade3','stdGrade4','stdGrade5',
-                  'stdGrade6','stdGrade7','stdGrade8','stdGrade9'];
-  grades.forEach((key, i) => {
+  // Localise grade option labels (values stay as "1"–"9")
+  const gradeKeys = ['stdGrade1','stdGrade2','stdGrade3','stdGrade4','stdGrade5',
+                     'stdGrade6','stdGrade7','stdGrade8','stdGrade9'];
+  gradeKeys.forEach((key, i) => {
     const opt = document.getElementById(`sf-g${i + 1}`);
     if (opt) opt.textContent = window.T?.[key] || opt.textContent;
   });
-  const gradeVal = d?.grade || document.getElementById('sf-g1')?.textContent || '';
-  document.getElementById('sf-grade').value = gradeVal;
+  document.getElementById('sf-grade').value = d?.grade || '1';
+
+  // Init map after the modal is visible (next tick so DOM is rendered)
+  setTimeout(() => initStudentMap(d?.latitude ?? null, d?.longitude ?? null), 50);
 }
 
+// ── Bus student multi-select state ───────────────────────────────────────
+let _allStudentsForBus = [];   // full list loaded once
+let _selectedStudentIds = new Set();
+
 function fillBusForm(d) {
-  document.getElementById('bus-modal-title').textContent = d ? 'تعديل باص' : 'إضافة باص جديد';
-  document.getElementById('bf-num').value = d?.plateNumber || '';
-  document.getElementById('bf-model').value = d?.model || '';
-  document.getElementById('bf-cap').value = d?.capacity || '';
-  document.getElementById('bf-status').value = d?.status || 'Idle';
+  const isRtl = window.T?.isRtl !== false;
+  document.getElementById('bus-modal-title').textContent =
+    d ? (isRtl ? 'تعديل باص' : 'Edit Bus') : (isRtl ? 'إضافة باص جديد' : 'Add New Bus');
+  document.getElementById('bf-num').value    = d?.plateNumber || '';
+  document.getElementById('bf-cap').value    = d?.capacity    || '';
+  document.getElementById('bf-status').value = d?.status      || 'Inactive';
+  document.getElementById('bf-student-search').value = '';
+
+  _selectedStudentIds = new Set((d?.studentIds || []).map(id => id.toString()));
+
+  // Load drivers & assistants then pre-select
+  loadDriversForBusModal(d?.driverId, d?.assistantDriverId);
+  loadStudentsForBusModal();
+}
+
+async function loadDriversForBusModal(driverId, assistantDriverId) {
+  if (!_driversCache.length) {
+    const data = await apiGet('/drivers?pageNumber=1&pageSize=200');
+    if (data?.items) _driversCache = data.items;
+  }
+  const drivers    = _driversCache.filter(d => d.driverType !== 'Assistant');
+  const assistants = _driversCache.filter(d => d.driverType === 'Assistant');
+  const isRtl = window.T?.isRtl !== false;
+
+  const driverSel = document.getElementById('bf-driver');
+  driverSel.innerHTML = `<option value="">${isRtl ? '— اختر سائقاً —' : '— Select Driver —'}</option>` +
+    drivers.map(d => `<option value="${d.id}"${d.id === driverId ? ' selected' : ''}>${escHtml(isRtl ? d.fullName : (d.fullNameEn || d.fullName))}</option>`).join('');
+
+  const assistSel = document.getElementById('bf-assistant');
+  assistSel.innerHTML = `<option value="">${isRtl ? '— اختر مساعداً —' : '— Select Assistant —'}</option>` +
+    assistants.map(d => `<option value="${d.id}"${d.id === assistantDriverId ? ' selected' : ''}>${escHtml(isRtl ? d.fullName : (d.fullNameEn || d.fullName))}</option>`).join('');
+}
+
+async function loadStudentsForBusModal() {
+  if (!_allStudentsForBus.length) {
+    const data = await apiGet('/students?pageNumber=1&pageSize=500');
+    if (data?.items) _allStudentsForBus = data.items;
+  }
+  renderBusStudentsList(_allStudentsForBus);
+}
+
+function renderBusStudentsList(students) {
+  const list = document.getElementById('bf-students-list');
+  const isRtl = window.T?.isRtl !== false;
+  if (!list) return;
+
+  if (!students.length) {
+    list.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px;">${isRtl ? 'لا يوجد طلاب' : 'No students found'}</div>`;
+    updateBusSelectedCount();
+    return;
+  }
+
+  list.innerHTML = students.map(s => {
+    const checked = _selectedStudentIds.has(s.id.toString());
+    const name = (!isRtl && s.fullNameEn) ? s.fullNameEn : s.fullName;
+    const area = s.homeArea ? ` — ${escHtml(s.homeArea)}` : '';
+    return `
+      <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s;"
+             onmouseover="this.style.background='var(--yl)'" onmouseout="this.style.background=''">
+        <input type="checkbox" value="${s.id}" ${checked ? 'checked' : ''}
+               onchange="toggleBusStudent(this)"
+               style="width:15px;height:15px;accent-color:var(--yd);flex-shrink:0;cursor:pointer;"/>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(name)}</div>
+          <div style="font-size:11px;color:var(--text3);">${escHtml(gradeLabel(s.grade))}${area}</div>
+        </div>
+      </label>`;
+  }).join('');
+
+  updateBusSelectedCount();
+}
+
+function toggleBusStudent(checkbox) {
+  if (checkbox.checked) _selectedStudentIds.add(checkbox.value);
+  else _selectedStudentIds.delete(checkbox.value);
+  updateBusSelectedCount();
+}
+
+function updateBusSelectedCount() {
+  const el = document.getElementById('bf-selected-count');
+  if (el) el.textContent = _selectedStudentIds.size;
+}
+
+function filterBusStudents(q) {
+  if (!_allStudentsForBus.length) return;
+  const term = q.trim().toLowerCase();
+  const filtered = term.length < 1
+    ? _allStudentsForBus
+    : _allStudentsForBus.filter(s => {
+        const name = (s.fullName || '').toLowerCase();
+        const nameEn = (s.fullNameEn || '').toLowerCase();
+        const area = (s.homeArea || '').toLowerCase();
+        return name.includes(term) || nameEn.includes(term) || area.includes(term);
+      });
+  renderBusStudentsList(filtered);
 }
 
 async function loadBusesForModal(selectId, selectedId) {
@@ -712,6 +1048,12 @@ function filterDrivers(type, btn) {
   loadDrivers(1);
 }
 
+// ── Grade helper ───────────────────────────────────────────────────────────
+function gradeLabel(grade) {
+  const key = 'stdGrade' + grade;
+  return (window.T?.[key]) || grade;
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 function updatePager(prefix, page, totalPages) {
   const prev = document.getElementById(`${prefix}-prev`);
@@ -732,13 +1074,16 @@ function getTripStatus(status) {
 }
 
 function getBusStatus(status) {
+  const isRtl = window.T?.isRtl !== false;
   const map = {
-    'OnRoute': { bg: '#F0FDF4', color: '#15803D', label: 'في الطريق 🟢' },
-    'Active': { bg: '#F0FDF4', color: '#15803D', label: 'نشط 🟢' },
-    'Idle': { bg: '#F1F5F9', color: '#475569', label: 'متوقف' },
-    'Maintenance': { bg: '#FEF2F2', color: '#B91C1C', label: 'صيانة ⚠️' }
+    'OnRoute':      { bg: '#F0FDF4', color: '#15803D', label: isRtl ? 'في الطريق 🟢' : 'On Route 🟢' },
+    'Active':       { bg: '#F0FDF4', color: '#15803D', label: isRtl ? 'نشط 🟢'        : 'Active 🟢' },
+    'Inactive':     { bg: '#F1F5F9', color: '#475569', label: isRtl ? 'غير نشط'        : 'Inactive' },
+    'Idle':         { bg: '#F1F5F9', color: '#475569', label: isRtl ? 'متوقف'          : 'Idle' },
+    'Maintenance':  { bg: '#FEF2F2', color: '#B91C1C', label: isRtl ? 'صيانة ⚠️'       : 'Maintenance ⚠️' },
+    'OutOfService': { bg: '#FEF2F2', color: '#B91C1C', label: isRtl ? 'خارج الخدمة'    : 'Out of Service' },
   };
-  return map[status] || { bg: '#F1F5F9', color: '#475569', label: status || 'غير محدد' };
+  return map[status] || { bg: '#F1F5F9', color: '#475569', label: status || (isRtl ? 'غير محدد' : 'Unknown') };
 }
 
 function getAlertSeverity(sev) {
@@ -881,7 +1226,10 @@ window.openChangePassword = openChangePassword;
 window.changePassword     = changePassword;
 window.openEdit        = openEdit;
 window.confirmDelete   = confirmDelete;
-window.saveTrip        = saveTrip;
+window.saveTrip           = saveTrip;
+window.saveBusSchedule    = saveBusSchedule;
+window.openBusScheduleModal   = openBusScheduleModal;
+window.triggerTripGeneration  = triggerTripGeneration;
 window.saveStudent     = saveStudent;
 window.saveBus         = saveBus;
 window.saveDriver      = saveDriver;
@@ -890,8 +1238,11 @@ window.ignoreAlert     = ignoreAlert;
 window.toggleSwitch    = toggleSwitch;
 window.filterStudents  = filterStudents;
 window.filterDrivers   = filterDrivers;
-window.loadStudents    = loadStudents;
-window.loadDrivers     = loadDrivers;
-window.loadTrips       = loadTrips;
-window.loadBuses       = loadBuses;
-window.loadAlerts      = loadAlerts;
+window.loadStudents       = loadStudents;
+window.loadDrivers        = loadDrivers;
+window.loadTrips          = loadTrips;
+window.loadBuses          = loadBuses;
+window.loadAlerts         = loadAlerts;
+window.openEditBus        = openEditBus;
+window.toggleBusStudent   = toggleBusStudent;
+window.filterBusStudents  = filterBusStudents;

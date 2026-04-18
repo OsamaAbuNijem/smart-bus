@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Trips.Commands.CreateTrip;
 using SmartBus.Application.Features.Trips.Commands.DeleteTrip;
+using SmartBus.Application.Features.Trips.Commands.SetBusSchedule;
 using SmartBus.Application.Features.Trips.Commands.UpdateTrip;
 using SmartBus.Application.Features.Trips.Commands.UpdateTripStatus;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
+using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
 using SmartBus.Domain.Enums;
+using SmartBus.Infrastructure.Jobs;
 
 namespace SmartBus.API.Controllers.v1;
 
@@ -55,6 +58,48 @@ public class TripsController : ControllerBase
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
 
+    /// <summary>
+    /// Manually trigger today's trip generation for both ذهاب and إياب.
+    /// Runs synchronously and bypasses the RepeatDays day-of-week filter
+    /// so every bus with a schedule gets trips regardless of today's weekday.
+    /// </summary>
+    [HttpPost("generate-today")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GenerateToday(
+        [FromServices] MorningTripGenerationJob morningJob,
+        [FromServices] ReturnTripGenerationJob returnJob,
+        CancellationToken cancellationToken)
+    {
+        var morningCreated = await morningJob.RunAsync(forceToday: true);
+        var returnCreated  = await returnJob.RunAsync(forceToday: true);
+        return Ok(new
+        {
+            message        = $"تم إنشاء {morningCreated} رحلة ذهاب و{returnCreated} رحلة إياب لليوم.",
+            morningCreated,
+            returnCreated
+        });
+    }
+
+    /// <summary>Get the ذهاب/إياب schedule for a specific bus.</summary>
+    [HttpGet("bus/{busId:guid}/schedule")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetBusSchedule(Guid busId, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetBusScheduleQuery(busId), cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>Set (create or update) the ذهاب/إياب schedule for a bus.</summary>
+    [HttpPost("bus/{busId:guid}/schedule")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> SetBusSchedule(Guid busId, [FromBody] BusScheduleRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new SetBusScheduleCommand(busId, request.MorningTime, request.ReturnTime, request.RepeatDays),
+            cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
+
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
@@ -65,4 +110,5 @@ public class TripsController : ControllerBase
 }
 
 public record UpdateStatusRequest(TripStatus Status, string? Notes);
-public record UpdateTripRequest(string Name, TripType Type, Guid BusId, Guid RouteId, DateTime ScheduledDeparture, byte RepeatDays, string? Notes);
+public record UpdateTripRequest(string Name, TripType Type, Guid BusId, Guid? RouteId, DateTime ScheduledDeparture, byte RepeatDays, string? Notes);
+public record BusScheduleRequest(string MorningTime, string ReturnTime, byte RepeatDays);

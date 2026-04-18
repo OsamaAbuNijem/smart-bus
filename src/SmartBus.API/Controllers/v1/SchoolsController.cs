@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,7 @@ using SmartBus.Application.Features.Schools.Commands.CreateSchool;
 using SmartBus.Application.Features.Schools.Commands.DeleteSchool;
 using SmartBus.Application.Features.Schools.Commands.UpdateSchool;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
+using SmartBus.Application.Features.Schools.Queries.GetMySchool;
 using SmartBus.Domain.Enums;
 
 namespace SmartBus.API.Controllers.v1;
@@ -23,6 +25,16 @@ public class SchoolsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
         => Ok(await _mediator.Send(new GetAllSchoolsQuery(pageNumber, pageSize), cancellationToken));
+
+    [HttpGet("current")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
+    public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        if (string.IsNullOrEmpty(email)) return Unauthorized();
+        var result = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateSchoolRequest request, CancellationToken cancellationToken)

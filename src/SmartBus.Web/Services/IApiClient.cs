@@ -2,6 +2,7 @@ using SmartBus.Application.Common.Models;
 using SmartBus.Application.Features.Alerts.Queries.GetAllAlerts;
 using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
+using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 
@@ -16,4 +17,5 @@ public interface IApiClient
     Task<PagedResult<StudentDto>?> GetStudentsAsync(int pageNumber = 1, int pageSize = 10);
     Task<PagedResult<DriverDto>?> GetDriversAsync(int pageNumber = 1, int pageSize = 10);
     Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null);
+    Task<SchoolDto?> GetMySchoolAsync();
 }

@@ -9,7 +9,7 @@ public record UpdateTripCommand(
     string Name,
     TripType Type,
     Guid BusId,
-    Guid RouteId,
+    Guid? RouteId,
     DateTime ScheduledDeparture,
     byte RepeatDays,
     string? Notes

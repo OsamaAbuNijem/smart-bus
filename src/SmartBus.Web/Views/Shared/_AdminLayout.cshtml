@@ -4,6 +4,8 @@
     var _culture        = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
     var _toggleCulture  = _isRtl ? "en" : "ar";
     var _returnUrl      = Context.Request.Path + Context.Request.QueryString;
+    var _schoolCity     = (string)(ViewBag.SchoolCity ?? string.Empty);
+    var _schoolName     = (string)(ViewBag.SchoolName ?? string.Empty);
 }
 <!DOCTYPE html>
 <html lang="@_culture" dir="@_dir">
@@ -12,6 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>@ViewData["Title"] - SmartBus</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root{
   --y:#FFD700; --yl:#FFFDE7; --yd:#B8960C;
@@ -253,8 +256,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
     </div>
   </div>
   <div class="sidebar-school">
-    <div class="school-av">ن</div>
-    <div><div class="school-name">مدرسة النور الدولية</div><div class="school-plan">خطة Premium</div></div>
+    <div class="school-av">@(_schoolName.Length > 0 ? _schoolName[0].ToString() : "S")</div>
+    <div>
+      <div class="school-name">@(_schoolName.Length > 0 ? _schoolName : "SmartBus School")</div>
+      <div class="school-plan" id="school-city-label">@(_schoolCity.Length > 0 ? _schoolCity : "")</div>
+    </div>
   </div>
   <div class="sidebar-nav">
     <div class="nav-section">@L["Nav_Main"]</div>
@@ -363,48 +369,68 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
   </div>
 </div>
 
-<!-- ══════ MODAL: TRIP ══════ -->
+<!-- ══════ MODAL: BUS SCHEDULE ══════ -->
 <div class="modal-overlay" id="modal-trip">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-header-title" id="trip-modal-title">إضافة رحلة جديدة</div>
+      <div class="modal-header-title">جدول رحلات الباص</div>
       <button class="modal-close-btn" onclick="closeModal('modal-trip')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">اسم الرحلة</label><input class="form-input" id="tf-name" placeholder="رحلة الصباح — ذهاب"/></div>
-        <div class="form-group"><label class="form-label">النوع</label>
-          <select class="form-select" id="tf-type"><option value="0">ذهاب</option><option value="1">إياب</option></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">الباص *</label>
-          <select class="form-select" id="tf-bus"><option value="">— اختر باصاً —</option></select>
-        </div>
-        <div class="form-group"><label class="form-label">المسار *</label>
-          <select class="form-select" id="tf-route"><option value="">— اختر مساراً —</option></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">السائق</label>
-          <select class="form-select" id="tf-driver"><option value="">— اختر سائقاً —</option></select>
-        </div>
-        <div class="form-group"><label class="form-label">وقت الانطلاق *</label><input class="form-input" id="tf-time" type="time" value="07:15"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">أيام التكرار</label>
-          <select class="form-select" id="tf-repeat"><option value="0">بدون تكرار</option><option value="62">الأحد — الخميس</option><option value="127">يومي</option></select>
-        </div>
-        <div class="form-group"></div>
-      </div>
+      <!-- Bus selector -->
       <div class="form-row full">
-        <div class="form-group"><label class="form-label">ملاحظات</label><input class="form-input" id="tf-notes" placeholder="ملاحظات إضافية اختيارية..."/></div>
+        <div class="form-group">
+          <label class="form-label">الباص *</label>
+          <select class="form-select" id="sch-bus"><option value="">— اختر باصاً —</option></select>
+        </div>
+      </div>
+
+      <!-- ذهاب -->
+      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:14px 16px;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:13px;color:#15803D;margin-bottom:10px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5" stroke-linecap="round" style="margin-left:6px;vertical-align:-2px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          ذهاب
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">وقت الانطلاق *</label>
+            <input class="form-input" id="sch-morning-time" type="time" value="07:15"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- إياب -->
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:13px;color:#1D4ED8;margin-bottom:10px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2.5" stroke-linecap="round" style="margin-left:6px;vertical-align:-2px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          إياب
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">وقت العودة *</label>
+            <input class="form-input" id="sch-return-time" type="time" value="14:00"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- أيام التكرار -->
+      <div class="form-group">
+        <label class="form-label">أيام التكرار *</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" class="sch-day" value="1"  style="accent-color:#3B82F6;width:15px;height:15px;"/> الأحد</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" class="sch-day" value="2"  style="accent-color:#3B82F6;width:15px;height:15px;"/> الاثنين</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" class="sch-day" value="4"  style="accent-color:#3B82F6;width:15px;height:15px;"/> الثلاثاء</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" class="sch-day" value="8"  style="accent-color:#3B82F6;width:15px;height:15px;"/> الأربعاء</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" class="sch-day" value="16" style="accent-color:#3B82F6;width:15px;height:15px;"/> الخميس</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" class="sch-day" value="32" style="accent-color:#3B82F6;width:15px;height:15px;"/> الجمعة</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" class="sch-day" value="64" style="accent-color:#3B82F6;width:15px;height:15px;"/> السبت</label>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-primary" onclick="saveTrip()">💾 حفظ الرحلة</button>
+      <button class="btn-primary" onclick="saveBusSchedule()">حفظ الجدول</button>
       <button class="btn-secondary" onclick="closeModal('modal-trip')">إلغاء</button>
     </div>
   </div>
@@ -421,50 +447,58 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
     </div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-group"><label class="form-label">@L["Std_Name"]</label><input class="form-input" id="sf-name" placeholder="أحمد محمد الخالدي"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_Name"]</label><input class="form-input" id="sf-name" placeholder="أحمد محمد الخالدي" dir="rtl"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_NameEn"]</label><input class="form-input" id="sf-name-en" placeholder="Ahmad Mohammad Al-Khalidi" dir="ltr"/></div>
+      </div>
+      <div class="form-row">
         <div class="form-group"><label class="form-label">@L["Std_Grade"]</label>
           <select class="form-input" id="sf-grade">
-            <option id="sf-g1">@L["Std_Grade1"]</option>
-            <option id="sf-g2">@L["Std_Grade2"]</option>
-            <option id="sf-g3">@L["Std_Grade3"]</option>
-            <option id="sf-g4">@L["Std_Grade4"]</option>
-            <option id="sf-g5">@L["Std_Grade5"]</option>
-            <option id="sf-g6">@L["Std_Grade6"]</option>
-            <option id="sf-g7">@L["Std_Grade7"]</option>
-            <option id="sf-g8">@L["Std_Grade8"]</option>
-            <option id="sf-g9">@L["Std_Grade9"]</option>
+            <option value="1" id="sf-g1">@L["Std_Grade1"]</option>
+            <option value="2" id="sf-g2">@L["Std_Grade2"]</option>
+            <option value="3" id="sf-g3">@L["Std_Grade3"]</option>
+            <option value="4" id="sf-g4">@L["Std_Grade4"]</option>
+            <option value="5" id="sf-g5">@L["Std_Grade5"]</option>
+            <option value="6" id="sf-g6">@L["Std_Grade6"]</option>
+            <option value="7" id="sf-g7">@L["Std_Grade7"]</option>
+            <option value="8" id="sf-g8">@L["Std_Grade8"]</option>
+            <option value="9" id="sf-g9">@L["Std_Grade9"]</option>
           </select>
         </div>
+        <div class="form-group"><label class="form-label">@L["Std_Building"]</label><input class="form-input" id="sf-building" placeholder="@L["Std_BuildingHint"]" dir="ltr"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">@L["Std_City"]</label>
-          <select class="form-input" id="sf-city">
-            <option value="">—</option>
-            <option value="Amman"    id="sf-city-amman">@L["City_Amman"]</option>
-            <option value="Zarqa"    id="sf-city-zarqa">@L["City_Zarqa"]</option>
-            <option value="Irbid"    id="sf-city-irbid">@L["City_Irbid"]</option>
-            <option value="Aqaba"    id="sf-city-aqaba">@L["City_Aqaba"]</option>
-            <option value="Salt"     id="sf-city-salt">@L["City_Salt"]</option>
-            <option value="Madaba"   id="sf-city-madaba">@L["City_Madaba"]</option>
-            <option value="Karak"    id="sf-city-karak">@L["City_Karak"]</option>
-            <option value="Jerash"   id="sf-city-jerash">@L["City_Jerash"]</option>
-            <option value="Ajloun"   id="sf-city-ajloun">@L["City_Ajloun"]</option>
-            <option value="Mafraq"   id="sf-city-mafraq">@L["City_Mafraq"]</option>
-            <option value="Tafilah"  id="sf-city-tafilah">@L["City_Tafilah"]</option>
-            <option value="Maan"     id="sf-city-maan">@L["City_Maan"]</option>
-            <option value="Russeifa" id="sf-city-russeifa">@L["City_Russeifa"]</option>
-            <option value="Ramtha"   id="sf-city-ramtha">@L["City_Ramtha"]</option>
-            <option value="WadiMusa" id="sf-city-wadimusa">@L["City_WadiMusa"]</option>
-          </select>
-        </div>
-        <div class="form-group"><label class="form-label">@L["Std_Address"]</label><input class="form-input" id="sf-address" placeholder="شارع المدينة، بناية 12"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_Parent"]</label><input class="form-input" id="sf-parent" placeholder="محمد الخالدي" dir="rtl"/></div>
+        <div class="form-group"><label class="form-label">@L["Std_ParentEn"]</label><input class="form-input" id="sf-parent-en" placeholder="Mohammad Al-Khalidi" dir="ltr"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">@L["Std_Parent"]</label><input class="form-input" id="sf-parent" placeholder="محمد الخالدي"/></div>
         <div class="form-group"><label class="form-label">@L["Std_Phone"]</label><input class="form-input" id="sf-phone" placeholder="+962 79 123 4567" dir="ltr"/></div>
       </div>
-      <div class="form-row full">
-        <div class="form-group"><label class="form-label">@L["Std_Notes"]</label><input class="form-input" id="sf-notes" placeholder="اختياري"/></div>
+      <!-- Map picker -->
+      <div class="form-row full" style="margin-top:4px;">
+        <div class="form-group" style="width:100%;">
+          <label class="form-label">@L["Std_MapTitle"]</label>
+          <div style="display:flex;gap:6px;margin-bottom:6px;">
+            <input class="form-input" id="sf-map-search" placeholder="@L["Std_MapSearch"]" style="flex:1;font-size:12px;" autocomplete="off"/>
+            <button type="button" id="sf-map-locate" title="موقعي الحالي" style="flex-shrink:0;width:36px;height:36px;border-radius:8px;border:1.5px solid var(--input-border);background:var(--card2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="locateStudentMap()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 4"/></svg>
+            </button>
+          </div>
+          <div id="sf-map-search-results" style="display:none;position:absolute;z-index:9999;background:var(--card);border:1px solid var(--border);border-radius:8px;width:calc(100% - 50px);max-height:160px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.3);font-size:12px;"></div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">@L["Std_MapHint"]</div>
+          <div id="sf-map" style="height:220px;border-radius:10px;overflow:hidden;border:1.5px solid var(--input-border);"></div>
+          <input type="hidden" id="sf-lat"/>
+          <input type="hidden" id="sf-lng"/>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+            <div>
+              <label class="form-label" style="font-size:11px;">@L["Std_MapArea"]</label>
+              <input class="form-input" id="sf-area" readonly placeholder="—" style="background:var(--card2);font-size:12px;"/>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px;">@L["Std_MapStreet"]</label>
+              <input class="form-input" id="sf-street" readonly placeholder="—" style="background:var(--card2);font-size:12px;"/>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -476,34 +510,76 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
 
 <!-- ══════ MODAL: BUS ══════ -->
 <div class="modal-overlay" id="modal-bus">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:600px;">
     <div class="modal-header">
-      <div class="modal-header-title" id="bus-modal-title">إضافة باص جديد</div>
+      <div class="modal-header-title" id="bus-modal-title">@(_isRtl ? "إضافة باص جديد" : "Add New Bus")</div>
       <button class="modal-close-btn" onclick="closeModal('modal-bus')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="modal-body">
+      <!-- Row 1: Plate + Capacity -->
       <div class="form-row">
-        <div class="form-group"><label class="form-label">رقم لوحة الباص</label><input class="form-input" id="bf-num" placeholder="مثال: 42-ABC"/></div>
-        <div class="form-group"><label class="form-label">الطاقة الاستيعابية</label><input class="form-input" id="bf-cap" type="number" placeholder="30"/></div>
+        <div class="form-group">
+          <label class="form-label">@(_isRtl ? "رقم الباص" : "Bus Number")</label>
+          <input class="form-input" id="bf-num" placeholder="@(_isRtl ? "مثال: 42-ABC" : "e.g. 42-ABC")" dir="ltr"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@(_isRtl ? "الطاقة الاستيعابية" : "Capacity")</label>
+          <input class="form-input" id="bf-cap" type="number" min="1" max="100" placeholder="30"/>
+        </div>
       </div>
-      <div class="form-row full">
-        <div class="form-group"><label class="form-label">الموديل والسنة</label><input class="form-input" id="bf-model" placeholder="مرسيدس سبرينتر 2024"/></div>
-      </div>
+      <!-- Row 2: Status -->
       <div class="form-row">
-        <div class="form-group"><label class="form-label">تاريخ آخر صيانة</label><input class="form-input" id="bf-maint" type="date"/></div>
-        <div class="form-group"><label class="form-label">الحالة</label>
-          <select class="form-select" id="bf-status">
-            <option value="Idle">متوقف</option><option value="OnRoute">نشط</option>
-            <option value="Maintenance">صيانة</option><option value="Active">جاهز</option>
+        <div class="form-group">
+          <label class="form-label">@(_isRtl ? "الحالة" : "Status")</label>
+          <select class="form-input" id="bf-status">
+            <option value="Inactive">@(_isRtl ? "غير نشط" : "Inactive")</option>
+            <option value="Active">@(_isRtl ? "نشط" : "Active")</option>
+            <option value="OnRoute">@(_isRtl ? "في الطريق" : "On Route")</option>
+            <option value="Maintenance">@(_isRtl ? "صيانة" : "Maintenance")</option>
+            <option value="OutOfService">@(_isRtl ? "خارج الخدمة" : "Out of Service")</option>
           </select>
+        </div>
+        <div class="form-group"></div>
+      </div>
+      <!-- Row 3: Driver + Assistant -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@(_isRtl ? "السائق" : "Driver")</label>
+          <select class="form-input" id="bf-driver">
+            <option value="">@(_isRtl ? "— اختر سائقاً —" : "— Select Driver —")</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@(_isRtl ? "المساعد" : "Assistant")</label>
+          <select class="form-input" id="bf-assistant">
+            <option value="">@(_isRtl ? "— اختر مساعداً —" : "— Select Assistant —")</option>
+          </select>
+        </div>
+      </div>
+      <!-- Students multi-select -->
+      <div class="form-group" style="margin-top:6px;">
+        <label class="form-label">@(_isRtl ? "الطلاب المسندون" : "Assigned Students")</label>
+        <div style="position:relative;">
+          <input class="form-input" id="bf-student-search"
+                 placeholder="@(_isRtl ? "ابحث باسم الطالب أو الحي..." : "Search by name or area...")"
+                 autocomplete="off" oninput="filterBusStudents(this.value)"/>
+        </div>
+        <div id="bf-students-list"
+             style="border:1.5px solid var(--border2);border-radius:10px;max-height:200px;overflow-y:auto;margin-top:6px;background:var(--bg);">
+          <div style="padding:16px;text-align:center;color:var(--text3);font-size:12px;" id="bf-students-loading">
+            @(_isRtl ? "جاري التحميل..." : "Loading...")
+          </div>
+        </div>
+        <div style="margin-top:5px;font-size:11px;color:var(--text3);">
+          <span id="bf-selected-count">0</span> @(_isRtl ? "طالب مختار" : "students selected")
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-primary" onclick="saveBus()">💾 حفظ الباص</button>
-      <button class="btn-secondary" onclick="closeModal('modal-bus')">إلغاء</button>
+      <button class="btn-primary" onclick="saveBus()">@(_isRtl ? "💾 حفظ الباص" : "💾 Save Bus")</button>
+      <button class="btn-secondary" onclick="closeModal('modal-bus')">@(_isRtl ? "إلغاء" : "Cancel")</button>
     </div>
   </div>
 </div>
@@ -650,6 +726,13 @@ window.T = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
     pageReports     = L["JS_PageReports"].Value,
     pageAlerts      = L["JS_PageAlerts"].Value,
     pageSettings    = L["JS_PageSettings"].Value,
+    stdMapSearch   = L["Std_MapSearch"].Value,
+    stdMapTitle    = L["Std_MapTitle"].Value,
+    stdMapHint     = L["Std_MapHint"].Value,
+    stdMapArea     = L["Std_MapArea"].Value,
+    stdMapStreet   = L["Std_MapStreet"].Value,
+    stdMapLoading  = L["Std_MapLoading"].Value,
+    stdMapNoResult = L["Std_MapNoResult"].Value,
     stdAddTitle  = L["Std_AddTitle"].Value,
     stdEditTitle = L["Std_EditTitle"].Value,
     stdGrade1    = L["Std_Grade1"].Value,
@@ -673,10 +756,13 @@ window.T = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
     driverEditTitle = L["Driver_EditTitle"].Value,
     driverTypeDriver = L["Driver_TypeDriver"].Value,
     driverTypeAssist = L["Driver_TypeAssist"].Value,
-    isRtl = _isRtl,
-    dir   = _dir,
+    isRtl      = _isRtl,
+    dir        = _dir,
+    schoolCity = _schoolCity,
+    schoolName = _schoolName,
 }));
 </script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="~/js/dashboard.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

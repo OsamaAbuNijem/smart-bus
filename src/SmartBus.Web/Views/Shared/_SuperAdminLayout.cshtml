@@ -459,9 +459,26 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
           <span class="form-err" id="err-sch-name">الاسم مطلوب</span>
         </div>
         <div class="form-group">
-          <label class="form-label">المدينة *</label>
-          <input type="text" id="sch-city" class="form-control" placeholder="الرياض"/>
-          <span class="form-err" id="err-sch-city">المدينة مطلوبة</span>
+          <label class="form-label">@L["Std_City"] *</label>
+          <select id="sch-city" class="form-control">
+            <option value="">—</option>
+            <option value="Amman">@L["City_Amman"]</option>
+            <option value="Zarqa">@L["City_Zarqa"]</option>
+            <option value="Irbid">@L["City_Irbid"]</option>
+            <option value="Aqaba">@L["City_Aqaba"]</option>
+            <option value="Salt">@L["City_Salt"]</option>
+            <option value="Madaba">@L["City_Madaba"]</option>
+            <option value="Karak">@L["City_Karak"]</option>
+            <option value="Jerash">@L["City_Jerash"]</option>
+            <option value="Ajloun">@L["City_Ajloun"]</option>
+            <option value="Mafraq">@L["City_Mafraq"]</option>
+            <option value="Tafilah">@L["City_Tafilah"]</option>
+            <option value="Maan">@L["City_Maan"]</option>
+            <option value="Russeifa">@L["City_Russeifa"]</option>
+            <option value="Ramtha">@L["City_Ramtha"]</option>
+            <option value="WadiMusa">@L["City_WadiMusa"]</option>
+          </select>
+          <span class="form-err" id="err-sch-city">@L["Std_City"]</span>
         </div>
       </div>
       <div class="form-row">

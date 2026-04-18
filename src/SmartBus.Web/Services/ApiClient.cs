@@ -5,6 +5,7 @@ using SmartBus.Application.Common.Models;
 using SmartBus.Application.Features.Alerts.Queries.GetAllAlerts;
 using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
+using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 
@@ -98,6 +99,15 @@ public class ApiClient : IApiClient
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<PagedResult<AlertDto>>(json, _jsonOptions);
+    }
+
+    public async Task<SchoolDto?> GetMySchoolAsync()
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetAsync("api/v1/schools/current");
+        if (!response.IsSuccessStatusCode) return null;
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<SchoolDto>(json, _jsonOptions);
     }
 
     private record LoginResult(string Token, string Email, IEnumerable<string> Roles, DateTime ExpiresAt);

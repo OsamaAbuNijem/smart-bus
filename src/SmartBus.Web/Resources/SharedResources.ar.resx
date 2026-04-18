@@ -44,7 +44,8 @@
   <!-- Student modal labels -->
   <data name="Std_AddTitle"     xml:space="preserve"><value>إضافة طالب جديد</value></data>
   <data name="Std_EditTitle"    xml:space="preserve"><value>تعديل بيانات طالب</value></data>
-  <data name="Std_Name"         xml:space="preserve"><value>اسم الطالب كاملاً</value></data>
+  <data name="Std_Name"         xml:space="preserve"><value>اسم الطالب بالعربية</value></data>
+  <data name="Std_NameEn"       xml:space="preserve"><value>اسم الطالب بالإنجليزية</value></data>
   <data name="Std_Grade"        xml:space="preserve"><value>الصف الدراسي</value></data>
   <data name="Std_Grade1"       xml:space="preserve"><value>الصف الأول</value></data>
   <data name="Std_Grade2"       xml:space="preserve"><value>الصف الثاني</value></data>
@@ -72,9 +73,18 @@
   <data name="City_Ramtha"     xml:space="preserve"><value>الرمثا</value></data>
   <data name="City_WadiMusa"   xml:space="preserve"><value>وادي موسى</value></data>
   <data name="Std_Address"      xml:space="preserve"><value>العنوان</value></data>
-  <data name="Std_Parent"       xml:space="preserve"><value>اسم ولي الأمر</value></data>
+  <data name="Std_Parent"       xml:space="preserve"><value>اسم ولي الأمر بالعربية</value></data>
+  <data name="Std_ParentEn"     xml:space="preserve"><value>اسم ولي الأمر بالإنجليزية</value></data>
+  <data name="Std_Building"     xml:space="preserve"><value>رقم البناء</value></data>
+  <data name="Std_BuildingHint" xml:space="preserve"><value>مثال: 12 / B</value></data>
+  <data name="Std_MapSearch"    xml:space="preserve"><value>ابحث عن موقع...</value></data>
   <data name="Std_Phone"        xml:space="preserve"><value>رقم الهاتف</value></data>
-  <data name="Std_Notes"        xml:space="preserve"><value>ملاحظات طبية أو خاصة</value></data>
+  <data name="Std_MapTitle"     xml:space="preserve"><value>موقع المنزل على الخريطة</value></data>
+  <data name="Std_MapHint"      xml:space="preserve"><value>انقر على الخريطة لتحديد موقع المنزل</value></data>
+  <data name="Std_MapArea"      xml:space="preserve"><value>الحي / المنطقة</value></data>
+  <data name="Std_MapStreet"    xml:space="preserve"><value>الشارع</value></data>
+  <data name="Std_MapLoading"   xml:space="preserve"><value>جاري تحديد العنوان...</value></data>
+  <data name="Std_MapNoResult"  xml:space="preserve"><value>تعذّر تحديد العنوان</value></data>
   <data name="Std_SaveBtn"      xml:space="preserve"><value>💾 حفظ الطالب</value></data>
   <data name="Std_Cancel"       xml:space="preserve"><value>إلغاء</value></data>
 

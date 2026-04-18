@@ -7,10 +7,13 @@ public record GetAllTripsQuery(int PageNumber = 1, int PageSize = 10) : IRequest
 
 public record TripDto(
     Guid Id,
+    Guid BusId,
     string BusPlateNumber,
-    string RouteName,
+    string? RouteName,
+    string TripType,
     DateTime ScheduledDeparture,
     DateTime? ActualDeparture,
     DateTime? ActualArrival,
-    string Status
+    string Status,
+    byte RepeatDays
 );

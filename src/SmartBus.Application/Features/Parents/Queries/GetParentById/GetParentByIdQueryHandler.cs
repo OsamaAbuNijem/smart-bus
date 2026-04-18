@@ -25,9 +25,11 @@ public class GetParentByIdQueryHandler : IRequestHandler<GetParentByIdQuery, Res
         var dto = new ParentDetailDto(
             parent.Id, parent.FullName, parent.PhoneNumber,
             parent.Children.Select(c => new StudentDto(
-                c.Id, c.FullName, c.Grade, c.Class,
-                c.ParentName, c.ParentPhone,
-                c.Route?.Name, c.CreatedAt)).ToList(),
+                c.Id, c.FullName, c.FullNameEn, c.Grade, c.Class,
+                c.ParentName, c.ParentNameEn, c.ParentPhone,
+                c.Route?.Name,
+                c.Latitude, c.Longitude, c.HomeArea, c.HomeStreet, c.HomeBuildingNumber,
+                c.CreatedAt)).ToList(),
             parent.CreatedAt);
 
         return Result<ParentDetailDto>.Success(dto);

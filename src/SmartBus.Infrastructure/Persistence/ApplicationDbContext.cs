@@ -27,6 +27,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
     public DbSet<StudentAllergy> StudentAllergies => Set<StudentAllergy>();
     public DbSet<School> Schools => Set<School>();
+    public DbSet<BusSchedule> BusSchedules => Set<BusSchedule>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -51,12 +52,34 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<EmergencyContact>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<StudentAllergy>().HasQueryFilter(a => !a.IsDeleted);
         builder.Entity<School>().HasQueryFilter(s => !s.IsDeleted);
+        builder.Entity<BusSchedule>().HasQueryFilter(s => !s.IsDeleted);
 
-        // Bus → Assistant: Bus owns the FK (AssistantId)
+        // One schedule per bus
+        builder.Entity<BusSchedule>()
+            .HasIndex(s => s.BusId)
+            .IsUnique();
+
+        // Bus → Driver (assistant role — explicit because two FKs point to Driver)
+        builder.Entity<Bus>()
+            .HasOne(b => b.AssistantDriver)
+            .WithMany()
+            .HasForeignKey(b => b.AssistantDriverId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // Bus → Assistant (legacy)
         builder.Entity<Bus>()
             .HasOne(b => b.Assistant)
             .WithOne(a => a.Bus)
             .HasForeignKey<Bus>(b => b.AssistantId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // Student → Bus assignment
+        builder.Entity<Student>()
+            .HasOne(s => s.AssignedBus)
+            .WithMany()
+            .HasForeignKey(s => s.BusId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
 

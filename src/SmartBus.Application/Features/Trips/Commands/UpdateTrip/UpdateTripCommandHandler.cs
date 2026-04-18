@@ -18,9 +18,6 @@ public class UpdateTripCommandHandler : IRequestHandler<UpdateTripCommand, Resul
         var bus = await _unitOfWork.Buses.GetByIdAsync(request.BusId, cancellationToken);
         if (bus is null) return Result.Failure("Bus not found.");
 
-        var route = await _unitOfWork.Routes.GetByIdAsync(request.RouteId, cancellationToken);
-        if (route is null) return Result.Failure("Route not found.");
-
         trip.Name = request.Name;
         trip.Type = request.Type;
         trip.BusId = request.BusId;

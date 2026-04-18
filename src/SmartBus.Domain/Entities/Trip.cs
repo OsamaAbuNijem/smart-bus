@@ -10,8 +10,8 @@ public class Trip : BaseEntity
     public TripType Type { get; set; }
     public Guid BusId { get; set; }
     public Bus Bus { get; set; } = default!;
-    public Guid RouteId { get; set; }
-    public Route Route { get; set; } = default!;
+    public Guid? RouteId { get; set; }
+    public Route? Route { get; set; }
     public DateTime ScheduledDeparture { get; set; }
     public DateTime? ActualDeparture { get; set; }
     public DateTime? ActualArrival { get; set; }
@@ -21,6 +21,12 @@ public class Trip : BaseEntity
     public byte RepeatDays { get; set; }
 
     public string? Notes { get; set; }
+
+    /// <summary>
+    /// True = recurring schedule template (set by admin via bus schedule modal).
+    /// False = a concrete daily trip instance created by the generation job.
+    /// </summary>
+    public bool IsTemplate { get; set; } = false;
 
     public ICollection<StudentTrip> StudentTrips { get; set; } = new List<StudentTrip>();
     public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();

@@ -52,9 +52,8 @@ try
     {
         app.UseExceptionHandler("/Home/Error");
         app.UseHsts();
+        app.UseHttpsRedirection();
     }
-
-    app.UseHttpsRedirection();
     app.UseStaticFiles();
     app.UseSerilogRequestLogging();
     app.UseRouting();
@@ -75,6 +74,18 @@ try
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Account}/{action=Login}/{id?}");
+
+    // Redirect /hangfire (and any sub-paths) to the API project's Hangfire dashboard
+    app.MapGet("/hangfire", (IConfiguration cfg) =>
+    {
+        var apiBase = cfg["ApiBaseUrl"]?.TrimEnd('/') ?? "http://localhost:8083";
+        return Results.Redirect($"{apiBase}/hangfire", permanent: false);
+    });
+    app.MapGet("/hangfire/{**path}", (string path, IConfiguration cfg) =>
+    {
+        var apiBase = cfg["ApiBaseUrl"]?.TrimEnd('/') ?? "http://localhost:8083";
+        return Results.Redirect($"{apiBase}/hangfire/{path}", permanent: false);
+    });
 
     await app.RunAsync();
 }

@@ -15,6 +15,9 @@ public static class DbSeeder
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         var db          = services.GetRequiredService<ApplicationDbContext>();
 
+        // Apply any pending migrations automatically
+        await db.Database.MigrateAsync();
+
         // ── Roles ──────────────────────────────────────────────────────────
         string[] roles = ["SuperAdmin", "Admin", "Driver", "Parent", "Assistant"];
         foreach (var role in roles)

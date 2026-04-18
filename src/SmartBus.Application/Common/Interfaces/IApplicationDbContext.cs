@@ -22,6 +22,7 @@ public interface IApplicationDbContext
     DbSet<EmergencyContact> EmergencyContacts { get; }
     DbSet<StudentAllergy> StudentAllergies { get; }
     DbSet<School> Schools { get; }
+    DbSet<BusSchedule> BusSchedules { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

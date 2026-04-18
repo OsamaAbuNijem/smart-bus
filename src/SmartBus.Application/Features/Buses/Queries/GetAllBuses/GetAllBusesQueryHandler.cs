@@ -25,24 +25,34 @@ public class GetAllBusesQueryHandler : IRequestHandler<GetAllBusesQuery, PagedRe
         var query = _context.Buses
             .Where(b => !b.IsDeleted)
             .Include(b => b.Driver)
+            .Include(b => b.AssistantDriver)
             .Include(b => b.LastLocation);
 
         var totalCount = await query.CountAsync(cancellationToken);
-        var buses = await query
+
+        var busEntities = await query
             .OrderByDescending(b => b.CreatedAt)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
-            .Select(b => new BusDto(
-                b.Id,
-                b.PlateNumber,
-                b.Model,
-                b.Capacity,
-                b.Status.ToString(),
-                b.Driver != null ? b.Driver.FullName : null,
-                b.LastLocation != null ? b.LastLocation.Latitude : null,
-                b.LastLocation != null ? b.LastLocation.Longitude : null,
-                b.CreatedAt))
             .ToListAsync(cancellationToken);
+
+        var busIds = busEntities.Select(b => b.Id).ToList();
+        var studentsByBus = await _context.Students
+            .Where(s => !s.IsDeleted && s.BusId != null && busIds.Contains(s.BusId!.Value))
+            .GroupBy(s => s.BusId!.Value)
+            .Select(g => new { BusId = g.Key, Ids = g.Select(s => s.Id).ToList(), Count = g.Count() })
+            .ToListAsync(cancellationToken);
+
+        var buses = busEntities.Select(b => {
+            var sg = studentsByBus.FirstOrDefault(x => x.BusId == b.Id);
+            return new BusDto(
+                b.Id, b.PlateNumber, b.Capacity, b.Status.ToString(),
+                b.DriverId, b.Driver?.FullName,
+                b.AssistantDriverId, b.AssistantDriver?.FullName,
+                sg?.Count ?? 0, (IReadOnlyList<Guid>)(sg?.Ids ?? new List<Guid>()),
+                b.LastLocation?.Latitude, b.LastLocation?.Longitude,
+                b.CreatedAt);
+        }).ToList();
 
         var result = PagedResult<BusDto>.Create(buses, totalCount, request.PageNumber, request.PageSize);
         await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(2), cancellationToken);

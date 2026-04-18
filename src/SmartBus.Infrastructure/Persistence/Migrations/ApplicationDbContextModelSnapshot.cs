@@ -333,6 +333,9 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AssistantDriverId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("AssistantId")
                         .HasColumnType("uniqueidentifier");
 
@@ -358,7 +361,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Model")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PlateNumber")
@@ -372,6 +374,8 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssistantDriverId");
 
                     b.HasIndex("AssistantId")
                         .IsUnique()
@@ -422,6 +426,41 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.HasIndex("BusId");
 
                     b.ToTable("BusLocations");
+                });
+
+            modelBuilder.Entity("SmartBus.Domain.Entities.BusSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("MorningTime")
+                        .HasColumnType("time");
+
+                    b.Property<byte>("RepeatDays")
+                        .HasColumnType("tinyint");
+
+                    b.Property<TimeOnly>("ReturnTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusId")
+                        .IsUnique();
+
+                    b.ToTable("BusSchedules");
                 });
 
             modelBuilder.Entity("SmartBus.Domain.Entities.Driver", b =>
@@ -720,6 +759,9 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("BusId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Class")
                         .HasColumnType("nvarchar(max)");
 
@@ -733,18 +775,39 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FullNameEn")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Grade")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("HomeArea")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomeBuildingNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomeStreet")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ParentName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParentNameEn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ParentPhone")
@@ -765,6 +828,8 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BusId");
 
                     b.HasIndex("ParentId");
 
@@ -865,6 +930,9 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsTemplate")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -875,7 +943,7 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.Property<byte>("RepeatDays")
                         .HasColumnType("tinyint");
 
-                    b.Property<Guid>("RouteId")
+                    b.Property<Guid?>("RouteId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ScheduledDeparture")
@@ -1054,6 +1122,11 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("SmartBus.Domain.Entities.Bus", b =>
                 {
+                    b.HasOne("SmartBus.Domain.Entities.Driver", "AssistantDriver")
+                        .WithMany()
+                        .HasForeignKey("AssistantDriverId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("SmartBus.Domain.Entities.Assistant", "Assistant")
                         .WithOne("Bus")
                         .HasForeignKey("SmartBus.Domain.Entities.Bus", "AssistantId")
@@ -1070,6 +1143,8 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.Navigation("Assistant");
 
+                    b.Navigation("AssistantDriver");
+
                     b.Navigation("Driver");
 
                     b.Navigation("LastLocation");
@@ -1079,6 +1154,17 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("SmartBus.Domain.Entities.Bus", "Bus")
                         .WithMany("BusLocations")
+                        .HasForeignKey("BusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bus");
+                });
+
+            modelBuilder.Entity("SmartBus.Domain.Entities.BusSchedule", b =>
+                {
+                    b.HasOne("SmartBus.Domain.Entities.Bus", "Bus")
+                        .WithMany()
                         .HasForeignKey("BusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1110,6 +1196,11 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("SmartBus.Domain.Entities.Student", b =>
                 {
+                    b.HasOne("SmartBus.Domain.Entities.Bus", "AssignedBus")
+                        .WithMany()
+                        .HasForeignKey("BusId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("SmartBus.Domain.Entities.Parent", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
@@ -1121,6 +1212,8 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.HasOne("SmartBus.Domain.Entities.Route", "Route")
                         .WithMany()
                         .HasForeignKey("RouteId");
+
+                    b.Navigation("AssignedBus");
 
                     b.Navigation("Parent");
 
@@ -1169,9 +1262,7 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.HasOne("SmartBus.Domain.Entities.Route", "Route")
                         .WithMany("Trips")
-                        .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RouteId");
 
                     b.Navigation("Bus");
 

@@ -5,6 +5,7 @@ namespace SmartBus.Domain.Entities;
 public class Student : BaseEntity
 {
     public string FullName { get; set; } = default!;
+    public string? FullNameEn { get; set; }
     public string SchoolId { get; set; } = default!;
     public string Grade { get; set; } = default!;
     public string? Class { get; set; }
@@ -17,6 +18,7 @@ public class Student : BaseEntity
 
     // Kept for backward-compat / denormalized quick access
     public string ParentName { get; set; } = default!;
+    public string? ParentNameEn { get; set; }
     public string ParentPhone { get; set; } = default!;
 
     // Route & pickup
@@ -24,6 +26,17 @@ public class Student : BaseEntity
     public Route? Route { get; set; }
     public Guid? PickupStopId { get; set; }
     public Stop? PickupStop { get; set; }
+
+    // Bus assignment
+    public Guid? BusId { get; set; }
+    public Bus? AssignedBus { get; set; }
+
+    // Home location (from map picker)
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public string? HomeArea { get; set; }
+    public string? HomeStreet { get; set; }
+    public string? HomeBuildingNumber { get; set; }
 
     // Medical & contacts
     public ICollection<StudentAllergy> Allergies { get; set; } = new List<StudentAllergy>();

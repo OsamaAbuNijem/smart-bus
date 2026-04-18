@@ -126,7 +126,9 @@ try
         });
     }
 
-    app.UseHttpsRedirection();
+    if (!app.Environment.IsDevelopment())
+        app.UseHttpsRedirection();
+
     app.UseCors("SmartBusPolicy");
 
     // Honour Accept-Language header forwarded by the Web proxy
@@ -161,6 +163,22 @@ try
         "update-inactive-buses",
         job => job.UpdateInactiveBusStatusAsync(),
         Cron.Minutely);
+
+    // Morning trip generation — runs at 12:00 AM daily (configurable).
+    // Override: "Jobs": { "MorningTripCron": "0 3 * * *" }
+    var morningCron = app.Configuration["Jobs:MorningTripCron"] ?? "0 0 * * *";
+    RecurringJob.AddOrUpdate<SmartBus.Infrastructure.Jobs.MorningTripGenerationJob>(
+        "generate-morning-trips",
+        job => job.ExecuteAsync(false),
+        morningCron);
+
+    // Return trip generation — runs at 12:05 AM daily (configurable).
+    // Override: "Jobs": { "ReturnTripCron": "5 0 * * *" }
+    var returnCron = app.Configuration["Jobs:ReturnTripCron"] ?? "5 0 * * *";
+    RecurringJob.AddOrUpdate<SmartBus.Infrastructure.Jobs.ReturnTripGenerationJob>(
+        "generate-return-trips",
+        job => job.ExecuteAsync(false),
+        returnCron);
 
     await app.RunAsync();
 }

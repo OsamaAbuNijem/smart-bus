@@ -5,7 +5,9 @@ namespace SmartBus.Application.Features.Buses.Commands.CreateBus;
 
 public record CreateBusCommand(
     string PlateNumber,
-    string Model,
     int Capacity,
-    Guid? DriverId
+    string Status,
+    Guid? DriverId,
+    Guid? AssistantDriverId,
+    IEnumerable<Guid> StudentIds
 ) : IRequest<Result<Guid>>;

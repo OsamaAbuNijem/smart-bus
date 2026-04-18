@@ -26,9 +26,10 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(s => new StudentDto(
-                s.Id, s.FullName, s.Grade, s.Class,
-                s.ParentName, s.ParentPhone,
+                s.Id, s.FullName, s.FullNameEn, s.Grade, s.Class,
+                s.ParentName, s.ParentNameEn, s.ParentPhone,
                 s.Route != null ? s.Route.Name : null,
+                s.Latitude, s.Longitude, s.HomeArea, s.HomeStreet, s.HomeBuildingNumber,
                 s.CreatedAt))
             .ToListAsync(cancellationToken);
 
