@@ -436,6 +436,26 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);displ
   </div>
 </div>
 
+<!-- ══════ MODAL: TRIP STUDENTS ══════ -->
+<div class="modal-overlay" id="modal-trip-students">
+  <div class="modal-box" style="max-width:680px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-header-title" id="trip-students-title">طلاب الرحلة</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="trip-students-sub"></div>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal('modal-trip-students')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div id="trip-students-body" style="max-height:420px;overflow-y:auto;">
+        <div style="padding:30px;text-align:center;color:var(--text3);">جاري التحميل...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══════ MODAL: STUDENT ══════ -->
 <div class="modal-overlay" id="modal-student">
   <div class="modal-box">

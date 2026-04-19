@@ -164,21 +164,14 @@ try
         job => job.UpdateInactiveBusStatusAsync(),
         Cron.Minutely);
 
-    // Morning trip generation — runs at 12:00 AM daily (configurable).
-    // Override: "Jobs": { "MorningTripCron": "0 3 * * *" }
-    var morningCron = app.Configuration["Jobs:MorningTripCron"] ?? "0 0 * * *";
-    RecurringJob.AddOrUpdate<SmartBus.Infrastructure.Jobs.MorningTripGenerationJob>(
-        "generate-morning-trips",
+    // Daily trip generation — runs at 12:05 AM (configurable).
+    // Creates both ذهاب and إياب trips for every bus whose schedule matches today.
+    // Override: "Jobs": { "TripGenerationCron": "5 3 * * *" }
+    var tripCron = app.Configuration["Jobs:TripGenerationCron"] ?? "5 0 * * *";
+    RecurringJob.AddOrUpdate<SmartBus.Infrastructure.Jobs.TripGenerationJob>(
+        "generate-daily-trips",
         job => job.ExecuteAsync(false),
-        morningCron);
-
-    // Return trip generation — runs at 12:05 AM daily (configurable).
-    // Override: "Jobs": { "ReturnTripCron": "5 0 * * *" }
-    var returnCron = app.Configuration["Jobs:ReturnTripCron"] ?? "5 0 * * *";
-    RecurringJob.AddOrUpdate<SmartBus.Infrastructure.Jobs.ReturnTripGenerationJob>(
-        "generate-return-trips",
-        job => job.ExecuteAsync(false),
-        returnCron);
+        tripCron);
 
     await app.RunAsync();
 }

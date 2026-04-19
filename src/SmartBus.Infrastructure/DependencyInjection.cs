@@ -110,8 +110,7 @@ public static class DependencyInjection
 
         services.AddHangfireServer();
         services.AddScoped<BusTrackingCleanupJob>();
-        services.AddScoped<MorningTripGenerationJob>();
-        services.AddScoped<ReturnTripGenerationJob>();
+        services.AddScoped<TripGenerationJob>();
 
         // Note: ISignalRNotificationService is registered in the API layer (needs Hub type)
 

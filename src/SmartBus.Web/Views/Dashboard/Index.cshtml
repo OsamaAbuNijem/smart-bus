@@ -187,18 +187,72 @@
 
 <!-- ══ TRIPS PAGE ══ -->
 <div class="page" id="page-trips">
-  <div class="filter-bar">
-    <button class="add-btn" onclick="openBusScheduleModal(null)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>جدول باص
+  <!-- Filter strip -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;flex-wrap:wrap;gap:10px;">
+    <!-- Search by name -->
+    <div style="position:relative;flex:1;min-width:200px;max-width:300px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"
+           style="position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input id="trip-filter-name" type="text" placeholder="بحث بالسائق أو المساعد..."
+             style="width:100%;padding:7px 34px 7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:var(--bg);color:var(--text1);transition:border-color .2s;"
+             onfocus="this.style.borderColor='#3B82F6'" onblur="this.style.borderColor=''"
+             oninput="debouncedTripsFilter()" />
+    </div>
+    <!-- Divider -->
+    <div style="width:1px;height:28px;background:var(--border);flex-shrink:0;"></div>
+    <!-- Date -->
+    <div style="display:flex;align-items:center;gap:6px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <input id="trip-filter-date" type="date"
+             style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:var(--bg);color:var(--text1);transition:border-color .2s;"
+             onfocus="this.style.borderColor='#3B82F6'" onblur="this.style.borderColor=''"
+             onchange="loadTrips(1)" />
+    </div>
+    <!-- Divider -->
+    <div style="width:1px;height:28px;background:var(--border);flex-shrink:0;"></div>
+    <!-- Status -->
+    <div style="display:flex;align-items:center;gap:6px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <select id="trip-filter-status"
+              style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:var(--bg);color:var(--text1);cursor:pointer;transition:border-color .2s;"
+              onfocus="this.style.borderColor='#3B82F6'" onblur="this.style.borderColor=''"
+              onchange="loadTrips(1)">
+        <option value="">كل الحالات</option>
+        <option value="Scheduled">قادمة</option>
+        <option value="InProgress">جارية</option>
+        <option value="Completed">مكتملة</option>
+        <option value="Delayed">متأخرة</option>
+        <option value="Cancelled">ملغاة</option>
+      </select>
+    </div>
+    <!-- Clear -->
+    <button onclick="clearTripsFilter()"
+            style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;"
+            onmouseenter="this.style.background='var(--bg)';this.style.color='var(--text1)'"
+            onmouseleave="this.style.background='transparent';this.style.color='var(--text2)'">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      مسح الفلاتر
     </button>
-    <button class="filter-btn" onclick="triggerTripGeneration()" style="display:flex;align-items:center;gap:6px;" title="إنشاء رحلات اليوم يدوياً">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>تشغيل الجدول الآن
+    <!-- Spacer -->
+    <div style="flex:1;"></div>
+    <!-- Generate button -->
+    <button onclick="triggerTripGeneration()"
+            style="display:flex;align-items:center;gap:6px;padding:7px 16px;background:#111;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;"
+            onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      تشغيل الجدول الآن
     </button>
   </div>
   <div class="card">
     <table class="table">
       <thead>
-        <tr><th>الباص</th><th>النوع</th><th>التاريخ</th><th>وقت الانطلاق</th><th>الحالة</th><th></th></tr>
+        <tr><th>السائق</th><th>المساعد</th><th>الباص</th><th>النوع</th><th>التاريخ</th><th>وقت الانطلاق</th><th>الحالة</th><th></th></tr>
       </thead>
       <tbody id="trips-tbody">
         <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">جاري تحميل البيانات...</td></tr>
@@ -219,9 +273,6 @@
   <div class="filter-bar">
     <button class="add-btn" onclick="openEdit('bus', null)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>إضافة باص
-    </button>
-    <button class="filter-btn" onclick="openBusScheduleModal(null, null)" style="display:flex;align-items:center;gap:6px;color:#7C3AED;font-weight:700;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>جدول باص
     </button>
   </div>
   <div class="card">

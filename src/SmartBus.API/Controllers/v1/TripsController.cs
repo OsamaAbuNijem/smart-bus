@@ -7,8 +7,10 @@ using SmartBus.Application.Features.Trips.Commands.DeleteTrip;
 using SmartBus.Application.Features.Trips.Commands.SetBusSchedule;
 using SmartBus.Application.Features.Trips.Commands.UpdateTrip;
 using SmartBus.Application.Features.Trips.Commands.UpdateTripStatus;
+using SmartBus.Application.Features.Trips.Queries.GetAllBusSchedules;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
+using SmartBus.Application.Features.Trips.Queries.GetTripStudents;
 using SmartBus.Domain.Enums;
 using SmartBus.Infrastructure.Jobs;
 
@@ -26,9 +28,18 @@ public class TripsController : ControllerBase
         => _mediator = mediator;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? personName = null,
+        [FromQuery] string? date = null,
+        [FromQuery] string? status = null,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetAllTripsQuery(pageNumber, pageSize), cancellationToken);
+        DateOnly? parsedDate = DateOnly.TryParse(date, out var d) ? d : null;
+        var result = await _mediator.Send(
+            new GetAllTripsQuery(pageNumber, pageSize, personName, parsedDate, status),
+            cancellationToken);
         return Ok(result);
     }
 
@@ -66,18 +77,25 @@ public class TripsController : ControllerBase
     [HttpPost("generate-today")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GenerateToday(
-        [FromServices] MorningTripGenerationJob morningJob,
-        [FromServices] ReturnTripGenerationJob returnJob,
+        [FromServices] TripGenerationJob tripJob,
         CancellationToken cancellationToken)
     {
-        var morningCreated = await morningJob.RunAsync(forceToday: true);
-        var returnCreated  = await returnJob.RunAsync(forceToday: true);
+        var created = await tripJob.RunAsync(forceToday: true);
         return Ok(new
         {
-            message        = $"تم إنشاء {morningCreated} رحلة ذهاب و{returnCreated} رحلة إياب لليوم.",
-            morningCreated,
-            returnCreated
+            message = created > 0
+                ? $"تم إنشاء {created} رحلة لليوم."
+                : "جميع رحلات اليوم موجودة مسبقاً أو لا توجد جداول محددة.",
+            created
         });
+    }
+
+    /// <summary>Get all saved bus schedules (used by the buses grid to show schedule status).</summary>
+    [HttpGet("schedules")]
+    public async Task<IActionResult> GetAllSchedules(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetAllBusSchedulesQuery(), cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
     }
 
     /// <summary>Get the ذهاب/إياب schedule for a specific bus.</summary>
@@ -96,6 +114,36 @@ public class TripsController : ControllerBase
     {
         var result = await _mediator.Send(
             new SetBusScheduleCommand(busId, request.MorningTime, request.ReturnTime, request.RepeatDays),
+            cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>Get students (with trip details) for a specific trip.</summary>
+    [HttpGet("{id:guid}/students")]
+    public async Task<IActionResult> GetStudents(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetTripStudentsQuery(id), cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>Mark a trip as In Progress (sets ActualDeparture to now).</summary>
+    [HttpPost("{id:guid}/start")]
+    [Authorize(Roles = "Admin,Driver")]
+    public async Task<IActionResult> Start(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new UpdateTripStatusCommand(id, Domain.Enums.TripStatus.InProgress),
+            cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>Mark a trip as Completed (sets ActualArrival to now).</summary>
+    [HttpPost("{id:guid}/complete")]
+    [Authorize(Roles = "Admin,Driver")]
+    public async Task<IActionResult> Complete(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new UpdateTripStatusCommand(id, Domain.Enums.TripStatus.Completed),
             cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }

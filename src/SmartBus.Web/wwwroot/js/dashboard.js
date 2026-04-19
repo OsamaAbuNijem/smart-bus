@@ -106,6 +106,17 @@ async function apiPut(path, body) {
   } catch { return { ok: false, data: null }; }
 }
 
+async function apiPatch(path, body) {
+  try {
+    const res = await fetch('/api-proxy' + path, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify(body)
+    });
+    return { ok: res.ok, data: await res.json().catch(() => null) };
+  } catch { return { ok: false, data: null }; }
+}
+
 // ── Dashboard ──────────────────────────────────────────────────────────────
 async function loadDashboard() {
   // Load buses for map
@@ -361,10 +372,38 @@ function repeatDaysLabel(mask) {
   return days.join('، ');
 }
 
+function getTripsFilterParams() {
+  const name   = (document.getElementById('trip-filter-name')?.value   || '').trim();
+  const date   = document.getElementById('trip-filter-date')?.value    || '';
+  const status = document.getElementById('trip-filter-status')?.value  || '';
+  const params = new URLSearchParams();
+  if (name)   params.set('personName', name);
+  if (date)   params.set('date', date);
+  if (status) params.set('status', status);
+  return params.toString() ? '&' + params.toString() : '';
+}
+
+function clearTripsFilter() {
+  const nameEl   = document.getElementById('trip-filter-name');
+  const dateEl   = document.getElementById('trip-filter-date');
+  const statusEl = document.getElementById('trip-filter-status');
+  if (nameEl)   nameEl.value   = '';
+  if (dateEl)   dateEl.value   = '';
+  if (statusEl) statusEl.value = '';
+  loadTrips(1);
+}
+
+let _tripsFilterTimer = null;
+function debouncedTripsFilter() {
+  clearTimeout(_tripsFilterTimer);
+  _tripsFilterTimer = setTimeout(() => loadTrips(1), 350);
+}
+
 async function loadTrips(page) {
   if (page < 1 || page > tripsTotalPages) return;
   tripsPage = page;
-  const data = await apiGet(`/trips?pageNumber=${page}&pageSize=10`);
+  const filters = getTripsFilterParams();
+  const data = await apiGet(`/trips?pageNumber=${page}&pageSize=10${filters}`);
   const tbody = document.getElementById('trips-tbody');
   const info = document.getElementById('trips-pager-info');
   if (!data || !tbody) return;
@@ -372,17 +411,23 @@ async function loadTrips(page) {
   if (info) info.textContent = `عرض ${data.items.length} من ${data.totalCount} رحلة`;
   updatePager('trips', page, tripsTotalPages);
   if (!data.items.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">لا توجد رحلات اليوم. تأكد من تحديد جدول لكل باص (زر الجدول في صفحة الباصات) ثم اضغط "تشغيل الجدول الآن".</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3);">لا توجد رحلات تطابق البحث. تأكد من تحديد جدول لكل باص (زر الجدول في صفحة الباصات) ثم اضغط "تشغيل الجدول الآن".</td></tr>';
     return;
   }
   tbody.innerHTML = data.items.map(t => {
-    const statusInfo = getTripStatus(t.status);
     const typeInfo   = tripTypeLabel(t.tripType);
     const dt         = t.scheduledDeparture ? new Date(t.scheduledDeparture) : null;
     const dateStr    = dt ? dt.toLocaleDateString('ar-SA', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
     const timeStr    = dt ? dt.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false }) : '—';
+    const driverName  = t.driverName          ? escHtml(t.driverName)          : '—';
+    const assistName  = t.assistantDriverName ? escHtml(t.assistantDriverName) : '—';
+    const statusInfo  = getTripStatus(t.status);
+    const canStart    = t.status === 'Scheduled' || t.status === 'Delayed';
+    const canComplete = t.status === 'InProgress';
     return `
       <tr>
+        <td><div class="td-sub">${driverName}</div></td>
+        <td><div class="td-sub">${assistName}</div></td>
         <td><span style="background:#EFF6FF;color:#1E40AF;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;">${escHtml(t.busPlateNumber)}</span></td>
         <td><span style="background:${typeInfo.bg};color:${typeInfo.color};border-radius:6px;padding:2px 10px;font-size:12px;font-weight:700;">${typeInfo.label}</span></td>
         <td style="font-size:12px;color:var(--text2);">${dateStr}</td>
@@ -391,6 +436,17 @@ async function loadTrips(page) {
           <span style="color:${statusInfo.color};">${statusInfo.label}</span>
         </div></td>
         <td><div class="tbl-actions">
+          <button class="tbl-btn" title="عرض الطلاب" style="color:#7C3AED;" onclick="openTripStudents('${t.id}','${escHtml(t.busPlateNumber)}','${typeInfo.label}','${dateStr}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </button>
+          ${canStart ? `
+          <button class="tbl-btn" title="بدء الرحلة" style="color:#D97706;" onclick="startTrip('${t.id}', this)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>` : ''}
+          ${canComplete ? `
+          <button class="tbl-btn" title="إتمام الرحلة" style="color:#16A34A;" onclick="completeTrip('${t.id}', this)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>` : ''}
           <button class="tbl-btn tbl-del" title="حذف" onclick="confirmDelete('رحلة','${escHtml(t.busPlateNumber)}','trip','${t.id}')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
           </button>
@@ -468,6 +524,7 @@ async function saveBusSchedule() {
   if (res?.ok) {
     closeModal('modal-trip');
     loadTrips(tripsPage);
+    loadBuses(busesPage);   // refresh schedule indicators
     showToast('تم حفظ جدول الرحلات بنجاح ✓');
   } else {
     const errMsg = res?.data?.error || res?.data?.title || JSON.stringify(res?.data) || 'خطأ غير معروف';
@@ -497,10 +554,20 @@ async function triggerTripGeneration() {
 async function loadBuses(page) {
   if (page < 1 || page > busesTotalPages) return;
   busesPage = page;
-  const data = await apiGet(`/buses?pageNumber=${page}&pageSize=10`);
+
+  // Fetch buses and all schedules in parallel
+  const [data, schedulesRaw] = await Promise.all([
+    apiGet(`/buses?pageNumber=${page}&pageSize=10`),
+    apiGet('/trips/schedules')
+  ]);
+
   const tbody = document.getElementById('buses-tbody');
   const info = document.getElementById('buses-pager-info');
   if (!data || !tbody) return;
+
+  // Build a Set of busIds that have a saved schedule
+  const scheduledBusIds = new Set((schedulesRaw || []).map(s => s.busId));
+
   busesTotalPages = data.totalPages || 1;
   if (info) info.textContent = `عرض ${data.items.length} من ${data.totalCount} باص`;
   updatePager('buses', page, busesTotalPages);
@@ -514,6 +581,19 @@ async function loadBuses(page) {
     const driverName   = b.driverName   ? escHtml(b.driverName)   : '—';
     const assistName   = b.assistantDriverName ? escHtml(b.assistantDriverName) : '—';
     const studentCount = b.studentCount ?? 0;
+    const hasSchedule  = scheduledBusIds.has(b.id);
+
+    // Schedule button: green + checkmark if set, amber + warning if missing
+    const schedBtnStyle = hasSchedule
+      ? 'color:#16A34A;background:#F0FDF4;border:1px solid #BBF7D0;'
+      : 'color:#B45309;background:#FFFBEB;border:1px solid #FDE68A;';
+    const schedIcon = hasSchedule
+      ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 15 11 17 15 13"/></svg>`
+      : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="17"/><circle cx="12" cy="19.5" r="0.5" fill="#B45309"/></svg>`;
+    const schedTitle = hasSchedule
+      ? (isRtl ? 'جدول محدد — انقر للتعديل' : 'Schedule set — click to edit')
+      : (isRtl ? 'لا يوجد جدول — انقر للإضافة' : 'No schedule — click to add');
+
     return `
       <tr>
         <td><div class="td-name">${escHtml(b.plateNumber)}</div></td>
@@ -527,8 +607,8 @@ async function loadBuses(page) {
           <span style="background:#EFF6FF;color:#1E40AF;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;">${studentCount}</span>
         </td>
         <td><div class="tbl-actions">
-          <button class="tbl-btn" title="${isRtl ? 'جدول الرحلات' : 'Schedule'}" style="color:#7C3AED;" onclick="openBusScheduleModal('${escHtml(b.plateNumber)}','${b.id}')">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <button class="tbl-btn" title="${schedTitle}" style="${schedBtnStyle}border-radius:6px;padding:3px 6px;" onclick="openBusScheduleModal('${escHtml(b.plateNumber)}','${b.id}')">
+            ${schedIcon}
           </button>
           <button class="tbl-btn tbl-edit" title="${isRtl ? 'تعديل' : 'Edit'}" onclick="openEditBus('${b.id}')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
@@ -1065,12 +1145,140 @@ function updatePager(prefix, page, totalPages) {
 function getTripStatus(status) {
   const map = {
     'InProgress': { dot: '#22C55E', bg: '#F0FDF4', color: '#15803D', label: 'جارية' },
-    'Completed': { dot: '#94A3B8', bg: '#F1F5F9', color: '#475569', label: 'مكتملة' },
-    'Late': { dot: '#EF4444', bg: '#FEF2F2', color: '#B91C1C', label: 'متأخرة ⚠️' },
-    'Scheduled': { dot: '#3B82F6', bg: '#EFF6FF', color: '#1E40AF', label: 'قادمة' },
-    'Cancelled': { dot: '#EF4444', bg: '#FEF2F2', color: '#B91C1C', label: 'ملغاة' }
+    'Completed':  { dot: '#94A3B8', bg: '#F1F5F9', color: '#475569', label: 'مكتملة' },
+    'Delayed':    { dot: '#EF4444', bg: '#FEF2F2', color: '#B91C1C', label: 'متأخرة' },
+    'Scheduled':  { dot: '#3B82F6', bg: '#EFF6FF', color: '#1E40AF', label: 'قادمة' },
+    'Cancelled':  { dot: '#EF4444', bg: '#FEF2F2', color: '#B91C1C', label: 'ملغاة' }
   };
   return map[status] || { dot: '#94A3B8', bg: '#F1F5F9', color: '#475569', label: status || 'غير محدد' };
+}
+
+const TRIP_STATUS_OPTIONS = [
+  { value: 0, key: 'Scheduled',  label: 'قادمة',    color: '#1E40AF' },
+  { value: 1, key: 'InProgress', label: 'جارية',    color: '#15803D' },
+  { value: 2, key: 'Completed',  label: 'مكتملة',   color: '#475569' },
+  { value: 3, key: 'Cancelled',  label: 'ملغاة',    color: '#B91C1C' },
+  { value: 4, key: 'Delayed',    label: 'متأخرة',   color: '#B45309' }
+];
+
+function renderTripStatusSelect(tripId, currentStatus) {
+  const info = getTripStatus(currentStatus);
+  const opts = TRIP_STATUS_OPTIONS.map(o =>
+    `<option value="${o.value}"${o.key === currentStatus ? ' selected' : ''}>${o.label}</option>`
+  ).join('');
+  return `<select class="trip-status-sel"
+    style="background:${info.bg};color:${info.color};border:1px solid ${info.color}30;
+           border-radius:6px;padding:3px 6px;font-size:12px;font-weight:700;cursor:pointer;outline:none;"
+    onchange="changeTripStatus('${tripId}', this)">${opts}</select>`;
+}
+
+async function changeTripStatus(tripId, selectEl) {
+  const newStatusInt = parseInt(selectEl.value);
+  const res = await apiPatch(`/trips/${tripId}/status`, { status: newStatusInt, notes: null });
+  if (res?.ok) {
+    const info = getTripStatus(TRIP_STATUS_OPTIONS.find(o => o.value === newStatusInt)?.key || '');
+    selectEl.style.background = info.bg;
+    selectEl.style.color      = info.color;
+    selectEl.style.border     = `1px solid ${info.color}30`;
+    showToast('تم تحديث حالة الرحلة ✓');
+  } else {
+    alert('فشل تحديث الحالة');
+    loadTrips(tripsPage);
+  }
+}
+
+async function startTrip(tripId, btn) {
+  btn.disabled = true;
+  const res = await fetch('/api-proxy/trips/' + tripId + '/start', {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
+  });
+  if (res.ok) {
+    showToast('تم بدء الرحلة ✓');
+    loadTrips(tripsPage);
+  } else {
+    btn.disabled = false;
+    alert('فشل تحديث الحالة');
+  }
+}
+
+async function completeTrip(tripId, btn) {
+  btn.disabled = true;
+  const res = await fetch('/api-proxy/trips/' + tripId + '/complete', {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
+  });
+  if (res.ok) {
+    showToast('تم إتمام الرحلة ✓');
+    loadTrips(tripsPage);
+  } else {
+    btn.disabled = false;
+    alert('فشل تحديث الحالة');
+  }
+}
+
+// ── Trip Students Modal ────────────────────────────────────────────────────
+async function openTripStudents(tripId, plate, typeLabel, dateStr) {
+  const titleEl = document.getElementById('trip-students-title');
+  const subEl   = document.getElementById('trip-students-sub');
+  const bodyEl  = document.getElementById('trip-students-body');
+  if (titleEl) titleEl.textContent = `طلاب الرحلة — ${plate}`;
+  if (subEl)   subEl.textContent   = `${typeLabel}  •  ${dateStr}`;
+  if (bodyEl)  bodyEl.innerHTML    = '<div style="padding:30px;text-align:center;color:var(--text3);">جاري التحميل...</div>';
+  openModal('modal-trip-students');
+
+  const students = await apiGet(`/trips/${tripId}/students`);
+  if (!bodyEl) return;
+  if (!students || !students.length) {
+    bodyEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text3);">لا يوجد طلاب مسجلون في هذه الرحلة</div>';
+    return;
+  }
+  const boardingMap = {
+    'Waiting': { bg: '#EFF6FF', color: '#1E40AF', label: 'في الانتظار' },
+    'Boarded': { bg: '#F0FDF4', color: '#15803D', label: 'ركب' },
+    'Absent':  { bg: '#FEF2F2', color: '#B91C1C', label: 'غائب' }
+  };
+  const gradeLabels = {
+    'KG1':'KG1','KG2':'KG2','Grade1':'الأول','Grade2':'الثاني','Grade3':'الثالث',
+    'Grade4':'الرابع','Grade5':'الخامس','Grade6':'السادس','Grade7':'السابع',
+    'Grade8':'الثامن','Grade9':'التاسع','Grade10':'العاشر','Grade11':'الحادي عشر',
+    'Grade12':'الثاني عشر'
+  };
+  bodyEl.innerHTML = `
+    <table class="table" style="margin:0;">
+      <thead>
+        <tr>
+          <th>الطالب</th>
+          <th>الصف</th>
+          <th>المنطقة</th>
+          <th>حالة الركوب</th>
+          <th>وقت الركوب</th>
+          <th>وقت التنزيل</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${students.map(s => {
+          const bs      = boardingMap[s.boardingStatus] || { bg:'#F1F5F9', color:'#475569', label: s.boardingStatus };
+          const grade   = gradeLabels[s.grade] || s.grade;
+          const bTime   = s.boardingTime ? new Date(s.boardingTime).toLocaleTimeString('ar-SA', { hour:'2-digit', minute:'2-digit', hour12:false }) : '—';
+          const dTime   = s.dropoffTime  ? new Date(s.dropoffTime).toLocaleTimeString('ar-SA',  { hour:'2-digit', minute:'2-digit', hour12:false }) : '—';
+          const initials = getInitials(s.fullName);
+          const colors   = getAvatarColor(s.studentId);
+          return `
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px;">
+                <div class="table-av" style="background:${colors.bg};color:${colors.text};width:28px;height:28px;font-size:11px;">${initials}</div>
+                <div class="td-name" style="font-size:13px;">${escHtml(s.fullName)}</div>
+              </div></td>
+              <td><div class="td-sub">${grade}</div></td>
+              <td><div class="td-sub">${s.homeArea ? escHtml(s.homeArea) : '—'}</div></td>
+              <td><span style="background:${bs.bg};color:${bs.color};border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;">${bs.label}</span></td>
+              <td style="font-size:12px;color:var(--text2);">${bTime}</td>
+              <td style="font-size:12px;color:var(--text2);">${dTime}</td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
 }
 
 function getBusStatus(status) {
@@ -1240,7 +1448,14 @@ window.filterStudents  = filterStudents;
 window.filterDrivers   = filterDrivers;
 window.loadStudents       = loadStudents;
 window.loadDrivers        = loadDrivers;
-window.loadTrips          = loadTrips;
+window.loadTrips            = loadTrips;
+window.changeTripStatus     = changeTripStatus;
+window.startTrip            = startTrip;
+window.completeTrip         = completeTrip;
+window.openTripStudents     = openTripStudents;
+window.apiPatch             = apiPatch;
+window.clearTripsFilter     = clearTripsFilter;
+window.debouncedTripsFilter = debouncedTripsFilter;
 window.loadBuses          = loadBuses;
 window.loadAlerts         = loadAlerts;
 window.openEditBus        = openEditBus;
