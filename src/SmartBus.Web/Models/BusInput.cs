@@ -12,9 +12,4 @@ public class BusInput
 
     [Required(ErrorMessage = "Validation_Required")]
     public string Status { get; set; } = "Inactive";
-
-    public Guid? DriverId { get; set; }
-    public Guid? AssistantDriverId { get; set; }
-
-    public List<Guid> StudentIds { get; set; } = new();
 }

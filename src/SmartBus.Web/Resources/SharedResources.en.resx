@@ -137,6 +137,18 @@
   <data name="Validation_Required"      xml:space="preserve"><value>This field is required</value></data>
   <data name="Validation_DriverType"    xml:space="preserve"><value>Type must be Driver or Assistant</value></data>
   <data name="Validation_PhoneFormat"   xml:space="preserve"><value>Phone must start with 077, 078 or 079 and be 10 digits long</value></data>
+  <data name="Validation_TimeFormat"    xml:space="preserve"><value>Time must be in HH:mm format</value></data>
+
+  <!-- Bus schedule modal -->
+  <data name="BusSchedule_Title"    xml:space="preserve"><value>Trip Schedule</value></data>
+  <data name="BusSchedule_Morning"  xml:space="preserve"><value>Morning trip (to school)</value></data>
+  <data name="BusSchedule_Return"   xml:space="preserve"><value>Return trip (home)</value></data>
+  <data name="BusSchedule_Time"     xml:space="preserve"><value>Time</value></data>
+  <data name="BusSchedule_Days"     xml:space="preserve"><value>Repeat days</value></data>
+  <data name="BusSchedule_Students" xml:space="preserve"><value>Students on this trip</value></data>
+  <data name="BusSchedule_Saved"    xml:space="preserve"><value>Schedule saved ✓</value></data>
+  <data name="BusSchedule_Incomplete" xml:space="preserve"><value>Missing driver/assistant/students</value></data>
+  <data name="BusSchedule_ReturnAfterMorning" xml:space="preserve"><value>Return time must be after the morning time</value></data>
 
   <!-- Students page -->
   <data name="Student_PageTitle"   xml:space="preserve"><value>Students</value></data>
@@ -175,6 +187,11 @@
   <data name="Bus_PageTitle"      xml:space="preserve"><value>Buses</value></data>
   <data name="Bus_None"           xml:space="preserve"><value>No buses registered</value></data>
   <data name="Bus_PagerInfo"      xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Bus_ColNumber"      xml:space="preserve"><value>#</value></data>
+  <data name="Bus_TotalLabel"     xml:space="preserve"><value>Total Buses</value></data>
+  <data name="Bus_Loading"        xml:space="preserve"><value>Loading...</value></data>
+  <data name="Bus_SearchNumber"   xml:space="preserve"><value>Search by plate number...</value></data>
+  <data name="Bus_SearchPerson"   xml:space="preserve"><value>Search by driver or assistant name...</value></data>
   <data name="Bus_TypeLabel"      xml:space="preserve"><value>bus</value></data>
   <data name="Bus_AddBtn"         xml:space="preserve"><value>Add Bus</value></data>
   <data name="Bus_AddTitle"       xml:space="preserve"><value>Add New Bus</value></data>
@@ -184,9 +201,6 @@
   <data name="Bus_Status"         xml:space="preserve"><value>Status</value></data>
   <data name="Bus_StatusActive"   xml:space="preserve"><value>Active</value></data>
   <data name="Bus_StatusInactive" xml:space="preserve"><value>Inactive</value></data>
-  <data name="Bus_StatusOnRoute"  xml:space="preserve"><value>On Route</value></data>
-  <data name="Bus_StatusMaint"    xml:space="preserve"><value>Maintenance</value></data>
-  <data name="Bus_StatusOOS"      xml:space="preserve"><value>Out of Service</value></data>
   <data name="Bus_Driver"         xml:space="preserve"><value>Driver</value></data>
   <data name="Bus_Assistant"      xml:space="preserve"><value>Assistant</value></data>
   <data name="Bus_NoneSelected"   xml:space="preserve"><value>— Select —</value></data>

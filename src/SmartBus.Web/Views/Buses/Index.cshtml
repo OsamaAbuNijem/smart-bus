@@ -4,32 +4,63 @@
     ViewData["Title"] = Model.PageTitle;
 }
 
-<input type="hidden" id="buses-page" value="1"/>
+<input type="hidden" id="buses-page"        value="1"/>
+<input type="hidden" id="buses-plate"       value=""/>
+<input type="hidden" id="buses-person"      value=""/>
 
-<div class="filter-bar">
-  <button class="filter-btn active">
-    الكل (<span id="buses-total">0</span>)
-  </button>
-  <button class="add-btn" onclick="buses.openForm()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    @L["Bus_AddBtn"]
-  </button>
+<div class="filter-bar panel">
+  <div class="filter-group">
+    <input type="search"
+           id="buses-plate-input"
+           class="form-input"
+           placeholder="@L["Bus_SearchNumber"]"
+           autocomplete="off"
+           oninput="buses.onPlateSearch(this.value)"/>
+    <input type="search"
+           id="buses-person-input"
+           class="form-input"
+           placeholder="@L["Bus_SearchPerson"]"
+           autocomplete="off"
+           oninput="buses.onPersonSearch(this.value)"/>
+  </div>
+
+  <div class="action-group">
+    <button class="add-btn" onclick="buses.openForm()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      @L["Bus_AddBtn"]
+    </button>
+  </div>
 </div>
 
 <div class="card">
   <table class="table">
     <thead>
-      <tr><th>@L["Bus_Number"]</th><th>@L["Bus_Capacity"]</th><th>@L["Bus_Status"]</th><th>@L["Bus_Driver"]</th><th>@L["Bus_Assistant"]</th><th>@L["Nav_Students"]</th><th></th></tr>
+      <tr>
+        <th scope="col">@L["Bus_ColNumber"]</th>
+        <th scope="col">@L["Bus_Number"]</th>
+        <th scope="col">@L["Bus_Capacity"]</th>
+        <th scope="col">@L["Bus_Status"]</th>
+        <th scope="col">@L["Bus_Driver"]</th>
+        <th scope="col">@L["Bus_Assistant"]</th>
+        <th scope="col">@L["Nav_Students"]</th>
+        <th scope="col"></th>
+      </tr>
     </thead>
     <tbody id="buses-tbody">
-      <tr><td colspan="7" class="u-loading-state">جاري التحميل...</td></tr>
+      <tr><td colspan="8" class="u-loading-state">@L["Bus_Loading"]</td></tr>
     </tbody>
   </table>
   <div class="table-pager">
-    <span class="table-pager-info" id="buses-pager-info"></span>
+    <div class="u-flex u-items-center u-gap-12">
+      <span class="count-pill accent" aria-live="polite">
+        <span>@L["Bus_TotalLabel"]</span>
+        <span class="count" id="buses-total">0</span>
+      </span>
+      <span class="table-pager-info" id="buses-pager-info" aria-live="polite"></span>
+    </div>
     <div class="table-pager-controls">
-      <button class="filter-btn" id="buses-prev" onclick="buses.prev()">‹ السابق</button>
-      <button class="filter-btn" id="buses-next" onclick="buses.next()">التالي ›</button>
+      <button class="filter-btn" id="buses-prev" onclick="buses.prev()">@L["Pager_Prev"]</button>
+      <button class="filter-btn" id="buses-next" onclick="buses.next()">@L["Pager_Next"]</button>
     </div>
   </div>
 </div>

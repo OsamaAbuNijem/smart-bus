@@ -65,6 +65,10 @@ public class ReturnTripGenerationJob
         {
             if (existingSet.Contains(sched.BusId)) continue;
 
+            // Skip incomplete schedules — no students or missing return driver/assistant.
+            if (sched.StudentCount <= 0 || sched.ReturnDriverId is null || sched.ReturnAssistantId is null)
+                continue;
+
             var departure = today.Add(sched.ReturnTime.ToTimeSpan());
             _context.Trips.Add(new Trip
             {

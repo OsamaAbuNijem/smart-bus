@@ -14,7 +14,4 @@ public class BusRepository : GenericRepository<Bus>, IBusRepository
 
     public async Task<IReadOnlyList<Bus>> GetByStatusAsync(BusStatus status, CancellationToken cancellationToken = default)
         => await _dbSet.Where(b => b.Status == status).ToListAsync(cancellationToken);
-
-    public async Task<Bus?> GetWithDriverAsync(Guid busId, CancellationToken cancellationToken = default)
-        => await _dbSet.Include(b => b.Driver).FirstOrDefaultAsync(b => b.Id == busId, cancellationToken);
 }

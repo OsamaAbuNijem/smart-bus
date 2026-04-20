@@ -56,15 +56,15 @@ public class TripGenerationJob
 
         var alreadyExists = existingTrips.Select(t => (t.BusId, t.Type)).ToHashSet();
 
-        // 3. Students grouped by bus — global query filter handles IsDeleted
-        var studentsByBus = await _context.Students
-            .Where(s => s.BusId.HasValue && busIds.Contains(s.BusId.Value))
-            .Select(s => new { s.Id, BusId = s.BusId!.Value })
+        // 3. Students grouped by bus — via the BusSchedule ↔ Student join
+        var studentsByBus = await _context.BusScheduleStudents
+            .Where(x => busIds.Contains(x.BusSchedule.BusId))
+            .Select(x => new { x.StudentId, x.BusSchedule.BusId })
             .ToListAsync();
 
         var studentMap = studentsByBus
             .GroupBy(s => s.BusId)
-            .ToDictionary(g => g.Key, g => g.Select(s => s.Id).ToList());
+            .ToDictionary(g => g.Key, g => g.Select(s => s.StudentId).ToList());
 
         // 4. Create new trips for any (bus, type) combos not yet generated today
         int created = 0;
@@ -72,7 +72,13 @@ public class TripGenerationJob
 
         foreach (var sched in schedules)
         {
-            if (!alreadyExists.Contains((sched.BusId, TripType.Morning)))
+            // Skip schedules with no assigned students — nothing to run.
+            if (sched.StudentCount <= 0) continue;
+
+            var canMorning = sched.MorningDriverId is not null && sched.MorningAssistantId is not null;
+            var canReturn  = sched.ReturnDriverId  is not null && sched.ReturnAssistantId  is not null;
+
+            if (canMorning && !alreadyExists.Contains((sched.BusId, TripType.Morning)))
             {
                 var trip = new Trip
                 {
@@ -89,7 +95,7 @@ public class TripGenerationJob
                 created++;
             }
 
-            if (!alreadyExists.Contains((sched.BusId, TripType.Return)))
+            if (canReturn && !alreadyExists.Contains((sched.BusId, TripType.Return)))
             {
                 var trip = new Trip
                 {

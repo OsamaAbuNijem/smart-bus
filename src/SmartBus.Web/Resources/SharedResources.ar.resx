@@ -137,6 +137,18 @@
   <data name="Validation_Required"      xml:space="preserve"><value>هذا الحقل مطلوب</value></data>
   <data name="Validation_DriverType"    xml:space="preserve"><value>النوع يجب أن يكون سائق أو مساعد</value></data>
   <data name="Validation_PhoneFormat"   xml:space="preserve"><value>رقم الهاتف يجب أن يبدأ بـ 077 أو 078 أو 079 ويتكون من 10 أرقام</value></data>
+  <data name="Validation_TimeFormat"    xml:space="preserve"><value>صيغة الوقت يجب أن تكون HH:mm</value></data>
+
+  <!-- Bus schedule modal -->
+  <data name="BusSchedule_Title"    xml:space="preserve"><value>جدول الرحلات</value></data>
+  <data name="BusSchedule_Morning"  xml:space="preserve"><value>رحلة الذهاب إلى المدرسة</value></data>
+  <data name="BusSchedule_Return"   xml:space="preserve"><value>رحلة العودة إلى المنزل</value></data>
+  <data name="BusSchedule_Time"     xml:space="preserve"><value>الوقت</value></data>
+  <data name="BusSchedule_Days"     xml:space="preserve"><value>أيام التكرار</value></data>
+  <data name="BusSchedule_Students" xml:space="preserve"><value>الطلاب في هذه الرحلة</value></data>
+  <data name="BusSchedule_Saved"    xml:space="preserve"><value>تم حفظ الجدول بنجاح ✓</value></data>
+  <data name="BusSchedule_Incomplete" xml:space="preserve"><value>بيانات ناقصة (سائق/مساعد/طلاب)</value></data>
+  <data name="BusSchedule_ReturnAfterMorning" xml:space="preserve"><value>وقت العودة يجب أن يكون بعد وقت الذهاب</value></data>
 
   <!-- Students page -->
   <data name="Student_PageTitle"   xml:space="preserve"><value>الطلاب</value></data>
@@ -175,6 +187,11 @@
   <data name="Bus_PageTitle"      xml:space="preserve"><value>الباصات</value></data>
   <data name="Bus_None"           xml:space="preserve"><value>لا توجد باصات مسجلة</value></data>
   <data name="Bus_PagerInfo"      xml:space="preserve"><value>عرض {0} من {1} باص — الصفحة {2} من {3}</value></data>
+  <data name="Bus_ColNumber"      xml:space="preserve"><value>#</value></data>
+  <data name="Bus_TotalLabel"     xml:space="preserve"><value>إجمالي الباصات</value></data>
+  <data name="Bus_Loading"        xml:space="preserve"><value>جاري التحميل...</value></data>
+  <data name="Bus_SearchNumber"   xml:space="preserve"><value>ابحث برقم الباص...</value></data>
+  <data name="Bus_SearchPerson"   xml:space="preserve"><value>ابحث باسم السائق أو المساعد...</value></data>
   <data name="Bus_TypeLabel"      xml:space="preserve"><value>باص</value></data>
   <data name="Bus_AddBtn"         xml:space="preserve"><value>إضافة باص</value></data>
   <data name="Bus_AddTitle"       xml:space="preserve"><value>إضافة باص جديد</value></data>
@@ -184,9 +201,6 @@
   <data name="Bus_Status"         xml:space="preserve"><value>الحالة</value></data>
   <data name="Bus_StatusActive"   xml:space="preserve"><value>نشط</value></data>
   <data name="Bus_StatusInactive" xml:space="preserve"><value>غير نشط</value></data>
-  <data name="Bus_StatusOnRoute"  xml:space="preserve"><value>في الطريق</value></data>
-  <data name="Bus_StatusMaint"    xml:space="preserve"><value>صيانة</value></data>
-  <data name="Bus_StatusOOS"      xml:space="preserve"><value>خارج الخدمة</value></data>
   <data name="Bus_Driver"         xml:space="preserve"><value>السائق</value></data>
   <data name="Bus_Assistant"      xml:space="preserve"><value>المساعد</value></data>
   <data name="Bus_NoneSelected"   xml:space="preserve"><value>— اختر —</value></data>

@@ -11,6 +11,4 @@ public class Driver : BaseEntity
     public string? UserId { get; set; }
     public bool IsActive { get; set; } = true;
     public DriverType DriverType { get; set; } = DriverType.Driver;
-
-    public ICollection<Bus> Buses { get; set; } = new List<Bus>();
 }

@@ -58,6 +58,8 @@ public class TranslationsController : Controller
             ["delConfirm"]       = _l["Del_Confirm"].Value,
             ["delCancel"]        = _l["Del_Cancel"].Value,
 
+            ["busScheduleReturnAfterMorning"] = _l["BusSchedule_ReturnAfterMorning"].Value,
+
             ["driverActive"]     = _l["Driver_Active"].Value,
             ["driverInactive"]   = _l["Driver_Inactive"].Value,
             ["driverAddTitle"]   = _l["Driver_AddTitle"].Value,

@@ -4,7 +4,7 @@
 
 @foreach (var b in (Model?.Items ?? Enumerable.Empty<BusDto>()).Take(5))
 {
-    var pct = b.Status == "OnRoute" ? 95 : b.Status == "Active" ? 80 : 40;
+    var pct = b.Status == "Active" ? 80 : 40;
     var col = pct > 80 ? "#22C55E" : pct > 60 ? "#FFD700" : "#EF4444";
     <div class="trip-row">
         <div class="report-row-bus">@b.PlateNumber</div>

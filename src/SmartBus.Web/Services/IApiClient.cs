@@ -5,6 +5,7 @@ using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
+using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
 using SmartBus.Web.Models;
 
 namespace SmartBus.Web.Services;
@@ -32,7 +33,8 @@ public interface IApiClient
     Task<bool> DeleteStudentAsync(Guid id);
 
     // Buses
-    Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10);
+    Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10,
+        string? plateNumber = null, string? personName = null);
     Task<BusDto?> GetBusByIdAsync(Guid busId);
     Task<(bool Ok, string? Error)> CreateBusAsync(BusInput input);
     Task<(bool Ok, string? Error)> UpdateBusAsync(Guid id, BusInput input);
@@ -46,6 +48,8 @@ public interface IApiClient
     Task<bool> CompleteTripAsync(Guid id);
     Task<bool> DeleteTripAsync(Guid id);
     Task<(bool Ok, string? Message)> GenerateTodayTripsAsync();
+    Task<BusScheduleDto?> GetBusScheduleAsync(Guid busId);
+    Task<(bool Ok, string? Error)> SetBusScheduleAsync(Guid busId, BusScheduleInput input);
 
     // Alerts
     Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null);

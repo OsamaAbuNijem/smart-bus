@@ -27,10 +27,6 @@ public class Student : BaseEntity
     public Guid? PickupStopId { get; set; }
     public Stop? PickupStop { get; set; }
 
-    // Bus assignment
-    public Guid? BusId { get; set; }
-    public Bus? AssignedBus { get; set; }
-
     // Home location (from map picker)
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }

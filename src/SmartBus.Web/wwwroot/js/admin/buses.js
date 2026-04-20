@@ -1,14 +1,23 @@
 /**
  * SmartBus Admin — Buses page.
  * Same pattern as drivers/students: server renders everything.
- * The driver/assistant/student lists are pre-loaded inside the Form partial.
  */
 
 const buses = {
+  _searchTimer: null,
+
+  _qs() {
+    const page   = document.getElementById('buses-page').value || 1;
+    const plate  = document.getElementById('buses-plate').value || '';
+    const person = document.getElementById('buses-person').value || '';
+    const params = new URLSearchParams({ page });
+    if (plate)  params.set('plateNumber', plate);
+    if (person) params.set('personName',  person);
+    return params.toString();
+  },
 
   async load() {
-    const page = document.getElementById('buses-page').value;
-    const res  = await fetch(`/Buses/List?page=${page}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    const res = await fetch(`/Buses/List?${this._qs()}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
     if (res.status === 401) { location.href = '/Account/Login'; return; }
     this._renderList(await res.text());
   },
@@ -34,41 +43,35 @@ const buses = {
   prev()  { this.goto(parseInt(document.getElementById('buses-page').value) - 1); },
   next()  { this.goto(parseInt(document.getElementById('buses-page').value) + 1); },
 
+  onPlateSearch(value) {
+    clearTimeout(this._searchTimer);
+    this._searchTimer = setTimeout(() => {
+      document.getElementById('buses-plate').value = (value || '').trim();
+      document.getElementById('buses-page').value  = 1;
+      this.load();
+    }, 300);
+  },
+
+  onPersonSearch(value) {
+    clearTimeout(this._searchTimer);
+    this._searchTimer = setTimeout(() => {
+      document.getElementById('buses-person').value = (value || '').trim();
+      document.getElementById('buses-page').value   = 1;
+      this.load();
+    }, 300);
+  },
+
   async openForm(id) {
     const url = id ? `/Buses/Form?id=${id}` : '/Buses/Form';
     const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
     document.getElementById('bus-form-container').innerHTML = await res.text();
     SB.openModal('modal-bus');
-    this._wireStudentCheckboxes();
-  },
-
-  _wireStudentCheckboxes() {
-    document.querySelectorAll('#bf-students-list input[type=checkbox]').forEach(cb => {
-      cb.addEventListener('change', () => this._updateSelectedCount());
-    });
-  },
-
-  _updateSelectedCount() {
-    const count = document.querySelectorAll('#bf-students-list input[type=checkbox]:checked').length;
-    const el = document.getElementById('bf-selected-count');
-    if (el) el.textContent = count;
-  },
-
-  // Client-side filter — the list is pre-rendered, we just toggle visibility
-  filterStudents(q) {
-    const term = (q || '').trim().toLowerCase();
-    document.querySelectorAll('#bf-students-list .bus-student-row').forEach(row => {
-      const name = row.dataset.name || '';
-      const area = row.dataset.area || '';
-      row.style.display = !term || name.includes(term) || area.includes(term) ? '' : 'none';
-    });
   },
 
   async submit(form) {
     const id   = form.dataset.id;
-    const page = document.getElementById('buses-page').value;
-    const url  = id ? `/Buses/Update?id=${id}&page=${page}` : '/Buses/Save';
-    const res  = await fetch(url, {
+    const base = id ? `/Buses/Update?id=${id}&${this._qs()}` : `/Buses/Save?${this._qs()}`;
+    const res  = await fetch(base, {
       method: 'POST',
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
       body: new FormData(form)
@@ -84,7 +87,74 @@ const buses = {
       SB.ShowMessage(result || 'Upstream API error');
     } else {
       document.getElementById('bus-form-container').innerHTML = await res.text();
-      this._wireStudentCheckboxes();
+    }
+  },
+
+  // ── Schedule modal ──────────────────────────────────────────────────────
+  async openSchedule(id) {
+    const res = await fetch(`/Buses/Schedule?id=${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    document.getElementById('bus-schedule-container').innerHTML = await res.text();
+    SB.openModal('modal-bus-schedule');
+    this._wireScheduleStudentCheckboxes();
+  },
+
+  _wireScheduleStudentCheckboxes() {
+    document.querySelectorAll('#bs-students-list input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => this._updateScheduleSelectedCount());
+    });
+  },
+
+  _updateScheduleSelectedCount() {
+    const count = document.querySelectorAll('#bs-students-list input[type=checkbox]:checked').length;
+    const el = document.getElementById('bs-selected-count');
+    if (el) el.textContent = count;
+  },
+
+  filterScheduleStudents(q) {
+    const term = (q || '').trim().toLowerCase();
+    document.querySelectorAll('#bs-students-list .bus-student-row').forEach(row => {
+      const name = row.dataset.name || '';
+      const area = row.dataset.area || '';
+      row.style.display = !term || name.includes(term) || area.includes(term) ? '' : 'none';
+    });
+  },
+
+  toggleScheduleDay(cb) {
+    const mask = parseInt(cb.dataset.mask) || 0;
+    const hidden = document.getElementById('bs-repeat-days');
+    let current = parseInt(hidden.value) || 0;
+    if (cb.checked) current |= mask;
+    else            current &= ~mask;
+    hidden.value = current;
+    cb.closest('.schedule-day').classList.toggle('active', cb.checked);
+  },
+
+  async submitSchedule(form) {
+    const id  = form.dataset.id;
+    const morning = form.querySelector('[name="MorningTime"]')?.value || '';
+    const ret     = form.querySelector('[name="ReturnTime"]')?.value  || '';
+    if (morning && ret && ret <= morning) {
+      SB.ShowMessage(window.SB?.t?.busScheduleReturnAfterMorning ||
+                     'Return time must be after the morning time.');
+      return;
+    }
+    const res = await fetch(`/Buses/SaveSchedule?id=${id}&${this._qs()}`, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: new FormData(form)
+    });
+    if (res.ok) {
+      const { result, html, page: newPage } = await res.json();
+      SB.closeModal('modal-bus-schedule');
+      if (newPage) document.getElementById('buses-page').value = newPage;
+      if (html)    this._renderList(html);
+      if (result)  SB.ShowMessage(result);
+    } else if (res.status === 502) {
+      const { result } = await res.json().catch(() => ({}));
+      SB.ShowMessage(result || 'Upstream API error');
+    } else {
+      document.getElementById('bus-schedule-container').innerHTML = await res.text();
+      this._wireScheduleStudentCheckboxes();
     }
   },
 
@@ -96,8 +166,7 @@ const buses = {
   },
 
   async _confirmDelete(id) {
-    const page = document.getElementById('buses-page').value;
-    const res  = await fetch(`/Buses/Delete?id=${id}&page=${page}`, {
+    const res = await fetch(`/Buses/Delete?id=${id}&${this._qs()}`, {
       method: 'POST',
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     });

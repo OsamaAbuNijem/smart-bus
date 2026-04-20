@@ -113,7 +113,17 @@ public class TripsController : ControllerBase
     public async Task<IActionResult> SetBusSchedule(Guid busId, [FromBody] BusScheduleRequest request, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
-            new SetBusScheduleCommand(busId, request.MorningTime, request.ReturnTime, request.RepeatDays),
+            new SetBusScheduleCommand(
+                busId,
+                request.MorningTime,
+                request.ReturnTime,
+                request.RepeatDays,
+                request.MorningDriverId,
+                request.MorningAssistantId,
+                request.ReturnDriverId,
+                request.ReturnAssistantId,
+                request.StudentIds ?? Array.Empty<Guid>()
+            ),
             cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
@@ -159,4 +169,13 @@ public class TripsController : ControllerBase
 
 public record UpdateStatusRequest(TripStatus Status, string? Notes);
 public record UpdateTripRequest(string Name, TripType Type, Guid BusId, Guid? RouteId, DateTime ScheduledDeparture, byte RepeatDays, string? Notes);
-public record BusScheduleRequest(string MorningTime, string ReturnTime, byte RepeatDays);
+public record BusScheduleRequest(
+    string MorningTime,
+    string ReturnTime,
+    byte RepeatDays,
+    Guid? MorningDriverId,
+    Guid? MorningAssistantId,
+    Guid? ReturnDriverId,
+    Guid? ReturnAssistantId,
+    IReadOnlyList<Guid>? StudentIds
+);

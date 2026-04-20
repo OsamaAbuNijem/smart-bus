@@ -25,9 +25,14 @@ public class BusesController : ControllerBase
     /// <summary>Get all buses (paginated).</summary>
     [HttpGet]
     [ProducesResponseType(typeof(GetAllBusesQuery), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? plateNumber = null,
+        [FromQuery] string? personName = null,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetAllBusesQuery(pageNumber, pageSize), cancellationToken);
+        var result = await _mediator.Send(new GetAllBusesQuery(pageNumber, pageSize, plateNumber, personName), cancellationToken);
         return Ok(result);
     }
 
@@ -48,8 +53,7 @@ public class BusesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] BusRequest request, CancellationToken cancellationToken)
     {
-        var command = new CreateBusCommand(request.PlateNumber, request.Capacity, request.Status,
-            request.DriverId, request.AssistantDriverId, request.StudentIds ?? []);
+        var command = new CreateBusCommand(request.PlateNumber, request.Capacity, request.Status);
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Data }, result.Data)
@@ -63,8 +67,7 @@ public class BusesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid id, [FromBody] BusRequest request, CancellationToken cancellationToken)
     {
-        var command = new UpdateBusCommand(id, request.PlateNumber, request.Capacity, request.Status,
-            request.DriverId, request.AssistantDriverId, request.StudentIds ?? []);
+        var command = new UpdateBusCommand(id, request.PlateNumber, request.Capacity, request.Status);
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
@@ -97,7 +100,4 @@ public record UpdateLocationRequest(double Latitude, double Longitude, double? S
 public record BusRequest(
     string PlateNumber,
     int Capacity,
-    string Status,
-    Guid? DriverId,
-    Guid? AssistantDriverId,
-    IEnumerable<Guid>? StudentIds);
+    string Status);

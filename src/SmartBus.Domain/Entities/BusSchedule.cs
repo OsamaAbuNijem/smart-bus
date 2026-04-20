@@ -22,4 +22,29 @@ public class BusSchedule : BaseEntity
 
     /// <summary>Bitmask of active days: Sun=1, Mon=2, Tue=4, Wed=8, Thu=16, Fri=32, Sat=64.</summary>
     public byte RepeatDays { get; set; }
+
+    public Guid? MorningDriverId { get; set; }
+
+    [ForeignKey(nameof(MorningDriverId))]
+    public Driver? MorningDriver { get; set; }
+
+    public Guid? MorningAssistantId { get; set; }
+
+    [ForeignKey(nameof(MorningAssistantId))]
+    public Driver? MorningAssistant { get; set; }
+
+    public Guid? ReturnDriverId { get; set; }
+
+    [ForeignKey(nameof(ReturnDriverId))]
+    public Driver? ReturnDriver { get; set; }
+
+    public Guid? ReturnAssistantId { get; set; }
+
+    [ForeignKey(nameof(ReturnAssistantId))]
+    public Driver? ReturnAssistant { get; set; }
+
+    /// <summary>Denormalized count of students on this schedule (updated when the schedule is saved).</summary>
+    public int StudentCount { get; set; }
+
+    public ICollection<BusScheduleStudent> Students { get; set; } = new List<BusScheduleStudent>();
 }

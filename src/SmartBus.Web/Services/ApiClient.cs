@@ -8,6 +8,7 @@ using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
+using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
 using SmartBus.Web.Models;
 
 namespace SmartBus.Web.Services;
@@ -149,8 +150,14 @@ public class ApiClient : IApiClient
     public Task<bool> DeleteStudentAsync(Guid id) => DeleteAsync($"api/v1/students/{id}");
 
     // ── Buses ──────────────────────────────────────────────────────────────
-    public Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10)
-        => GetAsync<PagedResult<BusDto>>($"api/v1/buses?pageNumber={pageNumber}&pageSize={pageSize}");
+    public Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10,
+        string? plateNumber = null, string? personName = null)
+    {
+        var url = $"api/v1/buses?pageNumber={pageNumber}&pageSize={pageSize}";
+        if (!string.IsNullOrWhiteSpace(plateNumber)) url += $"&plateNumber={Uri.EscapeDataString(plateNumber)}";
+        if (!string.IsNullOrWhiteSpace(personName))  url += $"&personName={Uri.EscapeDataString(personName)}";
+        return GetAsync<PagedResult<BusDto>>(url);
+    }
 
     public Task<BusDto?> GetBusByIdAsync(Guid id)
         => GetAsync<BusDto>($"api/v1/buses/{id}");
@@ -201,6 +208,12 @@ public class ApiClient : IApiClient
         catch { }
         return (true, null);
     }
+
+    public Task<BusScheduleDto?> GetBusScheduleAsync(Guid busId)
+        => GetAsync<BusScheduleDto>($"api/v1/trips/bus/{busId}/schedule");
+
+    public Task<(bool Ok, string? Error)> SetBusScheduleAsync(Guid busId, BusScheduleInput input)
+        => SendAsync(HttpMethod.Post, $"api/v1/trips/bus/{busId}/schedule", input);
 
     // ── Alerts ─────────────────────────────────────────────────────────────
     public Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null)

@@ -37,11 +37,13 @@ public class GetTripStudentsQueryHandler
                 st.DropoffTime))
             .ToListAsync(cancellationToken);
 
-        // Fallback: no StudentTrip rows yet — show bus-assigned students as Waiting
+        // Fallback: no StudentTrip rows yet — show schedule-assigned students as Waiting
         if (studentTrips.Count == 0)
         {
-            studentTrips = await _context.Students
-                .Where(s => s.BusId == trip.BusId)
+            studentTrips = await _context.BusScheduleStudents
+                .Where(x => x.BusSchedule.BusId == trip.BusId)
+                .Select(x => x.Student)
+                .Where(s => !s.IsDeleted)
                 .OrderBy(s => s.FullName)
                 .Select(s => new TripStudentDto(
                     s.Id,

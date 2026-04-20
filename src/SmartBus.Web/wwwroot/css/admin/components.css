@@ -210,6 +210,42 @@
 .bus-student-meta { font-size: 11px; color: var(--text3); }
 .bus-student-counter { margin-top: 5px; font-size: 11px; color: var(--text3); }
 
+/* Bus schedule modal */
+.schedule-section { margin-top: 14px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+.schedule-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.schedule-days { display: flex; gap: 6px; flex-wrap: wrap; }
+.schedule-day { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1.5px solid var(--border2); border-radius: 999px; background: var(--card); cursor: pointer; font-size: 12px; color: var(--text2); user-select: none; }
+.schedule-day input { position: absolute; opacity: 0; pointer-events: none; }
+.schedule-day:hover { background: var(--yl); }
+.schedule-day.active { background: #FFD700; border-color: #FFD700; color: #111; font-weight: 700; }
+.tbl-btn.tbl-sched { background: #E0F2FE; }
+.tbl-btn.tbl-sched:hover { background: #BAE6FD; }
+.tbl-btn.tbl-sched-warn { background: #FEF3C7; }
+.tbl-btn.tbl-sched-warn:hover { background: #FDE68A; }
+
+/* Bus grid — incomplete schedule row */
+tr.row-incomplete { background: #FFFBEB; }
+tr.row-incomplete:hover { background: #FEF3C7; }
+.tbl-btn.tbl-btn-wrap { position: relative; overflow: visible; }
+.badge-incomplete {
+  position: absolute;
+  top: -5px;
+  inset-inline-end: -5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #F59E0B;
+  color: #fff;
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 700;
+  box-shadow: 0 0 0 1.5px #fff;
+  pointer-events: none;
+}
+
 /* Map picker (student modal) */
 .map-picker-row { display: flex; gap: 6px; margin-bottom: 6px; }
 .map-picker-row .form-input { flex: 1; font-size: 12px; }

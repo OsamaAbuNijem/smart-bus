@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
 using SmartBus.Domain.Entities;
@@ -10,12 +9,10 @@ namespace SmartBus.Application.Features.Buses.Commands.CreateBus;
 public class CreateBusCommandHandler : IRequestHandler<CreateBusCommand, Result<Guid>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IApplicationDbContext _context;
 
-    public CreateBusCommandHandler(IUnitOfWork unitOfWork, IApplicationDbContext context)
+    public CreateBusCommandHandler(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _context = context;
     }
 
     public async Task<Result<Guid>> Handle(CreateBusCommand request, CancellationToken cancellationToken)
@@ -28,26 +25,13 @@ public class CreateBusCommandHandler : IRequestHandler<CreateBusCommand, Result<
 
         var bus = new Bus
         {
-            PlateNumber       = request.PlateNumber,
-            Capacity          = request.Capacity,
-            Status            = status,
-            DriverId          = request.DriverId,
-            AssistantDriverId = request.AssistantDriverId
+            PlateNumber = request.PlateNumber,
+            Capacity    = request.Capacity,
+            Status      = status
         };
 
         await _unitOfWork.Buses.AddAsync(bus, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        // Assign students
-        var studentIds = request.StudentIds?.ToList() ?? [];
-        if (studentIds.Count > 0)
-        {
-            var students = await _context.Students
-                .Where(s => !s.IsDeleted && studentIds.Contains(s.Id))
-                .ToListAsync(cancellationToken);
-            foreach (var st in students) st.BusId = bus.Id;
-            await _context.SaveChangesAsync(cancellationToken);
-        }
 
         return Result<Guid>.Success(bus.Id);
     }

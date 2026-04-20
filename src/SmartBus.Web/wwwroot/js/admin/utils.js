@@ -104,12 +104,8 @@
   function getBusStatus(status) {
     const isRtl = SB.t.isRtl !== false;
     const map = {
-      'OnRoute':      { bg:'#F0FDF4', color:'#15803D', label: isRtl ? 'في الطريق 🟢' : 'On Route 🟢' },
-      'Active':       { bg:'#F0FDF4', color:'#15803D', label: isRtl ? 'نشط 🟢' : 'Active 🟢' },
-      'Inactive':     { bg:'#F1F5F9', color:'#475569', label: isRtl ? 'غير نشط' : 'Inactive' },
-      'Idle':         { bg:'#F1F5F9', color:'#475569', label: isRtl ? 'متوقف' : 'Idle' },
-      'Maintenance':  { bg:'#FEF2F2', color:'#B91C1C', label: isRtl ? 'صيانة ⚠️' : 'Maintenance ⚠️' },
-      'OutOfService': { bg:'#FEF2F2', color:'#B91C1C', label: isRtl ? 'خارج الخدمة' : 'Out of Service' },
+      'Active':   { bg:'#F0FDF4', color:'#15803D', label: isRtl ? 'نشط 🟢' : 'Active 🟢' },
+      'Inactive': { bg:'#F1F5F9', color:'#475569', label: isRtl ? 'غير نشط' : 'Inactive' },
     };
     return map[status] || { bg:'#F1F5F9', color:'#475569', label: status || (isRtl ? 'غير محدد' : 'Unknown') };
   }

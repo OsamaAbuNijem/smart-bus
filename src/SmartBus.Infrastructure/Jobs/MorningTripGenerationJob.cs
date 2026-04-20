@@ -69,6 +69,10 @@ public class MorningTripGenerationJob
         {
             if (existingSet.Contains(sched.BusId)) continue;
 
+            // Skip incomplete schedules — no students or missing morning driver/assistant.
+            if (sched.StudentCount <= 0 || sched.MorningDriverId is null || sched.MorningAssistantId is null)
+                continue;
+
             var departure = today.Add(sched.MorningTime.ToTimeSpan());
             _context.Trips.Add(new Trip
             {

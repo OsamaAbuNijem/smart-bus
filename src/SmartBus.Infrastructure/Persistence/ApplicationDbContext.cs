@@ -28,6 +28,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<StudentAllergy> StudentAllergies => Set<StudentAllergy>();
     public DbSet<School> Schools => Set<School>();
     public DbSet<BusSchedule> BusSchedules => Set<BusSchedule>();
+    public DbSet<BusScheduleStudent> BusScheduleStudents => Set<BusScheduleStudent>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -59,29 +60,56 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             .HasIndex(s => s.BusId)
             .IsUnique();
 
-        // Bus → Driver (assistant role — explicit because two FKs point to Driver)
-        builder.Entity<Bus>()
-            .HasOne(b => b.AssistantDriver)
+        // BusSchedule → Driver FKs (four optional relationships; NoAction to avoid cascade cycles)
+        builder.Entity<BusSchedule>()
+            .HasOne(s => s.MorningDriver)
             .WithMany()
-            .HasForeignKey(b => b.AssistantDriverId)
+            .HasForeignKey(s => s.MorningDriverId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.NoAction);
 
-        // Bus → Assistant (legacy)
-        builder.Entity<Bus>()
-            .HasOne(b => b.Assistant)
-            .WithOne(a => a.Bus)
-            .HasForeignKey<Bus>(b => b.AssistantId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        // Student → Bus assignment
-        builder.Entity<Student>()
-            .HasOne(s => s.AssignedBus)
+        builder.Entity<BusSchedule>()
+            .HasOne(s => s.MorningAssistant)
             .WithMany()
-            .HasForeignKey(s => s.BusId)
+            .HasForeignKey(s => s.MorningAssistantId)
             .IsRequired(false)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BusSchedule>()
+            .HasOne(s => s.ReturnDriver)
+            .WithMany()
+            .HasForeignKey(s => s.ReturnDriverId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BusSchedule>()
+            .HasOne(s => s.ReturnAssistant)
+            .WithMany()
+            .HasForeignKey(s => s.ReturnAssistantId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // BusSchedule ↔ Student join
+        builder.Entity<BusScheduleStudent>()
+            .HasKey(x => new { x.BusScheduleId, x.StudentId });
+
+        builder.Entity<BusScheduleStudent>()
+            .HasQueryFilter(x => !x.BusSchedule.IsDeleted && !x.Student.IsDeleted);
+
+        builder.Entity<BusScheduleStudent>()
+            .HasOne(x => x.BusSchedule)
+            .WithMany(s => s.Students)
+            .HasForeignKey(x => x.BusScheduleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<BusScheduleStudent>()
+            .HasOne(x => x.Student)
+            .WithMany()
+            .HasForeignKey(x => x.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<BusScheduleStudent>()
+            .HasIndex(x => x.StudentId);
 
         // Bus → BusLocation: history (one-to-many via BusLocation.BusId)
         builder.Entity<Bus>()
@@ -115,9 +143,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<Student>().HasIndex(s => new { s.IsDeleted, s.CreatedAt });
         builder.Entity<Trip>()   .HasIndex(t => new { t.IsDeleted, t.ScheduledDeparture });
         builder.Entity<Alert>()  .HasIndex(a => new { a.IsDeleted, a.CreatedAt });
-
-        // Bus list handler does an N+1-ish students-by-bus lookup:
-        builder.Entity<Student>().HasIndex(s => new { s.BusId, s.IsDeleted });
 
         // Alerts page filters by Status (pending vs resolved):
         builder.Entity<Alert>().HasIndex(a => new { a.Status, a.CreatedAt });

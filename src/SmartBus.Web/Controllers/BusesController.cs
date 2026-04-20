@@ -18,8 +18,10 @@ public class BusesController : AdminControllerBase
         => View(await PopulateAsync(new AdminPageViewModel(), "buses", _l["Bus_PageTitle"]));
 
     [HttpGet]
-    public async Task<IActionResult> List(int page = 1)
-        => PartialView("_List", await ApiClient.GetBusesAsync(page, 10));
+    public async Task<IActionResult> List([FromQuery] int page = 1,
+                                          [FromQuery] string? plateNumber = null,
+                                          [FromQuery] string? personName = null)
+        => PartialView("_List", await ApiClient.GetBusesAsync(page, 10, plateNumber, personName));
 
     [HttpGet]
     public async Task<IActionResult> Form(Guid? id = null)
@@ -32,76 +34,129 @@ public class BusesController : AdminControllerBase
             vm.BusId = b.Id;
             vm.Input = new BusInput
             {
-                PlateNumber       = b.PlateNumber,
-                Capacity          = b.Capacity,
-                Status            = b.Status,
-                DriverId          = b.DriverId,
-                AssistantDriverId = b.AssistantDriverId,
-                StudentIds        = b.StudentIds.ToList()
+                PlateNumber = b.PlateNumber,
+                Capacity    = b.Capacity,
+                Status      = b.Status
             };
-            vm.SelectedStudentIds = b.StudentIds.ToHashSet();
         }
-        // Load dropdown data (one-off per modal open).
-        var drivers  = await ApiClient.GetDriversAsync(1, 200);
-        var students = await ApiClient.GetStudentsAsync(1, 500);
-        var all = drivers?.Items?.ToList() ?? new();
-        vm.Drivers    = all.Where(d => d.DriverType != SmartBus.Domain.Enums.DriverType.Assistant).ToList();
-        vm.Assistants = all.Where(d => d.DriverType == SmartBus.Domain.Enums.DriverType.Assistant).ToList();
-        vm.Students   = students?.Items?.ToList() ?? new();
-
         return PartialView("_Form", vm);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Save(BusInput input)
+    public async Task<IActionResult> Save(BusInput input,
+                                          [FromQuery] string? plateNumber = null,
+                                          [FromQuery] string? personName = null)
     {
         if (!ModelState.IsValid) return await FormWithErrors(null, input);
         var (ok, err) = await ApiClient.CreateBusAsync(input);
         if (!ok) return StatusCode(502, new { result = err ?? "Upstream API error" });
-        return await SuccessWithList(_l["JS_BusSaved"], page: 1);
+        return await SuccessWithList(_l["JS_BusSaved"], 1, plateNumber, personName);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(Guid id, BusInput input, int page = 1)
+    public async Task<IActionResult> Update(Guid id, BusInput input,
+                                            [FromQuery] int page = 1,
+                                            [FromQuery] string? plateNumber = null,
+                                            [FromQuery] string? personName = null)
     {
         if (!ModelState.IsValid) return await FormWithErrors(id, input);
         var (ok, err) = await ApiClient.UpdateBusAsync(id, input);
         if (!ok) return StatusCode(502, new { result = err ?? "Upstream API error" });
-        return await SuccessWithList(_l["JS_BusSaved"], page);
+        return await SuccessWithList(_l["JS_BusSaved"], page, plateNumber, personName);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Delete(Guid id, int page = 1)
+    public async Task<IActionResult> Delete(Guid id,
+                                            [FromQuery] int page = 1,
+                                            [FromQuery] string? plateNumber = null,
+                                            [FromQuery] string? personName = null)
     {
         if (!await ApiClient.DeleteBusAsync(id)) return StatusCode(502);
-        return await SuccessWithList(_l["JS_DeletedSuccess"], page);
+        return await SuccessWithList(_l["JS_DeletedSuccess"], page, plateNumber, personName);
     }
 
-    private async Task<IActionResult> FormWithErrors(Guid? id, BusInput input)
+    [HttpGet]
+    public async Task<IActionResult> Schedule(Guid id)
+    {
+        var bus = await ApiClient.GetBusByIdAsync(id);
+        if (bus is null) return NotFound();
+
+        var schedule = await ApiClient.GetBusScheduleAsync(id);
+        var drivers  = await ApiClient.GetDriversAsync(1, 200);
+        var students = await ApiClient.GetStudentsAsync(1, 500);
+        var allDrivers = drivers?.Items?.ToList() ?? new();
+
+        var selectedIds = schedule?.StudentIds?.ToHashSet() ?? new HashSet<Guid>();
+        var vm = new BusScheduleViewModel
+        {
+            BusId          = id,
+            BusPlateNumber = bus.PlateNumber,
+            Input = new BusScheduleInput
+            {
+                MorningTime        = schedule?.MorningTime ?? "07:00",
+                ReturnTime         = schedule?.ReturnTime  ?? "14:00",
+                RepeatDays         = schedule?.RepeatDays  ?? 0,
+                MorningDriverId    = schedule?.MorningDriverId,
+                MorningAssistantId = schedule?.MorningAssistantId,
+                ReturnDriverId     = schedule?.ReturnDriverId,
+                ReturnAssistantId  = schedule?.ReturnAssistantId,
+                StudentIds         = selectedIds.ToList()
+            },
+            Drivers    = allDrivers.Where(d => d.DriverType != SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
+            Assistants = allDrivers.Where(d => d.DriverType == SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
+            Students   = students?.Items?.ToList() ?? new(),
+            SelectedStudentIds = selectedIds
+        };
+        return PartialView("_Schedule", vm);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SaveSchedule(Guid id, BusScheduleInput input,
+                                                  [FromQuery] int page = 1,
+                                                  [FromQuery] string? plateNumber = null,
+                                                  [FromQuery] string? personName = null)
+    {
+        if (!ModelState.IsValid) return await ScheduleWithErrors(id, input);
+        var (ok, err) = await ApiClient.SetBusScheduleAsync(id, input);
+        if (!ok) return StatusCode(502, new { result = err ?? "Upstream API error" });
+        return await SuccessWithList(_l["BusSchedule_Saved"], page, plateNumber, personName);
+    }
+
+    private async Task<IActionResult> ScheduleWithErrors(Guid id, BusScheduleInput input)
+    {
+        var bus = await ApiClient.GetBusByIdAsync(id);
+        var drivers  = await ApiClient.GetDriversAsync(1, 200);
+        var students = await ApiClient.GetStudentsAsync(1, 500);
+        var allDrivers = drivers?.Items?.ToList() ?? new();
+        var selectedIds = input.StudentIds.ToHashSet();
+        var vm = new BusScheduleViewModel
+        {
+            BusId          = id,
+            BusPlateNumber = bus?.PlateNumber ?? string.Empty,
+            Input          = input,
+            Drivers    = allDrivers.Where(d => d.DriverType != SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
+            Assistants = allDrivers.Where(d => d.DriverType == SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
+            Students   = students?.Items?.ToList() ?? new(),
+            SelectedStudentIds = selectedIds
+        };
+        Response.StatusCode = 400;
+        return PartialView("_Schedule", vm);
+    }
+
+    private Task<IActionResult> FormWithErrors(Guid? id, BusInput input)
     {
         foreach (var kvp in ModelState)
             foreach (var err in kvp.Value!.Errors)
                 _logger.LogWarning("Bus form ModelState: {Field} = {Error}", kvp.Key, err.ErrorMessage);
 
-        var drivers  = await ApiClient.GetDriversAsync(1, 200);
-        var students = await ApiClient.GetStudentsAsync(1, 500);
-        var all = drivers?.Items?.ToList() ?? new();
-        var vm = new BusFormViewModel
-        {
-            BusId = id,
-            Input = input,
-            Drivers    = all.Where(d => d.DriverType != SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
-            Assistants = all.Where(d => d.DriverType == SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
-            Students   = students?.Items?.ToList() ?? new(),
-            SelectedStudentIds = input.StudentIds.ToHashSet()
-        };
+        var vm = new BusFormViewModel { BusId = id, Input = input };
         Response.StatusCode = 400;
-        return PartialView("_Form", vm);
+        return Task.FromResult<IActionResult>(PartialView("_Form", vm));
     }
 
-    private async Task<IActionResult> SuccessWithList(string message, int page)
+    private async Task<IActionResult> SuccessWithList(string message, int page, string? plateNumber = null, string? personName = null)
     {
-        var data = await ApiClient.GetBusesAsync(page, 10);
+        var data = await ApiClient.GetBusesAsync(page, 10, plateNumber, personName);
         var html = await RenderPartialAsync("_List", data);
         return Json(new { result = message, html, page });
     }

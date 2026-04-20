@@ -4,21 +4,25 @@
 
 @if (Model is null || !Model.Items.Any())
 {
-    <tr><td colspan="7" class="u-empty-state">@L["Bus_None"]</td></tr>
+    <tr><td colspan="8" class="u-empty-state">@L["Bus_None"]</td></tr>
 }
 else
 {
+    var rowIndex = ((Model.PageNumber - 1) * Model.PageSize);
     foreach (var b in Model.Items)
     {
-        var (statusCls, statusLabel) = b.Status switch
-        {
-            "OnRoute"     => ("badge-green", L["Bus_StatusOnRoute"].Value + " 🟢"),
-            "Active"      => ("badge-green", L["Bus_StatusActive"].Value + " 🟢"),
-            "Maintenance" => ("badge-red",   L["Bus_StatusMaint"].Value + " ⚠️"),
-            "OutOfService"=> ("badge-red",   L["Bus_StatusOOS"].Value),
-            _             => ("badge-gray",  L["Bus_StatusInactive"].Value)
-        };
-        <tr>
+        rowIndex++;
+        var (statusCls, statusLabel) = b.Status == "Active"
+            ? ("badge-green", L["Bus_StatusActive"].Value + " 🟢")
+            : ("badge-gray",  L["Bus_StatusInactive"].Value);
+        var rowCls     = b.IsScheduleComplete ? "" : "row-incomplete";
+        var schedCls   = b.IsScheduleComplete ? "tbl-sched" : "tbl-sched tbl-sched-warn";
+        var schedStroke = b.IsScheduleComplete ? "#0EA5E9" : "#B45309";
+        var schedTitle = b.IsScheduleComplete
+            ? L["BusSchedule_Title"].Value
+            : L["BusSchedule_Title"].Value + " — " + L["BusSchedule_Incomplete"].Value;
+        <tr class="@rowCls">
+            <td class="td-rownum">@rowIndex</td>
             <td><div class="td-name">@b.PlateNumber</div></td>
             <td>@b.Capacity</td>
             <td><span class="badge @statusCls">@statusLabel</span></td>
@@ -27,6 +31,13 @@ else
             <td><span class="badge badge-blue">@b.StudentCount</span></td>
             <td>
                 <div class="tbl-actions">
+                    <button class="tbl-btn @schedCls tbl-btn-wrap" title="@schedTitle" onclick="buses.openSchedule('@b.Id')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="@schedStroke" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        @if (!b.IsScheduleComplete)
+                        {
+                            <span class="badge-incomplete" aria-label="@L["BusSchedule_Incomplete"]">⚠</span>
+                        }
+                    </button>
                     <button class="tbl-btn tbl-edit" onclick="buses.openForm('@b.Id')">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
                     </button>

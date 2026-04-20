@@ -17,13 +17,25 @@ public class GetBusScheduleQueryHandler : IRequestHandler<GetBusScheduleQuery, R
         var schedule = await _context.BusSchedules
             .FirstOrDefaultAsync(s => s.BusId == request.BusId, cancellationToken);
 
+        var studentIds = schedule is null
+            ? new List<Guid>()
+            : await _context.BusScheduleStudents
+                .Where(x => x.BusScheduleId == schedule.Id)
+                .Select(x => x.StudentId)
+                .ToListAsync(cancellationToken);
+
         if (schedule is null)
-            return Result<BusScheduleDto>.Success(new BusScheduleDto(null, null, 0));
+            return Result<BusScheduleDto>.Success(new BusScheduleDto(null, null, 0, null, null, null, null, studentIds));
 
         return Result<BusScheduleDto>.Success(new BusScheduleDto(
             schedule.MorningTime.ToString("HH:mm"),
             schedule.ReturnTime.ToString("HH:mm"),
-            schedule.RepeatDays
+            schedule.RepeatDays,
+            schedule.MorningDriverId,
+            schedule.MorningAssistantId,
+            schedule.ReturnDriverId,
+            schedule.ReturnAssistantId,
+            studentIds
         ));
     }
 }

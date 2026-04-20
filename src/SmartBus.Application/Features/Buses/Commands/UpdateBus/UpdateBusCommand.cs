@@ -8,10 +8,7 @@ public record UpdateBusCommand(
     Guid BusId,
     string PlateNumber,
     int Capacity,
-    string Status,
-    Guid? DriverId,
-    Guid? AssistantDriverId,
-    IEnumerable<Guid> StudentIds
+    string Status
 ) : IRequest<Result>, ICacheInvalidator
 {
     public IEnumerable<string> CacheKeysToInvalidate      => new[] { $"bus:{BusId}" };
