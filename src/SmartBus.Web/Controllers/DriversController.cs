@@ -1,5 +1,7 @@
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using SmartBus.Domain.Enums;
 using SmartBus.Web.Models;
 using SmartBus.Web.Resources;
 using SmartBus.Web.Services;
@@ -9,9 +11,10 @@ namespace SmartBus.Web.Controllers;
 public class DriversController : AdminControllerBase
 {
     private readonly IStringLocalizer<SharedResources> _l;
+    private readonly ILogger<DriversController> _logger;
 
-    public DriversController(IApiClient apiClient, IStringLocalizer<SharedResources> l)
-        : base(apiClient) { _l = l; }
+    public DriversController(IApiClient apiClient, IStringLocalizer<SharedResources> l, ILogger<DriversController> logger)
+        : base(apiClient) { _l = l; _logger = logger; }
 
     public async Task<IActionResult> Index()
         => View(await PopulateAsync(new AdminPageViewModel(), "drivers", _l["Driver_PageTitle"]));
@@ -30,19 +33,17 @@ public class DriversController : AdminControllerBase
             if (d is null) return NotFound();
             model = new DriverInput
             {
-                FullName      = d.FullName,
-                FullNameEn    = d.FullNameEn,
-                PhoneNumber   = d.PhoneNumber,
-                LicenseNumber = d.LicenseNumber,
-                IsActive      = d.IsActive,
-                DriverType    = d.DriverType.ToString()
+                FullName    = d.FullName,
+                FullNameEn  = d.FullNameEn,
+                PhoneNumber = d.PhoneNumber,
+                IsActive    = d.IsActive,
+                DriverType  = d.DriverType.ToString()
             };
             ViewBag.DriverId = d.Id;
         }
         return PartialView("_Form", model);
     }
 
-    // Create: jumps the user back to page 1 so the new row is visible.
     [HttpPost]
     public async Task<IActionResult> Save(DriverInput input)
     {
@@ -52,10 +53,6 @@ public class DriversController : AdminControllerBase
         return await SuccessWithList(_l["JS_DriverSaved"], page: 1);
     }
 
-    // [FromQuery] forces these params to bind from the URL query string. Without
-    // it, the default value provider pulls `driverType` from the posted form
-    // (which carries DriverType=Driver/Assistant), so the list refresh after
-    // save would accidentally filter by the edited driver's type.
     [HttpPost]
     public async Task<IActionResult> Update(
         Guid id,
@@ -79,8 +76,133 @@ public class DriversController : AdminControllerBase
         return await SuccessWithList(_l["JS_DeletedSuccess"], page, driverType);
     }
 
-    // Builds a single response that carries both the toast text and the refreshed list HTML.
-    // JS drops `html` into the tbody and shows `result` as a toast — one round-trip instead of two.
+    // ── Export ─────────────────────────────────────────────────────────────
+    [HttpGet]
+    public async Task<IActionResult> Export(string? driverType = null)
+    {
+        var data = await ApiClient.GetDriversAsync(1, 10000, driverType);
+        using var wb = new XLWorkbook();
+        var ws = wb.AddWorksheet("Drivers");
+
+        string[] headers = { "FullName","FullNameEn","PhoneNumber","DriverType","IsActive","CreatedAt" };
+        for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
+        ws.Row(1).Style.Font.Bold = true;
+
+        var row = 2;
+        foreach (var d in data?.Items ?? Array.Empty<Application.Features.Drivers.Queries.GetAllDrivers.DriverDto>())
+        {
+            ws.Cell(row, 1).Value = d.FullName;
+            ws.Cell(row, 2).Value = d.FullNameEn;
+            ws.Cell(row, 3).Value = d.PhoneNumber;
+            ws.Cell(row, 4).Value = TypeLabel(d.DriverType);
+            ws.Cell(row, 5).Value = d.IsActive ? _l["Driver_Active"].Value : _l["Driver_Inactive"].Value;
+            ws.Cell(row, 6).Value = d.CreatedAt;
+            row++;
+        }
+        ws.Columns().AdjustToContents();
+
+        using var ms = new MemoryStream();
+        wb.SaveAs(ms);
+        return File(ms.ToArray(),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"drivers-{DateTime.UtcNow:yyyyMMdd-HHmm}.xlsx");
+    }
+
+    // ── Template ───────────────────────────────────────────────────────────
+    [HttpGet]
+    public IActionResult Template()
+    {
+        using var wb = new XLWorkbook();
+        var ws = wb.AddWorksheet("Drivers");
+
+        string[] headers = { "FullName","FullNameEn","PhoneNumber","DriverType" };
+        for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
+        ws.Row(1).Style.Font.Bold = true;
+        ws.Row(1).Style.Fill.BackgroundColor = XLColor.FromHtml("#FFFDE7");
+
+        ws.Cell(2, 1).Value = "محمد أحمد";
+        ws.Cell(2, 2).Value = "Mohammad Ahmad";
+        ws.Cell(2, 3).Value = "0791234567";
+        ws.Cell(2, 4).Value = "Driver";
+        ws.Row(2).Style.Font.Italic = true;
+        ws.Row(2).Style.Font.FontColor = XLColor.FromHtml("#94A3B8");
+        ws.Columns().AdjustToContents();
+
+        using var ms = new MemoryStream();
+        wb.SaveAs(ms);
+        return File(ms.ToArray(),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "drivers-template.xlsx");
+    }
+
+    // ── Import ─────────────────────────────────────────────────────────────
+    [HttpPost]
+    [RequestSizeLimit(5 * 1024 * 1024)]
+    public async Task<IActionResult> Import(IFormFile? file)
+    {
+        if (file is null || file.Length == 0)
+            return StatusCode(400, new { result = _l["Driver_ImportNoFile"].Value });
+
+        int imported = 0, failed = 0;
+        try
+        {
+            using var stream = file.OpenReadStream();
+            using var wb     = new XLWorkbook(stream);
+            var sheet        = wb.Worksheet(1);
+            var headerRow    = sheet.FirstRowUsed();
+            if (headerRow is null) return StatusCode(400, new { result = "Empty sheet" });
+
+            var cols = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in headerRow.CellsUsed())
+                cols[c.GetString().Trim()] = c.Address.ColumnNumber;
+
+            int Col(string n) => cols.TryGetValue(n, out var x) ? x : -1;
+            int cFull   = Col("FullName");
+            int cPhone  = Col("PhoneNumber");
+            int cType   = Col("DriverType");
+            int cFullEn = Col("FullNameEn");
+
+            if (cFull < 0 || cPhone < 0 || cType < 0)
+                return StatusCode(400, new { result = _l["Driver_ImportHint"].Value });
+
+            foreach (var row in sheet.RowsUsed().Skip(1))
+            {
+                string Get(int col) => col > 0 ? row.Cell(col).GetString().Trim() : string.Empty;
+
+                // DriverType accepted as enum name ("Driver"/"Assistant") or localized label
+                var rawType = Get(cType);
+                var driverType = rawType.Equals("Assistant", StringComparison.OrdinalIgnoreCase)
+                              || rawType == _l["Driver_TypeAssist"].Value
+                    ? "Assistant" : "Driver";
+
+                var input = new DriverInput
+                {
+                    FullName    = Get(cFull),
+                    FullNameEn  = Get(cFullEn),
+                    PhoneNumber = Get(cPhone),
+                    DriverType  = driverType,
+                    IsActive    = true
+                };
+                if (string.IsNullOrEmpty(input.FullName) || string.IsNullOrEmpty(input.PhoneNumber))
+                { failed++; continue; }
+
+                var (ok, _) = await ApiClient.CreateDriverAsync(input);
+                if (ok) imported++; else failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Driver import failed");
+            return StatusCode(400, new { result = ex.Message });
+        }
+
+        var message = string.Format(_l["Driver_ImportResult"].Value, imported, failed);
+        return await SuccessWithList(message, page: 1);
+    }
+
+    private string TypeLabel(DriverType t)
+        => t == DriverType.Assistant ? _l["Driver_TypeAssist"].Value : _l["Driver_TypeDriver"].Value;
+
     private async Task<IActionResult> SuccessWithList(string message, int page, string? driverType = null)
     {
         var data = await ApiClient.GetDriversAsync(page, 10, driverType);

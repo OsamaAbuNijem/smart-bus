@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartBus.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using SmartBus.Infrastructure.Persistence;
 namespace SmartBus.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260420092406_RemoveDriverLicense")]
+    partial class RemoveDriverLicense
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -496,7 +499,7 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -505,10 +508,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PhoneNumber")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
 
                     b.HasIndex("DriverType", "IsDeleted");
 

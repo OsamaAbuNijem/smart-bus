@@ -10,7 +10,6 @@ public record UpdateDriverCommand(
     string FullName,
     string? FullNameEn,
     string PhoneNumber,
-    string LicenseNumber,
     bool IsActive,
     DriverType DriverType
 ) : IRequest<Result>, ICacheInvalidator

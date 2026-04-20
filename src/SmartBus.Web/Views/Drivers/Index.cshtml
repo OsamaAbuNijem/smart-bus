@@ -4,36 +4,108 @@
     ViewData["Title"] = Model.PageTitle;
 }
 
-@* All page state lives in hidden inputs — no JS-side state. *@
 <input type="hidden" id="drivers-page"   value="1"/>
 <input type="hidden" id="drivers-filter" value=""/>
 
-<div class="filter-bar">
-  <button class="filter-btn active" onclick="drivers.filter('', this)">
-    الكل (<span id="drivers-total">0</span>)
-  </button>
-  <button class="filter-btn"        onclick="drivers.filter('Driver', this)">@L["Driver_TypeDriver"]</button>
-  <button class="filter-btn"        onclick="drivers.filter('Assistant', this)">@L["Driver_TypeAssist"]</button>
-  <button class="add-btn" onclick="drivers.openForm()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    @L["Driver_AddTitle"]
-  </button>
+<div class="filter-bar panel">
+
+  <div class="filter-group">
+    <button class="filter-btn active" onclick="drivers.filter('', this)">@L["Pager_All"]</button>
+    <button class="filter-btn"        onclick="drivers.filter('Driver', this)">@L["Driver_TypeDriver"]</button>
+    <button class="filter-btn"        onclick="drivers.filter('Assistant', this)">@L["Driver_TypeAssist"]</button>
+  </div>
+
+  <div class="action-group">
+    <button class="btn-ghost" onclick="drivers.downloadTemplate()"
+            aria-label="@L["Driver_Template"]" title="@L["Driver_Template"]">
+      <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+      </svg>
+      @L["Driver_Template"]
+    </button>
+
+    <button class="btn-ghost" onclick="drivers.exportFile()"
+            aria-label="@L["Driver_Export"]" title="@L["Driver_Export"]">
+      <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      @L["Driver_Export"]
+    </button>
+
+    <button class="btn-ghost" onclick="drivers.openImport()"
+            aria-label="@L["Driver_Import"]" title="@L["Driver_Import"]">
+      <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      @L["Driver_Import"]
+    </button>
+
+    <div class="filter-divider-v"></div>
+
+    <button class="add-btn" onclick="drivers.openForm()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      @L["Driver_AddTitle"]
+    </button>
+  </div>
 </div>
 
 <div class="card">
   <table class="table">
     <thead>
-      <tr><th>الموظف</th><th>الدور</th><th>رقم الرخصة</th><th>رقم التواصل</th><th>الحالة</th><th></th></tr>
+      <tr>
+        <th scope="col">@L["Driver_ColNumber"]</th>
+        <th scope="col">@L["Driver_ColName"]</th>
+        <th scope="col">@L["Driver_ColRole"]</th>
+        <th scope="col">@L["Driver_ColPhone"]</th>
+        <th scope="col">@L["Driver_ColStatus"]</th>
+        <th scope="col"></th>
+      </tr>
     </thead>
     <tbody id="drivers-tbody">
-      <tr><td colspan="6" class="u-loading-state">جاري التحميل...</td></tr>
+      <tr><td colspan="6" class="u-loading-state">@L["Driver_Loading"]</td></tr>
     </tbody>
   </table>
   <div class="table-pager">
-    <span class="table-pager-info" id="drivers-pager-info"></span>
+    <div class="u-flex u-items-center u-gap-12">
+      <span class="count-pill accent" aria-live="polite">
+        <span>@L["Driver_TotalLabel"]</span>
+        <span class="count" id="drivers-total">0</span>
+      </span>
+      <span class="table-pager-info" id="drivers-pager-info" aria-live="polite"></span>
+    </div>
     <div class="table-pager-controls">
-      <button class="filter-btn" id="drivers-prev" onclick="drivers.prev()">‹ السابق</button>
-      <button class="filter-btn" id="drivers-next" onclick="drivers.next()">التالي ›</button>
+      <button class="filter-btn" id="drivers-prev" onclick="drivers.prev()">@L["Pager_Prev"]</button>
+      <button class="filter-btn" id="drivers-next" onclick="drivers.next()">@L["Pager_Next"]</button>
+    </div>
+  </div>
+</div>
+
+@* Import modal *@
+<div class="modal-overlay" id="modal-drivers-import" role="dialog" aria-modal="true" aria-labelledby="drivers-import-title">
+  <div class="modal-box sm">
+    <div class="modal-header">
+      <div class="modal-header-title" id="drivers-import-title">@L["Driver_ImportTitle"]</div>
+      <button class="modal-close-btn" onclick="SB.closeModal('modal-drivers-import')" aria-label="Close">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body stack">
+      <div class="u-text-sm u-text-muted">@L["Driver_ImportHint"]</div>
+      <a href="/Drivers/Template" class="btn-ghost u-self-start">
+        <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        </svg>
+        @L["Driver_Template"]
+      </a>
+      <input type="file" id="drivers-import-file" accept=".xlsx" class="form-input"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="drivers.submitImport()">@L["Driver_Import"]</button>
+      <button class="btn-secondary" onclick="SB.closeModal('modal-drivers-import')">@L["Del_Cancel"]</button>
     </div>
   </div>
 </div>

@@ -1,12 +1,11 @@
 /**
  * SmartBus Admin — Drivers page.
- * Mutations (Save/Update/Delete) return { result, html, page } so one round-trip
- * handles the POST + list refresh.
+ * Mutations return { result, html, page }. Export / Import / Template mirror
+ * the Students page.
  */
 
 const drivers = {
 
-  // GET /Drivers/List → HTML rows
   async load() {
     const page   = document.getElementById('drivers-page').value;
     const filter = document.getElementById('drivers-filter').value;
@@ -28,7 +27,8 @@ const drivers = {
     const totalPages = parseInt(meta.dataset.totalPages) || 1;
     const totalCount = meta.dataset.totalCount || 0;
     document.getElementById('drivers-pager-info').textContent = meta.dataset.pagerInfo;
-    document.getElementById('drivers-total').textContent = totalCount;
+    const totalEl = document.getElementById('drivers-total');
+    if (totalEl) totalEl.textContent = totalCount;
     document.getElementById('drivers-prev').disabled = page <= 1;
     document.getElementById('drivers-next').disabled = page >= totalPages;
   },
@@ -101,6 +101,41 @@ const drivers = {
       const { result, html } = await res.json();
       if (html)   this._renderList(html);
       if (result) SB.ShowMessage(result);
+    }
+  },
+
+  // ── Export / Template ────────────────────────────────────────────────────
+  exportFile() {
+    const filter = document.getElementById('drivers-filter').value;
+    location.href = '/Drivers/Export' + (filter ? '?driverType=' + filter : '');
+  },
+  downloadTemplate() { location.href = '/Drivers/Template'; },
+
+  // ── Import ───────────────────────────────────────────────────────────────
+  openImport() {
+    document.getElementById('drivers-import-file').value = '';
+    SB.openModal('modal-drivers-import');
+  },
+
+  async submitImport() {
+    const input = document.getElementById('drivers-import-file');
+    const file  = input.files?.[0];
+    if (!file) { SB.ShowMessage('Choose a file'); return; }
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/Drivers/Import', {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: fd
+    });
+    if (res.ok) {
+      const { result, html } = await res.json();
+      SB.closeModal('modal-drivers-import');
+      if (html)   this._renderList(html);
+      if (result) SB.ShowMessage(result);
+    } else {
+      const { result } = await res.json().catch(() => ({}));
+      SB.ShowMessage(result || 'Import failed');
     }
   }
 };

@@ -16,7 +16,7 @@ public class GetDriverByIdQueryHandler : IRequestHandler<GetDriverByIdQuery, Res
     {
         var driver = await _context.Drivers
             .Where(d => d.Id == request.DriverId && !d.IsDeleted)
-            .Select(d => new DriverDto(d.Id, d.FullName, d.FullNameEn, d.PhoneNumber, d.LicenseNumber, d.IsActive, d.DriverType, d.CreatedAt))
+            .Select(d => new DriverDto(d.Id, d.FullName, d.FullNameEn, d.PhoneNumber, d.IsActive, d.DriverType, d.CreatedAt))
             .FirstOrDefaultAsync(cancellationToken);
 
         return driver is null

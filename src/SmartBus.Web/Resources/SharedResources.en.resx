@@ -105,7 +105,6 @@
   <data name="Driver_NameAr"      xml:space="preserve"><value>Name in Arabic *</value></data>
   <data name="Driver_NameEn"      xml:space="preserve"><value>Name in English *</value></data>
   <data name="Driver_Phone"       xml:space="preserve"><value>Phone Number *</value></data>
-  <data name="Driver_License"     xml:space="preserve"><value>License Number *</value></data>
   <data name="Driver_Status"      xml:space="preserve"><value>Status</value></data>
   <data name="Driver_Active"      xml:space="preserve"><value>Active</value></data>
   <data name="Driver_Inactive"    xml:space="preserve"><value>Inactive</value></data>
@@ -119,6 +118,20 @@
   <data name="Driver_PageTitle"   xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
   <data name="Driver_None"        xml:space="preserve"><value>No drivers registered</value></data>
   <data name="Driver_PagerInfo"   xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Driver_TotalLabel"  xml:space="preserve"><value>Total staff</value></data>
+  <data name="Driver_ColNumber"   xml:space="preserve"><value>#</value></data>
+  <data name="Driver_ColName"     xml:space="preserve"><value>Employee</value></data>
+  <data name="Driver_ColRole"     xml:space="preserve"><value>Role</value></data>
+  <data name="Driver_ColPhone"    xml:space="preserve"><value>Phone</value></data>
+  <data name="Driver_ColStatus"   xml:space="preserve"><value>Status</value></data>
+  <data name="Driver_Loading"     xml:space="preserve"><value>Loading...</value></data>
+  <data name="Driver_Export"      xml:space="preserve"><value>Export Excel</value></data>
+  <data name="Driver_Import"      xml:space="preserve"><value>Import Excel</value></data>
+  <data name="Driver_Template"    xml:space="preserve"><value>Download Template</value></data>
+  <data name="Driver_ImportTitle" xml:space="preserve"><value>Import Staff from Excel</value></data>
+  <data name="Driver_ImportHint"  xml:space="preserve"><value>File must contain columns: FullName, PhoneNumber, DriverType</value></data>
+  <data name="Driver_ImportResult" xml:space="preserve"><value>Imported {0} — {1} failed</value></data>
+  <data name="Driver_ImportNoFile" xml:space="preserve"><value>Please choose a file</value></data>
 
   <!-- Validation messages (shared) -->
   <data name="Validation_Required"      xml:space="preserve"><value>This field is required</value></data>

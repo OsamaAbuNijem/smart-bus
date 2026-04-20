@@ -9,7 +9,6 @@ public record CreateDriverCommand(
     string FullName,
     string? FullNameEn,
     string PhoneNumber,
-    string LicenseNumber,
     bool IsActive = true,
     DriverType DriverType = DriverType.Driver
 ) : IRequest<Result<Guid>>, ICacheInvalidator

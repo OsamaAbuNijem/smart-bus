@@ -11,25 +11,22 @@
 }
 else
 {
+    var baseIndex = ((Model.PageNumber - 1) * Model.PageSize);
+    var rowNum = 0;
     foreach (var d in Model.Items)
     {
+        rowNum++;
         var displayName = !isRtl && !string.IsNullOrEmpty(d.FullNameEn) ? d.FullNameEn : d.FullName;
         var isAssist    = d.DriverType == SmartBus.Domain.Enums.DriverType.Assistant;
         var typeLabel   = isAssist ? L["Driver_TypeAssist"] : L["Driver_TypeDriver"];
         var typeCls     = isAssist ? "badge-purple" : "badge-blue";
         var activeLabel = d.IsActive ? L["Driver_Active"] : L["Driver_Inactive"];
         var activeCls   = d.IsActive ? "badge-green" : "badge-gray";
-        var initials    = displayName.Length >= 2 ? displayName[..2] : displayName;
 
         <tr>
-            <td>
-                <div class="u-flex u-items-center u-gap-10">
-                    <div class="table-av">@initials</div>
-                    <div><div class="td-name">@displayName</div></div>
-                </div>
-            </td>
+            <td class="u-text-muted u-text-sm">@(baseIndex + rowNum)</td>
+            <td><div class="td-name">@displayName</div></td>
             <td><span class="badge @typeCls">@typeLabel</span></td>
-            <td>@(string.IsNullOrEmpty(d.LicenseNumber) ? "—" : d.LicenseNumber)</td>
             <td>@d.PhoneNumber</td>
             <td><span class="badge @activeCls">@activeLabel@(d.IsActive ? " 🟢" : "")</span></td>
             <td>

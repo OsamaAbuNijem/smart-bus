@@ -128,6 +128,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         // Driver filtering by type:
         builder.Entity<Driver>().HasIndex(d => new { d.DriverType, d.IsDeleted });
 
+        // Unique phone per active (non-deleted) driver:
+        builder.Entity<Driver>()
+            .HasIndex(d => d.PhoneNumber)
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
+
         // Latest-location lookup on BusLocation:
         builder.Entity<BusLocation>().HasIndex(l => new { l.BusId, l.Timestamp });
     }

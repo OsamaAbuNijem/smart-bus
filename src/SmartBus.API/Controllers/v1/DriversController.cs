@@ -51,7 +51,7 @@ public class DriversController : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDriverRequest request, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
-            new UpdateDriverCommand(id, request.FullName, request.FullNameEn, request.PhoneNumber, request.LicenseNumber, request.IsActive, request.DriverType),
+            new UpdateDriverCommand(id, request.FullName, request.FullNameEn, request.PhoneNumber, request.IsActive, request.DriverType),
             cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
@@ -69,7 +69,6 @@ public record UpdateDriverRequest(
     string FullName,
     string? FullNameEn,
     string PhoneNumber,
-    string LicenseNumber,
     bool IsActive = true,
     DriverType DriverType = DriverType.Driver
 );

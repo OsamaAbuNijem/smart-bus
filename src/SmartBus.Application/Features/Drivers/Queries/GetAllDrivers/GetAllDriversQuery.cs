@@ -20,7 +20,6 @@ public record DriverDto(
     string FullName,
     string? FullNameEn,
     string PhoneNumber,
-    string LicenseNumber,
     bool IsActive,
     DriverType DriverType,
     DateTime CreatedAt

@@ -105,7 +105,6 @@
   <data name="Driver_NameAr"      xml:space="preserve"><value>الاسم بالعربية *</value></data>
   <data name="Driver_NameEn"      xml:space="preserve"><value>الاسم بالإنجليزية *</value></data>
   <data name="Driver_Phone"       xml:space="preserve"><value>رقم الهاتف *</value></data>
-  <data name="Driver_License"     xml:space="preserve"><value>رقم الرخصة *</value></data>
   <data name="Driver_Status"      xml:space="preserve"><value>الحالة</value></data>
   <data name="Driver_Active"      xml:space="preserve"><value>نشط</value></data>
   <data name="Driver_Inactive"    xml:space="preserve"><value>غير نشط</value></data>
@@ -119,6 +118,20 @@
   <data name="Driver_PageTitle"   xml:space="preserve"><value>السائقون والمساعدون</value></data>
   <data name="Driver_None"        xml:space="preserve"><value>لا يوجد سائقون مسجلون</value></data>
   <data name="Driver_PagerInfo"   xml:space="preserve"><value>عرض {0} من {1} موظف — الصفحة {2} من {3}</value></data>
+  <data name="Driver_TotalLabel"  xml:space="preserve"><value>إجمالي الموظفين</value></data>
+  <data name="Driver_ColNumber"   xml:space="preserve"><value>#</value></data>
+  <data name="Driver_ColName"     xml:space="preserve"><value>الموظف</value></data>
+  <data name="Driver_ColRole"     xml:space="preserve"><value>الدور</value></data>
+  <data name="Driver_ColPhone"    xml:space="preserve"><value>رقم التواصل</value></data>
+  <data name="Driver_ColStatus"   xml:space="preserve"><value>الحالة</value></data>
+  <data name="Driver_Loading"     xml:space="preserve"><value>جاري التحميل...</value></data>
+  <data name="Driver_Export"      xml:space="preserve"><value>تصدير Excel</value></data>
+  <data name="Driver_Import"      xml:space="preserve"><value>استيراد Excel</value></data>
+  <data name="Driver_Template"    xml:space="preserve"><value>تحميل القالب</value></data>
+  <data name="Driver_ImportTitle" xml:space="preserve"><value>استيراد الموظفين من Excel</value></data>
+  <data name="Driver_ImportHint"  xml:space="preserve"><value>يجب أن يحتوي الملف على الأعمدة: FullName, PhoneNumber, DriverType</value></data>
+  <data name="Driver_ImportResult" xml:space="preserve"><value>تم استيراد {0} موظف — فشل {1}</value></data>
+  <data name="Driver_ImportNoFile" xml:space="preserve"><value>الرجاء اختيار ملف</value></data>
 
   <!-- Validation messages (shared) -->
   <data name="Validation_Required"      xml:space="preserve"><value>هذا الحقل مطلوب</value></data>

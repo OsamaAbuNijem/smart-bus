@@ -1,11 +1,12 @@
 using FluentValidation;
 
-namespace SmartBus.Application.Features.Drivers.Commands.CreateDriver;
+namespace SmartBus.Application.Features.Drivers.Commands.UpdateDriver;
 
-public class CreateDriverCommandValidator : AbstractValidator<CreateDriverCommand>
+public class UpdateDriverCommandValidator : AbstractValidator<UpdateDriverCommand>
 {
-    public CreateDriverCommandValidator()
+    public UpdateDriverCommandValidator()
     {
+        RuleFor(x => x.DriverId).NotEmpty();
         RuleFor(x => x.FullName).NotEmpty().MaximumLength(100);
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()

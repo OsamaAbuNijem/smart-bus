@@ -25,7 +25,7 @@ public class GetAllDriversQueryHandler : IRequestHandler<GetAllDriversQuery, Pag
             .Take(request.PageSize)
             .Select(d => new DriverDto(
                 d.Id, d.FullName, d.FullNameEn,
-                d.PhoneNumber, d.LicenseNumber,
+                d.PhoneNumber,
                 d.IsActive, d.DriverType, d.CreatedAt))
             .ToListAsync(cancellationToken);
 
