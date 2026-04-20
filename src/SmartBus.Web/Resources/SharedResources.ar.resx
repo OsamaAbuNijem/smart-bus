@@ -149,6 +149,14 @@
   <data name="BusSchedule_Saved"    xml:space="preserve"><value>تم حفظ الجدول بنجاح ✓</value></data>
   <data name="BusSchedule_Incomplete" xml:space="preserve"><value>بيانات ناقصة (سائق/مساعد/طلاب)</value></data>
   <data name="BusSchedule_ReturnAfterMorning" xml:space="preserve"><value>وقت العودة يجب أن يكون بعد وقت الذهاب</value></data>
+  <data name="BusSchedule_StudentsSelected" xml:space="preserve"><value>طالب مختار</value></data>
+  <data name="Day_Sun" xml:space="preserve"><value>الأحد</value></data>
+  <data name="Day_Mon" xml:space="preserve"><value>الاثنين</value></data>
+  <data name="Day_Tue" xml:space="preserve"><value>الثلاثاء</value></data>
+  <data name="Day_Wed" xml:space="preserve"><value>الأربعاء</value></data>
+  <data name="Day_Thu" xml:space="preserve"><value>الخميس</value></data>
+  <data name="Day_Fri" xml:space="preserve"><value>الجمعة</value></data>
+  <data name="Day_Sat" xml:space="preserve"><value>السبت</value></data>
 
   <!-- Students page -->
   <data name="Student_PageTitle"   xml:space="preserve"><value>الطلاب</value></data>
@@ -220,6 +228,30 @@
   <data name="Trip_StatusCompleted"  xml:space="preserve"><value>مكتملة</value></data>
   <data name="Trip_StatusDelayed"    xml:space="preserve"><value>متأخرة</value></data>
   <data name="Trip_StatusCancelled"  xml:space="preserve"><value>ملغاة</value></data>
+  <data name="Trip_ColNumber"        xml:space="preserve"><value>#</value></data>
+  <data name="Trip_ColDriver"        xml:space="preserve"><value>السائق</value></data>
+  <data name="Trip_ColAssistant"     xml:space="preserve"><value>المساعد</value></data>
+  <data name="Trip_ColBus"           xml:space="preserve"><value>الباص</value></data>
+  <data name="Trip_ColType"          xml:space="preserve"><value>النوع</value></data>
+  <data name="Trip_ColDate"          xml:space="preserve"><value>التاريخ</value></data>
+  <data name="Trip_ColTime"          xml:space="preserve"><value>الوقت</value></data>
+  <data name="Trip_ColStatus"        xml:space="preserve"><value>الحالة</value></data>
+  <data name="Trip_SearchPerson"     xml:space="preserve"><value>ابحث بالسائق أو المساعد...</value></data>
+  <data name="Trip_FilterDate"       xml:space="preserve"><value>التاريخ</value></data>
+  <data name="Trip_FilterStatus"     xml:space="preserve"><value>الحالة</value></data>
+  <data name="Trip_ClearFilter"      xml:space="preserve"><value>مسح</value></data>
+  <data name="Trip_Loading"          xml:space="preserve"><value>جاري التحميل...</value></data>
+  <data name="Trip_TotalLabel"       xml:space="preserve"><value>إجمالي الرحلات</value></data>
+  <data name="Trip_StudentsTotal"    xml:space="preserve"><value>إجمالي الطلاب</value></data>
+  <data name="Trip_StudentsColName"    xml:space="preserve"><value>الطالب</value></data>
+  <data name="Trip_StudentsColGrade"   xml:space="preserve"><value>الصف</value></data>
+  <data name="Trip_StudentsColArea"    xml:space="preserve"><value>المنطقة</value></data>
+  <data name="Trip_StudentsColBoarding" xml:space="preserve"><value>حالة الركوب</value></data>
+  <data name="Trip_StudentsColBoardTime" xml:space="preserve"><value>وقت الركوب</value></data>
+  <data name="Trip_StudentsColDropTime" xml:space="preserve"><value>وقت التنزيل</value></data>
+  <data name="Trip_BoardingWaiting"  xml:space="preserve"><value>في الانتظار</value></data>
+  <data name="Trip_BoardingBoarded"  xml:space="preserve"><value>ركب</value></data>
+  <data name="Trip_BoardingAbsent"   xml:space="preserve"><value>غائب</value></data>
   <data name="JS_TripStarted"     xml:space="preserve"><value>تم بدء الرحلة ✓</value></data>
   <data name="JS_TripCompleted"   xml:space="preserve"><value>تم إتمام الرحلة ✓</value></data>
   <data name="JS_TripsGenerated"  xml:space="preserve"><value>تم إنشاء رحلات اليوم بنجاح ✓</value></data>

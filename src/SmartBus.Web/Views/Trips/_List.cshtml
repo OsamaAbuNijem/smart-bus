@@ -4,12 +4,14 @@
 
 @if (Model is null || !Model.Items.Any())
 {
-    <tr><td colspan="8" class="u-empty-state">@L["Trip_None"]</td></tr>
+    <tr><td colspan="9" class="u-empty-state">@L["Trip_None"]</td></tr>
 }
 else
 {
+    var rowIndex = ((Model.PageNumber - 1) * Model.PageSize);
     foreach (var t in Model.Items)
     {
+        rowIndex++;
         var statusKey = $"Trip_Status{t.Status}";
         var statusCls = t.Status switch
         {
@@ -26,6 +28,7 @@ else
         var canComplete = t.Status == "InProgress";
 
         <tr>
+            <td class="td-rownum">@rowIndex</td>
             <td><div class="td-sub">@(string.IsNullOrEmpty(t.DriverName) ? "—" : t.DriverName)</div></td>
             <td><div class="td-sub">@(string.IsNullOrEmpty(t.AssistantDriverName) ? "—" : t.AssistantDriverName)</div></td>
             <td><span class="badge badge-blue">@t.BusPlateNumber</span></td>

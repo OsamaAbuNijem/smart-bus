@@ -149,6 +149,14 @@
   <data name="BusSchedule_Saved"    xml:space="preserve"><value>Schedule saved ✓</value></data>
   <data name="BusSchedule_Incomplete" xml:space="preserve"><value>Missing driver/assistant/students</value></data>
   <data name="BusSchedule_ReturnAfterMorning" xml:space="preserve"><value>Return time must be after the morning time</value></data>
+  <data name="BusSchedule_StudentsSelected" xml:space="preserve"><value>students selected</value></data>
+  <data name="Day_Sun" xml:space="preserve"><value>Sun</value></data>
+  <data name="Day_Mon" xml:space="preserve"><value>Mon</value></data>
+  <data name="Day_Tue" xml:space="preserve"><value>Tue</value></data>
+  <data name="Day_Wed" xml:space="preserve"><value>Wed</value></data>
+  <data name="Day_Thu" xml:space="preserve"><value>Thu</value></data>
+  <data name="Day_Fri" xml:space="preserve"><value>Fri</value></data>
+  <data name="Day_Sat" xml:space="preserve"><value>Sat</value></data>
 
   <!-- Students page -->
   <data name="Student_PageTitle"   xml:space="preserve"><value>Students</value></data>
@@ -220,6 +228,30 @@
   <data name="Trip_StatusCompleted"  xml:space="preserve"><value>Completed</value></data>
   <data name="Trip_StatusDelayed"    xml:space="preserve"><value>Delayed</value></data>
   <data name="Trip_StatusCancelled"  xml:space="preserve"><value>Cancelled</value></data>
+  <data name="Trip_ColNumber"        xml:space="preserve"><value>#</value></data>
+  <data name="Trip_ColDriver"        xml:space="preserve"><value>Driver</value></data>
+  <data name="Trip_ColAssistant"     xml:space="preserve"><value>Assistant</value></data>
+  <data name="Trip_ColBus"           xml:space="preserve"><value>Bus</value></data>
+  <data name="Trip_ColType"          xml:space="preserve"><value>Type</value></data>
+  <data name="Trip_ColDate"          xml:space="preserve"><value>Date</value></data>
+  <data name="Trip_ColTime"          xml:space="preserve"><value>Time</value></data>
+  <data name="Trip_ColStatus"        xml:space="preserve"><value>Status</value></data>
+  <data name="Trip_SearchPerson"     xml:space="preserve"><value>Search by driver or assistant...</value></data>
+  <data name="Trip_FilterDate"       xml:space="preserve"><value>Date</value></data>
+  <data name="Trip_FilterStatus"     xml:space="preserve"><value>Status</value></data>
+  <data name="Trip_ClearFilter"      xml:space="preserve"><value>Clear</value></data>
+  <data name="Trip_Loading"          xml:space="preserve"><value>Loading...</value></data>
+  <data name="Trip_TotalLabel"       xml:space="preserve"><value>Total Trips</value></data>
+  <data name="Trip_StudentsTotal"    xml:space="preserve"><value>Total Students</value></data>
+  <data name="Trip_StudentsColName"    xml:space="preserve"><value>Student</value></data>
+  <data name="Trip_StudentsColGrade"   xml:space="preserve"><value>Grade</value></data>
+  <data name="Trip_StudentsColArea"    xml:space="preserve"><value>Area</value></data>
+  <data name="Trip_StudentsColBoarding" xml:space="preserve"><value>Boarding</value></data>
+  <data name="Trip_StudentsColBoardTime" xml:space="preserve"><value>Board Time</value></data>
+  <data name="Trip_StudentsColDropTime" xml:space="preserve"><value>Drop Time</value></data>
+  <data name="Trip_BoardingWaiting"  xml:space="preserve"><value>Waiting</value></data>
+  <data name="Trip_BoardingBoarded"  xml:space="preserve"><value>Boarded</value></data>
+  <data name="Trip_BoardingAbsent"   xml:space="preserve"><value>Absent</value></data>
   <data name="JS_TripStarted"     xml:space="preserve"><value>Trip started ✓</value></data>
   <data name="JS_TripCompleted"   xml:space="preserve"><value>Trip completed ✓</value></data>
   <data name="JS_TripsGenerated"  xml:space="preserve"><value>Today's trips generated ✓</value></data>

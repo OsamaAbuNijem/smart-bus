@@ -17,9 +17,12 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
     {
         // Join trip → schedule (per-bus). Driver/assistant names are taken from the schedule
         // side matching the trip type (Morning/Return).
+        // Exclude trips whose Bus has been soft-deleted — otherwise the count (which
+        // doesn't traverse the nav) won't match the rendered rows (where the Bus
+        // query filter hides soft-deleted buses and their trips become orphans).
         var query =
             from t in _context.Trips
-            where !t.IsDeleted && !t.IsTemplate
+            where !t.IsDeleted && !t.IsTemplate && t.Bus != null
             from sched in _context.BusSchedules.Where(s => s.BusId == t.BusId).DefaultIfEmpty()
             from morningDriver    in _context.Drivers.Where(d => sched != null && d.Id == sched.MorningDriverId).DefaultIfEmpty()
             from morningAssistant in _context.Drivers.Where(d => sched != null && d.Id == sched.MorningAssistantId).DefaultIfEmpty()

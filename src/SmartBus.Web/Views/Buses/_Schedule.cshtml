@@ -15,13 +15,13 @@
     // Bitmask: Sun=1, Mon=2, Tue=4, Wed=8, Thu=16, Fri=32, Sat=64
     var dayDefs = new[]
     {
-        (Mask: (byte)1,  Ar: "الأحد",    En: "Sun"),
-        (Mask: (byte)2,  Ar: "الاثنين",  En: "Mon"),
-        (Mask: (byte)4,  Ar: "الثلاثاء", En: "Tue"),
-        (Mask: (byte)8,  Ar: "الأربعاء", En: "Wed"),
-        (Mask: (byte)16, Ar: "الخميس",   En: "Thu"),
-        (Mask: (byte)32, Ar: "الجمعة",   En: "Fri"),
-        (Mask: (byte)64, Ar: "السبت",    En: "Sat")
+        (Mask: (byte)1,  Label: L["Day_Sun"].Value),
+        (Mask: (byte)2,  Label: L["Day_Mon"].Value),
+        (Mask: (byte)4,  Label: L["Day_Tue"].Value),
+        (Mask: (byte)8,  Label: L["Day_Wed"].Value),
+        (Mask: (byte)16, Label: L["Day_Thu"].Value),
+        (Mask: (byte)32, Label: L["Day_Fri"].Value),
+        (Mask: (byte)64, Label: L["Day_Sat"].Value)
     };
 }
 
@@ -114,11 +114,11 @@
       <div class="schedule-section-title">@L["BusSchedule_Days"]</div>
       <input type="hidden" name="RepeatDays" id="bs-repeat-days" value="@Model.Input.RepeatDays"/>
       <div class="schedule-days">
-        @foreach (var (mask, ar, en) in dayDefs)
+        @foreach (var (mask, label) in dayDefs)
         {
             <label class="schedule-day @(DayOn(mask) ? "active" : "")" data-mask="@mask">
               <input type="checkbox" class="schedule-day-cb" data-mask="@mask" @(DayOn(mask) ? "checked" : "") onchange="buses.toggleScheduleDay(this)"/>
-              <span>@(isRtl ? ar : en)</span>
+              <span>@label</span>
             </label>
         }
       </div>
@@ -127,7 +127,7 @@
     <div class="schedule-section">
       <div class="schedule-section-title">@L["BusSchedule_Students"]</div>
       <input type="text" class="form-input" id="bs-student-search"
-             placeholder="@(isRtl ? "ابحث..." : "Search...")"
+             placeholder="@L["SearchShort"]"
              autocomplete="off" oninput="buses.filterScheduleStudents(this.value)"/>
       <div id="bs-students-list" class="bus-students-list">
         @foreach (var s in Model.Students)
@@ -143,7 +143,7 @@
         }
       </div>
       <div class="bus-student-counter">
-        <span id="bs-selected-count">@Model.SelectedStudentIds.Count</span> @(isRtl ? "طالب مختار" : "students selected")
+        <span id="bs-selected-count">@Model.SelectedStudentIds.Count</span> @L["BusSchedule_StudentsSelected"]
       </div>
     </div>
 
@@ -151,6 +151,6 @@
 
   <div class="modal-footer">
     <button type="submit" class="btn-primary">@L["Bus_SaveBtn"]</button>
-    <button type="button" class="btn-secondary" onclick="SB.closeModal('modal-bus-schedule')">@(isRtl ? "إلغاء" : "Cancel")</button>
+    <button type="button" class="btn-secondary" onclick="SB.closeModal('modal-bus-schedule')">@L["Del_Cancel"]</button>
   </div>
 </form>

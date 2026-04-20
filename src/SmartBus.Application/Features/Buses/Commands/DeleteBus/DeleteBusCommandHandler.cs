@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
 
@@ -7,10 +8,12 @@ namespace SmartBus.Application.Features.Buses.Commands.DeleteBus;
 public class DeleteBusCommandHandler : IRequestHandler<DeleteBusCommand, Result>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IApplicationDbContext _context;
 
-    public DeleteBusCommandHandler(IUnitOfWork unitOfWork)
+    public DeleteBusCommandHandler(IUnitOfWork unitOfWork, IApplicationDbContext context)
     {
         _unitOfWork = unitOfWork;
+        _context    = context;
     }
 
     public async Task<Result> Handle(DeleteBusCommand request, CancellationToken cancellationToken)
@@ -18,12 +21,20 @@ public class DeleteBusCommandHandler : IRequestHandler<DeleteBusCommand, Result>
         var bus = await _unitOfWork.Buses.GetByIdAsync(request.BusId, cancellationToken);
         if (bus is null) return Result.Failure("Bus not found.");
 
-        // BusSchedule cascades (soft-delete), and BusScheduleStudents will cascade
-        // at the SQL level if we hard-delete the schedule — but we soft-delete the bus,
-        // so the schedule rows remain logically intact. No student-side cleanup needed.
+        // Soft-delete dependents so they don't linger as orphans in the trips grid.
+        var orphanTrips = await _context.Trips
+            .Where(t => t.BusId == request.BusId && !t.IsDeleted)
+            .ToListAsync(cancellationToken);
+        foreach (var trip in orphanTrips) trip.IsDeleted = true;
+
+        var orphanSchedule = await _context.BusSchedules
+            .FirstOrDefaultAsync(s => s.BusId == request.BusId && !s.IsDeleted, cancellationToken);
+        if (orphanSchedule is not null) orphanSchedule.IsDeleted = true;
+
         bus.IsDeleted = true;
         await _unitOfWork.Buses.UpdateAsync(bus);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

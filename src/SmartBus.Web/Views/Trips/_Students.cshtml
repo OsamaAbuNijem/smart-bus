@@ -3,39 +3,74 @@
 
 @if (Model is null || !Model.Any())
 {
-    <div class="u-empty-state">@L["Trip_StudentsNone"]</div>
+    <div class="trip-students-empty">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <div class="trip-students-empty-text">@L["Trip_StudentsNone"]</div>
+    </div>
 }
 else
 {
-    <table class="table">
-      <thead><tr>
-        <th>الطالب</th><th>الصف</th><th>المنطقة</th><th>حالة الركوب</th><th>وقت الركوب</th><th>وقت التنزيل</th>
-      </tr></thead>
-      <tbody>
-        @foreach (var s in Model)
-        {
-            var (cls, label) = s.BoardingStatus switch
-            {
-                "Waiting" => ("waiting", "في الانتظار"),
-                "Boarded" => ("boarded", "ركب"),
-                "Absent"  => ("absent",  "غائب"),
-                _         => ("",        s.BoardingStatus)
-            };
-            var initials = s.FullName.Length >= 2 ? s.FullName[..2] : s.FullName;
-            <tr>
-              <td>
-                <div class="u-flex u-items-center u-gap-8">
-                    <div class="table-av sm">@initials</div>
-                    <div class="td-name u-text-13">@s.FullName</div>
-                </div>
-              </td>
-              <td><div class="td-sub">@L["Std_Grade" + s.Grade]</div></td>
-              <td><div class="td-sub">@(string.IsNullOrEmpty(s.HomeArea) ? "—" : s.HomeArea)</div></td>
-              <td><span class="status-pill @cls">@label</span></td>
-              <td class="u-text-12 u-text-sub">@(s.BoardingTime?.ToString("HH:mm") ?? "—")</td>
-              <td class="u-text-12 u-text-sub">@(s.DropoffTime?.ToString("HH:mm")  ?? "—")</td>
-            </tr>
-        }
-      </tbody>
-    </table>
+    var waitingCount = Model.Count(s => s.BoardingStatus == "Waiting");
+    var boardedCount = Model.Count(s => s.BoardingStatus == "Boarded");
+    var absentCount  = Model.Count(s => s.BoardingStatus == "Absent");
+
+    <div class="trip-students-summary">
+      <div class="ts-stat ts-stat-total">
+        <div class="ts-stat-label">@L["Trip_StudentsTotal"]</div>
+        <div class="ts-stat-value">@Model.Count</div>
+      </div>
+      <div class="ts-stat ts-stat-boarded">
+        <div class="ts-stat-label">@L["Trip_BoardingBoarded"]</div>
+        <div class="ts-stat-value">@boardedCount</div>
+      </div>
+      <div class="ts-stat ts-stat-waiting">
+        <div class="ts-stat-label">@L["Trip_BoardingWaiting"]</div>
+        <div class="ts-stat-value">@waitingCount</div>
+      </div>
+      <div class="ts-stat ts-stat-absent">
+        <div class="ts-stat-label">@L["Trip_BoardingAbsent"]</div>
+        <div class="ts-stat-value">@absentCount</div>
+      </div>
+    </div>
+
+    <div class="trip-students-table-wrap">
+      <table class="table trip-students-table">
+        <thead>
+          <tr>
+            <th scope="col" class="col-num">@L["Trip_ColNumber"]</th>
+            <th scope="col">@L["Trip_StudentsColName"]</th>
+            <th scope="col">@L["Trip_StudentsColGrade"]</th>
+            <th scope="col">@L["Trip_StudentsColArea"]</th>
+            <th scope="col">@L["Trip_StudentsColBoarding"]</th>
+            <th scope="col">@L["Trip_StudentsColBoardTime"]</th>
+            <th scope="col">@L["Trip_StudentsColDropTime"]</th>
+          </tr>
+        </thead>
+        <tbody>
+          @{ var i = 0; }
+          @foreach (var s in Model)
+          {
+              i++;
+              var (cls, label) = s.BoardingStatus switch
+              {
+                  "Waiting" => ("waiting", L["Trip_BoardingWaiting"].Value),
+                  "Boarded" => ("boarded", L["Trip_BoardingBoarded"].Value),
+                  "Absent"  => ("absent",  L["Trip_BoardingAbsent"].Value),
+                  _         => ("",        s.BoardingStatus)
+              };
+              <tr>
+                <td class="col-num">@i</td>
+                <td class="col-name">@s.FullName</td>
+                <td><span class="grade-chip">@L["Std_Grade" + s.Grade]</span></td>
+                <td class="col-area">@(string.IsNullOrEmpty(s.HomeArea) ? "—" : s.HomeArea)</td>
+                <td><span class="status-pill @cls"><span class="status-dot"></span>@label</span></td>
+                <td class="col-time">@(s.BoardingTime?.ToString("HH:mm") ?? "—")</td>
+                <td class="col-time">@(s.DropoffTime?.ToString("HH:mm")  ?? "—")</td>
+              </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 }

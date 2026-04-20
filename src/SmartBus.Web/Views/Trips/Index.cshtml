@@ -6,56 +6,101 @@
 
 <input type="hidden" id="trips-page" value="1"/>
 
-<div class="trip-filter-bar">
-  <div class="trip-filter-search">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round">
-      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-    </svg>
-    <input id="trip-filter-name" type="text" placeholder="بحث بالسائق أو المساعد..." oninput="trips.debouncedSearch()"/>
+<div class="filter-bar panel">
+  <div class="filter-group">
+    @* Honeypot decoys — Chrome re-runs autofill after every DOM change. *@
+    <input type="text"     class="u-honeypot" tabindex="-1" aria-hidden="true"
+           autocomplete="username"          name="fake-user"/>
+    <input type="password" class="u-honeypot" tabindex="-1" aria-hidden="true"
+           autocomplete="current-password"  name="fake-pass"/>
+
+    <input type="search"
+           id="trip-filter-name"
+           name="search-person"
+           class="form-input"
+           placeholder="@L["Trip_SearchPerson"]"
+           value=""
+           readonly
+           onfocus="this.removeAttribute('readonly')"
+           onblur="this.setAttribute('readonly','')"
+           autocomplete="off"
+           autocorrect="off"
+           autocapitalize="none"
+           spellcheck="false"
+           data-lpignore="true"
+           data-form-type="other"
+           oninput="trips.debouncedSearch()"/>
+
+    <input id="trip-filter-date"
+           type="date"
+           class="form-input"
+           aria-label="@L["Trip_FilterDate"]"
+           onchange="trips.load(1)"/>
+
+    <select id="trip-filter-status"
+            class="form-input"
+            aria-label="@L["Trip_FilterStatus"]"
+            onchange="trips.load(1)">
+      <option value="">@L["Trip_FilterStatus"] — @L["Pager_All"]</option>
+      <option value="Scheduled">@L["Trip_StatusScheduled"]</option>
+      <option value="InProgress">@L["Trip_StatusInProgress"]</option>
+      <option value="Completed">@L["Trip_StatusCompleted"]</option>
+      <option value="Delayed">@L["Trip_StatusDelayed"]</option>
+      <option value="Cancelled">@L["Trip_StatusCancelled"]</option>
+    </select>
+
+    <button class="btn-ghost" onclick="trips.clearFilter()"
+            aria-label="@L["Trip_ClearFilter"]" title="@L["Trip_ClearFilter"]">
+      <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      @L["Trip_ClearFilter"]
+    </button>
   </div>
-  <div class="trip-filter-divider"></div>
-  <input id="trip-filter-date" type="date" class="trip-filter-input" onchange="trips.load(1)"/>
-  <div class="trip-filter-divider"></div>
-  <select id="trip-filter-status" class="trip-filter-select" onchange="trips.load(1)">
-    <option value="">كل الحالات</option>
-    <option value="Scheduled">@L["Trip_StatusScheduled"]</option>
-    <option value="InProgress">@L["Trip_StatusInProgress"]</option>
-    <option value="Completed">@L["Trip_StatusCompleted"]</option>
-    <option value="Delayed">@L["Trip_StatusDelayed"]</option>
-    <option value="Cancelled">@L["Trip_StatusCancelled"]</option>
-  </select>
-  <button class="trip-filter-clear" onclick="trips.clearFilter()">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    مسح
-  </button>
-  <div class="trip-filter-spacer"></div>
-  <button class="trip-filter-run" onclick="trips.generate()">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-    @L["Trip_GenerateBtn"]
-  </button>
+
+  <div class="action-group">
+    <button class="add-btn" onclick="trips.generate()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      @L["Trip_GenerateBtn"]
+    </button>
+  </div>
 </div>
 
 <div class="card">
   <table class="table">
     <thead>
-      <tr><th>السائق</th><th>المساعد</th><th>الباص</th><th>النوع</th><th>التاريخ</th><th>الوقت</th><th>الحالة</th><th></th></tr>
+      <tr>
+        <th scope="col">@L["Trip_ColNumber"]</th>
+        <th scope="col">@L["Trip_ColDriver"]</th>
+        <th scope="col">@L["Trip_ColAssistant"]</th>
+        <th scope="col">@L["Trip_ColBus"]</th>
+        <th scope="col">@L["Trip_ColType"]</th>
+        <th scope="col">@L["Trip_ColDate"]</th>
+        <th scope="col">@L["Trip_ColTime"]</th>
+        <th scope="col">@L["Trip_ColStatus"]</th>
+        <th scope="col"></th>
+      </tr>
     </thead>
     <tbody id="trips-tbody">
-      <tr><td colspan="8" class="u-loading-state">جاري التحميل...</td></tr>
+      <tr><td colspan="9" class="u-loading-state">@L["Trip_Loading"]</td></tr>
     </tbody>
   </table>
   <div class="table-pager">
-    <span class="table-pager-info" id="trips-pager-info"></span>
+    <div class="u-flex u-items-center u-gap-12">
+      <span class="count-pill accent" aria-live="polite">
+        <span>@L["Trip_TotalLabel"]</span>
+        <span class="count" id="trips-total">0</span>
+      </span>
+      <span class="table-pager-info" id="trips-pager-info" aria-live="polite"></span>
+    </div>
     <div class="table-pager-controls">
-      <button class="filter-btn" id="trips-prev" onclick="trips.prev()">‹ السابق</button>
-      <button class="filter-btn" id="trips-next" onclick="trips.next()">التالي ›</button>
+      <button class="filter-btn" id="trips-prev" onclick="trips.prev()">@L["Pager_Prev"]</button>
+      <button class="filter-btn" id="trips-next" onclick="trips.next()">@L["Pager_Next"]</button>
     </div>
   </div>
 </div>
 
 @* Trip students modal *@
 <div class="modal-overlay" id="modal-trip-students">
-  <div class="modal-box lg">
+  <div class="modal-box xl">
     <div class="modal-header">
       <div>
         <div class="modal-header-title" id="trip-students-title">@L["Trip_StudentsTitle"]</div>
@@ -67,7 +112,7 @@
     </div>
     <div class="modal-body flush">
       <div id="trip-students-body" class="modal-body-scroll">
-        <div class="u-empty-state">جاري التحميل...</div>
+        <div class="u-empty-state">@L["Trip_Loading"]</div>
       </div>
     </div>
   </div>

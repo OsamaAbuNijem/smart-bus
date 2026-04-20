@@ -27,7 +27,10 @@ const trips = {
     if (!meta) return;
     const page       = parseInt(document.getElementById('trips-page').value) || 1;
     const totalPages = parseInt(meta.dataset.totalPages) || 1;
+    const totalCount = meta.dataset.totalCount || 0;
     document.getElementById('trips-pager-info').textContent = meta.dataset.pagerInfo;
+    const totalEl = document.getElementById('trips-total');
+    if (totalEl) totalEl.textContent = totalCount;
     document.getElementById('trips-prev').disabled = page <= 1;
     document.getElementById('trips-next').disabled = page >= totalPages;
   },
