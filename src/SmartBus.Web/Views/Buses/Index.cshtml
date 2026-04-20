@@ -10,17 +10,45 @@
 
 <div class="filter-bar panel">
   <div class="filter-group">
+    @* Honeypot decoys — Chrome re-runs autofill after every DOM change (modal open,
+       partial swap, etc.). These absorb the autofill instead of the real inputs.
+       Must be placed before the real fields and visible enough for Chrome to find. *@
+    <input type="text"     class="u-honeypot" tabindex="-1" aria-hidden="true"
+           autocomplete="username"          name="fake-user"/>
+    <input type="password" class="u-honeypot" tabindex="-1" aria-hidden="true"
+           autocomplete="current-password"  name="fake-pass"/>
+
     <input type="search"
            id="buses-plate-input"
+           name="search-plate"
            class="form-input"
            placeholder="@L["Bus_SearchNumber"]"
+           value=""
+           readonly
+           onfocus="this.removeAttribute('readonly')"
+           onblur="this.setAttribute('readonly','')"
            autocomplete="off"
+           autocorrect="off"
+           autocapitalize="none"
+           spellcheck="false"
+           data-lpignore="true"
+           data-form-type="other"
            oninput="buses.onPlateSearch(this.value)"/>
     <input type="search"
            id="buses-person-input"
+           name="search-person"
            class="form-input"
            placeholder="@L["Bus_SearchPerson"]"
+           value=""
+           readonly
+           onfocus="this.removeAttribute('readonly')"
+           onblur="this.setAttribute('readonly','')"
            autocomplete="off"
+           autocorrect="off"
+           autocapitalize="none"
+           spellcheck="false"
+           data-lpignore="true"
+           data-form-type="other"
            oninput="buses.onPersonSearch(this.value)"/>
   </div>
 
