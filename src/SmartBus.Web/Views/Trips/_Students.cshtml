@@ -1,0 +1,41 @@
+@using SmartBus.Application.Features.Trips.Queries.GetTripStudents
+@model List<TripStudentDto>
+
+@if (Model is null || !Model.Any())
+{
+    <div class="u-empty-state">@L["Trip_StudentsNone"]</div>
+}
+else
+{
+    <table class="table">
+      <thead><tr>
+        <th>الطالب</th><th>الصف</th><th>المنطقة</th><th>حالة الركوب</th><th>وقت الركوب</th><th>وقت التنزيل</th>
+      </tr></thead>
+      <tbody>
+        @foreach (var s in Model)
+        {
+            var (cls, label) = s.BoardingStatus switch
+            {
+                "Waiting" => ("waiting", "في الانتظار"),
+                "Boarded" => ("boarded", "ركب"),
+                "Absent"  => ("absent",  "غائب"),
+                _         => ("",        s.BoardingStatus)
+            };
+            var initials = s.FullName.Length >= 2 ? s.FullName[..2] : s.FullName;
+            <tr>
+              <td>
+                <div class="u-flex u-items-center u-gap-8">
+                    <div class="table-av sm">@initials</div>
+                    <div class="td-name u-text-13">@s.FullName</div>
+                </div>
+              </td>
+              <td><div class="td-sub">@L["Std_Grade" + s.Grade]</div></td>
+              <td><div class="td-sub">@(string.IsNullOrEmpty(s.HomeArea) ? "—" : s.HomeArea)</div></td>
+              <td><span class="status-pill @cls">@label</span></td>
+              <td class="u-text-12 u-text-sub">@(s.BoardingTime?.ToString("HH:mm") ?? "—")</td>
+              <td class="u-text-12 u-text-sub">@(s.DropoffTime?.ToString("HH:mm")  ?? "—")</td>
+            </tr>
+        }
+      </tbody>
+    </table>
+}

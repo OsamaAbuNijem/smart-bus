@@ -1,9 +1,15 @@
 using MediatR;
+using SmartBus.Application.Common.Caching;
 using SmartBus.Application.Common.Models;
 
 namespace SmartBus.Application.Features.Students.Queries.GetAllStudents;
 
-public record GetAllStudentsQuery(int PageNumber = 1, int PageSize = 10, Guid? RouteId = null) : IRequest<PagedResult<StudentDto>>;
+public record GetAllStudentsQuery(int PageNumber = 1, int PageSize = 10, Guid? RouteId = null)
+    : IRequest<PagedResult<StudentDto>>, ICacheableQuery
+{
+    public string CacheKey => $"students:page:{PageNumber}:size:{PageSize}:route:{RouteId?.ToString() ?? "all"}";
+    public TimeSpan? CacheExpiry => TimeSpan.FromMinutes(2);
+}
 
 public record StudentDto(
     Guid Id,

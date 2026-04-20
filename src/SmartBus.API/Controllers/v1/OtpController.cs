@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Localization;
 using SmartBus.API.Resources;
 using SmartBus.Application.Features.Auth.Commands.RequestOtp;
@@ -12,6 +13,7 @@ namespace SmartBus.API.Controllers.v1;
 /// OTP-based login for mobile users (Parent, Driver, Assistant).
 /// </summary>
 [ApiController]
+[EnableRateLimiting("auth")]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/auth/otp")]
 public class OtpController : ControllerBase

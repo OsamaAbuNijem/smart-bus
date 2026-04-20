@@ -1,0 +1,116 @@
+@model SmartBus.Web.Models.BusFormViewModel
+@{
+    var isRtl  = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var isEdit = Model.BusId is not null;
+    var errors = ViewData.ModelState;
+    string? ErrFor(string key) => errors[key]?.Errors.FirstOrDefault()?.ErrorMessage;
+
+    string DriverLabel(SmartBus.Application.Features.Drivers.Queries.GetAllDrivers.DriverDto d)
+        => !isRtl && !string.IsNullOrEmpty(d.FullNameEn) ? d.FullNameEn : d.FullName;
+
+    string StudentLabel(SmartBus.Application.Features.Students.Queries.GetAllStudents.StudentDto s)
+        => !isRtl && !string.IsNullOrEmpty(s.FullNameEn) ? s.FullNameEn! : s.FullName;
+}
+
+<form id="bus-form"
+      data-id="@Model.BusId"
+      onsubmit="event.preventDefault(); buses.submit(this);">
+
+  <div class="modal-header">
+    <div class="modal-header-title">@(isEdit ? L["Bus_EditTitle"] : L["Bus_AddTitle"])</div>
+    <button type="button" class="modal-close-btn" onclick="SB.closeModal('modal-bus')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    @if (errors.ErrorCount > 0)
+    {
+        <div class="form-server-err" style="display:block; margin-bottom:14px;">
+            @foreach (var state in errors)
+            {
+                foreach (var err in state.Value.Errors)
+                {
+                    <div>@(string.IsNullOrEmpty(state.Key) ? "" : state.Key + ": ")@err.ErrorMessage</div>
+                }
+            }
+        </div>
+    }
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">@L["Bus_Number"]</label>
+        <input type="text" name="PlateNumber" class="form-input" dir="ltr" value="@Model.Input.PlateNumber"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["Bus_Capacity"]</label>
+        <input type="number" name="Capacity" class="form-input" min="1" max="100" value="@(Model.Input.Capacity > 0 ? Model.Input.Capacity.ToString() : "")"/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">@L["Bus_Status"]</label>
+        <select name="Status" class="form-input">
+          <option value="Inactive"     selected="@(Model.Input.Status == "Inactive")">@L["Bus_StatusInactive"]</option>
+          <option value="Active"       selected="@(Model.Input.Status == "Active")">@L["Bus_StatusActive"]</option>
+          <option value="OnRoute"      selected="@(Model.Input.Status == "OnRoute")">@L["Bus_StatusOnRoute"]</option>
+          <option value="Maintenance"  selected="@(Model.Input.Status == "Maintenance")">@L["Bus_StatusMaint"]</option>
+          <option value="OutOfService" selected="@(Model.Input.Status == "OutOfService")">@L["Bus_StatusOOS"]</option>
+        </select>
+      </div>
+      <div class="form-group"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">@L["Bus_Driver"]</label>
+        <select name="DriverId" class="form-input">
+          <option value="">@L["Bus_NoneSelected"]</option>
+          @foreach (var d in Model.Drivers)
+          {
+              <option value="@d.Id" selected="@(Model.Input.DriverId == d.Id)">@DriverLabel(d)</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["Bus_Assistant"]</label>
+        <select name="AssistantDriverId" class="form-input">
+          <option value="">@L["Bus_NoneSelected"]</option>
+          @foreach (var d in Model.Assistants)
+          {
+              <option value="@d.Id" selected="@(Model.Input.AssistantDriverId == d.Id)">@DriverLabel(d)</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group u-mt-6">
+      <label class="form-label">@(isRtl ? "الطلاب المسندون" : "Assigned Students")</label>
+      <input type="text" class="form-input" id="bf-student-search"
+             placeholder="@(isRtl ? "ابحث..." : "Search...")"
+             autocomplete="off" oninput="buses.filterStudents(this.value)"/>
+      <div id="bf-students-list" class="bus-students-list">
+        @foreach (var s in Model.Students)
+        {
+            var checked_ = Model.SelectedStudentIds.Contains(s.Id);
+            <label class="bus-student-row" data-name="@StudentLabel(s).ToLowerInvariant()" data-area="@(s.HomeArea ?? "").ToLowerInvariant()">
+              <input type="checkbox" name="StudentIds" value="@s.Id" @(checked_ ? "checked" : "")/>
+              <div class="bus-student-info">
+                <div class="bus-student-name">@StudentLabel(s)</div>
+                <div class="bus-student-meta">@L["Std_Grade" + s.Grade]@(!string.IsNullOrEmpty(s.HomeArea) ? " — " + s.HomeArea : "")</div>
+              </div>
+            </label>
+        }
+      </div>
+      <div class="bus-student-counter">
+        <span id="bf-selected-count">@Model.SelectedStudentIds.Count</span> @(isRtl ? "طالب مختار" : "students selected")
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="submit" class="btn-primary">@L["Bus_SaveBtn"]</button>
+    <button type="button" class="btn-secondary" onclick="SB.closeModal('modal-bus')">@(isRtl ? "إلغاء" : "Cancel")</button>
+  </div>
+</form>

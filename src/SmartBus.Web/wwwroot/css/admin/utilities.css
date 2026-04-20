@@ -1,0 +1,119 @@
+/* Utility classes — prefer these over inline style attributes. */
+
+/* ── Display / Flex ─────────────────────────────────────────────── */
+.u-flex       { display: flex; }
+.u-inline-flex { display: inline-flex; }
+.u-flex-col   { display: flex; flex-direction: column; }
+.u-flex-wrap  { flex-wrap: wrap; }
+.u-flex-1     { flex: 1; }
+.u-flex-shrink-0 { flex-shrink: 0; }
+.u-items-center    { align-items: center; }
+.u-items-start     { align-items: flex-start; }
+.u-items-end       { align-items: flex-end; }
+.u-justify-between { justify-content: space-between; }
+.u-justify-center  { justify-content: center; }
+.u-justify-end     { justify-content: flex-end; }
+.u-gap-2  { gap: 2px; }
+.u-gap-4  { gap: 4px; }
+.u-gap-5  { gap: 5px; }
+.u-gap-6  { gap: 6px; }
+.u-gap-8  { gap: 8px; }
+.u-gap-10 { gap: 10px; }
+.u-gap-12 { gap: 12px; }
+.u-gap-14 { gap: 14px; }
+.u-gap-16 { gap: 16px; }
+.u-gap-20 { gap: 20px; }
+.u-hidden { display: none !important; }
+.u-inline-block { display: inline-block; }
+
+/* ── Text ───────────────────────────────────────────────────────── */
+.u-text-center { text-align: center; }
+.u-text-right  { text-align: right; }
+.u-text-muted  { color: var(--text3); }
+.u-text-sub    { color: var(--text2); }
+.u-text-strong { color: var(--text); }
+.u-text-danger { color: #DC2626; }
+.u-text-success { color: #15803D; }
+.u-text-9  { font-size: 9px; }
+.u-text-10 { font-size: 10px; }
+.u-text-11 { font-size: 11px; }
+.u-text-xs { font-size: 11px; }
+.u-text-12 { font-size: 12px; }
+.u-text-sm { font-size: 12px; }
+.u-text-13 { font-size: 13px; }
+.u-text-md { font-size: 13px; }
+.u-text-14 { font-size: 14px; }
+.u-text-lg { font-size: 14px; }
+.u-text-15 { font-size: 15px; }
+.u-text-16 { font-size: 16px; }
+.u-weight-500 { font-weight: 500; }
+.u-weight-600 { font-weight: 600; }
+.u-weight-700 { font-weight: 700; }
+.u-weight-800 { font-weight: 800; }
+.u-nowrap  { white-space: nowrap; }
+.u-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.u-leading-tight { line-height: 1.4; }
+
+/* ── Spacing ────────────────────────────────────────────────────── */
+.u-m-0    { margin: 0; }
+.u-mt-1   { margin-top: 1px; }
+.u-mt-2   { margin-top: 2px; }
+.u-mt-3   { margin-top: 3px; }
+.u-mt-4   { margin-top: 4px; }
+.u-mt-6   { margin-top: 6px; }
+.u-mt-8   { margin-top: 8px; }
+.u-mt-10  { margin-top: 10px; }
+.u-mt-12  { margin-top: 12px; }
+.u-mt-14  { margin-top: 14px; }
+.u-mt-16  { margin-top: 16px; }
+.u-mb-2   { margin-bottom: 2px; }
+.u-mb-4   { margin-bottom: 4px; }
+.u-mb-6   { margin-bottom: 6px; }
+.u-mb-8   { margin-bottom: 8px; }
+.u-mb-10  { margin-bottom: 10px; }
+.u-mb-12  { margin-bottom: 12px; }
+.u-mb-14  { margin-bottom: 14px; }
+.u-mb-16  { margin-bottom: 16px; }
+.u-mb-24  { margin-bottom: 24px; }
+.u-mx-auto { margin-left: auto; margin-right: auto; }
+.u-ml-auto { margin-left: auto; }
+.u-mr-auto { margin-right: auto; }
+.u-p-0    { padding: 0; }
+.u-p-12   { padding: 12px; }
+.u-p-16   { padding: 16px; }
+.u-p-20   { padding: 20px; }
+.u-p-30   { padding: 30px; }
+.u-py-12  { padding-top: 12px; padding-bottom: 12px; }
+.u-py-20  { padding-top: 20px; padding-bottom: 20px; }
+.u-py-30  { padding-top: 30px; padding-bottom: 30px; }
+.u-px-12  { padding-left: 12px; padding-right: 12px; }
+.u-px-20  { padding-left: 20px; padding-right: 20px; }
+
+/* ── Empty/Loading states inside tables or card bodies ─────────── */
+.u-empty-state   { padding: 30px; text-align: center; color: var(--text3); font-size: 13px; }
+.u-loading-state { padding: 20px 0; text-align: center; color: var(--text3); font-size: 13px; }
+
+/* ── Position / Layout ──────────────────────────────────────────── */
+.u-relative { position: relative; }
+.u-absolute { position: absolute; }
+.u-cursor-pointer { cursor: pointer; }
+.u-min-w-0 { min-width: 0; }
+.u-w-full  { width: 100%; }
+
+/* ── Sizing ─────────────────────────────────────────────────────── */
+.u-size-28 { width: 28px; height: 28px; }
+.u-size-32 { width: 32px; height: 32px; }
+.u-size-36 { width: 36px; height: 36px; }
+
+/* ── Dividers and background fills ──────────────────────────────── */
+.u-border-top { border-top: 1px solid var(--border); }
+.u-bg-bg     { background: var(--bg); }
+.u-bg-card   { background: var(--card); }
+
+/* ── Inline style prop helpers ──────────────────────────────────── */
+.u-opacity-40 { opacity: .4; }
+.u-opacity-60 { opacity: .6; }
+
+/* ── Animations ─────────────────────────────────────────────────── */
+@keyframes toast-in { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.toast { position: fixed; bottom: 24px; left: 24px; background: #111; color: #fff; padding: 12px 20px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 600; z-index: 9999; animation: toast-in .2s ease; box-shadow: 0 4px 16px rgba(0,0,0,.2); }

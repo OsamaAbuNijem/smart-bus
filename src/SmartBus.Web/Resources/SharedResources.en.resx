@@ -111,6 +111,66 @@
   <data name="Driver_Cancel"      xml:space="preserve"><value>Cancel</value></data>
   <data name="Driver_AddTitle"    xml:space="preserve"><value>Add New Driver</value></data>
   <data name="Driver_EditTitle"   xml:space="preserve"><value>Edit Driver</value></data>
+  <data name="Driver_PageTitle"   xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
+  <data name="Driver_None"        xml:space="preserve"><value>No drivers registered</value></data>
+  <data name="Driver_PagerInfo"   xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+
+  <!-- Validation messages (shared) -->
+  <data name="Validation_Required"      xml:space="preserve"><value>This field is required</value></data>
+  <data name="Validation_DriverType"    xml:space="preserve"><value>Type must be Driver or Assistant</value></data>
+
+  <!-- Students page -->
+  <data name="Student_PageTitle"  xml:space="preserve"><value>Students</value></data>
+  <data name="Student_None"       xml:space="preserve"><value>No students registered</value></data>
+  <data name="Student_PagerInfo" xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Student_TypeLabel"  xml:space="preserve"><value>student</value></data>
+  <data name="Student_AddBtn"     xml:space="preserve"><value>Add Student</value></data>
+
+  <!-- Buses page -->
+  <data name="Bus_PageTitle"      xml:space="preserve"><value>Buses</value></data>
+  <data name="Bus_None"           xml:space="preserve"><value>No buses registered</value></data>
+  <data name="Bus_PagerInfo"      xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Bus_TypeLabel"      xml:space="preserve"><value>bus</value></data>
+  <data name="Bus_AddBtn"         xml:space="preserve"><value>Add Bus</value></data>
+  <data name="Bus_AddTitle"       xml:space="preserve"><value>Add New Bus</value></data>
+  <data name="Bus_EditTitle"      xml:space="preserve"><value>Edit Bus</value></data>
+  <data name="Bus_Number"         xml:space="preserve"><value>Plate Number *</value></data>
+  <data name="Bus_Capacity"       xml:space="preserve"><value>Capacity *</value></data>
+  <data name="Bus_Status"         xml:space="preserve"><value>Status</value></data>
+  <data name="Bus_StatusActive"   xml:space="preserve"><value>Active</value></data>
+  <data name="Bus_StatusInactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="Bus_StatusOnRoute"  xml:space="preserve"><value>On Route</value></data>
+  <data name="Bus_StatusMaint"    xml:space="preserve"><value>Maintenance</value></data>
+  <data name="Bus_StatusOOS"      xml:space="preserve"><value>Out of Service</value></data>
+  <data name="Bus_Driver"         xml:space="preserve"><value>Driver</value></data>
+  <data name="Bus_Assistant"      xml:space="preserve"><value>Assistant</value></data>
+  <data name="Bus_NoneSelected"   xml:space="preserve"><value>— Select —</value></data>
+  <data name="Bus_SaveBtn"        xml:space="preserve"><value>💾 Save Bus</value></data>
+
+  <!-- Trips page -->
+  <data name="Trip_None"          xml:space="preserve"><value>No trips</value></data>
+  <data name="Trip_PagerInfo"     xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Trip_TypeLabel"     xml:space="preserve"><value>trip</value></data>
+  <data name="Trip_GenerateBtn"   xml:space="preserve"><value>Generate Today</value></data>
+  <data name="Trip_StudentsTitle" xml:space="preserve"><value>Trip Students</value></data>
+  <data name="Trip_StudentsNone"  xml:space="preserve"><value>No students on this trip</value></data>
+  <data name="Trip_Morning"       xml:space="preserve"><value>Morning</value></data>
+  <data name="Trip_Return"        xml:space="preserve"><value>Return</value></data>
+  <data name="Trip_StatusScheduled"  xml:space="preserve"><value>Scheduled</value></data>
+  <data name="Trip_StatusInProgress" xml:space="preserve"><value>In Progress</value></data>
+  <data name="Trip_StatusCompleted"  xml:space="preserve"><value>Completed</value></data>
+  <data name="Trip_StatusDelayed"    xml:space="preserve"><value>Delayed</value></data>
+  <data name="Trip_StatusCancelled"  xml:space="preserve"><value>Cancelled</value></data>
+  <data name="JS_TripStarted"     xml:space="preserve"><value>Trip started ✓</value></data>
+  <data name="JS_TripCompleted"   xml:space="preserve"><value>Trip completed ✓</value></data>
+  <data name="JS_TripsGenerated"  xml:space="preserve"><value>Today's trips generated ✓</value></data>
+
+  <!-- Alerts page -->
+  <data name="Alert_PageTitle"    xml:space="preserve"><value>Alerts</value></data>
+  <data name="Alert_None"         xml:space="preserve"><value>No alerts</value></data>
+  <data name="Alert_Count"        xml:space="preserve"><value>{0} alerts</value></data>
+  <data name="Alert_Resolve"      xml:space="preserve"><value>Resolve</value></data>
+  <data name="Alert_Ignore"       xml:space="preserve"><value>Ignore</value></data>
 
   <!-- JS toast messages (admin dashboard) -->
   <data name="JS_StudentSaved"    xml:space="preserve"><value>Student saved ✓</value></data>

@@ -247,6 +247,10 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IsDeleted", "CreatedAt");
+
+                    b.HasIndex("Status", "CreatedAt");
+
                     b.ToTable("Alerts");
                 });
 
@@ -385,6 +389,8 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("LastLocationId");
 
+                    b.HasIndex("IsDeleted", "CreatedAt");
+
                     b.ToTable("Buses");
                 });
 
@@ -423,7 +429,7 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusId");
+                    b.HasIndex("BusId", "Timestamp");
 
                     b.ToTable("BusLocations");
                 });
@@ -503,6 +509,10 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DriverType", "IsDeleted");
+
+                    b.HasIndex("IsDeleted", "CreatedAt");
 
                     b.ToTable("Drivers");
                 });
@@ -829,13 +839,15 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusId");
-
                     b.HasIndex("ParentId");
 
                     b.HasIndex("PickupStopId");
 
                     b.HasIndex("RouteId");
+
+                    b.HasIndex("BusId", "IsDeleted");
+
+                    b.HasIndex("IsDeleted", "CreatedAt");
 
                     b.ToTable("Students");
                 });
@@ -963,6 +975,10 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.HasIndex("BusId");
 
                     b.HasIndex("RouteId");
+
+                    b.HasIndex("IsDeleted", "ScheduledDeparture");
+
+                    b.HasIndex("Status", "ScheduledDeparture");
 
                     b.ToTable("Trips");
                 });

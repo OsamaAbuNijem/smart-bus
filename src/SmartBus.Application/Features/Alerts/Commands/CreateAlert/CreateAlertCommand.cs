@@ -1,4 +1,5 @@
 using MediatR;
+using SmartBus.Application.Common.Caching;
 using SmartBus.Application.Common.Models;
 using SmartBus.Domain.Enums;
 
@@ -11,4 +12,7 @@ public record CreateAlertCommand(
     Guid? RelatedBusId = null,
     Guid? RelatedTripId = null,
     Guid? RelatedStudentId = null
-) : IRequest<Result<Guid>>;
+) : IRequest<Result<Guid>>, ICacheInvalidator
+{
+    public IEnumerable<string> CachePatternsToInvalidate => new[] { "alerts:page:*" };
+}

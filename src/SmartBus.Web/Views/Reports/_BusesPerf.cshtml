@@ -1,0 +1,16 @@
+@using SmartBus.Application.Common.Models
+@using SmartBus.Application.Features.Buses.Queries.GetAllBuses
+@model PagedResult<BusDto>
+
+@foreach (var b in (Model?.Items ?? Enumerable.Empty<BusDto>()).Take(5))
+{
+    var pct = b.Status == "OnRoute" ? 95 : b.Status == "Active" ? 80 : 40;
+    var col = pct > 80 ? "#22C55E" : pct > 60 ? "#FFD700" : "#EF4444";
+    <div class="trip-row">
+        <div class="report-row-bus">@b.PlateNumber</div>
+        <div class="report-row-bar">
+            <div class="report-row-bar-fill" style="background:@col;width:@(pct)%;"></div>
+        </div>
+        <div class="report-row-pct" style="color:@col;">@pct%</div>
+    </div>
+}

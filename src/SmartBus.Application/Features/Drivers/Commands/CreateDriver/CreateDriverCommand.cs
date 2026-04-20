@@ -1,4 +1,5 @@
 using MediatR;
+using SmartBus.Application.Common.Caching;
 using SmartBus.Application.Common.Models;
 using SmartBus.Domain.Enums;
 
@@ -11,4 +12,7 @@ public record CreateDriverCommand(
     string LicenseNumber,
     bool IsActive = true,
     DriverType DriverType = DriverType.Driver
-) : IRequest<Result<Guid>>;
+) : IRequest<Result<Guid>>, ICacheInvalidator
+{
+    public IEnumerable<string> CachePatternsToInvalidate => new[] { "drivers:page:*" };
+}

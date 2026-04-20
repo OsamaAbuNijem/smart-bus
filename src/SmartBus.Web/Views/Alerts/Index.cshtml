@@ -1,0 +1,25 @@
+@model AdminPageViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<input type="hidden" id="alerts-page" value="1"/>
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">@L["Alert_PageTitle"]</div>
+    <div class="u-text-sm u-text-muted" id="alerts-header-sub"></div>
+  </div>
+  <div class="card-body card-body-flush" id="alerts-list">
+    <div class="u-loading-state">جاري التحميل...</div>
+  </div>
+  <div class="table-pager end">
+    <button class="filter-btn" id="alerts-prev" onclick="alerts.prev()">‹ السابق</button>
+    <button class="filter-btn" id="alerts-next" onclick="alerts.next()">التالي ›</button>
+  </div>
+</div>
+
+@section Scripts {
+  <script src="~/js/admin/alerts.js" asp-append-version="true"></script>
+}

@@ -1,4 +1,5 @@
 using MediatR;
+using SmartBus.Application.Common.Caching;
 using SmartBus.Application.Common.Models;
 using SmartBus.Domain.Enums;
 
@@ -13,4 +14,7 @@ public record UpdateTripCommand(
     DateTime ScheduledDeparture,
     byte RepeatDays,
     string? Notes
-) : IRequest<Result>;
+) : IRequest<Result>, ICacheInvalidator
+{
+    public IEnumerable<string> CachePatternsToInvalidate => new[] { "trips:page:*" };
+}

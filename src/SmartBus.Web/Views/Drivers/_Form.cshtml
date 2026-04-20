@@ -1,0 +1,72 @@
+@model SmartBus.Web.Models.DriverInput?
+@{
+    var isEdit   = ViewBag.DriverId is not null;
+    var driverId = ViewBag.DriverId as Guid?;
+    var errors   = ViewData.ModelState;
+
+    string? ErrFor(string key) => errors[key]?.Errors.FirstOrDefault()?.ErrorMessage;
+}
+
+<form id="driver-form"
+      data-id="@driverId"
+      onsubmit="event.preventDefault(); drivers.submit(this);">
+
+  <div class="modal-header">
+    <div class="modal-header-title">@(isEdit ? L["Driver_EditTitle"] : L["Driver_AddTitle"])</div>
+    <button type="button" class="modal-close-btn" onclick="SB.closeModal('modal-driver')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">@L["Driver_NameAr"]</label>
+        <input type="text" name="FullName" class="form-input" dir="rtl" value="@Model?.FullName"/>
+        @if (ErrFor(nameof(DriverInput.FullName)) is { } e1) { <span class="form-err" style="display:block;">@e1</span> }
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["Driver_NameEn"]</label>
+        <input type="text" name="FullNameEn" class="form-input" dir="ltr" value="@Model?.FullNameEn"/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">@L["Driver_Phone"]</label>
+        <input type="text" name="PhoneNumber" class="form-input" value="@Model?.PhoneNumber"/>
+        @if (ErrFor(nameof(DriverInput.PhoneNumber)) is { } e2) { <span class="form-err" style="display:block;">@e2</span> }
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["Driver_License"]</label>
+        <input type="text" name="LicenseNumber" class="form-input" value="@Model?.LicenseNumber"/>
+        @if (ErrFor(nameof(DriverInput.LicenseNumber)) is { } e3) { <span class="form-err" style="display:block;">@e3</span> }
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">@L["Driver_Type"]</label>
+        <select name="DriverType" class="form-input">
+          <option value="Driver"    selected="@(Model?.DriverType == "Driver")">@L["Driver_TypeDriver"]</option>
+          <option value="Assistant" selected="@(Model?.DriverType == "Assistant")">@L["Driver_TypeAssist"]</option>
+        </select>
+        @if (ErrFor(nameof(DriverInput.DriverType)) is { } e4) { <span class="form-err" style="display:block;">@e4</span> }
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["Driver_Status"]</label>
+        <select name="IsActive" class="form-input">
+          <option value="true"  selected="@(Model?.IsActive ?? true)">@L["Driver_Active"]</option>
+          <option value="false" selected="@(Model is not null && !Model.IsActive)">@L["Driver_Inactive"]</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="submit" class="btn-primary">@L["Driver_SaveBtn"]</button>
+    <button type="button" class="btn-secondary" onclick="SB.closeModal('modal-driver')">@L["Driver_Cancel"]</button>
+  </div>
+</form>

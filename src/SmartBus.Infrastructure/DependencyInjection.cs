@@ -108,7 +108,16 @@ public static class DependencyInjection
                     DisableGlobalLocks = true
                 }));
 
-        services.AddHangfireServer();
+        // Cap worker count so background jobs can't starve live request threads.
+        // Default is Math.Min(Environment.ProcessorCount * 5, 20); here we pin it low
+        // because this API also serves user traffic. Bump if jobs back up.
+        services.AddHangfireServer(opts =>
+        {
+            opts.WorkerCount              = 4;
+            opts.Queues                   = new[] { "default" };
+            opts.SchedulePollingInterval  = TimeSpan.FromSeconds(15);
+            opts.ServerTimeout            = TimeSpan.FromMinutes(5);
+        });
         services.AddScoped<BusTrackingCleanupJob>();
         services.AddScoped<TripGenerationJob>();
 

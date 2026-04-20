@@ -107,6 +107,29 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<Attendance>()
             .HasIndex(a => new { a.StudentId, a.TripId, a.Date })
             .IsUnique();
+
+        // ── Hot-path indexes (based on query handler scan) ────────────────
+        // List queries sort by CreatedAt DESC with IsDeleted=false predicate:
+        builder.Entity<Bus>()    .HasIndex(b => new { b.IsDeleted, b.CreatedAt });
+        builder.Entity<Driver>() .HasIndex(d => new { d.IsDeleted, d.CreatedAt });
+        builder.Entity<Student>().HasIndex(s => new { s.IsDeleted, s.CreatedAt });
+        builder.Entity<Trip>()   .HasIndex(t => new { t.IsDeleted, t.ScheduledDeparture });
+        builder.Entity<Alert>()  .HasIndex(a => new { a.IsDeleted, a.CreatedAt });
+
+        // Bus list handler does an N+1-ish students-by-bus lookup:
+        builder.Entity<Student>().HasIndex(s => new { s.BusId, s.IsDeleted });
+
+        // Alerts page filters by Status (pending vs resolved):
+        builder.Entity<Alert>().HasIndex(a => new { a.Status, a.CreatedAt });
+
+        // Trip filters by status + date (used by the Trips page filter bar):
+        builder.Entity<Trip>().HasIndex(t => new { t.Status, t.ScheduledDeparture });
+
+        // Driver filtering by type:
+        builder.Entity<Driver>().HasIndex(d => new { d.DriverType, d.IsDeleted });
+
+        // Latest-location lookup on BusLocation:
+        builder.Entity<BusLocation>().HasIndex(l => new { l.BusId, l.Timestamp });
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

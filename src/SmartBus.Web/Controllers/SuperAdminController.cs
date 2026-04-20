@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SmartBus.Web.Filters;
 using SmartBus.Web.Models;
 using SmartBus.Web.Services;
 
@@ -35,10 +36,7 @@ public class SuperAdminController : Controller
         return RedirectToAction(nameof(Dashboard));
     }
 
+    [RequireJwt]
     public IActionResult Dashboard()
-    {
-        if (string.IsNullOrEmpty(HttpContext.Session.GetString("JwtToken")))
-            return RedirectToAction(nameof(Login));
-        return View();
-    }
+        => View(new SuperAdminPageViewModel { ActivePage = "overview", PageTitle = "لوحة المشرف العام" });
 }

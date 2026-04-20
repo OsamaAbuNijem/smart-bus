@@ -1,0 +1,41 @@
+@model AdminPageViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<input type="hidden" id="students-page" value="1"/>
+
+<div class="filter-bar">
+  <button class="filter-btn active">
+    الكل (<span id="students-total">0</span>)
+  </button>
+  <button class="add-btn" onclick="students.openForm()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    @L["Student_AddBtn"]
+  </button>
+</div>
+
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>@L["Std_Name"]</th><th>@L["Std_Grade"]</th><th>المسار</th><th>@L["Std_Parent"]</th><th>@L["Std_Phone"]</th><th>تاريخ التسجيل</th><th></th>
+      </tr>
+    </thead>
+    <tbody id="students-tbody">
+      <tr><td colspan="7" class="u-loading-state">جاري التحميل...</td></tr>
+    </tbody>
+  </table>
+  <div class="table-pager">
+    <span class="table-pager-info" id="students-pager-info"></span>
+    <div class="table-pager-controls">
+      <button class="filter-btn" id="students-prev" onclick="students.prev()">‹ السابق</button>
+      <button class="filter-btn" id="students-next" onclick="students.next()">التالي ›</button>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <script src="~/js/admin/students.js" asp-append-version="true"></script>
+}

@@ -1,13 +1,18 @@
 using Asp.Versioning;
 using Hangfire;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using SmartBus.API.HealthChecks;
 using SmartBus.API.Hubs;
 using SmartBus.API.Middleware;
 using SmartBus.Application;
 using SmartBus.Infrastructure;
 using SmartBus.Infrastructure.Jobs;
+using SmartBus.Infrastructure.Persistence;
+using StackExchange.Redis;
+using System.Threading.RateLimiting;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -93,8 +98,40 @@ try
         c.OperationFilter<SmartBus.API.Extensions.AcceptLanguageOperationFilter>();
     });
 
-    // SignalR
-    builder.Services.AddSignalR();
+    // SignalR — Redis backplane if present so broadcasts reach clients across API instances.
+    var redisConnection = builder.Configuration.GetConnectionString("Redis");
+    var signalR = builder.Services.AddSignalR();
+    if (!string.IsNullOrEmpty(redisConnection))
+        signalR.AddStackExchangeRedis(redisConnection, options => options.Configuration.ChannelPrefix = RedisChannel.Literal("smartbus"));
+
+    // Health checks: quick SQL ping + Redis ping, exposed at /health.
+    builder.Services.AddHealthChecks()
+        .AddDbContextCheck<ApplicationDbContext>("sql")
+        .AddCheck<RedisHealthCheck>("redis");
+
+    // Rate limiting: 60 req/min per IP (global), plus a stricter 10 req/min "auth"
+    // bucket for login / OTP endpoints to slow credential-stuffing.
+    builder.Services.AddRateLimiter(o =>
+    {
+        o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        o.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 60,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0
+                }));
+        o.AddPolicy("auth", ctx => RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+    });
 
     // CORS
     builder.Services.AddCors(options =>
@@ -143,6 +180,7 @@ try
 
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseRateLimiter();
 
     // Hangfire Dashboard (admin only in production)
     app.UseHangfireDashboard("/hangfire", new DashboardOptions
@@ -150,6 +188,7 @@ try
         Authorization = []
     });
 
+    app.MapHealthChecks("/health");
     app.MapControllers();
     app.MapHub<BusTrackingHub>("/hubs/bus-tracking");
 

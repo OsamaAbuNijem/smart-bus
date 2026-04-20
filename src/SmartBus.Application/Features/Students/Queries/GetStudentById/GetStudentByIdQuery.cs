@@ -1,9 +1,14 @@
 using MediatR;
+using SmartBus.Application.Common.Caching;
 using SmartBus.Application.Common.Models;
 
 namespace SmartBus.Application.Features.Students.Queries.GetStudentById;
 
-public record GetStudentByIdQuery(Guid StudentId) : IRequest<Result<StudentDetailDto>>;
+public record GetStudentByIdQuery(Guid StudentId) : IRequest<Result<StudentDetailDto>>, ICacheableQuery
+{
+    public string CacheKey => $"student:{StudentId}";
+    public TimeSpan? CacheExpiry => TimeSpan.FromMinutes(5);
+}
 
 public record StudentDetailDto(
     Guid Id,

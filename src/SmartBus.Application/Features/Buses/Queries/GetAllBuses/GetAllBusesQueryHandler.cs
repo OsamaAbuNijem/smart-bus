@@ -8,20 +8,11 @@ namespace SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 public class GetAllBusesQueryHandler : IRequestHandler<GetAllBusesQuery, PagedResult<BusDto>>
 {
     private readonly IApplicationDbContext _context;
-    private readonly ICacheService _cacheService;
 
-    public GetAllBusesQueryHandler(IApplicationDbContext context, ICacheService cacheService)
-    {
-        _context = context;
-        _cacheService = cacheService;
-    }
+    public GetAllBusesQueryHandler(IApplicationDbContext context) => _context = context;
 
     public async Task<PagedResult<BusDto>> Handle(GetAllBusesQuery request, CancellationToken cancellationToken)
     {
-        var cacheKey = $"buses:page:{request.PageNumber}:size:{request.PageSize}";
-        var cached = await _cacheService.GetAsync<PagedResult<BusDto>>(cacheKey, cancellationToken);
-        if (cached is not null) return cached;
-
         var query = _context.Buses
             .Where(b => !b.IsDeleted)
             .Include(b => b.Driver)
@@ -54,9 +45,6 @@ public class GetAllBusesQueryHandler : IRequestHandler<GetAllBusesQuery, PagedRe
                 b.CreatedAt);
         }).ToList();
 
-        var result = PagedResult<BusDto>.Create(buses, totalCount, request.PageNumber, request.PageSize);
-        await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(2), cancellationToken);
-
-        return result;
+        return PagedResult<BusDto>.Create(buses, totalCount, request.PageNumber, request.PageSize);
     }
 }

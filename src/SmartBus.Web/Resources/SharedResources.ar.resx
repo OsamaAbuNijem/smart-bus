@@ -111,6 +111,66 @@
   <data name="Driver_Cancel"      xml:space="preserve"><value>إلغاء</value></data>
   <data name="Driver_AddTitle"    xml:space="preserve"><value>إضافة سائق جديد</value></data>
   <data name="Driver_EditTitle"   xml:space="preserve"><value>تعديل بيانات سائق</value></data>
+  <data name="Driver_PageTitle"   xml:space="preserve"><value>السائقون والمساعدون</value></data>
+  <data name="Driver_None"        xml:space="preserve"><value>لا يوجد سائقون مسجلون</value></data>
+  <data name="Driver_PagerInfo"   xml:space="preserve"><value>عرض {0} من {1} موظف — الصفحة {2} من {3}</value></data>
+
+  <!-- Validation messages (shared) -->
+  <data name="Validation_Required"      xml:space="preserve"><value>هذا الحقل مطلوب</value></data>
+  <data name="Validation_DriverType"    xml:space="preserve"><value>النوع يجب أن يكون سائق أو مساعد</value></data>
+
+  <!-- Students page -->
+  <data name="Student_PageTitle"  xml:space="preserve"><value>الطلاب</value></data>
+  <data name="Student_None"       xml:space="preserve"><value>لا يوجد طلاب مسجلون</value></data>
+  <data name="Student_PagerInfo" xml:space="preserve"><value>عرض {0} من {1} طالب — الصفحة {2} من {3}</value></data>
+  <data name="Student_TypeLabel"  xml:space="preserve"><value>طالب</value></data>
+  <data name="Student_AddBtn"     xml:space="preserve"><value>إضافة طالب</value></data>
+
+  <!-- Buses page -->
+  <data name="Bus_PageTitle"      xml:space="preserve"><value>الباصات</value></data>
+  <data name="Bus_None"           xml:space="preserve"><value>لا توجد باصات مسجلة</value></data>
+  <data name="Bus_PagerInfo"      xml:space="preserve"><value>عرض {0} من {1} باص — الصفحة {2} من {3}</value></data>
+  <data name="Bus_TypeLabel"      xml:space="preserve"><value>باص</value></data>
+  <data name="Bus_AddBtn"         xml:space="preserve"><value>إضافة باص</value></data>
+  <data name="Bus_AddTitle"       xml:space="preserve"><value>إضافة باص جديد</value></data>
+  <data name="Bus_EditTitle"      xml:space="preserve"><value>تعديل بيانات باص</value></data>
+  <data name="Bus_Number"         xml:space="preserve"><value>رقم الباص *</value></data>
+  <data name="Bus_Capacity"       xml:space="preserve"><value>الطاقة الاستيعابية *</value></data>
+  <data name="Bus_Status"         xml:space="preserve"><value>الحالة</value></data>
+  <data name="Bus_StatusActive"   xml:space="preserve"><value>نشط</value></data>
+  <data name="Bus_StatusInactive" xml:space="preserve"><value>غير نشط</value></data>
+  <data name="Bus_StatusOnRoute"  xml:space="preserve"><value>في الطريق</value></data>
+  <data name="Bus_StatusMaint"    xml:space="preserve"><value>صيانة</value></data>
+  <data name="Bus_StatusOOS"      xml:space="preserve"><value>خارج الخدمة</value></data>
+  <data name="Bus_Driver"         xml:space="preserve"><value>السائق</value></data>
+  <data name="Bus_Assistant"      xml:space="preserve"><value>المساعد</value></data>
+  <data name="Bus_NoneSelected"   xml:space="preserve"><value>— اختر —</value></data>
+  <data name="Bus_SaveBtn"        xml:space="preserve"><value>💾 حفظ الباص</value></data>
+
+  <!-- Trips page -->
+  <data name="Trip_None"          xml:space="preserve"><value>لا توجد رحلات</value></data>
+  <data name="Trip_PagerInfo"     xml:space="preserve"><value>عرض {0} من {1} رحلة — الصفحة {2} من {3}</value></data>
+  <data name="Trip_TypeLabel"     xml:space="preserve"><value>رحلة</value></data>
+  <data name="Trip_GenerateBtn"   xml:space="preserve"><value>تشغيل الجدول الآن</value></data>
+  <data name="Trip_StudentsTitle" xml:space="preserve"><value>طلاب الرحلة</value></data>
+  <data name="Trip_StudentsNone"  xml:space="preserve"><value>لا يوجد طلاب مسجلون في هذه الرحلة</value></data>
+  <data name="Trip_Morning"       xml:space="preserve"><value>ذهاب</value></data>
+  <data name="Trip_Return"        xml:space="preserve"><value>إياب</value></data>
+  <data name="Trip_StatusScheduled"  xml:space="preserve"><value>قادمة</value></data>
+  <data name="Trip_StatusInProgress" xml:space="preserve"><value>جارية</value></data>
+  <data name="Trip_StatusCompleted"  xml:space="preserve"><value>مكتملة</value></data>
+  <data name="Trip_StatusDelayed"    xml:space="preserve"><value>متأخرة</value></data>
+  <data name="Trip_StatusCancelled"  xml:space="preserve"><value>ملغاة</value></data>
+  <data name="JS_TripStarted"     xml:space="preserve"><value>تم بدء الرحلة ✓</value></data>
+  <data name="JS_TripCompleted"   xml:space="preserve"><value>تم إتمام الرحلة ✓</value></data>
+  <data name="JS_TripsGenerated"  xml:space="preserve"><value>تم إنشاء رحلات اليوم بنجاح ✓</value></data>
+
+  <!-- Alerts page -->
+  <data name="Alert_PageTitle"    xml:space="preserve"><value>التنبيهات</value></data>
+  <data name="Alert_None"         xml:space="preserve"><value>لا توجد تنبيهات</value></data>
+  <data name="Alert_Count"        xml:space="preserve"><value>{0} تنبيه</value></data>
+  <data name="Alert_Resolve"      xml:space="preserve"><value>حل التنبيه</value></data>
+  <data name="Alert_Ignore"       xml:space="preserve"><value>تجاهل</value></data>
 
   <!-- JS toast messages (admin dashboard) -->
   <data name="JS_StudentSaved"    xml:space="preserve"><value>تم حفظ الطالب بنجاح ✓</value></data>

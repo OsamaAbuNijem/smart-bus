@@ -1,0 +1,11 @@
+@model SmartBus.Web.ViewComponents.TablePagerViewComponent.TablePagerModel
+
+<div class="table-pager">
+  <span class="table-pager-info" id="@(Model.Prefix)-pager-info"></span>
+  <div class="table-pager-controls">
+    <button class="filter-btn" id="@(Model.Prefix)-prev"
+            data-action="pager-prev" data-prefix="@Model.Prefix">@Model.PrevLabel</button>
+    <button class="filter-btn" id="@(Model.Prefix)-next"
+            data-action="pager-next" data-prefix="@Model.Prefix">@Model.NextLabel</button>
+  </div>
+</div>

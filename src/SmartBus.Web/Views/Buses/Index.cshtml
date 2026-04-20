@@ -1,88 +1,39 @@
-@using SmartBus.Application.Common.Models
-@using SmartBus.Application.Features.Buses.Queries.GetAllBuses
-@model PagedResult<BusDto>
+@model AdminPageViewModel
 @{
-    ViewData["Title"] = "Buses";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = Model.PageTitle;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0"><i class="bi bi-bus-front-fill text-primary me-2"></i>Fleet Management</h4>
-    <span class="badge bg-primary fs-6">@Model?.TotalCount Total Buses</span>
+<input type="hidden" id="buses-page" value="1"/>
+
+<div class="filter-bar">
+  <button class="filter-btn active">
+    الكل (<span id="buses-total">0</span>)
+  </button>
+  <button class="add-btn" onclick="buses.openForm()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    @L["Bus_AddBtn"]
+  </button>
 </div>
 
-<div class="card border-0 shadow-sm rounded-4">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="ps-4">Plate Number</th>
-                        <th>Model</th>
-                        <th>Capacity</th>
-                        <th>Status</th>
-                        <th>Driver</th>
-                        <th>Last Location</th>
-                        <th class="pe-4">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model?.Items.Any() == true)
-                    {
-                        @foreach (var bus in Model.Items)
-                        {
-                            <tr>
-                                <td class="ps-4 fw-semibold">@bus.PlateNumber</td>
-                                <td>—</td>
-                                <td><i class="bi bi-people me-1 text-muted"></i>@bus.Capacity</td>
-                                <td>
-                                    <span class="badge @(bus.Status == "OnRoute" ? "bg-success" : bus.Status == "Active" ? "bg-primary" : bus.Status == "Maintenance" ? "bg-warning" : "bg-secondary")">
-                                        @bus.Status
-                                    </span>
-                                </td>
-                                <td>@(bus.DriverName ?? "<span class='text-muted'>Unassigned</span>")</td>
-                                <td>
-                                    @if (bus.LastLatitude.HasValue)
-                                    {
-                                        <small class="text-muted">@bus.LastLatitude!.Value.ToString("F4"), @bus.LastLongitude!.Value.ToString("F4")</small>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No data</span>
-                                    }
-                                </td>
-                                <td class="pe-4">
-                                    <a asp-action="Details" asp-route-id="@bus.Id" class="btn btn-sm btn-outline-primary me-1">
-                                        <i class="bi bi-eye"></i> Details
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-5">
-                                <i class="bi bi-bus-front fs-1 d-block mb-2"></i>No buses found.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr><th>@L["Bus_Number"]</th><th>@L["Bus_Capacity"]</th><th>@L["Bus_Status"]</th><th>@L["Bus_Driver"]</th><th>@L["Bus_Assistant"]</th><th>@L["Nav_Students"]</th><th></th></tr>
+    </thead>
+    <tbody id="buses-tbody">
+      <tr><td colspan="7" class="u-loading-state">جاري التحميل...</td></tr>
+    </tbody>
+  </table>
+  <div class="table-pager">
+    <span class="table-pager-info" id="buses-pager-info"></span>
+    <div class="table-pager-controls">
+      <button class="filter-btn" id="buses-prev" onclick="buses.prev()">‹ السابق</button>
+      <button class="filter-btn" id="buses-next" onclick="buses.next()">التالي ›</button>
     </div>
-    @if (Model?.TotalPages > 1)
-    {
-        <div class="card-footer bg-white border-0 d-flex justify-content-center pb-3">
-            <nav>
-                <ul class="pagination mb-0">
-                    @for (int i = 1; i <= Model.TotalPages; i++)
-                    {
-                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                            <a class="page-link" asp-action="Index" asp-route-pageNumber="@i">@i</a>
-                        </li>
-                    }
-                </ul>
-            </nav>
-        </div>
-    }
+  </div>
 </div>
+
+@section Scripts {
+  <script src="~/js/admin/buses.js" asp-append-version="true"></script>
+}

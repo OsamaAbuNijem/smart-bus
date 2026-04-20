@@ -1,0 +1,61 @@
+<div class="modal-overlay" id="modal-trip">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-header-title">جدول رحلات الباص</div>
+      <button class="modal-close-btn" data-action="modal-close" data-target="modal-trip">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row full">
+        <div class="form-group">
+          <label class="form-label">الباص *</label>
+          <select class="form-select" id="sch-bus"><option value="">— اختر باصاً —</option></select>
+        </div>
+      </div>
+
+      <div class="form-trip-group morning">
+        <div class="form-trip-group-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          ذهاب
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">وقت الانطلاق *</label>
+            <input class="form-input" id="sch-morning-time" type="time" value="07:15"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-trip-group return">
+        <div class="form-trip-group-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          إياب
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">وقت العودة *</label>
+            <input class="form-input" id="sch-return-time" type="time" value="14:00"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">أيام التكرار *</label>
+        <div class="form-days">
+          <label class="form-day-label"><input type="checkbox" class="sch-day" value="1"/> الأحد</label>
+          <label class="form-day-label"><input type="checkbox" class="sch-day" value="2"/> الاثنين</label>
+          <label class="form-day-label"><input type="checkbox" class="sch-day" value="4"/> الثلاثاء</label>
+          <label class="form-day-label"><input type="checkbox" class="sch-day" value="8"/> الأربعاء</label>
+          <label class="form-day-label"><input type="checkbox" class="sch-day" value="16"/> الخميس</label>
+          <label class="form-day-label"><input type="checkbox" class="sch-day" value="32"/> الجمعة</label>
+          <label class="form-day-label"><input type="checkbox" class="sch-day" value="64"/> السبت</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" data-action="schedule-save">حفظ الجدول</button>
+      <button class="btn-secondary" data-action="modal-close" data-target="modal-trip">إلغاء</button>
+    </div>
+  </div>
+</div>

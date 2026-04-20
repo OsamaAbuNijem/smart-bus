@@ -8,6 +8,7 @@ using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
+using SmartBus.Web.Models;
 
 namespace SmartBus.Web.Services;
 
@@ -17,7 +18,12 @@ public class ApiClient : IApiClient
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly ILogger<ApiClient> _logger;
 
-    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+    };
 
     public ApiClient(HttpClient httpClient, IHttpContextAccessor contextAccessor, ILogger<ApiClient> logger)
     {
@@ -26,88 +32,181 @@ public class ApiClient : IApiClient
         _logger = logger;
     }
 
-    private void SetAuthHeader()
+    // Build a per-request message with the JWT attached.
+    // DO NOT touch HttpClient.DefaultRequestHeaders — HttpClient is shared across
+    // concurrent callers and mutating its headers causes cross-user auth leakage.
+    private HttpRequestMessage AuthorizedRequest(HttpMethod method, string url, HttpContent? content = null)
     {
+        var req = new HttpRequestMessage(method, url);
+        if (content is not null) req.Content = content;
         var token = _contextAccessor.HttpContext?.Session.GetString("JwtToken");
         if (!string.IsNullOrEmpty(token))
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return req;
     }
 
     public async Task<(string? Token, IEnumerable<string> Roles)> LoginAsync(string email, string password)
     {
-        var body = JsonSerializer.Serialize(new { email, password });
-        var content = new StringContent(body, Encoding.UTF8, "application/json");
+        // Login has no bearer yet — no auth header needed.
+        var content = new StringContent(
+            JsonSerializer.Serialize(new { email, password }), Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync("api/v1/auth/login", content);
-
         if (!response.IsSuccessStatusCode) return (null, []);
         var json = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<LoginResult>(json, _jsonOptions);
         return (result?.Token, result?.Roles ?? []);
     }
 
-    public async Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10)
+    // ── Generic HTTP helpers ───────────────────────────────────────────────
+    private async Task<T?> GetAsync<T>(string url)
     {
-        SetAuthHeader();
-        var response = await _httpClient.GetAsync($"api/v1/buses?pageNumber={pageNumber}&pageSize={pageSize}");
-        if (!response.IsSuccessStatusCode) return null;
+        using var req = AuthorizedRequest(HttpMethod.Get, url);
+        using var response = await _httpClient.SendAsync(req);
+        if (!response.IsSuccessStatusCode) return default;
         var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<PagedResult<BusDto>>(json, _jsonOptions);
+        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
     }
 
-    public async Task<BusDto?> GetBusByIdAsync(Guid busId)
+    private async Task<(bool Ok, string? Error)> SendAsync(HttpMethod method, string url, object? body = null)
     {
-        SetAuthHeader();
-        var response = await _httpClient.GetAsync($"api/v1/buses/{busId}");
-        if (!response.IsSuccessStatusCode) return null;
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<BusDto>(json, _jsonOptions);
+        HttpContent? content = null;
+        if (body is not null)
+            content = new StringContent(JsonSerializer.Serialize(body, _jsonOptions), Encoding.UTF8, "application/json");
+        using var req = AuthorizedRequest(method, url, content);
+        using var response = await _httpClient.SendAsync(req);
+        if (response.IsSuccessStatusCode) return (true, null);
+        var resBody = await response.Content.ReadAsStringAsync();
+        _logger.LogWarning("{Method} {Url} failed. Status={Status} Body={Body}", method, url, response.StatusCode, resBody);
+        return (false, ExtractError(resBody));
     }
 
-    public async Task<PagedResult<TripDto>?> GetTripsAsync(int pageNumber = 1, int pageSize = 10)
+    private async Task<bool> DeleteAsync(string url)
     {
-        SetAuthHeader();
-        var response = await _httpClient.GetAsync($"api/v1/trips?pageNumber={pageNumber}&pageSize={pageSize}");
-        if (!response.IsSuccessStatusCode) return null;
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<PagedResult<TripDto>>(json, _jsonOptions);
+        using var req = AuthorizedRequest(HttpMethod.Delete, url);
+        using var response = await _httpClient.SendAsync(req);
+        return response.IsSuccessStatusCode;
     }
 
-    public async Task<PagedResult<StudentDto>?> GetStudentsAsync(int pageNumber = 1, int pageSize = 10)
+    private static string? ExtractError(string? body)
     {
-        SetAuthHeader();
-        var response = await _httpClient.GetAsync($"api/v1/students?pageNumber={pageNumber}&pageSize={pageSize}");
-        if (!response.IsSuccessStatusCode) return null;
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<PagedResult<StudentDto>>(json, _jsonOptions);
+        if (string.IsNullOrWhiteSpace(body)) return null;
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            var root = doc.RootElement;
+            if (root.ValueKind != JsonValueKind.Object) return body;
+            foreach (var key in new[] { "error", "message", "detail", "title" })
+                if (root.TryGetProperty(key, out var p) && p.ValueKind == JsonValueKind.String)
+                    return p.GetString();
+        }
+        catch { }
+        return body;
     }
 
-    public async Task<PagedResult<DriverDto>?> GetDriversAsync(int pageNumber = 1, int pageSize = 10)
+    // ── Schools ────────────────────────────────────────────────────────────
+    public Task<SchoolDto?> GetMySchoolAsync()
+        => GetAsync<SchoolDto>("api/v1/schools/current");
+
+    // ── Drivers ────────────────────────────────────────────────────────────
+    public Task<PagedResult<DriverDto>?> GetDriversAsync(int pageNumber = 1, int pageSize = 10, string? driverType = null)
     {
-        SetAuthHeader();
-        var response = await _httpClient.GetAsync($"api/v1/drivers?pageNumber={pageNumber}&pageSize={pageSize}");
-        if (!response.IsSuccessStatusCode) return null;
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<PagedResult<DriverDto>>(json, _jsonOptions);
+        var url = $"api/v1/drivers?pageNumber={pageNumber}&pageSize={pageSize}";
+        if (!string.IsNullOrEmpty(driverType)) url += $"&driverType={driverType}";
+        return GetAsync<PagedResult<DriverDto>>(url);
     }
 
-    public async Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null)
+    public Task<DriverDto?> GetDriverByIdAsync(Guid id)
+        => GetAsync<DriverDto>($"api/v1/drivers/{id}");
+
+    public Task<(bool Ok, string? Error)> CreateDriverAsync(DriverInput input)
+        => SendAsync(HttpMethod.Post, "api/v1/drivers", input);
+
+    public Task<(bool Ok, string? Error)> UpdateDriverAsync(Guid id, DriverInput input)
+        => SendAsync(HttpMethod.Put, $"api/v1/drivers/{id}", input);
+
+    public Task<bool> DeleteDriverAsync(Guid id) => DeleteAsync($"api/v1/drivers/{id}");
+
+    // ── Students ───────────────────────────────────────────────────────────
+    public Task<PagedResult<StudentDto>?> GetStudentsAsync(int pageNumber = 1, int pageSize = 10)
+        => GetAsync<PagedResult<StudentDto>>($"api/v1/students?pageNumber={pageNumber}&pageSize={pageSize}");
+
+    public Task<StudentDto?> GetStudentByIdAsync(Guid id)
+        => GetAsync<StudentDto>($"api/v1/students/{id}");
+
+    public Task<(bool Ok, string? Error)> CreateStudentAsync(StudentInput input)
+        => SendAsync(HttpMethod.Post, "api/v1/students", input);
+
+    public Task<(bool Ok, string? Error)> UpdateStudentAsync(Guid id, StudentInput input)
+        => SendAsync(HttpMethod.Put, $"api/v1/students/{id}", input);
+
+    public Task<bool> DeleteStudentAsync(Guid id) => DeleteAsync($"api/v1/students/{id}");
+
+    // ── Buses ──────────────────────────────────────────────────────────────
+    public Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10)
+        => GetAsync<PagedResult<BusDto>>($"api/v1/buses?pageNumber={pageNumber}&pageSize={pageSize}");
+
+    public Task<BusDto?> GetBusByIdAsync(Guid id)
+        => GetAsync<BusDto>($"api/v1/buses/{id}");
+
+    public Task<(bool Ok, string? Error)> CreateBusAsync(BusInput input)
+        => SendAsync(HttpMethod.Post, "api/v1/buses", input);
+
+    public Task<(bool Ok, string? Error)> UpdateBusAsync(Guid id, BusInput input)
+        => SendAsync(HttpMethod.Put, $"api/v1/buses/{id}", input);
+
+    public Task<bool> DeleteBusAsync(Guid id) => DeleteAsync($"api/v1/buses/{id}");
+
+    // ── Trips ──────────────────────────────────────────────────────────────
+    public Task<PagedResult<TripDto>?> GetTripsAsync(int pageNumber = 1, int pageSize = 10,
+        string? personName = null, DateOnly? date = null, string? status = null)
     {
-        SetAuthHeader();
+        var url = $"api/v1/trips?pageNumber={pageNumber}&pageSize={pageSize}";
+        if (!string.IsNullOrEmpty(personName)) url += $"&personName={Uri.EscapeDataString(personName)}";
+        if (date.HasValue)                     url += $"&date={date.Value:yyyy-MM-dd}";
+        if (!string.IsNullOrEmpty(status))     url += $"&status={status}";
+        return GetAsync<PagedResult<TripDto>>(url);
+    }
+
+    public Task<List<SmartBus.Application.Features.Trips.Queries.GetTripStudents.TripStudentDto>?> GetTripStudentsAsync(Guid tripId)
+        => GetAsync<List<SmartBus.Application.Features.Trips.Queries.GetTripStudents.TripStudentDto>>($"api/v1/trips/{tripId}/students");
+
+    public async Task<bool> StartTripAsync(Guid id)
+        => (await SendAsync(HttpMethod.Post, $"api/v1/trips/{id}/start")).Ok;
+
+    public async Task<bool> CompleteTripAsync(Guid id)
+        => (await SendAsync(HttpMethod.Post, $"api/v1/trips/{id}/complete")).Ok;
+
+    public Task<bool> DeleteTripAsync(Guid id) => DeleteAsync($"api/v1/trips/{id}");
+
+    public async Task<(bool Ok, string? Message)> GenerateTodayTripsAsync()
+    {
+        var content = new StringContent("{}", Encoding.UTF8, "application/json");
+        using var req = AuthorizedRequest(HttpMethod.Post, "api/v1/trips/generate-today", content);
+        using var response = await _httpClient.SendAsync(req);
+        var body = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode) return (false, ExtractError(body));
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.TryGetProperty("message", out var msg) && msg.ValueKind == JsonValueKind.String)
+                return (true, msg.GetString());
+        }
+        catch { }
+        return (true, null);
+    }
+
+    // ── Alerts ─────────────────────────────────────────────────────────────
+    public Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null)
+    {
         var url = $"api/v1/alerts?pageNumber={pageNumber}&pageSize={pageSize}";
         if (status.HasValue) url += $"&status={status.Value}";
-        var response = await _httpClient.GetAsync(url);
-        if (!response.IsSuccessStatusCode) return null;
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<PagedResult<AlertDto>>(json, _jsonOptions);
+        return GetAsync<PagedResult<AlertDto>>(url);
     }
 
-    public async Task<SchoolDto?> GetMySchoolAsync()
+    public async Task<bool> SetAlertStatusAsync(Guid id, int status)
     {
-        SetAuthHeader();
-        var response = await _httpClient.GetAsync("api/v1/schools/current");
-        if (!response.IsSuccessStatusCode) return null;
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<SchoolDto>(json, _jsonOptions);
+        var (ok, _) = await SendAsync(HttpMethod.Post, $"api/v1/alerts/{id}/status", new { status });
+        return ok;
     }
 
     private record LoginResult(string Token, string Email, IEnumerable<string> Roles, DateTime ExpiresAt);

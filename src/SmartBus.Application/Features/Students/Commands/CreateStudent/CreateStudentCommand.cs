@@ -1,4 +1,5 @@
 using MediatR;
+using SmartBus.Application.Common.Caching;
 using SmartBus.Application.Common.Models;
 
 namespace SmartBus.Application.Features.Students.Commands.CreateStudent;
@@ -22,4 +23,7 @@ public record CreateStudentCommand(
     string? HomeArea,
     string? HomeStreet,
     string? HomeBuildingNumber
-) : IRequest<Result<Guid>>;
+) : IRequest<Result<Guid>>, ICacheInvalidator
+{
+    public IEnumerable<string> CachePatternsToInvalidate => new[] { "students:page:*" };
+}

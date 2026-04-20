@@ -1,0 +1,78 @@
+@model AdminPageViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<input type="hidden" id="trips-page" value="1"/>
+
+<div class="trip-filter-bar">
+  <div class="trip-filter-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input id="trip-filter-name" type="text" placeholder="بحث بالسائق أو المساعد..." oninput="trips.debouncedSearch()"/>
+  </div>
+  <div class="trip-filter-divider"></div>
+  <input id="trip-filter-date" type="date" class="trip-filter-input" onchange="trips.load(1)"/>
+  <div class="trip-filter-divider"></div>
+  <select id="trip-filter-status" class="trip-filter-select" onchange="trips.load(1)">
+    <option value="">كل الحالات</option>
+    <option value="Scheduled">@L["Trip_StatusScheduled"]</option>
+    <option value="InProgress">@L["Trip_StatusInProgress"]</option>
+    <option value="Completed">@L["Trip_StatusCompleted"]</option>
+    <option value="Delayed">@L["Trip_StatusDelayed"]</option>
+    <option value="Cancelled">@L["Trip_StatusCancelled"]</option>
+  </select>
+  <button class="trip-filter-clear" onclick="trips.clearFilter()">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    مسح
+  </button>
+  <div class="trip-filter-spacer"></div>
+  <button class="trip-filter-run" onclick="trips.generate()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    @L["Trip_GenerateBtn"]
+  </button>
+</div>
+
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr><th>السائق</th><th>المساعد</th><th>الباص</th><th>النوع</th><th>التاريخ</th><th>الوقت</th><th>الحالة</th><th></th></tr>
+    </thead>
+    <tbody id="trips-tbody">
+      <tr><td colspan="8" class="u-loading-state">جاري التحميل...</td></tr>
+    </tbody>
+  </table>
+  <div class="table-pager">
+    <span class="table-pager-info" id="trips-pager-info"></span>
+    <div class="table-pager-controls">
+      <button class="filter-btn" id="trips-prev" onclick="trips.prev()">‹ السابق</button>
+      <button class="filter-btn" id="trips-next" onclick="trips.next()">التالي ›</button>
+    </div>
+  </div>
+</div>
+
+@* Trip students modal *@
+<div class="modal-overlay" id="modal-trip-students">
+  <div class="modal-box lg">
+    <div class="modal-header">
+      <div>
+        <div class="modal-header-title" id="trip-students-title">@L["Trip_StudentsTitle"]</div>
+        <div class="u-text-11 u-text-muted u-mt-2" id="trip-students-sub"></div>
+      </div>
+      <button class="modal-close-btn" onclick="SB.closeModal('modal-trip-students')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body flush">
+      <div id="trip-students-body" class="modal-body-scroll">
+        <div class="u-empty-state">جاري التحميل...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <script src="~/js/admin/trips.js" asp-append-version="true"></script>
+}

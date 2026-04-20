@@ -3,6 +3,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SmartBus.Application.Features.Auth.Commands.ChangePassword;
 using SmartBus.Application.Features.Auth.Commands.Login;
 
@@ -11,6 +12,7 @@ namespace SmartBus.API.Controllers.v1;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
+[EnableRateLimiting("auth")]
 public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;

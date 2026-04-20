@@ -9,20 +9,11 @@ namespace SmartBus.Application.Features.Buses.Queries.GetBusById;
 public class GetBusByIdQueryHandler : IRequestHandler<GetBusByIdQuery, Result<BusDto>>
 {
     private readonly IApplicationDbContext _context;
-    private readonly ICacheService _cacheService;
 
-    public GetBusByIdQueryHandler(IApplicationDbContext context, ICacheService cacheService)
-    {
-        _context = context;
-        _cacheService = cacheService;
-    }
+    public GetBusByIdQueryHandler(IApplicationDbContext context) => _context = context;
 
     public async Task<Result<BusDto>> Handle(GetBusByIdQuery request, CancellationToken cancellationToken)
     {
-        var cacheKey = $"bus:{request.BusId}";
-        var cached = await _cacheService.GetAsync<BusDto>(cacheKey, cancellationToken);
-        if (cached is not null) return Result<BusDto>.Success(cached);
-
         var busEntity = await _context.Buses
             .Where(b => b.Id == request.BusId && !b.IsDeleted)
             .Include(b => b.Driver)
@@ -46,7 +37,6 @@ public class GetBusByIdQueryHandler : IRequestHandler<GetBusByIdQuery, Result<Bu
             busEntity.LastLocation?.Latitude, busEntity.LastLocation?.Longitude,
             busEntity.CreatedAt);
 
-        await _cacheService.SetAsync(cacheKey, bus, TimeSpan.FromMinutes(5), cancellationToken);
         return Result<BusDto>.Success(bus);
     }
 }

@@ -22,9 +22,22 @@ try
     builder.WebHost.UseStaticWebAssets();
 
     builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
-    builder.Services.AddControllersWithViews()
+    builder.Services.AddControllersWithViews(options =>
+        {
+            // Always parse double/double? form values using InvariantCulture —
+            // the request culture (ar/en) shouldn't affect lat/lng parsing.
+            options.ModelBinderProviders.Insert(0, new SmartBus.Web.Infrastructure.InvariantDoubleBinderProvider());
+        })
         .AddViewLocalization()
-        .AddDataAnnotationsLocalization();
+        .AddDataAnnotationsLocalization(options =>
+        {
+            options.DataAnnotationLocalizerProvider = (type, factory) =>
+                factory.Create(typeof(SmartBus.Web.Resources.SharedResources));
+        });
+
+    // Feature-folder support: look in Features/{Controller}/ for views.
+    builder.Services.Configure<Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions>(o =>
+        o.ViewLocationExpanders.Add(new SmartBus.Web.Infrastructure.FeatureFolderViewLocationExpander()));
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddSession(options =>
     {
@@ -71,9 +84,16 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
+    // "/" → Account/Login (landing page)
+    app.MapControllerRoute(
+        name: "home",
+        pattern: "",
+        defaults: new { controller = "Account", action = "Login" });
+
+    // Everything else uses Index as the default action, so /Drivers works without /Index.
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Account}/{action=Login}/{id?}");
+        pattern: "{controller}/{action=Index}/{id?}");
 
     // Redirect /hangfire (and any sub-paths) to the API project's Hangfire dashboard
     app.MapGet("/hangfire", (IConfiguration cfg) =>
