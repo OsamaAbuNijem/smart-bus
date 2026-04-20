@@ -4,34 +4,177 @@
     ViewData["Title"] = Model.PageTitle;
 }
 
-<input type="hidden" id="students-page" value="1"/>
+<input type="hidden" id="students-page"         value="1"/>
+<input type="hidden" id="students-filter-name"  value=""/>
+<input type="hidden" id="students-filter-grade" value=""/>
+<input type="hidden" id="students-filter-area"  value=""/>
 
-<div class="filter-bar">
-  <button class="filter-btn active">
-    الكل (<span id="students-total">0</span>)
-  </button>
-  <button class="add-btn" onclick="students.openForm()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    @L["Student_AddBtn"]
-  </button>
+<div class="filter-bar panel">
+
+  <div class="filter-group">
+    <div class="search-input-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+
+      @* ── Honeypot decoys ──────────────────────────────────────────────────
+         Chrome ignores autocomplete="off" and re-runs autofill whenever the
+         DOM changes (modal open/close, partial swaps). These hidden username
+         + password fields are the ones Chrome targets instead of our real
+         search input. They MUST be visible enough for Chrome to find them
+         (visibility:hidden, not display:none) and placed BEFORE the real
+         field. Tab-index -1 + aria-hidden so keyboard users and screen
+         readers don't reach them. *@
+      <input type="text"     class="u-honeypot" tabindex="-1" aria-hidden="true"
+             autocomplete="username"          name="fake-user"/>
+      <input type="password" class="u-honeypot" tabindex="-1" aria-hidden="true"
+             autocomplete="current-password"  name="fake-pass"/>
+
+      @* The real search input.
+         readonly + onfocus removes it → blocks the initial autofill pass.
+         onblur re-arms readonly so Chrome can't target it after the user
+         clicks another element (edit/delete button, etc.) and re-scans forms. *@
+      <input type="search" id="students-name-input"
+             name="search-q"
+             value=""
+             readonly
+             onfocus="this.removeAttribute('readonly')"
+             onblur="this.setAttribute('readonly','')"
+             autocomplete="off"
+             autocorrect="off"
+             autocapitalize="none"
+             spellcheck="false"
+             data-lpignore="true"
+             data-form-type="other"
+             placeholder="@L["Std_Name"]"
+             aria-label="@L["Std_Name"]"
+             oninput="students.debouncedFilter()"/>
+    </div>
+
+    <select id="students-grade-select" class="filter-select"
+            aria-label="@L["Std_Grade"]"
+            onchange="students.applyFilters()">
+      <option value="">@L["Std_Grade"] — @L["Pager_All"]</option>
+      @{
+          var filterGradeCodes = new[] { "KG1", "KG2", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
+      }
+      @foreach (var val in filterGradeCodes)
+      {
+          <option value="@val">@L["Std_Grade" + val]</option>
+      }
+    </select>
+
+    @* Home-area filter (LIKE search on the server — partial matches OK) *@
+    <input type="search" id="students-area-input"
+           name="search-area-q"
+           class="filter-select"
+           value=""
+           autocomplete="off"
+           autocorrect="off"
+           autocapitalize="none"
+           spellcheck="false"
+           data-lpignore="true"
+           placeholder="@L["Student_FilterAreaPlaceholder"]"
+           aria-label="@L["Student_ColHomeArea"]"
+           oninput="students.debouncedFilter()"/>
+  </div>
+
+  <div class="action-group">
+    <button class="btn-ghost" onclick="students.downloadTemplate()"
+            aria-label="@L["Student_Template"]"
+            title="@L["Student_TemplateHint"]">
+      <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+      </svg>
+      @L["Student_Template"]
+    </button>
+
+    <button class="btn-ghost" onclick="students.exportFile()"
+            aria-label="@L["Student_Export"]" title="@L["Student_Export"]">
+      <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      @L["Student_Export"]
+    </button>
+
+    <button class="btn-ghost" onclick="students.openImport()"
+            aria-label="@L["Student_Import"]" title="@L["Student_Import"]">
+      <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      @L["Student_Import"]
+    </button>
+
+    <div class="filter-divider-v"></div>
+
+    <button class="add-btn"
+            aria-label="@L["Student_AriaAdd"]"
+            onclick="students.openForm()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      @L["Student_AddBtn"]
+    </button>
+  </div>
 </div>
 
 <div class="card">
-  <table class="table">
+  <table class="table" role="table" aria-label="@L["Student_AriaTable"]">
     <thead>
       <tr>
-        <th>@L["Std_Name"]</th><th>@L["Std_Grade"]</th><th>المسار</th><th>@L["Std_Parent"]</th><th>@L["Std_Phone"]</th><th>تاريخ التسجيل</th><th></th>
+        <th scope="col">@L["Student_ColNumber"]</th>
+        <th scope="col">@L["Student_ColStudent"]</th>
+        <th scope="col">@L["Student_ColGrade"]</th>
+        <th scope="col">@L["Student_ColParent"]</th>
+        <th scope="col">@L["Student_ColPhone"]</th>
+        <th scope="col">@L["Student_ColHomeArea"]</th>
+        <th scope="col">@L["Student_ColCreated"]</th>
+        <th scope="col" aria-label="@L["Student_ColActions"]"></th>
       </tr>
     </thead>
     <tbody id="students-tbody">
-      <tr><td colspan="7" class="u-loading-state">جاري التحميل...</td></tr>
+      <tr><td colspan="8" class="u-loading-state">@L["Student_Loading"]</td></tr>
     </tbody>
   </table>
   <div class="table-pager">
-    <span class="table-pager-info" id="students-pager-info"></span>
+    <div class="u-flex u-items-center u-gap-12">
+      <span class="count-pill accent" aria-live="polite">
+        <span>@L["Student_TotalLabel"]</span>
+        <span class="count" id="students-total">0</span>
+      </span>
+      <span class="table-pager-info" id="students-pager-info" aria-live="polite"></span>
+    </div>
     <div class="table-pager-controls">
-      <button class="filter-btn" id="students-prev" onclick="students.prev()">‹ السابق</button>
-      <button class="filter-btn" id="students-next" onclick="students.next()">التالي ›</button>
+      <button class="filter-btn" id="students-prev" onclick="students.prev()" aria-label="@L["Pager_Prev"]">@L["Pager_Prev"]</button>
+      <button class="filter-btn" id="students-next" onclick="students.next()" aria-label="@L["Pager_Next"]">@L["Pager_Next"]</button>
+    </div>
+  </div>
+</div>
+
+@* Import modal *@
+<div class="modal-overlay" id="modal-students-import" role="dialog" aria-modal="true" aria-labelledby="students-import-title">
+  <div class="modal-box sm">
+    <div class="modal-header">
+      <div class="modal-header-title" id="students-import-title">@L["Student_ImportTitle"]</div>
+      <button class="modal-close-btn" onclick="SB.closeModal('modal-students-import')" aria-label="Close">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body stack">
+      <div class="u-text-sm u-text-muted">@L["Student_ImportHint"]</div>
+      <a href="/Students/Template" class="btn-ghost u-self-start">
+        <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        </svg>
+        @L["Student_Template"]
+      </a>
+      <input type="file" id="students-import-file" accept=".xlsx" class="form-input"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="students.submitImport()">@L["Student_Import"]</button>
+      <button class="btn-secondary" onclick="SB.closeModal('modal-students-import')">@L["Del_Cancel"]</button>
     </div>
   </div>
 </div>

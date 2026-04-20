@@ -20,6 +20,23 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
         if (request.RouteId.HasValue)
             query = query.Where(s => s.RouteId == request.RouteId.Value);
 
+        if (!string.IsNullOrWhiteSpace(request.Name))
+        {
+            var term = request.Name.Trim();
+            query = query.Where(s =>
+                EF.Functions.Like(s.FullName, $"%{term}%") ||
+                (s.FullNameEn != null && EF.Functions.Like(s.FullNameEn, $"%{term}%")));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Grade))
+            query = query.Where(s => s.Grade == request.Grade);
+
+        if (!string.IsNullOrWhiteSpace(request.HomeArea))
+        {
+            var area = request.HomeArea.Trim();
+            query = query.Where(s => s.HomeArea != null && EF.Functions.Like(s.HomeArea, $"%{area}%"));
+        }
+
         var total = await query.CountAsync(cancellationToken);
         var items = await query
             .OrderBy(s => s.FullName)

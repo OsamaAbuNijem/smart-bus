@@ -23,8 +23,17 @@ public class StudentsController : ControllerBase
     public StudentsController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] Guid? routeId = null, CancellationToken cancellationToken = default)
-        => Ok(await _mediator.Send(new GetAllStudentsQuery(pageNumber, pageSize, routeId), cancellationToken));
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] Guid? routeId = null,
+        [FromQuery] string? name = null,
+        [FromQuery] string? grade = null,
+        [FromQuery] string? homeArea = null,
+        CancellationToken cancellationToken = default)
+        => Ok(await _mediator.Send(
+            new GetAllStudentsQuery(pageNumber, pageSize, routeId, name, grade, homeArea),
+            cancellationToken));
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)

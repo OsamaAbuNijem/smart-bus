@@ -24,7 +24,8 @@ public interface IApiClient
     Task<bool> DeleteDriverAsync(Guid id);
 
     // Students
-    Task<PagedResult<StudentDto>?> GetStudentsAsync(int pageNumber = 1, int pageSize = 10);
+    Task<PagedResult<StudentDto>?> GetStudentsAsync(int pageNumber = 1, int pageSize = 10,
+        string? name = null, string? grade = null, string? homeArea = null);
     Task<StudentDto?> GetStudentByIdAsync(Guid id);
     Task<(bool Ok, string? Error)> CreateStudentAsync(StudentInput input);
     Task<(bool Ok, string? Error)> UpdateStudentAsync(Guid id, StudentInput input);

@@ -127,8 +127,15 @@ public class ApiClient : IApiClient
     public Task<bool> DeleteDriverAsync(Guid id) => DeleteAsync($"api/v1/drivers/{id}");
 
     // ── Students ───────────────────────────────────────────────────────────
-    public Task<PagedResult<StudentDto>?> GetStudentsAsync(int pageNumber = 1, int pageSize = 10)
-        => GetAsync<PagedResult<StudentDto>>($"api/v1/students?pageNumber={pageNumber}&pageSize={pageSize}");
+    public Task<PagedResult<StudentDto>?> GetStudentsAsync(int pageNumber = 1, int pageSize = 10,
+        string? name = null, string? grade = null, string? homeArea = null)
+    {
+        var url = $"api/v1/students?pageNumber={pageNumber}&pageSize={pageSize}";
+        if (!string.IsNullOrEmpty(name))     url += $"&name={Uri.EscapeDataString(name)}";
+        if (!string.IsNullOrEmpty(grade))    url += $"&grade={grade}";
+        if (!string.IsNullOrEmpty(homeArea)) url += $"&homeArea={Uri.EscapeDataString(homeArea)}";
+        return GetAsync<PagedResult<StudentDto>>(url);
+    }
 
     public Task<StudentDto?> GetStudentByIdAsync(Guid id)
         => GetAsync<StudentDto>($"api/v1/students/{id}");

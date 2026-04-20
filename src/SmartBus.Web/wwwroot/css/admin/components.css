@@ -47,10 +47,91 @@
 
 /* ══ FILTER BAR ══ */
 .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
-.filter-btn { border: 1px solid var(--border); border-radius: 9px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Cairo', sans-serif; color: var(--text2); background: var(--card); }
+/* Panel modifier — gives the filter bar a card look with padding and a subtle shadow. */
+.filter-bar.panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; box-shadow: var(--shadow); flex-wrap: wrap; gap: 12px; }
+.filter-bar .filter-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.filter-bar .action-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.filter-bar .action-group .add-btn { margin-right: 0; margin-left: 0; }
+[dir="ltr"] .filter-bar .action-group .add-btn { margin-right: 0; margin-left: 0; }
+
+.filter-btn { border: 1px solid var(--border); border-radius: 9px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Cairo', sans-serif; color: var(--text2); background: var(--card); transition: all .15s; }
+.filter-btn:hover { background: var(--bg); border-color: var(--border2); }
 .filter-btn.active { background: #111; color: #fff; border-color: #111; }
-.add-btn { background: var(--y); border-radius: 9px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; font-family: 'Cairo', sans-serif; color: #111; display: flex; align-items: center; gap: 6px; margin-right: auto; }
+.add-btn { background: var(--y); border-radius: 9px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; font-family: 'Cairo', sans-serif; color: #111; display: flex; align-items: center; gap: 6px; margin-right: auto; transition: background .15s, transform .05s; }
+.add-btn:hover  { background: #FFC800; }
+.add-btn:active { transform: translateY(1px); }
 [dir="ltr"] .add-btn { margin-right: 0; margin-left: auto; }
+
+/* Ghost (outlined) secondary action — Export / Import */
+.btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 9px; font-size: 12px; font-weight: 600; font-family: 'Cairo', sans-serif; cursor: pointer; transition: all .15s; text-decoration: none; }
+.btn-ghost:hover { background: var(--bg); border-color: var(--border2); }
+.btn-ghost .ico { opacity: .6; }
+
+/* Count pill — "All (42)" */
+.count-pill { display: inline-flex; align-items: center; gap: 8px; padding: 5px 6px 5px 14px; border: 1px solid #111; border-radius: 999px; background: #111; color: #fff; font-size: 12px; font-weight: 600; font-family: 'Cairo', sans-serif; cursor: default; }
+[dir="ltr"] .count-pill { padding: 5px 14px 5px 6px; }
+.count-pill .count { background: rgba(255,255,255,.18); color: #fff; min-width: 22px; text-align: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+
+/* ── Accent variant — "total records" indicator below the grid ───────────
+   Polished KPI-chip look: soft gradient, inset highlight, "live" pulse dot
+   on the leading edge, and a dark inverted counter badge for contrast. */
+.count-pill.accent {
+  background: linear-gradient(135deg, #FFFDE7 0%, #FFF3BF 100%);
+  border: 1px solid #F7D976;
+  color: #7A5D00;
+  padding: 6px 8px 6px 14px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  box-shadow:
+    0 2px 6px rgba(184,150,12,.10),
+    inset 0 1px 0 rgba(255,255,255,.7);
+  transition: box-shadow .15s;
+}
+[dir="ltr"] .count-pill.accent { padding: 6px 14px 6px 8px; }
+
+.count-pill.accent:hover { box-shadow: 0 3px 10px rgba(184,150,12,.18), inset 0 1px 0 rgba(255,255,255,.7); }
+
+/* "Live" pulse dot — visual cue that this value updates as data changes. */
+.count-pill.accent::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--y);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, .22);
+  flex-shrink: 0;
+  animation: count-pulse 2s ease-in-out infinite;
+}
+@keyframes count-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(255, 215, 0, .22); }
+  50%      { box-shadow: 0 0 0 6px rgba(255, 215, 0, .08); }
+}
+
+/* Count chip inside — dark background, yellow text = strong but on-theme. */
+.count-pill.accent .count {
+  background: #111;
+  color: var(--y);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 3px 12px;
+  min-width: 36px;
+  letter-spacing: 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+}
+
+/* Search input with inline icon */
+.search-input-wrap { position: relative; flex: 1; min-width: 160px; max-width: 260px; }
+.search-input-wrap > input { width: 100%; padding: 7px 34px 7px 12px; border: 1px solid var(--border); border-radius: 9px; font-size: 13px; outline: none; background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; transition: border-color .15s, box-shadow .15s; }
+.search-input-wrap > input:focus { border-color: var(--y); background: var(--card); box-shadow: 0 0 0 3px rgba(255,215,0,.15); }
+.search-input-wrap > .search-icon { position: absolute; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; right: 10px; }
+[dir="ltr"] .search-input-wrap > input { padding: 7px 12px 7px 34px; }
+[dir="ltr"] .search-input-wrap > .search-icon { right: auto; left: 10px; }
+
+/* Lightweight select — matches the search input */
+.filter-select { padding: 7px 12px; border: 1px solid var(--border); border-radius: 9px; font-size: 13px; background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; cursor: pointer; outline: none; min-width: 140px; transition: border-color .15s, box-shadow .15s; }
+.filter-select:focus { border-color: var(--y); background: var(--card); box-shadow: 0 0 0 3px rgba(255,215,0,.15); }
+
+/* Vertical divider between filter groups */
+.filter-divider-v { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
 
 /* ══ TRIP FILTER BAR (page-level) ══ */
 .trip-filter-bar { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }

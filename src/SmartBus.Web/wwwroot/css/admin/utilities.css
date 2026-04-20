@@ -9,6 +9,11 @@
 .u-flex-shrink-0 { flex-shrink: 0; }
 .u-items-center    { align-items: center; }
 .u-items-start     { align-items: flex-start; }
+.u-self-start      { align-self: flex-start; }
+
+/* Honeypot decoy inputs — Chrome autofills these instead of the real search field.
+   Off-screen but NOT display:none (Chrome skips display:none when picking targets). */
+.u-honeypot { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .u-items-end       { align-items: flex-end; }
 .u-justify-between { justify-content: space-between; }
 .u-justify-center  { justify-content: center; }

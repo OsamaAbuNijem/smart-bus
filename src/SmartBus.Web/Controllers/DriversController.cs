@@ -52,8 +52,16 @@ public class DriversController : AdminControllerBase
         return await SuccessWithList(_l["JS_DriverSaved"], page: 1);
     }
 
+    // [FromQuery] forces these params to bind from the URL query string. Without
+    // it, the default value provider pulls `driverType` from the posted form
+    // (which carries DriverType=Driver/Assistant), so the list refresh after
+    // save would accidentally filter by the edited driver's type.
     [HttpPost]
-    public async Task<IActionResult> Update(Guid id, DriverInput input, int page = 1, string? driverType = null)
+    public async Task<IActionResult> Update(
+        Guid id,
+        DriverInput input,
+        [FromQuery] int page = 1,
+        [FromQuery] string? driverType = null)
     {
         if (!ModelState.IsValid) { Response.StatusCode = 400; ViewBag.DriverId = id; return PartialView("_Form", input); }
         var (ok, err) = await ApiClient.UpdateDriverAsync(id, input);
@@ -62,7 +70,10 @@ public class DriversController : AdminControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Delete(Guid id, int page = 1, string? driverType = null)
+    public async Task<IActionResult> Delete(
+        [FromQuery] Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] string? driverType = null)
     {
         if (!await ApiClient.DeleteDriverAsync(id)) return StatusCode(502);
         return await SuccessWithList(_l["JS_DeletedSuccess"], page, driverType);

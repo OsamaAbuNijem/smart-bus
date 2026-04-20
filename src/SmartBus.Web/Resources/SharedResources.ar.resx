@@ -56,6 +56,11 @@
   <data name="Std_Grade7"       xml:space="preserve"><value>الصف السابع</value></data>
   <data name="Std_Grade8"       xml:space="preserve"><value>الصف الثامن</value></data>
   <data name="Std_Grade9"       xml:space="preserve"><value>الصف التاسع</value></data>
+  <data name="Std_Grade10"      xml:space="preserve"><value>الصف العاشر</value></data>
+  <data name="Std_Grade11"      xml:space="preserve"><value>الصف الحادي عشر</value></data>
+  <data name="Std_Grade12"      xml:space="preserve"><value>الصف الثاني عشر</value></data>
+  <data name="Std_GradeKG1"     xml:space="preserve"><value>روضة أولى</value></data>
+  <data name="Std_GradeKG2"     xml:space="preserve"><value>روضة ثانية</value></data>
   <data name="Std_City"         xml:space="preserve"><value>المدينة</value></data>
   <data name="City_Amman"      xml:space="preserve"><value>عمّان</value></data>
   <data name="City_Zarqa"      xml:space="preserve"><value>الزرقاء</value></data>
@@ -118,13 +123,40 @@
   <!-- Validation messages (shared) -->
   <data name="Validation_Required"      xml:space="preserve"><value>هذا الحقل مطلوب</value></data>
   <data name="Validation_DriverType"    xml:space="preserve"><value>النوع يجب أن يكون سائق أو مساعد</value></data>
+  <data name="Validation_PhoneFormat"   xml:space="preserve"><value>رقم الهاتف يجب أن يبدأ بـ 077 أو 078 أو 079 ويتكون من 10 أرقام</value></data>
 
   <!-- Students page -->
-  <data name="Student_PageTitle"  xml:space="preserve"><value>الطلاب</value></data>
-  <data name="Student_None"       xml:space="preserve"><value>لا يوجد طلاب مسجلون</value></data>
-  <data name="Student_PagerInfo" xml:space="preserve"><value>عرض {0} من {1} طالب — الصفحة {2} من {3}</value></data>
-  <data name="Student_TypeLabel"  xml:space="preserve"><value>طالب</value></data>
-  <data name="Student_AddBtn"     xml:space="preserve"><value>إضافة طالب</value></data>
+  <data name="Student_PageTitle"   xml:space="preserve"><value>الطلاب</value></data>
+  <data name="Student_None"        xml:space="preserve"><value>لا يوجد طلاب مسجلون</value></data>
+  <data name="Student_PagerInfo"   xml:space="preserve"><value>عرض {0} من {1} طالب — الصفحة {2} من {3}</value></data>
+  <data name="Student_TypeLabel"   xml:space="preserve"><value>طالب</value></data>
+  <data name="Student_AddBtn"      xml:space="preserve"><value>إضافة طالب</value></data>
+  <data name="Student_Loading"     xml:space="preserve"><value>جاري التحميل...</value></data>
+  <data name="Student_ColNumber"   xml:space="preserve"><value>#</value></data>
+  <data name="Student_ColStudent"  xml:space="preserve"><value>الطالب</value></data>
+  <data name="Student_ColGrade"    xml:space="preserve"><value>الصف</value></data>
+  <data name="Student_ColParent"   xml:space="preserve"><value>ولي الأمر</value></data>
+  <data name="Student_ColPhone"    xml:space="preserve"><value>الهاتف</value></data>
+  <data name="Student_ColCreated"  xml:space="preserve"><value>تاريخ التسجيل</value></data>
+  <data name="Student_ColHomeArea" xml:space="preserve"><value>المنطقة السكنية</value></data>
+  <data name="Student_FilterAreaPlaceholder" xml:space="preserve"><value>فلترة حسب المنطقة</value></data>
+  <data name="Student_ColActions"  xml:space="preserve"><value>إجراءات</value></data>
+  <data name="Student_AriaEdit"    xml:space="preserve"><value>تعديل الطالب {0}</value></data>
+  <data name="Student_AriaDelete"  xml:space="preserve"><value>حذف الطالب {0}</value></data>
+  <data name="Student_AriaAdd"     xml:space="preserve"><value>إضافة طالب جديد</value></data>
+  <data name="Student_AriaTable"   xml:space="preserve"><value>جدول الطلاب</value></data>
+  <data name="Student_Export"      xml:space="preserve"><value>تصدير Excel</value></data>
+  <data name="Student_Import"      xml:space="preserve"><value>استيراد Excel</value></data>
+  <data name="Student_ImportTitle" xml:space="preserve"><value>استيراد الطلاب من Excel</value></data>
+  <data name="Student_ImportHint"  xml:space="preserve"><value>يجب أن يحتوي الملف على الأعمدة التالية في الصف الأول: FullName, Grade, ParentName, ParentPhone</value></data>
+  <data name="Student_ImportResult" xml:space="preserve"><value>تم استيراد {0} طالب — فشل {1}</value></data>
+  <data name="Student_ImportNoFile" xml:space="preserve"><value>الرجاء اختيار ملف</value></data>
+  <data name="Student_Template"     xml:space="preserve"><value>تحميل القالب</value></data>
+  <data name="Student_TemplateHint" xml:space="preserve"><value>قالب Excel فارغ بالأعمدة المطلوبة للاستيراد</value></data>
+  <data name="Student_TotalLabel"   xml:space="preserve"><value>إجمالي السجلات</value></data>
+  <data name="Pager_Prev"          xml:space="preserve"><value>‹ السابق</value></data>
+  <data name="Pager_Next"          xml:space="preserve"><value>التالي ›</value></data>
+  <data name="Pager_All"           xml:space="preserve"><value>الكل</value></data>
 
   <!-- Buses page -->
   <data name="Bus_PageTitle"      xml:space="preserve"><value>الباصات</value></data>

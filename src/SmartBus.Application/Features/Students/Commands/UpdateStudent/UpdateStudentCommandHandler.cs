@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
 
@@ -7,13 +8,24 @@ namespace SmartBus.Application.Features.Students.Commands.UpdateStudent;
 public class UpdateStudentCommandHandler : IRequestHandler<UpdateStudentCommand, Result>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IApplicationDbContext _context;
 
-    public UpdateStudentCommandHandler(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+    public UpdateStudentCommandHandler(IUnitOfWork unitOfWork, IApplicationDbContext context)
+    { _unitOfWork = unitOfWork; _context = context; }
 
     public async Task<Result> Handle(UpdateStudentCommand request, CancellationToken cancellationToken)
     {
         var student = await _unitOfWork.Students.GetByIdAsync(request.StudentId, cancellationToken);
         if (student is null) return Result.Failure("Student not found.");
+
+        // Parent phone must be unique — reject if another student already has it.
+        if (!string.Equals(student.ParentPhone, request.ParentPhone, StringComparison.Ordinal))
+        {
+            var phoneTaken = await _context.Students
+                .AnyAsync(s => !s.IsDeleted && s.Id != request.StudentId && s.ParentPhone == request.ParentPhone, cancellationToken);
+            if (phoneTaken)
+                return Result.Failure($"Parent phone '{request.ParentPhone}' is already used by another student.");
+        }
 
         student.FullName     = request.FullName;
         student.FullNameEn   = request.FullNameEn;

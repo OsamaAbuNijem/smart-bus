@@ -1,14 +1,32 @@
 /**
  * SmartBus Admin — Students page.
- * Same pattern as drivers.js: server renders everything, JS is pure AJAX glue.
- * The Leaflet map picker is wired up after the form partial is injected.
+ * Server renders rows/form. Filters: name (search) + grade (dropdown).
  */
 
 const students = {
+  _filterTimer: null,
+
+  // Read current filter state from hidden inputs (single source of truth)
+  _state() {
+    return {
+      page:     document.getElementById('students-page').value,
+      name:     document.getElementById('students-filter-name').value,
+      grade:    document.getElementById('students-filter-grade').value,
+      homeArea: document.getElementById('students-filter-area').value
+    };
+  },
+
+  _qs({ page, name, grade, homeArea }) {
+    const qs = new URLSearchParams({ page });
+    if (name)     qs.set('name', name);
+    if (grade)    qs.set('grade', grade);
+    if (homeArea) qs.set('homeArea', homeArea);
+    return qs.toString();
+  },
 
   async load() {
-    const page = document.getElementById('students-page').value;
-    const res  = await fetch(`/Students/List?page=${page}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    const s   = this._state();
+    const res = await fetch(`/Students/List?${this._qs(s)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
     if (res.status === 401) { location.href = '/Account/Login'; return; }
     this._renderList(await res.text());
   },
@@ -25,35 +43,80 @@ const students = {
     const totalPages = parseInt(meta.dataset.totalPages) || 1;
     const totalCount = meta.dataset.totalCount || 0;
     document.getElementById('students-pager-info').textContent = meta.dataset.pagerInfo;
-    document.getElementById('students-total').textContent = totalCount;
+    const totalEl = document.getElementById('students-total');
+    if (totalEl) totalEl.textContent = totalCount;
     document.getElementById('students-prev').disabled = page <= 1;
     document.getElementById('students-next').disabled = page >= totalPages;
   },
 
+  // Pagination
   goto(p) { document.getElementById('students-page').value = p; this.load(); },
   prev()  { this.goto(parseInt(document.getElementById('students-page').value) - 1); },
   next()  { this.goto(parseInt(document.getElementById('students-page').value) + 1); },
+
+  // Filters — when any filter changes, reset to page 1 and refetch
+  applyFilters() {
+    document.getElementById('students-filter-name').value  = document.getElementById('students-name-input').value.trim();
+    document.getElementById('students-filter-grade').value = document.getElementById('students-grade-select').value;
+    document.getElementById('students-filter-area').value  = document.getElementById('students-area-input').value.trim();
+    document.getElementById('students-page').value         = 1;
+    this.load();
+  },
+
+  debouncedFilter() {
+    clearTimeout(this._filterTimer);
+    this._filterTimer = setTimeout(() => this.applyFilters(), 350);
+  },
+
+  // Export — include current filters so the exported file matches what the user sees
+  exportFile() {
+    const s  = this._state();
+    const qs = new URLSearchParams();
+    if (s.name)     qs.set('name', s.name);
+    if (s.grade)    qs.set('grade', s.grade);
+    if (s.homeArea) qs.set('homeArea', s.homeArea);
+    location.href = '/Students/Export' + (qs.toString() ? '?' + qs : '');
+  },
+
+  // Empty template with the required columns + one example row
+  downloadTemplate() {
+    location.href = '/Students/Template';
+  },
 
   async openForm(id) {
     const url = id ? `/Students/Form?id=${id}` : '/Students/Form';
     const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
     document.getElementById('student-form-container').innerHTML = await res.text();
     SB.openModal('modal-student');
-    // Init map after the modal animation has settled + container has final size.
+
     const lat = parseFloat(document.getElementById('sf-lat').value) || null;
     const lng = parseFloat(document.getElementById('sf-lng').value) || null;
-    setTimeout(() => {
+
+    // Map init after the modal slide animation settles
+    const modalBox = document.querySelector('#modal-student .modal-box');
+    let initialized = false;
+    const initOnce = () => {
+      if (initialized) return;
+      initialized = true;
       this._initMap(lat, lng);
-      // Leaflet measures container on init; force a re-measure once visible.
-      setTimeout(() => this._map?.invalidateSize(), 150);
-    }, 50);
+      requestAnimationFrame(() => {
+        this._map?.invalidateSize();
+        setTimeout(() => this._map?.invalidateSize(), 120);
+      });
+    };
+    modalBox?.addEventListener('animationend', initOnce, { once: true });
+    setTimeout(initOnce, 400);
   },
 
   async submit(form) {
-    const id   = form.dataset.id;
-    const page = document.getElementById('students-page').value;
-    const url  = id ? `/Students/Update?id=${id}&page=${page}` : '/Students/Save';
-    const res  = await fetch(url, {
+    const s     = this._state();
+    const id    = form.dataset.id;
+    const extra = `&page=${s.page}`
+                + (s.name     ? '&name='     + encodeURIComponent(s.name)     : '')
+                + (s.grade    ? '&grade='    + s.grade                        : '')
+                + (s.homeArea ? '&homeArea=' + encodeURIComponent(s.homeArea) : '');
+    const url   = id ? `/Students/Update?id=${id}${extra}` : '/Students/Save';
+    const res   = await fetch(url, {
       method: 'POST',
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
       body: new FormData(form)
@@ -80,8 +143,9 @@ const students = {
   },
 
   async _confirmDelete(id) {
-    const page = document.getElementById('students-page').value;
-    const res  = await fetch(`/Students/Delete?id=${id}&page=${page}`, {
+    const s   = this._state();
+    const qs  = this._qs(s);
+    const res = await fetch(`/Students/Delete?id=${id}&${qs}`, {
       method: 'POST',
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     });
@@ -93,18 +157,43 @@ const students = {
     }
   },
 
-  // ── Leaflet map picker ───────────────────────────────────────────────────
+  // ── Import ────────────────────────────────────────────────────────────────
+  openImport() {
+    document.getElementById('students-import-file').value = '';
+    SB.openModal('modal-students-import');
+  },
+
+  async submitImport() {
+    const input = document.getElementById('students-import-file');
+    const file  = input.files?.[0];
+    if (!file) { SB.ShowMessage(SB.t.stdImportNoFile || 'Choose a file'); return; }
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/Students/Import', {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: fd
+    });
+    if (res.ok) {
+      const { result, html } = await res.json();
+      SB.closeModal('modal-students-import');
+      if (html)   this._renderList(html);
+      if (result) SB.ShowMessage(result);
+    } else {
+      const { result } = await res.json().catch(() => ({}));
+      SB.ShowMessage(result || 'Import failed');
+    }
+  },
+
+  // ── Leaflet map picker ────────────────────────────────────────────────────
   _map: null,
   _marker: null,
   _searchDebounce: null,
 
   _initMap(lat, lng) {
-    // Clean up previous instance, if any.
     if (this._map) { try { this._map.remove(); } catch {} this._map = null; this._marker = null; }
     const container = document.getElementById('sf-map');
     if (!container) return;
-    // Leaflet stamps _leaflet_id on the div and refuses to re-init. Since the
-    // modal body is replaced via innerHTML, the div itself is fresh — but be defensive.
     if (container._leaflet_id) { try { delete container._leaflet_id; } catch {} }
 
     const defaultLat = lat ?? 31.9539;
@@ -130,7 +219,6 @@ const students = {
             const r    = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=jo&limit=5&accept-language=${lang}`);
             const items = await r.json();
             if (!items.length) { resultsEl.style.display = 'none'; return; }
-            // Use onmousedown (fires before onblur, so dropdown doesn't close first)
             resultsEl.innerHTML = items.map(it =>
               `<div class="map-search-result"
                     onmousedown="students._selectSearch(${it.lat}, ${it.lon}, '${(it.display_name || '').split(',')[0].replace(/'/g,'&apos;').replace(/"/g,'&quot;')}')">
@@ -176,4 +264,30 @@ const students = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => students.load());
+// Reset filter inputs on every page entry (including back/forward cache restores
+// and browser autofill), then refresh the list. Sidebar click = fresh navigation
+// = this runs = empty name/grade filters.
+function _studentsReset() {
+  const nameInput    = document.getElementById('students-name-input');
+  const gradeSelect  = document.getElementById('students-grade-select');
+  const areaInput    = document.getElementById('students-area-input');
+  const pageHidden   = document.getElementById('students-page');
+  const nameHidden   = document.getElementById('students-filter-name');
+  const gradeHidden  = document.getElementById('students-filter-grade');
+  const areaHidden   = document.getElementById('students-filter-area');
+  if (nameInput) {
+    nameInput.value = '';
+    // Re-arm readonly — keeps the Chrome autofill trick working after modal opens
+    // or any DOM mutation that causes Chrome to rescan forms.
+    nameInput.setAttribute('readonly', '');
+  }
+  if (areaInput)   areaInput.value   = '';
+  if (gradeSelect) gradeSelect.value = '';
+  if (pageHidden)  pageHidden.value  = '1';
+  if (nameHidden)  nameHidden.value  = '';
+  if (gradeHidden) gradeHidden.value = '';
+  if (areaHidden)  areaHidden.value  = '';
+}
+
+document.addEventListener('DOMContentLoaded', () => { _studentsReset(); students.load(); });
+window.addEventListener('pageshow', e => { if (e.persisted) { _studentsReset(); students.load(); } });

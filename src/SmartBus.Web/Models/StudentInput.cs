@@ -17,7 +17,10 @@ public class StudentInput
 
     public string? ParentNameEn { get; set; }
 
+    // Jordan mobile: 077 / 078 / 079 followed by 7 digits. 10 digits total.
+    // Callers should strip spaces/dashes client-side; server enforces the final shape.
     [Required(ErrorMessage = "Validation_Required")]
+    [RegularExpression(@"^07[789]\d{7}$", ErrorMessage = "Validation_PhoneFormat")]
     public string ParentPhone { get; set; } = string.Empty;
 
     public double? Latitude    { get; set; }
