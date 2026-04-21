@@ -7,19 +7,18 @@ public class Student : BaseEntity
     public string FullName { get; set; } = default!;
     public string? FullNameEn { get; set; }
     public string SchoolId { get; set; } = default!;
+
+    /// <summary>Jordan national ID number (10 digits). Unique per live student.</summary>
+    public string NationalNumber { get; set; } = string.Empty;
+
     public string Grade { get; set; } = default!;
     public string? Class { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public string? Address { get; set; }
 
-    // Parent relationship
+    // Parent relationship — all parent details live on Parent entity
     public Guid? ParentId { get; set; }
     public Parent? Parent { get; set; }
-
-    // Kept for backward-compat / denormalized quick access
-    public string ParentName { get; set; } = default!;
-    public string? ParentNameEn { get; set; }
-    public string ParentPhone { get; set; } = default!;
 
     // Route & pickup
     public Guid? RouteId { get; set; }

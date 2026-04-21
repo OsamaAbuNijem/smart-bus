@@ -15,7 +15,8 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
     {
         IQueryable<SmartBus.Domain.Entities.Student> query = _context.Students
             .Where(s => !s.IsDeleted)
-            .Include(s => s.Route);
+            .Include(s => s.Route)
+            .Include(s => s.Parent);
 
         if (request.RouteId.HasValue)
             query = query.Where(s => s.RouteId == request.RouteId.Value);
@@ -43,8 +44,9 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(s => new StudentDto(
-                s.Id, s.FullName, s.FullNameEn, s.Grade, s.Class,
-                s.ParentName, s.ParentNameEn, s.ParentPhone,
+                s.Id, s.FullName, s.FullNameEn, s.NationalNumber, s.Grade, s.Class,
+                s.Parent != null ? s.Parent.FullName    : string.Empty,
+                s.Parent != null ? s.Parent.PhoneNumber : string.Empty,
                 s.Route != null ? s.Route.Name : null,
                 s.Latitude, s.Longitude, s.HomeArea, s.HomeStreet, s.HomeBuildingNumber,
                 s.CreatedAt))

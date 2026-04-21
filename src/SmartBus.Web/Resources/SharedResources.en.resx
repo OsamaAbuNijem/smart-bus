@@ -46,6 +46,7 @@
   <data name="Std_EditTitle"    xml:space="preserve"><value>Edit Student</value></data>
   <data name="Std_Name"         xml:space="preserve"><value>Student Name (Arabic)</value></data>
   <data name="Std_NameEn"       xml:space="preserve"><value>Student Name (English)</value></data>
+  <data name="Std_NationalNumber" xml:space="preserve"><value>National Number</value></data>
   <data name="Std_Grade"        xml:space="preserve"><value>Grade</value></data>
   <data name="Std_Grade1"       xml:space="preserve"><value>Grade 1</value></data>
   <data name="Std_Grade2"       xml:space="preserve"><value>Grade 2</value></data>
@@ -78,9 +79,14 @@
   <data name="City_Ramtha"     xml:space="preserve"><value>Ramtha</value></data>
   <data name="City_WadiMusa"   xml:space="preserve"><value>Wadi Musa</value></data>
   <data name="Std_Address"      xml:space="preserve"><value>Address</value></data>
-  <data name="Std_Parent"       xml:space="preserve"><value>Parent Name (Arabic)</value></data>
-  <data name="Std_ParentEn"     xml:space="preserve"><value>Parent Name (English)</value></data>
+  <data name="Std_Parent"       xml:space="preserve"><value>Parent Name</value></data>
   <data name="Std_Building"     xml:space="preserve"><value>Building No.</value></data>
+  <data name="Std_SectionStudent"     xml:space="preserve"><value>Student Information</value></data>
+  <data name="Std_SectionStudent_Sub" xml:space="preserve"><value>Name, national number, and grade</value></data>
+  <data name="Std_SectionParent"      xml:space="preserve"><value>Parent Information</value></data>
+  <data name="Std_SectionParent_Sub"  xml:space="preserve"><value>Name and phone — an account is created automatically</value></data>
+  <data name="Std_SectionHome"        xml:space="preserve"><value>Home Address</value></data>
+  <data name="Std_SectionHome_Sub"    xml:space="preserve"><value>Pick the location on the map</value></data>
   <data name="Std_BuildingHint" xml:space="preserve"><value>e.g. 12 / B</value></data>
   <data name="Std_MapSearch"    xml:space="preserve"><value>Search location...</value></data>
   <data name="Std_Phone"        xml:space="preserve"><value>Phone Number</value></data>
@@ -137,6 +143,7 @@
   <data name="Validation_Required"      xml:space="preserve"><value>This field is required</value></data>
   <data name="Validation_DriverType"    xml:space="preserve"><value>Type must be Driver or Assistant</value></data>
   <data name="Validation_PhoneFormat"   xml:space="preserve"><value>Phone must start with 077, 078 or 079 and be 10 digits long</value></data>
+  <data name="Validation_NationalNumberFormat" xml:space="preserve"><value>National number must be 10 digits</value></data>
   <data name="Validation_TimeFormat"    xml:space="preserve"><value>Time must be in HH:mm format</value></data>
 
   <!-- Bus schedule modal -->

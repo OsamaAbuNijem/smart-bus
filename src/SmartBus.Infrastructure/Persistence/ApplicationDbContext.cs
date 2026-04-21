@@ -159,6 +159,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             .IsUnique()
             .HasFilter("[IsDeleted] = 0");
 
+        // Unique national number per active student (blank rows excluded for backfill safety):
+        builder.Entity<Student>()
+            .HasIndex(s => s.NationalNumber)
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0 AND [NationalNumber] <> ''");
+
+        // Unique phone per active parent (so siblings resolve to one Parent row):
+        builder.Entity<Parent>()
+            .HasIndex(p => p.PhoneNumber)
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
+
         // Latest-location lookup on BusLocation:
         builder.Entity<BusLocation>().HasIndex(l => new { l.BusId, l.Timestamp });
     }

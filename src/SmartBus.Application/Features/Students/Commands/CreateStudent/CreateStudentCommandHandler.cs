@@ -10,31 +10,36 @@ public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand,
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IApplicationDbContext _context;
+    private readonly IParentUpsertService _parentUpsert;
 
-    public CreateStudentCommandHandler(IUnitOfWork unitOfWork, IApplicationDbContext context)
-    { _unitOfWork = unitOfWork; _context = context; }
+    public CreateStudentCommandHandler(IUnitOfWork unitOfWork, IApplicationDbContext context, IParentUpsertService parentUpsert)
+    { _unitOfWork = unitOfWork; _context = context; _parentUpsert = parentUpsert; }
 
     public async Task<Result<Guid>> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
     {
-        // Parent phone must be unique across (non-deleted) students.
-        var phoneTaken = await _context.Students
-            .AnyAsync(s => !s.IsDeleted && s.ParentPhone == request.ParentPhone, cancellationToken);
-        if (phoneTaken)
-            return Result<Guid>.Failure($"Parent phone '{request.ParentPhone}' is already used by another student.");
+        if (!string.IsNullOrWhiteSpace(request.NationalNumber))
+        {
+            var taken = await _context.Students
+                .AnyAsync(s => !s.IsDeleted && s.NationalNumber == request.NationalNumber, cancellationToken);
+            if (taken)
+                return Result<Guid>.Failure($"National number '{request.NationalNumber}' is already used by another student.");
+        }
+
+        // Upsert parent (find-by-phone or create) + ensure an Identity user exists.
+        var parentId = await _parentUpsert.UpsertAsync(
+            request.ParentName, request.ParentPhone, cancellationToken);
 
         var student = new Student
         {
             SchoolId             = request.SchoolId,
             FullName             = request.FullName,
             FullNameEn           = request.FullNameEn,
+            NationalNumber       = request.NationalNumber ?? string.Empty,
             Grade                = request.Grade,
             Class                = request.Class,
             DateOfBirth          = request.DateOfBirth,
             Address              = request.Address,
-            ParentName           = request.ParentName,
-            ParentNameEn         = request.ParentNameEn,
-            ParentPhone          = request.ParentPhone,
-            ParentId             = request.ParentId,
+            ParentId             = parentId,
             RouteId              = request.RouteId,
             PickupStopId         = request.PickupStopId,
             Latitude             = request.Latitude,

@@ -18,7 +18,6 @@
   </div>
 
   <div class="modal-body">
-    @* Show ALL validation errors at the top so nothing is hidden *@
     @if (errors.ErrorCount > 0)
     {
         <div class="form-server-err" style="display:block; margin-bottom:14px;">
@@ -31,91 +30,121 @@
             }
         </div>
     }
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">@L["Std_Name"]</label>
-        <input type="text" name="FullName" class="form-input" dir="rtl" value="@Model?.FullName"/>
-        @if (ErrFor(nameof(StudentInput.FullName)) is { } e1) { <span class="form-err" style="display:block;">@e1</span> }
-      </div>
-      <div class="form-group">
-        <label class="form-label">@L["Std_NameEn"]</label>
-        <input type="text" name="FullNameEn" class="form-input" dir="ltr" value="@Model?.FullNameEn"/>
-      </div>
-    </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">@L["Std_Grade"]</label>
-        <select name="Grade" class="form-input">
-          @{
-              var gradeCodes = new[] { "KG1", "KG2", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
-          }
-          @foreach (var val in gradeCodes)
-          {
-              <option value="@val" selected="@(Model?.Grade == val)">@L["Std_Grade" + val]</option>
-          }
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">@L["Std_Building"]</label>
-        <input type="text" name="HomeBuildingNumber" class="form-input" dir="ltr" value="@Model?.HomeBuildingNumber"/>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">@L["Std_Parent"]</label>
-        <input type="text" name="ParentName" class="form-input" dir="rtl" value="@Model?.ParentName"/>
-        @if (ErrFor(nameof(StudentInput.ParentName)) is { } e2) { <span class="form-err" style="display:block;">@e2</span> }
-      </div>
-      <div class="form-group">
-        <label class="form-label">@L["Std_ParentEn"]</label>
-        <input type="text" name="ParentNameEn" class="form-input" dir="ltr" value="@Model?.ParentNameEn"/>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">@L["Std_Phone"]</label>
-        <input type="tel" name="ParentPhone" class="form-input" dir="ltr"
-               pattern="^07[789]\d{7}$"
-               placeholder="079XXXXXXX"
-               inputmode="numeric"
-               maxlength="10"
-               value="@Model?.ParentPhone"/>
-        @if (ErrFor(nameof(StudentInput.ParentPhone)) is { } e3) { <span class="form-err" style="display:block;">@e3</span> }
-      </div>
-    </div>
-
-    <div class="form-row full u-mt-4">
-      <div class="form-group u-w-full">
-        <label class="form-label">@L["Std_MapTitle"]</label>
-        <div class="map-picker-row">
-          <input class="form-input sm" id="sf-map-search" placeholder="@L["Std_MapSearch"]" autocomplete="off"/>
-          <button type="button" class="map-locate-btn" onclick="students.locateMap()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-          </button>
+    @* ── Section: Student Info ────────────────────────────────────── *@
+    <section class="form-section">
+      <header class="form-section-head">
+        <span class="form-section-ico sb-student">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </span>
+        <div>
+          <div class="form-section-title">@L["Std_SectionStudent"]</div>
+          <div class="form-section-sub">@L["Std_SectionStudent_Sub"]</div>
         </div>
-        <div id="sf-map-search-results" class="map-search-results"></div>
-        <div class="map-hint">@L["Std_MapHint"]</div>
-        <div id="sf-map" class="map-canvas"></div>
-        @* Invariant culture — JS parseFloat cannot read Arabic digits ("٫") *@
-        <input type="hidden" name="Latitude"  id="sf-lat"
-               value="@(Model?.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"/>
-        <input type="hidden" name="Longitude" id="sf-lng"
-               value="@(Model?.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"/>
-        <div class="map-addr-grid">
-          <div>
-            <label class="form-label sm">@L["Std_MapArea"]</label>
-            <input name="HomeArea" class="form-input sm" id="sf-area" readonly placeholder="—" value="@Model?.HomeArea"/>
-          </div>
-          <div>
-            <label class="form-label sm">@L["Std_MapStreet"]</label>
-            <input name="HomeStreet" class="form-input sm" id="sf-street" readonly placeholder="—" value="@Model?.HomeStreet"/>
-          </div>
+      </header>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["Std_Name"]</label>
+          <input type="text" name="FullName" class="form-input" dir="rtl" value="@Model?.FullName"/>
+          @if (ErrFor(nameof(StudentInput.FullName)) is { } e1) { <span class="form-err" style="display:block;">@e1</span> }
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["Std_NameEn"]</label>
+          <input type="text" name="FullNameEn" class="form-input" dir="ltr" value="@Model?.FullNameEn"/>
         </div>
       </div>
-    </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["Std_NationalNumber"]</label>
+          <input type="text" name="NationalNumber" class="form-input" dir="ltr"
+                 pattern="^\d{10}$"
+                 inputmode="numeric"
+                 maxlength="10"
+                 placeholder="1234567890"
+                 value="@Model?.NationalNumber"/>
+          @if (ErrFor(nameof(StudentInput.NationalNumber)) is { } eNat) { <span class="form-err" style="display:block;">@eNat</span> }
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["Std_Grade"]</label>
+          <select name="Grade" class="form-input">
+            @{
+                var gradeCodes = new[] { "KG1", "KG2", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
+            }
+            @foreach (var val in gradeCodes)
+            {
+                <option value="@val" selected="@(Model?.Grade == val)">@L["Std_Grade" + val]</option>
+            }
+          </select>
+        </div>
+      </div>
+    </section>
+
+    @* ── Section: Parent Info ─────────────────────────────────────── *@
+    <section class="form-section">
+      <header class="form-section-head">
+        <span class="form-section-ico sb-parent">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <div>
+          <div class="form-section-title">@L["Std_SectionParent"]</div>
+          <div class="form-section-sub">@L["Std_SectionParent_Sub"]</div>
+        </div>
+      </header>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["Std_Parent"]</label>
+          <input type="text" name="ParentName" class="form-input" dir="rtl" value="@Model?.ParentName"/>
+          @if (ErrFor(nameof(StudentInput.ParentName)) is { } e2) { <span class="form-err" style="display:block;">@e2</span> }
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["Std_Phone"]</label>
+          <input type="tel" name="ParentPhone" class="form-input" dir="ltr"
+                 pattern="^07[789]\d{7}$"
+                 placeholder="079XXXXXXX"
+                 inputmode="numeric"
+                 maxlength="10"
+                 value="@Model?.ParentPhone"/>
+          @if (ErrFor(nameof(StudentInput.ParentPhone)) is { } e3) { <span class="form-err" style="display:block;">@e3</span> }
+        </div>
+      </div>
+    </section>
+
+    @* ── Section: Home Address ────────────────────────────────────── *@
+    <section class="form-section">
+      <header class="form-section-head">
+        <span class="form-section-ico sb-home">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </span>
+        <div>
+          <div class="form-section-title">@L["Std_SectionHome"]</div>
+          <div class="form-section-sub">@L["Std_SectionHome_Sub"]</div>
+        </div>
+      </header>
+
+      @* Preserve any existing GPS coordinates on update (no UI picker anymore). *@
+      <input type="hidden" name="Latitude"  id="sf-lat"
+             value="@(Model?.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"/>
+      <input type="hidden" name="Longitude" id="sf-lng"
+             value="@(Model?.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"/>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["Std_MapArea"]</label>
+          <input type="text" name="HomeArea" class="form-input" id="sf-area" dir="rtl" value="@Model?.HomeArea"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["Std_MapStreet"]</label>
+          <input type="text" name="HomeStreet" class="form-input" id="sf-street" dir="rtl" value="@Model?.HomeStreet"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["Std_Building"]</label>
+          <input type="text" name="HomeBuildingNumber" class="form-input" dir="ltr" value="@Model?.HomeBuildingNumber"/>
+        </div>
+      </div>
+    </section>
   </div>
 
   <div class="modal-footer">

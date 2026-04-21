@@ -16,6 +16,7 @@ public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, R
         var student = await _context.Students
             .Where(s => s.Id == request.StudentId && !s.IsDeleted)
             .Include(s => s.Route)
+            .Include(s => s.Parent)
             .Include(s => s.Allergies)
             .Include(s => s.EmergencyContacts)
             .FirstOrDefaultAsync(cancellationToken);
@@ -26,13 +27,13 @@ public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, R
             student.Id,
             student.FullName,
             student.FullNameEn,
+            student.NationalNumber,
             student.Grade,
             student.Class,
             student.DateOfBirth,
             student.Address,
-            student.ParentName,
-            student.ParentNameEn,
-            student.ParentPhone,
+            student.Parent?.FullName    ?? string.Empty,
+            student.Parent?.PhoneNumber ?? string.Empty,
             student.Route?.Name,
             student.Latitude,
             student.Longitude,

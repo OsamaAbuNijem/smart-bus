@@ -40,6 +40,7 @@ public static class DependencyInjection
         .AddDefaultTokenProviders();
 
         services.AddScoped<IUserStore, UserStoreService>();
+        services.AddScoped<IParentUpsertService, ParentUpsertService>();
 
         // JWT
         services.AddAuthentication(options =>

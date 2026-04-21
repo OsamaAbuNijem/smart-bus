@@ -34,9 +34,9 @@ public class StudentsController : AdminControllerBase
             {
                 FullName           = s.FullName,
                 FullNameEn         = s.FullNameEn,
+                NationalNumber     = s.NationalNumber ?? string.Empty,
                 Grade              = s.Grade,
                 ParentName         = s.ParentName,
-                ParentNameEn       = s.ParentNameEn,
                 ParentPhone        = s.ParentPhone,
                 Latitude           = s.Latitude,
                 Longitude          = s.Longitude,
@@ -99,7 +99,7 @@ public class StudentsController : AdminControllerBase
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Students");
 
-        string[] headers = { "FullName","FullNameEn","Grade","ParentName","ParentNameEn",
+        string[] headers = { "FullName","FullNameEn","NationalNumber","Grade","ParentName",
                              "ParentPhone","HomeArea","HomeStreet","HomeBuildingNumber",
                              "Latitude","Longitude","CreatedAt" };
         for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
@@ -110,9 +110,9 @@ public class StudentsController : AdminControllerBase
         {
             ws.Cell(row, 1).Value  = s.FullName;
             ws.Cell(row, 2).Value  = s.FullNameEn;
-            ws.Cell(row, 3).Value  = GradeLabel(s.Grade);           // label (e.g. "الأول") instead of "1"
-            ws.Cell(row, 4).Value  = s.ParentName;
-            ws.Cell(row, 5).Value  = s.ParentNameEn;
+            ws.Cell(row, 3).Value  = s.NationalNumber;
+            ws.Cell(row, 4).Value  = GradeLabel(s.Grade);
+            ws.Cell(row, 5).Value  = s.ParentName;
             ws.Cell(row, 6).Value  = s.ParentPhone;
             ws.Cell(row, 7).Value  = s.HomeArea;
             ws.Cell(row, 8).Value  = s.HomeStreet;
@@ -178,7 +178,7 @@ public class StudentsController : AdminControllerBase
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Students");
 
-        string[] headers = { "FullName","FullNameEn","Grade","ParentName","ParentNameEn",
+        string[] headers = { "FullName","FullNameEn","NationalNumber","Grade","ParentName",
                              "ParentPhone","HomeArea","HomeStreet","HomeBuildingNumber" };
         for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
         ws.Row(1).Style.Font.Bold = true;
@@ -187,10 +187,10 @@ public class StudentsController : AdminControllerBase
         // Example row so the importer can see the expected shape
         ws.Cell(2, 1).Value = "أحمد محمد";
         ws.Cell(2, 2).Value = "Ahmad Mohammad";
-        ws.Cell(2, 3).Value = "1";
-        ws.Cell(2, 4).Value = "محمد خالد";
-        ws.Cell(2, 5).Value = "Mohammad Khaled";
-        ws.Cell(2, 6).Value = "+962791234567";
+        ws.Cell(2, 3).Value = "9991234567";
+        ws.Cell(2, 4).Value = "1";
+        ws.Cell(2, 5).Value = "محمد خالد";
+        ws.Cell(2, 6).Value = "0791234567";
         ws.Cell(2, 7).Value = "عمان";
         ws.Cell(2, 8).Value = "شارع الجامعة";
         ws.Cell(2, 9).Value = "12";
@@ -229,16 +229,16 @@ public class StudentsController : AdminControllerBase
 
             int Col(string n) => cols.TryGetValue(n, out var x) ? x : -1;
             int cFull   = Col("FullName");
+            int cNat    = Col("NationalNumber");
             int cGrade  = Col("Grade");
             int cPar    = Col("ParentName");
             int cPhone  = Col("ParentPhone");
             int cFullEn = Col("FullNameEn");
-            int cParEn  = Col("ParentNameEn");
             int cArea   = Col("HomeArea");
             int cStreet = Col("HomeStreet");
             int cBuild  = Col("HomeBuildingNumber");
 
-            if (cFull < 0 || cGrade < 0 || cPar < 0 || cPhone < 0)
+            if (cFull < 0 || cNat < 0 || cGrade < 0 || cPar < 0 || cPhone < 0)
                 return StatusCode(400, new { result = _l["Student_ImportHint"].Value });
 
             foreach (var row in sheet.RowsUsed().Skip(1))
@@ -248,16 +248,17 @@ public class StudentsController : AdminControllerBase
                 var input = new StudentInput
                 {
                     FullName           = Get(cFull),
+                    NationalNumber     = Get(cNat),
                     Grade              = GradeFromAnything(Get(cGrade)),  // accept "1" or "الأول"
                     ParentName         = Get(cPar),
                     ParentPhone        = Get(cPhone),
                     FullNameEn         = Get(cFullEn),
-                    ParentNameEn       = Get(cParEn),
                     HomeArea           = Get(cArea),
                     HomeStreet         = Get(cStreet),
                     HomeBuildingNumber = Get(cBuild)
                 };
                 if (string.IsNullOrEmpty(input.FullName) || string.IsNullOrEmpty(input.Grade) ||
+                    string.IsNullOrEmpty(input.NationalNumber) ||
                     string.IsNullOrEmpty(input.ParentName) || string.IsNullOrEmpty(input.ParentPhone))
                 { failed++; continue; }
 

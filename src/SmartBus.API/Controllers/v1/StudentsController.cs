@@ -54,8 +54,9 @@ public class StudentsController : ControllerBase
 
         var command = new CreateStudentCommand(
             schoolResult.Data!.Id.ToString(),
-            request.FullName, request.FullNameEn, request.Grade, request.Class, request.DateOfBirth,
-            request.Address, request.ParentName, request.ParentNameEn, request.ParentPhone,
+            request.FullName, request.FullNameEn, request.NationalNumber ?? string.Empty,
+            request.Grade, request.Class, request.DateOfBirth,
+            request.Address, request.ParentName, request.ParentPhone,
             request.ParentId, request.RouteId, request.PickupStopId,
             request.Latitude, request.Longitude, request.HomeArea, request.HomeStreet, request.HomeBuildingNumber);
 
@@ -70,8 +71,9 @@ public class StudentsController : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateStudentRequest request, CancellationToken cancellationToken)
     {
         var command = new UpdateStudentCommand(
-            id, request.FullName, request.FullNameEn, request.Grade, request.Class, request.DateOfBirth,
-            request.Address, request.ParentName, request.ParentNameEn, request.ParentPhone,
+            id, request.FullName, request.FullNameEn, request.NationalNumber ?? string.Empty,
+            request.Grade, request.Class, request.DateOfBirth,
+            request.Address, request.ParentName, request.ParentPhone,
             request.RouteId, request.PickupStopId,
             request.Latitude, request.Longitude, request.HomeArea, request.HomeStreet, request.HomeBuildingNumber);
         var result = await _mediator.Send(command, cancellationToken);
@@ -88,11 +90,13 @@ public class StudentsController : ControllerBase
 }
 
 public record CreateStudentRequest(
-    string FullName, string? FullNameEn, string Grade, string? Class, DateOnly? DateOfBirth, string? Address,
-    string ParentName, string? ParentNameEn, string ParentPhone, Guid? ParentId, Guid? RouteId, Guid? PickupStopId,
+    string FullName, string? FullNameEn, string? NationalNumber,
+    string Grade, string? Class, DateOnly? DateOfBirth, string? Address,
+    string ParentName, string ParentPhone, Guid? ParentId, Guid? RouteId, Guid? PickupStopId,
     double? Latitude, double? Longitude, string? HomeArea, string? HomeStreet, string? HomeBuildingNumber);
 
 public record UpdateStudentRequest(
-    string FullName, string? FullNameEn, string Grade, string? Class, DateOnly? DateOfBirth, string? Address,
-    string ParentName, string? ParentNameEn, string ParentPhone, Guid? RouteId, Guid? PickupStopId,
+    string FullName, string? FullNameEn, string? NationalNumber,
+    string Grade, string? Class, DateOnly? DateOfBirth, string? Address,
+    string ParentName, string ParentPhone, Guid? RouteId, Guid? PickupStopId,
     double? Latitude, double? Longitude, string? HomeArea, string? HomeStreet, string? HomeBuildingNumber);

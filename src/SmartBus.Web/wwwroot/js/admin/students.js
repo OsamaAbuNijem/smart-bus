@@ -88,24 +88,6 @@ const students = {
     const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
     document.getElementById('student-form-container').innerHTML = await res.text();
     SB.openModal('modal-student');
-
-    const lat = parseFloat(document.getElementById('sf-lat').value) || null;
-    const lng = parseFloat(document.getElementById('sf-lng').value) || null;
-
-    // Map init after the modal slide animation settles
-    const modalBox = document.querySelector('#modal-student .modal-box');
-    let initialized = false;
-    const initOnce = () => {
-      if (initialized) return;
-      initialized = true;
-      this._initMap(lat, lng);
-      requestAnimationFrame(() => {
-        this._map?.invalidateSize();
-        setTimeout(() => this._map?.invalidateSize(), 120);
-      });
-    };
-    modalBox?.addEventListener('animationend', initOnce, { once: true });
-    setTimeout(initOnce, 400);
   },
 
   async submit(form) {

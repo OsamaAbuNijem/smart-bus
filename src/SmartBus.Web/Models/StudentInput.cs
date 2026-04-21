@@ -9,13 +9,16 @@ public class StudentInput
 
     public string? FullNameEn { get; set; }
 
+    // Jordan national ID — 10 digits.
+    [Required(ErrorMessage = "Validation_Required")]
+    [RegularExpression(@"^\d{10}$", ErrorMessage = "Validation_NationalNumberFormat")]
+    public string NationalNumber { get; set; } = string.Empty;
+
     [Required(ErrorMessage = "Validation_Required")]
     public string Grade { get; set; } = "1";
 
     [Required(ErrorMessage = "Validation_Required")]
     public string ParentName { get; set; } = string.Empty;
-
-    public string? ParentNameEn { get; set; }
 
     // Jordan mobile: 077 / 078 / 079 followed by 7 digits. 10 digits total.
     // Callers should strip spaces/dashes client-side; server enforces the final shape.

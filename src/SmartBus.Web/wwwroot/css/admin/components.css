@@ -296,6 +296,60 @@ tr.row-incomplete:hover { background: #FEF3C7; }
 .status-pill.boarded { background: #F0FDF4; color: #15803D; }
 .status-pill.absent  { background: #FEF2F2; color: #B91C1C; }
 
+/* ══ Form sections (student form, etc.) ═══════════════════════════════ */
+.form-section {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px 8px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+.form-section + .form-section { margin-top: 0; }
+.form-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed var(--border);
+}
+.form-section-ico {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.form-section-ico.sb-student { background: #EEF2FF; color: #3730A3; }
+.form-section-ico.sb-parent  { background: #FEF3C7; color: #B45309; }
+.form-section-ico.sb-home    { background: #ECFDF5; color: #047857; }
+.form-section-title { font-size: 13px; font-weight: 800; color: var(--text); line-height: 1.2; }
+.form-section-sub   { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* ══ Student form modal — tight layout + pinned header/footer ═════════ */
+#student-form-container {
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+}
+#student-form-container > form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+}
+#student-form-container .modal-header,
+#student-form-container .modal-footer { flex: 0 0 auto; }
+#student-form-container .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 18px;
+}
+#student-form-container .form-row { gap: 10px; margin-bottom: 10px; }
+#student-form-container .map-canvas { height: 160px; }
+
 /* ══ Trip-students modal ═══════════════════════════════════════════════ */
 .trip-students-summary {
   display: grid;
