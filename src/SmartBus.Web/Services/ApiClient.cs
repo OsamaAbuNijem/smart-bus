@@ -184,11 +184,11 @@ public class ApiClient : IApiClient
     public Task<List<SmartBus.Application.Features.Trips.Queries.GetTripStudents.TripStudentDto>?> GetTripStudentsAsync(Guid tripId)
         => GetAsync<List<SmartBus.Application.Features.Trips.Queries.GetTripStudents.TripStudentDto>>($"api/v1/trips/{tripId}/students");
 
-    public async Task<bool> StartTripAsync(Guid id)
-        => (await SendAsync(HttpMethod.Post, $"api/v1/trips/{id}/start")).Ok;
+    public Task<(bool Ok, string? Error)> StartTripAsync(Guid id)
+        => SendAsync(HttpMethod.Post, $"api/v1/trips/{id}/start");
 
-    public async Task<bool> CompleteTripAsync(Guid id)
-        => (await SendAsync(HttpMethod.Post, $"api/v1/trips/{id}/complete")).Ok;
+    public Task<(bool Ok, string? Error)> CompleteTripAsync(Guid id)
+        => SendAsync(HttpMethod.Post, $"api/v1/trips/{id}/complete");
 
     public Task<bool> DeleteTripAsync(Guid id) => DeleteAsync($"api/v1/trips/{id}");
 

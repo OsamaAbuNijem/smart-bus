@@ -44,11 +44,4 @@ public class Trip : BaseEntity
         ActualArrival = DateTime.UtcNow;
         AddDomainEvent(new TripStatusChangedEvent(Id, TripStatus.Completed));
     }
-
-    public void Cancel(string? reason = null)
-    {
-        Status = TripStatus.Cancelled;
-        Notes = reason;
-        AddDomainEvent(new TripStatusChangedEvent(Id, TripStatus.Cancelled));
-    }
 }

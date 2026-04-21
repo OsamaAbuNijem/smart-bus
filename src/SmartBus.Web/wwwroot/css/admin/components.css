@@ -171,6 +171,7 @@
 .modal-footer.center { justify-content: center; }
 
 .modal-ico-circle-danger { width: 56px; height: 56px; border-radius: 50%; background: #FEF2F2; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.modal-ico-circle-info   { width: 56px; height: 56px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
 .modal-heading-line { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 8px; }
 .modal-body-line    { font-size: 13px; color: #475569; line-height: 1.5; }
 

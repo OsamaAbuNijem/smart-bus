@@ -44,8 +44,8 @@ public interface IApiClient
     Task<PagedResult<TripDto>?> GetTripsAsync(int pageNumber = 1, int pageSize = 10,
         string? personName = null, DateOnly? date = null, string? status = null);
     Task<List<SmartBus.Application.Features.Trips.Queries.GetTripStudents.TripStudentDto>?> GetTripStudentsAsync(Guid tripId);
-    Task<bool> StartTripAsync(Guid id);
-    Task<bool> CompleteTripAsync(Guid id);
+    Task<(bool Ok, string? Error)> StartTripAsync(Guid id);
+    Task<(bool Ok, string? Error)> CompleteTripAsync(Guid id);
     Task<bool> DeleteTripAsync(Guid id);
     Task<(bool Ok, string? Message)> GenerateTodayTripsAsync();
     Task<BusScheduleDto?> GetBusScheduleAsync(Guid busId);

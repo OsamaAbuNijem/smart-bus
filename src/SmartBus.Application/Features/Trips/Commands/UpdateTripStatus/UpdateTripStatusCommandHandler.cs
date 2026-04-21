@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.Extensions.Logging;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
 using SmartBus.Domain.Enums;
@@ -9,11 +10,16 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ISignalRNotificationService _notificationService;
+    private readonly ILogger<UpdateTripStatusCommandHandler> _logger;
 
-    public UpdateTripStatusCommandHandler(IUnitOfWork unitOfWork, ISignalRNotificationService notificationService)
+    public UpdateTripStatusCommandHandler(
+        IUnitOfWork unitOfWork,
+        ISignalRNotificationService notificationService,
+        ILogger<UpdateTripStatusCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _notificationService = notificationService;
+        _logger = logger;
     }
 
     public async Task<Result> Handle(UpdateTripStatusCommand request, CancellationToken cancellationToken)
@@ -25,14 +31,21 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
         {
             case TripStatus.InProgress: trip.Start(); break;
             case TripStatus.Completed: trip.Complete(); break;
-            case TripStatus.Cancelled: trip.Cancel(request.Notes); break;
             default: return Result.Failure("Invalid status transition.");
         }
 
         await _unitOfWork.Trips.UpdateAsync(trip);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await _notificationService.SendTripStatusUpdateAsync(trip.Id, request.NewStatus.ToString(), cancellationToken);
+        // SignalR broadcasts are best-effort — a hub failure must not roll back a persisted status change.
+        try
+        {
+            await _notificationService.SendTripStatusUpdateAsync(trip.Id, request.NewStatus.ToString(), cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "TripStatusUpdated broadcast failed for {TripId} → {Status}", trip.Id, request.NewStatus);
+        }
 
         return Result.Success();
     }

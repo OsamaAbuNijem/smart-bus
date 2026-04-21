@@ -76,8 +76,8 @@ public class SetBusScheduleCommandHandler : IRequestHandler<SetBusScheduleComman
             return Result.Failure($"Selected students ({selectedStudentIds.Count}) exceed the bus capacity ({bus.Capacity}).");
 
         // Conflict check: nobody can be on two buses' non-completed trips at once.
-        // "Non-completed" = Scheduled | InProgress | Delayed (Completed/Cancelled are OK).
-        var pendingStatuses = new[] { TripStatus.Scheduled, TripStatus.InProgress, TripStatus.Delayed };
+        // "Non-completed" = Scheduled | InProgress (Completed is OK).
+        var pendingStatuses = new[] { TripStatus.Scheduled, TripStatus.InProgress };
 
         if (selectedStudentIds.Count > 0)
         {
@@ -258,7 +258,7 @@ public class SetBusScheduleCommandHandler : IRequestHandler<SetBusScheduleComman
         // Propagate to already-generated trips that haven't started yet:
         //   • shift ScheduledDeparture to match the new per-direction time
         //   • sync StudentTrip roster to match the selected students
-        // Only trips with Status == Scheduled (not InProgress/Completed/Cancelled) are touched,
+        // Only trips with Status == Scheduled (not InProgress/Completed) are touched,
         // and only today-or-future ones (past days stay frozen for historical accuracy).
         var pendingTrips = await _context.Trips
             .Where(t => !t.IsTemplate

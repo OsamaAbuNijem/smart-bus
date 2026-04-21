@@ -17,14 +17,12 @@ else
         {
             "InProgress" => "badge-green",
             "Completed"  => "badge-gray",
-            "Delayed"    => "badge-red",
-            "Cancelled"  => "badge-red",
             _            => "badge-blue"
         };
         var (typeLabel, typeCls) = string.Equals(t.TripType, "morning", StringComparison.OrdinalIgnoreCase)
             ? (L["Trip_Morning"].Value, "pill-morning")
             : (L["Trip_Return"].Value,  "pill-return");
-        var canStart    = t.Status == "Scheduled" || t.Status == "Delayed";
+        var canStart    = t.Status == "Scheduled";
         var canComplete = t.Status == "InProgress";
 
         <tr>

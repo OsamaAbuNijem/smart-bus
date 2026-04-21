@@ -16,7 +16,11 @@ const trips = {
     if (name)   qs.set('personName', name);
     if (date)   qs.set('date', date);
     if (status) qs.set('status', status);
-    const res = await fetch(`/Trips/List?${qs}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    qs.set('_t', Date.now());
+    const res = await fetch(`/Trips/List?${qs}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      cache: 'no-store'
+    });
     if (res.status === 401) { location.href = '/Account/Login'; return; }
     this._renderList(await res.text());
   },
@@ -47,8 +51,22 @@ const trips = {
   prev() { this.load(parseInt(document.getElementById('trips-page').value) - 1); },
   next() { this.load(parseInt(document.getElementById('trips-page').value) + 1); },
 
-  async start(id)    { await this._action(`/Trips/Start?id=${id}`); },
-  async complete(id) { await this._action(`/Trips/Complete?id=${id}`); },
+  start(id) {
+    SB.confirm({
+      title:       SB.t.confirmStartTripTitle || 'بدء الرحلة',
+      body:        SB.t.confirmStartTrip      || 'هل تريد بدء هذه الرحلة؟',
+      confirmText: SB.t.startAction           || 'بدء',
+      onConfirm:   () => this._action(`/Trips/Start?id=${id}`)
+    });
+  },
+  complete(id) {
+    SB.confirm({
+      title:       SB.t.confirmCompleteTripTitle || 'إتمام الرحلة',
+      body:        SB.t.confirmCompleteTrip      || 'هل تريد إتمام هذه الرحلة؟',
+      confirmText: SB.t.completeAction           || 'إتمام',
+      onConfirm:   () => this._action(`/Trips/Complete?id=${id}`)
+    });
+  },
   async generate()   { await this._action('/Trips/GenerateToday'); },
 
   async _action(url) {
@@ -58,9 +76,9 @@ const trips = {
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     });
     if (res.ok) {
-      const { result, html } = await res.json();
-      if (html)   this._renderList(html);
+      const { result } = await res.json().catch(() => ({}));
       if (result) SB.ShowMessage(result);
+      await this.load();
     } else if (res.status === 502) {
       const { result } = await res.json().catch(() => ({}));
       SB.ShowMessage(result || 'Upstream API error');

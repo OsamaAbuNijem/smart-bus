@@ -233,8 +233,6 @@
   <data name="Trip_StatusScheduled"  xml:space="preserve"><value>قادمة</value></data>
   <data name="Trip_StatusInProgress" xml:space="preserve"><value>جارية</value></data>
   <data name="Trip_StatusCompleted"  xml:space="preserve"><value>مكتملة</value></data>
-  <data name="Trip_StatusDelayed"    xml:space="preserve"><value>متأخرة</value></data>
-  <data name="Trip_StatusCancelled"  xml:space="preserve"><value>ملغاة</value></data>
   <data name="Trip_ColNumber"        xml:space="preserve"><value>#</value></data>
   <data name="Trip_ColDriver"        xml:space="preserve"><value>السائق</value></data>
   <data name="Trip_ColAssistant"     xml:space="preserve"><value>المساعد</value></data>
@@ -262,6 +260,16 @@
   <data name="JS_TripStarted"     xml:space="preserve"><value>تم بدء الرحلة ✓</value></data>
   <data name="JS_TripCompleted"   xml:space="preserve"><value>تم إتمام الرحلة ✓</value></data>
   <data name="JS_TripsGenerated"  xml:space="preserve"><value>تم إنشاء رحلات اليوم بنجاح ✓</value></data>
+  <data name="JS_ConfirmStartTrip"    xml:space="preserve"><value>هل تريد بدء هذه الرحلة؟</value></data>
+  <data name="JS_ConfirmCompleteTrip" xml:space="preserve"><value>هل تريد إتمام هذه الرحلة؟</value></data>
+  <data name="Confirm_Title"          xml:space="preserve"><value>تأكيد</value></data>
+  <data name="Confirm_Heading"        xml:space="preserve"><value>يرجى التأكيد</value></data>
+  <data name="Confirm_Confirm"        xml:space="preserve"><value>تأكيد</value></data>
+  <data name="Confirm_Cancel"         xml:space="preserve"><value>إلغاء</value></data>
+  <data name="JS_ConfirmStartTripTitle"    xml:space="preserve"><value>بدء الرحلة</value></data>
+  <data name="JS_ConfirmCompleteTripTitle" xml:space="preserve"><value>إتمام الرحلة</value></data>
+  <data name="JS_StartAction"    xml:space="preserve"><value>بدء</value></data>
+  <data name="JS_CompleteAction" xml:space="preserve"><value>إتمام</value></data>
 
   <!-- Alerts page -->
   <data name="Alert_PageTitle"    xml:space="preserve"><value>التنبيهات</value></data>

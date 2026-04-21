@@ -31,6 +31,12 @@ public class TranslationsController : Controller
             ["passwordChanged"]  = _l["JS_PasswordChanged"].Value,
             ["saveFailed"]       = _l["JS_SaveFailed"].Value,
             ["saving"]           = _l["JS_Saving"].Value,
+            ["confirmStartTrip"]         = _l["JS_ConfirmStartTrip"].Value,
+            ["confirmCompleteTrip"]      = _l["JS_ConfirmCompleteTrip"].Value,
+            ["confirmStartTripTitle"]    = _l["JS_ConfirmStartTripTitle"].Value,
+            ["confirmCompleteTripTitle"] = _l["JS_ConfirmCompleteTripTitle"].Value,
+            ["startAction"]              = _l["JS_StartAction"].Value,
+            ["completeAction"]           = _l["JS_CompleteAction"].Value,
 
             ["stdMapSearch"]     = _l["Std_MapSearch"].Value,
             ["stdMapTitle"]      = _l["Std_MapTitle"].Value,

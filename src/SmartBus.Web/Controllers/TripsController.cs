@@ -30,14 +30,16 @@ public class TripsController : AdminControllerBase
     [HttpPost]
     public async Task<IActionResult> Start(Guid id, int page = 1)
     {
-        if (!await ApiClient.StartTripAsync(id)) return StatusCode(502);
+        var (ok, error) = await ApiClient.StartTripAsync(id);
+        if (!ok) return StatusCode(502, new { result = error ?? "Upstream API error" });
         return await SuccessWithList(_l["JS_TripStarted"].Value, page);
     }
 
     [HttpPost]
     public async Task<IActionResult> Complete(Guid id, int page = 1)
     {
-        if (!await ApiClient.CompleteTripAsync(id)) return StatusCode(502);
+        var (ok, error) = await ApiClient.CompleteTripAsync(id);
+        if (!ok) return StatusCode(502, new { result = error ?? "Upstream API error" });
         return await SuccessWithList(_l["JS_TripCompleted"].Value, page);
     }
 

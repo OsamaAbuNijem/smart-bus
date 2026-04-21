@@ -95,9 +95,7 @@
     const map = {
       'InProgress': { dot:'#22C55E', bg:'#F0FDF4', color:'#15803D', label:'جارية' },
       'Completed':  { dot:'#94A3B8', bg:'#F1F5F9', color:'#475569', label:'مكتملة' },
-      'Delayed':    { dot:'#EF4444', bg:'#FEF2F2', color:'#B91C1C', label:'متأخرة' },
-      'Scheduled':  { dot:'#3B82F6', bg:'#EFF6FF', color:'#1E40AF', label:'قادمة' },
-      'Cancelled':  { dot:'#EF4444', bg:'#FEF2F2', color:'#B91C1C', label:'ملغاة' }
+      'Scheduled':  { dot:'#3B82F6', bg:'#EFF6FF', color:'#1E40AF', label:'قادمة' }
     };
     return map[status] || { dot:'#94A3B8', bg:'#F1F5F9', color:'#475569', label: status || 'غير محدد' };
   }
@@ -137,6 +135,32 @@
           ${actions}
         </div>
       </div>`;
+  }
+
+  // ── Generic confirmation modal ─────────────────────────────────────────────
+  // Usage: SB.confirm({ title, body, confirmText, onConfirm })
+  // Falls back to native confirm() if the modal element isn't on the page.
+  function confirm({ title, body, confirmText, onConfirm } = {}) {
+    const modal = document.getElementById('modal-confirm');
+    if (!modal) {
+      if (window.confirm(body || title || '')) {
+        if (typeof onConfirm === 'function') onConfirm();
+      }
+      return;
+    }
+    const titleEl = document.getElementById('confirm-title');
+    const bodyEl  = document.getElementById('confirm-body');
+    const btn     = document.getElementById('confirm-btn');
+    if (titleEl && title)           titleEl.textContent = title;
+    if (bodyEl)                     bodyEl.textContent  = body || '';
+    if (btn && confirmText)         btn.textContent     = confirmText;
+    if (btn) {
+      btn.onclick = async () => {
+        closeModal('modal-confirm');
+        if (typeof onConfirm === 'function') await onConfirm();
+      };
+    }
+    openModal('modal-confirm');
   }
 
   // ── Delete confirmation ────────────────────────────────────────────────────
@@ -296,5 +320,6 @@
   SB.getAlertSeverity = getAlertSeverity;
   SB.renderAlertItem = renderAlertItem;
   SB.confirmDelete = confirmDelete;
+  SB.confirm = confirm;
   SB.on = on;
 })();
