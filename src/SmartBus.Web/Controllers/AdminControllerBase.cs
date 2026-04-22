@@ -15,15 +15,29 @@ public abstract class AdminControllerBase : Controller
 
     protected AdminControllerBase(IApiClient apiClient) => ApiClient = apiClient;
 
-    /// <summary>Hydrates the common sidebar fields (school name + city) on a view model.</summary>
+    /// <summary>Hydrates the common sidebar fields (school name + city) on a view model.
+    /// Reads the cached values stashed in session at login; falls back to the API once
+    /// if the session is empty (e.g. the admin logged in before the cache was introduced).</summary>
     protected async Task<T> PopulateAsync<T>(T vm, string activePage, string pageTitle)
         where T : AdminPageViewModel
     {
-        var school = await ApiClient.GetMySchoolAsync();
         vm.ActivePage = activePage;
         vm.PageTitle  = pageTitle;
-        vm.SchoolName = school?.Name ?? string.Empty;
-        vm.SchoolCity = school?.City ?? string.Empty;
+
+        var name = HttpContext.Session.GetString("SchoolName");
+        var city = HttpContext.Session.GetString("SchoolCity");
+
+        if (name is null)
+        {
+            var school = await ApiClient.GetMySchoolAsync();
+            name = school?.Name ?? string.Empty;
+            city = school?.City ?? string.Empty;
+            HttpContext.Session.SetString("SchoolName", name);
+            HttpContext.Session.SetString("SchoolCity", city);
+        }
+
+        vm.SchoolName = name ?? string.Empty;
+        vm.SchoolCity = city ?? string.Empty;
         return vm;
     }
 

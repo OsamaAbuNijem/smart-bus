@@ -73,6 +73,17 @@ public class TranslationsController : Controller
             ["driverTypeDriver"] = _l["Driver_TypeDriver"].Value,
             ["driverTypeAssist"] = _l["Driver_TypeAssist"].Value,
 
+            ["dashTotal"]           = _l["Dash_Total"].Value,
+            ["dashTripsCount"]      = _l["Dash_TripsCount"].Value,
+            ["dashTripsToday"]      = _l["Dash_TripsToday"].Value,
+            ["dashTripsWeek"]       = _l["Dash_TripsWeek"].Value,
+            ["dashChartLabelTrips"] = _l["Dash_ChartLabelTrips"].Value,
+            ["dashStatusScheduled"]  = _l["Trip_StatusScheduled"].Value,
+            ["dashStatusInProgress"] = _l["Trip_StatusInProgress"].Value,
+            ["dashStatusCompleted"]  = _l["Trip_StatusCompleted"].Value,
+            ["dashTypeMorning"]      = _l["Trip_Morning"].Value,
+            ["dashTypeReturn"]       = _l["Trip_Return"].Value,
+
             ["isRtl"]            = isRtl,
             ["dir"]              = isRtl ? "rtl" : "ltr"
         };

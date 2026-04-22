@@ -11,14 +11,11 @@
   <!-- Admin sidebar nav -->
   <data name="Nav_Main"       xml:space="preserve"><value>MAIN</value></data>
   <data name="Nav_Mgmt"       xml:space="preserve"><value>MANAGEMENT</value></data>
-  <data name="Nav_Analysis"   xml:space="preserve"><value>ANALYTICS</value></data>
-  <data name="Nav_System"     xml:space="preserve"><value>SYSTEM</value></data>
   <data name="Nav_Dashboard"  xml:space="preserve"><value>Dashboard</value></data>
   <data name="Nav_Trips"      xml:space="preserve"><value>Trips</value></data>
   <data name="Nav_Students"   xml:space="preserve"><value>Students</value></data>
   <data name="Nav_Drivers"    xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
   <data name="Nav_Buses"      xml:space="preserve"><value>Buses</value></data>
-  <data name="Nav_Reports"    xml:space="preserve"><value>Reports</value></data>
   <data name="Nav_Alerts"     xml:space="preserve"><value>Alerts</value></data>
   <data name="Nav_Settings"   xml:space="preserve"><value>Settings</value></data>
 
@@ -318,4 +315,38 @@
   <data name="JS_PageSchools"   xml:space="preserve"><value>Schools Management</value></data>
   <data name="JS_PageAdmins"    xml:space="preserve"><value>Admins</value></data>
   <data name="JS_PagePlans"     xml:space="preserve"><value>Subscription Plans</value></data>
+
+  <!-- Dashboard page -->
+  <data name="Dash_GreetMorning"       xml:space="preserve"><value>Good morning</value></data>
+  <data name="Dash_GreetAfternoon"     xml:space="preserve"><value>Good afternoon</value></data>
+  <data name="Dash_GreetEvening"       xml:space="preserve"><value>Good evening</value></data>
+  <data name="Dash_AdminUser"          xml:space="preserve"><value>Administrator</value></data>
+  <data name="Dash_FallbackTitle"      xml:space="preserve"><value>SmartBus Control Panel</value></data>
+  <data name="Dash_Refresh"            xml:space="preserve"><value>Refresh</value></data>
+  <data name="Dash_SectionKPI"         xml:space="preserve"><value>KEY METRICS</value></data>
+  <data name="Dash_SectionPerf"        xml:space="preserve"><value>TRIP PERFORMANCE</value></data>
+  <data name="Dash_SectionAlerts"      xml:space="preserve"><value>LATEST ALERTS</value></data>
+  <data name="Dash_Stat_Students"      xml:space="preserve"><value>Total Students</value></data>
+  <data name="Dash_Stat_StudentsSub"   xml:space="preserve"><value>Registered in system</value></data>
+  <data name="Dash_Stat_Buses"         xml:space="preserve"><value>Total Buses</value></data>
+  <data name="Dash_Stat_BusesSub"      xml:space="preserve"><value>Buses in fleet</value></data>
+  <data name="Dash_Stat_Trips"         xml:space="preserve"><value>Registered Trips</value></data>
+  <data name="Dash_Stat_TripsSub"      xml:space="preserve"><value>Trips in system</value></data>
+  <data name="Dash_Stat_Alerts"        xml:space="preserve"><value>Pending Alerts</value></data>
+  <data name="Dash_Stat_AlertsSub"     xml:space="preserve"><value>Needs review</value></data>
+  <data name="Dash_Card_Weekly"        xml:space="preserve"><value>Last 7 days trips</value></data>
+  <data name="Dash_Card_TodayStatus"   xml:space="preserve"><value>Today's trip status</value></data>
+  <data name="Dash_Card_TodayTrips"    xml:space="preserve"><value>Today's Trips</value></data>
+  <data name="Dash_Card_TypeDonut"     xml:space="preserve"><value>Morning vs Return</value></data>
+  <data name="Dash_Card_RecentAlerts"  xml:space="preserve"><value>Recent Alerts</value></data>
+  <data name="Dash_Card_RecentAlertsSub" xml:space="preserve"><value>Latest {0} alerts needing review</value></data>
+  <data name="Dash_ViewAll"            xml:space="preserve"><value>View all</value></data>
+  <data name="Dash_Loading"            xml:space="preserve"><value>Loading...</value></data>
+  <data name="Dash_LoadingTrips"       xml:space="preserve"><value>Loading trips...</value></data>
+  <data name="Dash_LoadingAlerts"      xml:space="preserve"><value>Loading alerts...</value></data>
+  <data name="Dash_TripsCount"         xml:space="preserve"><value>trip(s)</value></data>
+  <data name="Dash_TripsToday"         xml:space="preserve"><value>trip(s) today</value></data>
+  <data name="Dash_TripsWeek"          xml:space="preserve"><value>trips over 7 days</value></data>
+  <data name="Dash_ChartLabelTrips"    xml:space="preserve"><value>Trips</value></data>
+  <data name="Dash_Total"              xml:space="preserve"><value>Total</value></data>
 </root>

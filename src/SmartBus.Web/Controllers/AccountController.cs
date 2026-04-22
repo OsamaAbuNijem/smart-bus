@@ -36,6 +36,11 @@ public class AccountController : Controller
         if (roles.Contains("SuperAdmin"))
             return RedirectToAction("Dashboard", "SuperAdmin");
 
+        // Cache the admin's school once so every page doesn't re-hit /schools/current.
+        var school = await _apiClient.GetMySchoolAsync();
+        HttpContext.Session.SetString("SchoolName", school?.Name ?? string.Empty);
+        HttpContext.Session.SetString("SchoolCity", school?.City ?? string.Empty);
+
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
 
@@ -46,7 +51,7 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Logout()
     {
-        HttpContext.Session.Remove("JwtToken");
+        HttpContext.Session.Clear();
         return RedirectToAction(nameof(Login));
     }
 }

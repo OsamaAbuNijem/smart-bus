@@ -13,18 +13,10 @@
           <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
         </svg>
       </div>
-      <div>
-        <div class="logo-name">SmartBus</div>
-        <div class="logo-sub">@(isRtl ? "لوحة الإدارة" : "Admin Panel")</div>
+      <div class="logo-text">
+        <div class="logo-name">@(Model.SchoolName.Length > 0 ? Model.SchoolName : (isRtl ? "مدرسة سمارت باص" : "SmartBus School"))</div>
+        <div class="logo-sub">@(string.IsNullOrWhiteSpace(Model.SchoolCity) ? (isRtl ? "لوحة الإدارة" : "Admin Panel") : Model.SchoolCity)</div>
       </div>
-    </div>
-  </div>
-
-  <div class="sidebar-school">
-    <div class="school-av">@(Model.SchoolName.Length > 0 ? Model.SchoolName[0].ToString() : "S")</div>
-    <div>
-      <div class="school-name">@(Model.SchoolName.Length > 0 ? Model.SchoolName : "SmartBus School")</div>
-      <div class="school-plan">@Model.SchoolCity</div>
     </div>
   </div>
 
@@ -45,7 +37,6 @@
         <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
       </svg>
       <span class="nav-label">@L["Nav_Trips"]</span>
-      <div class="nav-badge y" id="trips-badge">0</div>
     </a>
 
     <div class="nav-section">@L["Nav_Mgmt"]</div>
@@ -73,33 +64,6 @@
       <span class="nav-label">@L["Nav_Buses"]</span>
     </a>
 
-    <div class="nav-section">@L["Nav_Analysis"]</div>
-
-    <a class="@NavClass("reports")" href="/Reports">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-      </svg>
-      <span class="nav-label">@L["Nav_Reports"]</span>
-    </a>
-
-    <a class="@NavClass("alerts")" href="/Alerts">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
-      <span class="nav-label">@L["Nav_Alerts"]</span>
-      <div class="nav-badge" id="alerts-badge">0</div>
-    </a>
-
-    <div class="nav-section">@L["Nav_System"]</div>
-
-    <a class="@NavClass("settings")" href="/Settings">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 9 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68"/>
-      </svg>
-      <span class="nav-label">@L["Nav_Settings"]</span>
-    </a>
   </div>
 
   <div class="sidebar-bottom">

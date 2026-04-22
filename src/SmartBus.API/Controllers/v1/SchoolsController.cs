@@ -12,7 +12,7 @@ using SmartBus.Domain.Enums;
 
 namespace SmartBus.API.Controllers.v1;
 
-[Authorize(Roles = "SuperAdmin")]
+[Authorize]
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -23,6 +23,7 @@ public class SchoolsController : ControllerBase
     public SchoolsController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
+    [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
         => Ok(await _mediator.Send(new GetAllSchoolsQuery(pageNumber, pageSize), cancellationToken));
 
@@ -37,6 +38,7 @@ public class SchoolsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> Create([FromBody] CreateSchoolRequest request, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
@@ -47,6 +49,7 @@ public class SchoolsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSchoolRequest request, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
@@ -57,6 +60,7 @@ public class SchoolsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new DeleteSchoolCommand(id), cancellationToken);
