@@ -38,6 +38,21 @@
   <data name="Login_SABack"   xml:space="preserve"><value>Back to school login</value></data>
   <data name="Login_SASubmit" xml:space="preserve"><value>Super Admin Login</value></data>
 
+  <!-- Login — school admin (redesigned split layout) -->
+  <data name="Login_BrandTagline" xml:space="preserve"><value>Smart school transport management</value></data>
+  <data name="Login_BrandLead"    xml:space="preserve"><value>Track every trip in real time and run your fleet from a single dashboard.</value></data>
+  <data name="Login_Feature1"     xml:space="preserve"><value>Real-time trip &amp; bus tracking</value></data>
+  <data name="Login_Feature2"     xml:space="preserve"><value>End-to-end driver &amp; student management</value></data>
+  <data name="Login_Feature3"     xml:space="preserve"><value>Instant notifications for parents</value></data>
+  <data name="Login_WelcomeBack"  xml:space="preserve"><value>Welcome back</value></data>
+  <data name="Login_WelcomeSub"   xml:space="preserve"><value>Sign in to your account to continue managing your school.</value></data>
+  <data name="Login_RememberMe"   xml:space="preserve"><value>Remember me</value></data>
+  <data name="Login_ForgotPwd"    xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Login_EmailPH"      xml:space="preserve"><value>name@school.com</value></data>
+  <data name="Login_PasswordPH"   xml:space="preserve"><value>••••••••</value></data>
+  <data name="Login_FooterRights" xml:space="preserve"><value>All rights reserved</value></data>
+  <data name="Login_FooterPowered" xml:space="preserve"><value>Powered by</value></data>
+
   <!-- Student modal labels -->
   <data name="Std_AddTitle"     xml:space="preserve"><value>Add New Student</value></data>
   <data name="Std_EditTitle"    xml:space="preserve"><value>Edit Student</value></data>

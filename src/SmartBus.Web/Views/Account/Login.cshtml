@@ -13,161 +13,313 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SmartBus — تسجيل الدخول</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<title>SmartBus — @L["Login_Submit"]</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --y:#FFD700;--yd:#B8960C;--yl:#FFFDE7;
-  --bg:#0F1117;--card:#1A1D27;--card2:#22263A;
-  --border:#2A2F45;--text:#F1F5F9;--text2:#94A3B8;--text3:#475569;
-  --input:#161923;--input-border:#2D3250;
+  --bg:#0B0E17;--card:#141826;--card2:#1B2033;
+  --border:#262B40;--text:#F1F5F9;--text2:#94A3B8;--text3:#64748B;
+  --input:#11141E;--input-border:#2A3049;
+  --accent:#3B82F6;
 }
-body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+html,body{height:100%;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 
-/* ── Background decoration ── */
-.bg-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;}
-.bg-orb.o1{width:500px;height:500px;background:rgba(255,215,0,.07);top:-150px;right:-150px;}
-.bg-orb.o2{width:400px;height:400px;background:rgba(59,130,246,.05);bottom:-100px;left:-100px;}
-.bg-orb.o3{width:300px;height:300px;background:rgba(139,92,246,.04);top:50%;left:50%;transform:translate(-50%,-50%);}
-.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:40px 40px;z-index:0;}
+/* ── Shell: split layout ───────────────────────────────────── */
+.login-shell{display:flex;min-height:100vh;}
 
-/* ── Wrapper ── */
-.login-wrap{position:relative;z-index:1;width:100%;max-width:440px;padding:24px 16px;}
+/* ── Brand side ────────────────────────────────────────────── */
+.login-brand{
+  flex:1;position:relative;overflow:hidden;padding:48px 56px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(255,215,0,.18), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(59,130,246,.14), transparent 55%),
+    linear-gradient(160deg,#0F1320 0%,#161B2D 60%,#0F1320 100%);
+  border-inline-end:1px solid rgba(255,255,255,.05);
+}
+.brand-header{display:flex;align-items:center;gap:12px;position:relative;z-index:2;}
+.brand-mark{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,#FFD700 0%,#FFA500 100%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 24px rgba(255,215,0,.35);
+}
+.brand-mark svg{width:24px;height:24px;}
+.brand-name{font-size:22px;font-weight:800;letter-spacing:-.3px;}
 
-/* ── Logo / header ── */
-.login-logo{text-align:center;margin-bottom:32px;}
-.logo-ring{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 32px rgba(255,215,0,.3);}
-.logo-ring svg{width:38px;height:38px;}
-.login-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
-.login-sub{font-size:14px;color:var(--text2);margin-top:4px;}
+.brand-body{position:relative;z-index:2;max-width:460px;margin:auto 0;}
+.brand-tagline{
+  font-size:36px;font-weight:900;line-height:1.25;margin-bottom:14px;
+  background:linear-gradient(90deg,#FFFFFF 0%,#D1D5DB 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.brand-lead{font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:32px;}
+.brand-features{display:flex;flex-direction:column;gap:14px;}
+.feature-row{display:flex;align-items:center;gap:12px;font-size:14px;color:#CBD5E1;}
+.feature-dot{
+  width:28px;height:28px;border-radius:8px;flex-shrink:0;
+  background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.28);
+  display:flex;align-items:center;justify-content:center;color:var(--y);
+}
 
-/* ── Card ── */
-.login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;box-shadow:0 24px 64px rgba(0,0,0,.4);}
+.brand-footer{position:relative;z-index:2;font-size:12px;color:var(--text3);}
+.brand-footer strong{color:var(--y);font-weight:700;}
+
+/* Decorative orb on brand side */
+.brand-orb{
+  position:absolute;inset:auto -120px -120px auto;
+  width:360px;height:360px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,215,0,.16) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* ── Form side ─────────────────────────────────────────────── */
+.login-form-col{
+  width:520px;flex-shrink:0;padding:48px 56px;
+  display:flex;flex-direction:column;justify-content:center;gap:24px;
+  background:var(--bg);
+  animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) both;
+}
+@@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+.form-header{margin-bottom:4px;}
+.welcome-title{font-size:30px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px;}
+.welcome-sub{font-size:14px;color:var(--text2);line-height:1.6;}
+
+.login-card{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
 
 /* ── Fields ── */
-.field{margin-bottom:20px;}
-.field label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;}
+.field{margin-bottom:18px;}
+.field-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.field label{font-size:13px;font-weight:600;color:var(--text2);}
+.field-link{font-size:12px;color:var(--y);text-decoration:none;font-weight:600;}
+.field-link:hover{text-decoration:underline;}
 .field-wrap{position:relative;}
-.field-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text3);}
-.field input{width:100%;background:var(--input);border:1.5px solid var(--input-border);border-radius:12px;padding:13px 44px 13px 14px;font-size:14px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;}
+.field-icon{position:absolute;inset-inline-start:14px;top:50%;transform:translateY(-50%);color:var(--text3);display:flex;}
+.field input{
+  width:100%;background:var(--input);border:1.5px solid var(--input-border);border-radius:12px;
+  padding-block:13px;padding-inline-start:44px;padding-inline-end:14px;
+  font-size:14px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;
+  transition:border-color .2s,box-shadow .2s,background-color .2s;
+}
 .field input::placeholder{color:var(--text3);}
-.field input:focus{border-color:var(--y);box-shadow:0 0 0 3px rgba(255,215,0,.12);}
-.field-err{font-size:12px;color:#EF4444;margin-top:6px;}
+.field input:focus{border-color:var(--y);box-shadow:0 0 0 4px rgba(255,215,0,.10);background:#13172A;}
+.field-validation-error{font-size:12px;color:#EF4444;margin-top:6px;display:block;}
 
-/* ── Error summary ── */
-.err-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#FCA5A5;}
+/* Password toggle */
+.pwd-toggle{
+  position:absolute;inset-inline-end:10px;top:50%;transform:translateY(-50%);
+  background:transparent;border:none;color:var(--text3);cursor:pointer;
+  width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;
+}
+.pwd-toggle:hover{color:var(--text2);background:rgba(255,255,255,.03);}
 
-/* ── Submit ── */
-.btn-login{width:100%;background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:800;font-family:'Cairo',sans-serif;color:#111;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-login:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,215,0,.4);}
+/* Error summary */
+.err-box{
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);
+  border-radius:10px;padding:12px 14px;margin-bottom:18px;
+  font-size:13px;color:#FCA5A5;display:flex;gap:10px;align-items:flex-start;
+}
+.err-box svg{flex-shrink:0;margin-top:2px;}
+
+/* Remember / forgot row */
+.row-misc{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.remember{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);cursor:pointer;user-select:none;}
+.remember input{
+  appearance:none;-webkit-appearance:none;
+  width:16px;height:16px;border-radius:4px;background:var(--input);
+  border:1.5px solid var(--input-border);cursor:pointer;position:relative;
+}
+.remember input:checked{background:var(--y);border-color:var(--y);}
+.remember input:checked::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-size:12px;background-repeat:no-repeat;background-position:center;
+}
+
+/* Submit */
+.btn-login{
+  width:100%;background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);
+  border:none;border-radius:12px;padding:14px;
+  font-size:15px;font-weight:800;font-family:'Cairo',sans-serif;color:#111;
+  cursor:pointer;transition:transform .15s,box-shadow .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(255,215,0,.42);}
 .btn-login:active{transform:translateY(0);}
+.btn-login svg{width:18px;height:18px;}
 
-/* ── Divider ── */
-.login-divider{display:flex;align-items:center;gap:12px;margin:22px 0;}
-.login-divider span{font-size:12px;color:var(--text3);}
-.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* ── Super admin link ── */
-.sa-link{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:13px;font-size:13px;font-weight:600;font-family:'Cairo',sans-serif;color:var(--text2);text-decoration:none;transition:border-color .2s,color .2s;}
-.sa-link:hover{border-color:var(--y);color:var(--y);}
-.sa-link svg{flex-shrink:0;}
-
-/* ── Footer ── */
-.login-footer{text-align:center;margin-top:24px;font-size:12px;color:var(--text3);}
+/* Footer */
+.login-footer{text-align:center;font-size:12px;color:var(--text3);margin-top:8px;}
 .login-footer strong{color:var(--y);}
 
-/* Validation */
-.field-validation-error{font-size:12px;color:#EF4444;margin-top:5px;display:block;}
-/* Language button */
-.lang-btn{position:fixed;top:16px;left:16px;height:32px;min-width:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:var(--text2);cursor:pointer;padding:0 10px;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;z-index:100;}
-.lang-btn:hover{background:var(--y);border-color:var(--yd);color:#111;}
-[dir="ltr"] .lang-btn{left:auto;right:16px;}
+/* Language button — pinned to the right edge regardless of locale */
+.lang-btn{
+  position:fixed;top:20px;right:20px;
+  height:34px;min-width:36px;border-radius:10px;
+  border:1px solid var(--border);background:rgba(20,24,38,.8);backdrop-filter:blur(8px);
+  font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:var(--text);
+  cursor:pointer;padding:0 12px;gap:6px;
+  text-decoration:none;display:inline-flex;align-items:center;justify-content:center;
+  transition:all .15s;z-index:100;
+}
+.lang-btn:hover{border-color:var(--y);color:var(--y);}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@@media (max-width: 1024px){
+  .login-shell{flex-direction:column;}
+  .login-brand{padding:32px 28px;min-height:auto;}
+  .brand-body{margin:28px 0;}
+  .brand-tagline{font-size:26px;}
+  .brand-lead{font-size:14px;margin-bottom:18px;}
+  .brand-features{display:none;}
+  .brand-orb{width:220px;height:220px;inset:-80px -80px auto auto;}
+  .login-form-col{width:100%;padding:32px 24px 48px;}
+}
+@@media (max-width: 520px){
+  .login-form-col{padding:24px 18px 36px;}
+  .login-card{padding:22px;}
+  .welcome-title{font-size:24px;}
+}
 </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-orb o1"></div>
-<div class="bg-orb o2"></div>
-<div class="bg-orb o3"></div>
-<a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)">@L["SwitchLang"]</a>
+<a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+  <span>@L["SwitchLang"]</span>
+</a>
 
-<div class="login-wrap">
-  <!-- Logo -->
-  <div class="login-logo">
-    <div class="logo-ring">
-      <svg viewBox="0 0 48 32" fill="none">
-        <rect x="2" y="2" width="44" height="24" rx="6" fill="rgba(0,0,0,0.15)"/>
-        <rect x="2" y="2" width="44" height="24" rx="6" fill="rgba(0,0,0,0.1)" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
-        <circle cx="12" cy="30" r="4" fill="rgba(0,0,0,0.3)"/>
-        <circle cx="36" cy="30" r="4" fill="rgba(0,0,0,0.3)"/>
-        <rect x="8" y="8" width="12" height="9" rx="2" fill="rgba(255,255,255,0.4)"/>
-        <rect x="24" y="8" width="12" height="9" rx="2" fill="rgba(255,255,255,0.4)"/>
-      </svg>
+<div class="login-shell">
+  <!-- Brand panel -->
+  <aside class="login-brand">
+    <div class="brand-orb"></div>
+
+    <div class="brand-header">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <div class="brand-name">SmartBus</div>
     </div>
-    <div class="login-title">SmartBus</div>
-    <div class="login-sub">@L["Login_SchoolSub"]</div>
-  </div>
 
-  <!-- Card -->
-  <div class="login-card">
-    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey(string.Empty))
-    {
-      <div class="err-box">
-        @foreach (var err in ViewData.ModelState[string.Empty]!.Errors)
-        {
-          <div>@err.ErrorMessage</div>
-        }
-      </div>
-    }
-
-    <form asp-action="Login" method="post" autocomplete="off">
-      @Html.AntiForgeryToken()
-      <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
-
-      <div class="field">
-        <label>@L["Login_Email"]</label>
-        <div class="field-wrap">
-          <span class="field-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </span>
-          <input asp-for="Email" type="email" placeholder="admin@smartbus.com" autocomplete="username" />
+    <div class="brand-body">
+      <div class="brand-tagline">@L["Login_BrandTagline"]</div>
+      <div class="brand-lead">@L["Login_BrandLead"]</div>
+      <div class="brand-features">
+        <div class="feature-row">
+          <span class="feature-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 0 0-8-8z"/></svg></span>
+          <span>@L["Login_Feature1"]</span>
         </div>
-        <span asp-validation-for="Email" class="field-validation-error"></span>
-      </div>
-
-      <div class="field">
-        <label>@L["Login_Password"]</label>
-        <div class="field-wrap">
-          <span class="field-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </span>
-          <input asp-for="Password" type="password" placeholder="••••••••" autocomplete="current-password" />
+        <div class="feature-row">
+          <span class="feature-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span>@L["Login_Feature2"]</span>
         </div>
-        <span asp-validation-for="Password" class="field-validation-error"></span>
+        <div class="feature-row">
+          <span class="feature-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+          <span>@L["Login_Feature3"]</span>
+        </div>
       </div>
+    </div>
 
-      <button type="submit" class="btn-login">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        @L["Login_Submit"]
-      </button>
-    </form>
+    <div class="brand-footer">
+      © @DateTime.Now.Year <strong>SmartBus Platform</strong> · @L["Login_FooterRights"]
+    </div>
+  </aside>
 
-    <div class="login-divider"><span>@L["Login_Or"]</span></div>
+  <!-- Form panel -->
+  <section class="login-form-col">
+    <div class="form-header">
+      <div class="welcome-title">@L["Login_WelcomeBack"]</div>
+      <div class="welcome-sub">@L["Login_WelcomeSub"]</div>
+    </div>
 
-    <a href="/SuperAdmin/Login" class="sa-link">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      @L["Login_SALink"]
-    </a>
-  </div>
+    <div class="login-card">
+      @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey(string.Empty))
+      {
+        <div class="err-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>
+            @foreach (var err in ViewData.ModelState[string.Empty]!.Errors)
+            {
+              <div>@err.ErrorMessage</div>
+            }
+          </div>
+        </div>
+      }
 
-  <div class="login-footer">
-    مدعوم بواسطة <strong>SmartBus Platform</strong> &nbsp;·&nbsp; جميع الحقوق محفوظة © @DateTime.Now.Year
-  </div>
+      <form asp-action="Login" method="post" autocomplete="off">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+        <div class="field">
+          <div class="field-head"><label>@L["Login_Email"]</label></div>
+          <div class="field-wrap">
+            <span class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <input asp-for="Email" type="email" placeholder="@L["Login_EmailPH"]" autocomplete="username" />
+          </div>
+          <span asp-validation-for="Email" class="field-validation-error"></span>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <label>@L["Login_Password"]</label>
+            <a href="#" class="field-link" tabindex="-1" data-noop>@L["Login_ForgotPwd"]</a>
+          </div>
+          <div class="field-wrap">
+            <span class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input asp-for="Password" id="pwd-input" type="password" placeholder="@L["Login_PasswordPH"]" autocomplete="current-password" />
+            <button type="button" class="pwd-toggle" id="pwd-toggle" aria-label="toggle password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <span asp-validation-for="Password" class="field-validation-error"></span>
+        </div>
+
+        <div class="row-misc">
+          <label class="remember">
+            <input type="checkbox" name="rememberMe" value="true"/>
+            <span>@L["Login_RememberMe"]</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-login">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          @L["Login_Submit"]
+        </button>
+      </form>
+    </div>
+
+    <div class="login-footer">
+      @L["Login_FooterPowered"] <strong>SmartBus Platform</strong>
+    </div>
+  </section>
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script>
+  (function () {
+    var toggle = document.getElementById('pwd-toggle');
+    var input  = document.getElementById('pwd-input');
+    if (toggle && input) {
+      toggle.addEventListener('click', function () {
+        input.type = input.type === 'password' ? 'text' : 'password';
+      });
+    }
+    document.querySelectorAll('[data-noop]').forEach(function (el) {
+      el.addEventListener('click', function (e) { e.preventDefault(); });
+    });
+  })();
+</script>
 </body>
 </html>
