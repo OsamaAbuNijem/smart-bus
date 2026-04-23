@@ -68,54 +68,65 @@
 .btn-ghost .ico { opacity: .6; }
 
 /* Count pill — "All (42)" */
-.count-pill { display: inline-flex; align-items: center; gap: 8px; padding: 5px 6px 5px 14px; border: 1px solid #111; border-radius: 999px; background: #111; color: #fff; font-size: 12px; font-weight: 600; font-family: 'Cairo', sans-serif; cursor: default; }
-[dir="ltr"] .count-pill { padding: 5px 14px 5px 6px; }
+.count-pill { display: inline-flex; align-items: center; gap: 8px; padding-block: 5px; padding-inline-start: 14px; padding-inline-end: 6px; border: 1px solid #111; border-radius: 999px; background: #111; color: #fff; font-size: 12px; font-weight: 600; font-family: 'Cairo', sans-serif; cursor: default; }
 .count-pill .count { background: rgba(255,255,255,.18); color: #fff; min-width: 22px; text-align: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
 
 /* ── Accent variant — "total records" indicator below the grid ───────────
-   Polished KPI-chip look: soft gradient, inset highlight, "live" pulse dot
-   on the leading edge, and a dark inverted counter badge for contrast. */
+   Polished KPI chip: clean white base with a gold-tinted border, inset highlight,
+   live-status dot on the leading edge, and a gold-gradient count badge. */
 .count-pill.accent {
-  background: linear-gradient(135deg, #FFFDE7 0%, #FFF3BF 100%);
-  border: 1px solid #F7D976;
-  color: #7A5D00;
-  padding: 6px 8px 6px 14px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFB 100%);
+  border: 1px solid #E7EAF0;
+  color: #334155;
+  padding-block: 6px;
+  padding-inline-start: 14px;
+  padding-inline-end: 6px;
   font-weight: 600;
-  letter-spacing: .01em;
+  letter-spacing: -.01em;
   box-shadow:
-    0 2px 6px rgba(184,150,12,.10),
-    inset 0 1px 0 rgba(255,255,255,.7);
-  transition: box-shadow .15s;
+    0 1px 2px rgba(15,23,42,.04),
+    0 4px 12px rgba(15,23,42,.04),
+    inset 0 1px 0 #FFFFFF;
+  transition: box-shadow .2s ease, border-color .2s ease, transform .15s ease;
 }
-[dir="ltr"] .count-pill.accent { padding: 6px 14px 6px 8px; }
+.count-pill.accent:hover {
+  border-color: #F5D97B;
+  box-shadow:
+    0 2px 4px rgba(184,150,12,.08),
+    0 6px 18px rgba(184,150,12,.12),
+    inset 0 1px 0 #FFFFFF;
+  transform: translateY(-1px);
+}
 
-.count-pill.accent:hover { box-shadow: 0 3px 10px rgba(184,150,12,.18), inset 0 1px 0 rgba(255,255,255,.7); }
-
-/* "Live" pulse dot — visual cue that this value updates as data changes. */
+/* "Live" pulse dot — green = universal "active data" signal. */
 .count-pill.accent::before {
   content: '';
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: var(--y);
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, .22);
+  background: #22C55E;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.22);
   flex-shrink: 0;
-  animation: count-pulse 2s ease-in-out infinite;
+  animation: count-pulse 2.2s ease-in-out infinite;
 }
 @keyframes count-pulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(255, 215, 0, .22); }
-  50%      { box-shadow: 0 0 0 6px rgba(255, 215, 0, .08); }
+  0%, 100% { box-shadow: 0 0 0 3px rgba(34,197,94,.22); }
+  50%      { box-shadow: 0 0 0 7px rgba(34,197,94,.06); }
 }
 
-/* Count chip inside — dark background, yellow text = strong but on-theme. */
+/* Count chip — gold gradient with black numerals for strong brand contrast. */
 .count-pill.accent .count {
-  background: #111;
-  color: var(--y);
+  background: linear-gradient(135deg, #FFE566 0%, #FFD700 100%);
+  color: #111;
   font-size: 13px;
   font-weight: 800;
-  padding: 3px 12px;
-  min-width: 36px;
+  padding: 4px 12px;
+  min-width: 38px;
+  line-height: 1.1;
   letter-spacing: 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 -1px 0 rgba(184,150,12,.22);
 }
 
 /* Search input with inline icon */
