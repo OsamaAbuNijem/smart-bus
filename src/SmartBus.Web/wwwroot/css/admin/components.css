@@ -161,7 +161,7 @@
 .modal-overlay.open { display: flex; }
 .modal-box { background: #fff; border-radius: 20px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,.15); overflow: hidden; animation: mslide .2s ease; }
 .modal-box.md  { max-width: 600px; }
-.modal-box.lg  { max-width: 680px; }
+.modal-box.lg  { max-width: 680px; max-height: min(900px, calc(100vh - 40px)); overflow-y: auto; overflow-x: hidden; }
 .modal-box.xl  { max-width: 960px; }
 .modal-box.sm  { max-width: 420px; }
 .modal-box.xs  { max-width: 380px; }
