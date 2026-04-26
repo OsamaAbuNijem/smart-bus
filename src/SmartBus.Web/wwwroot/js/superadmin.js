@@ -20,6 +20,19 @@ const pageNames = {
 };
 const planLabels  = { 0: 'أساسية', 1: 'معيارية', 2: 'مميزة ⭐' };
 const planClasses = { 0: 'plan-basic', 1: 'plan-standard', 2: 'plan-premium' };
+// API returns Plan as the enum name ("Basic" | "Standard" | "Premium") because
+// of JsonStringEnumConverter; older callers send it as a number. Normalize both
+// shapes to the numeric id our dropdown + counters use.
+function planToNumber(p) {
+  if (typeof p === 'number' && Number.isFinite(p)) return p;
+  const map = { Basic: 0, Standard: 1, Premium: 2 };
+  return map[p] ?? 0;
+}
+// Normalize a list of school DTOs from the API: coerce `plan` to a number so
+// the rest of the JS can use === comparisons and dictionary lookups directly.
+function normalizeSchools(items) {
+  return (items || []).map(s => ({ ...s, plan: planToNumber(s.plan) }));
+}
 
 // ── Init ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -107,7 +120,7 @@ async function loadOverview() {
   const data = await apiGet('/schools?pageNumber=1&pageSize=100');
   if (!data) return;
 
-  const items = data.items || [];
+  const items = normalizeSchools(data.items);
   _allSchools = items;
   const total  = data.totalCount || 0;
   const active = items.filter(s => s.isActive).length;
@@ -124,7 +137,7 @@ async function loadOverview() {
   const tbody = document.getElementById('overview-schools-tbody');
   if (!tbody) return;
   if (!items.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:32px 24px;">
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state" style="padding:32px 24px;">
       <div class="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
       <div class="empty-title">لا توجد مدارس بعد</div>
       <div class="empty-sub">ابدأ بإضافة أول مدرسة في المنصة</div>
@@ -143,6 +156,9 @@ function renderOverviewRow(s) {
     <td>${escHtml(s.city)}</td>
     <td><span class="plan-badge ${planClass}">${planLabel}</span></td>
     <td style="font-weight:700;">${s.maxBuses}</td>
+    <td style="font-weight:700;">${s.maxDrivers ?? '—'}</td>
+    <td style="font-weight:700;">${s.maxAssistants ?? '—'}</td>
+    <td style="font-weight:700;">${s.maxStudents ?? '—'}</td>
     <td>${statusLabel}</td>
   </tr>`;
 }
@@ -158,10 +174,10 @@ async function loadSchools(page) {
 
   const data = await apiGet(`/schools?pageNumber=${page}&pageSize=10`);
   const tbody = document.getElementById('schools-tbody');
-  if (!data || !tbody) { if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3);">تعذر تحميل البيانات</td></tr>'; return; }
+  if (!data || !tbody) { if (tbody) tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--text3);">تعذر تحميل البيانات</td></tr>'; return; }
 
   schoolsTotalPages = data.totalPages || 1;
-  _allSchools = data.items || [];
+  _allSchools = normalizeSchools(data.items);
   _selectedIds.clear();
   updateBulkBar();
 
@@ -220,7 +236,7 @@ function renderSchoolsTable(items) {
 
   if (!items.length) {
     const isSearching = !!_searchQuery;
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state">
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state">
       <div class="empty-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round">
           ${isSearching
@@ -285,6 +301,9 @@ function renderSchoolRow(s) {
     <td onclick="openDrawer(getSchoolById('${s.id}'))">${admin}</td>
     <td onclick="openDrawer(getSchoolById('${s.id}'))"><span class="plan-badge ${planClass}">${planLabel}</span></td>
     <td onclick="openDrawer(getSchoolById('${s.id}'))" style="font-weight:700;">${s.maxBuses}</td>
+    <td onclick="openDrawer(getSchoolById('${s.id}'))" style="font-weight:700;">${s.maxDrivers ?? '—'}</td>
+    <td onclick="openDrawer(getSchoolById('${s.id}'))" style="font-weight:700;">${s.maxAssistants ?? '—'}</td>
+    <td onclick="openDrawer(getSchoolById('${s.id}'))" style="font-weight:700;">${s.maxStudents ?? '—'}</td>
     <td onclick="openDrawer(getSchoolById('${s.id}'))">${formatDate(s.createdAt)}</td>
     <td onclick="event.stopPropagation()">
       <button class="st-toggle ${s.isActive ? 'on' : 'off'}" title="${s.isActive ? 'إيقاف' : 'تفعيل'}"
@@ -321,6 +340,9 @@ function openDrawer(school) {
   setText('drw-phone', school.phoneNumber);
   setText('drw-admin', school.adminEmail);
   setText('drw-max-buses', school.maxBuses);
+  setText('drw-max-drivers', school.maxDrivers ?? '—');
+  setText('drw-max-assistants', school.maxAssistants ?? '—');
+  setText('drw-max-students', school.maxStudents ?? '—');
   setText('drw-date', `أُنشئت ${formatDate(school.createdAt)}`);
 
   const planBadge = document.getElementById('drw-plan-badge');
@@ -388,7 +410,9 @@ async function quickChangePlan(planNum) {
   const body = {
     name: s.name, city: s.city, contactEmail: s.contactEmail,
     phoneNumber: s.phoneNumber, adminEmail: s.adminEmail,
-    plan: planNum, maxBuses: s.maxBuses, isActive: s.isActive, notes: s.notes || null
+    plan: planNum, maxBuses: s.maxBuses,
+    maxDrivers: s.maxDrivers, maxAssistants: s.maxAssistants, maxStudents: s.maxStudents,
+    isActive: s.isActive, notes: s.notes || null
   };
   const res = await apiPut(`/schools/${s.id}`, body);
   if (res?.ok) {
@@ -414,6 +438,7 @@ async function toggleStatus(id, currentIsActive) {
     name: school.name, city: school.city, contactEmail: school.contactEmail,
     phoneNumber: school.phoneNumber, adminEmail: school.adminEmail,
     plan: school.plan, maxBuses: school.maxBuses,
+    maxDrivers: school.maxDrivers, maxAssistants: school.maxAssistants, maxStudents: school.maxStudents,
     isActive: !currentIsActive, notes: school.notes || null
   };
   const res = await apiPut(`/schools/${id}`, body);
@@ -585,15 +610,37 @@ function openEditSchool(data) {
   const pwGroup = document.getElementById('sch-password-group');
   if (pwGroup) pwGroup.style.display = 'none';
   document.getElementById('sch-name').value = data.name || '';
-  document.getElementById('sch-city').value = data.city || '';
+  setSelectValueOrAddOption('sch-city', data.city);
   document.getElementById('sch-email').value = data.contactEmail || '';
   document.getElementById('sch-phone').value = data.phoneNumber || '';
   document.getElementById('sch-admin').value = data.adminEmail || '';
-  document.getElementById('sch-plan').value = String(data.plan ?? 0);
+  document.getElementById('sch-plan').value = String(planToNumber(data.plan));
   document.getElementById('sch-buses').value = data.maxBuses || 5;
+  document.getElementById('sch-drivers').value = data.maxDrivers || 5;
+  document.getElementById('sch-assistants').value = data.maxAssistants || 5;
+  document.getElementById('sch-students').value = data.maxStudents || 100;
   document.getElementById('sch-active').value = String(data.isActive !== false);
   document.getElementById('sch-notes').value = data.notes || '';
   openModal('modal-school');
+}
+
+// Populate a <select> with an arbitrary string. If the value isn't one of the
+// existing <option>s, inject it as a new option so the select can actually hold
+// it (otherwise the select silently stays blank and required-field validation
+// trips even when the source data is non-empty).
+function setSelectValueOrAddOption(selectId, value) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  const v = (value ?? '').toString();
+  if (!v) { sel.value = ''; return; }
+  const exists = Array.from(sel.options).some(o => o.value === v);
+  if (!exists) {
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = v;
+    sel.appendChild(opt);
+  }
+  sel.value = v;
 }
 
 function clearSchoolForm() {
@@ -604,7 +651,10 @@ function clearSchoolForm() {
   ['err-sch-name','err-sch-city','err-sch-email','err-sch-phone','err-sch-admin'].forEach(id => {
     document.getElementById(id)?.classList.remove('show');
   });
-  const buses = document.getElementById('sch-buses');    if (buses) buses.value = '5';
+  const buses    = document.getElementById('sch-buses');      if (buses)    buses.value    = '5';
+  const drivers  = document.getElementById('sch-drivers');    if (drivers)  drivers.value  = '5';
+  const assists  = document.getElementById('sch-assistants'); if (assists)  assists.value  = '5';
+  const students = document.getElementById('sch-students');   if (students) students.value = '100';
   const plan  = document.getElementById('sch-plan');     if (plan)  plan.value  = '0';
   const act   = document.getElementById('sch-active');   if (act)   act.value   = 'true';
   const notes = document.getElementById('sch-notes');    if (notes) notes.value = '';
@@ -639,10 +689,14 @@ async function saveSchool() {
   const admin = document.getElementById('sch-admin').value.trim();
   const id    = document.getElementById('sch-id').value;
 
+  const planRaw = parseInt(document.getElementById('sch-plan').value);
   const body = {
     name, city, contactEmail: email, phoneNumber: phone, adminEmail: admin,
-    plan: parseInt(document.getElementById('sch-plan').value),
-    maxBuses: parseInt(document.getElementById('sch-buses').value) || 5,
+    plan: Number.isFinite(planRaw) ? planRaw : 0,
+    maxBuses:      parseInt(document.getElementById('sch-buses').value)      || 5,
+    maxDrivers:    parseInt(document.getElementById('sch-drivers').value)    || 5,
+    maxAssistants: parseInt(document.getElementById('sch-assistants').value) || 5,
+    maxStudents:   parseInt(document.getElementById('sch-students').value)   || 100,
     isActive: document.getElementById('sch-active').value === 'true',
     notes: document.getElementById('sch-notes').value.trim() || null,
     adminPassword: document.getElementById('sch-password')?.value.trim() || 'Admin@123456'
@@ -695,7 +749,7 @@ async function loadAdmins() {
     tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="empty-title">لا يوجد مديرون بعد</div><div class="empty-sub">أضف مدارس أولاً لتظهر بيانات المديرين هنا</div></div></td></tr>`;
     return;
   }
-  tbody.innerHTML = data.items.map(s => {
+  tbody.innerHTML = normalizeSchools(data.items).map(s => {
     const planClass = planClasses[s.plan] || 'plan-basic';
     const planLabel = planLabels[s.plan] || 'أساسية';
     const statusLabel = s.isActive ? '<span style="color:#15803D;font-weight:700;">نشطة ●</span>' : '<span style="color:#94A3B8;">موقوفة</span>';
@@ -713,7 +767,7 @@ async function loadAdmins() {
 async function loadPlanStats() {
   const data = await apiGet('/schools?pageNumber=1&pageSize=100');
   if (!data?.items) return;
-  const items = data.items;
+  const items = normalizeSchools(data.items);
   animateCounter('plan-basic-count',    items.filter(s => s.plan === 0).length);
   animateCounter('plan-standard-count', items.filter(s => s.plan === 1).length);
   animateCounter('plan-premium-count',  items.filter(s => s.plan === 2).length);

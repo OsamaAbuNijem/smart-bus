@@ -396,7 +396,7 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
     </div>
     <!-- Subscription -->
     <div class="drawer-section">
-      <div class="drawer-section-title">الاشتراك والباصات</div>
+      <div class="drawer-section-title">الاشتراك والحدود</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
           <div style="font-size:24px;font-weight:800;" id="drw-max-buses">—</div>
@@ -405,6 +405,18 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
         <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
           <div id="drw-plan-big" style="font-size:14px;font-weight:800;margin-top:4px;"></div>
           <div style="font-size:11px;color:var(--text3);margin-top:2px;">الخطة الحالية</div>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:24px;font-weight:800;" id="drw-max-drivers">—</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">أقصى سائقين</div>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:24px;font-weight:800;" id="drw-max-assistants">—</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">أقصى مساعدين</div>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;grid-column:1/-1;">
+          <div style="font-size:24px;font-weight:800;" id="drw-max-students">—</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">أقصى طلاب</div>
         </div>
       </div>
     </div>
@@ -520,6 +532,20 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
         </div>
       </div>
       <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">أقصى عدد سائقين</label>
+          <input type="number" id="sch-drivers" class="form-control" placeholder="5" min="1" max="2000"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">أقصى عدد مساعدين</label>
+          <input type="number" id="sch-assistants" class="form-control" placeholder="5" min="0" max="2000"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">أقصى عدد طلاب</label>
+          <input type="number" id="sch-students" class="form-control" placeholder="100" min="1" max="20000"/>
+        </div>
         <div class="form-group">
           <label class="form-label">الحالة</label>
           <select id="sch-active" class="form-control">

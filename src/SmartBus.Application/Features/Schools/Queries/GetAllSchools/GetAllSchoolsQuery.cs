@@ -15,6 +15,9 @@ public record SchoolDto(
     string AdminEmail,
     PlanType Plan,
     int MaxBuses,
+    int MaxDrivers,
+    int MaxAssistants,
+    int MaxStudents,
     bool IsActive,
     string? Notes,
     DateTime CreatedAt

@@ -35,14 +35,17 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
 
         var school = new School
         {
-            Name         = request.Name,
-            City         = request.City,
-            ContactEmail = request.ContactEmail,
-            PhoneNumber  = request.PhoneNumber,
-            AdminEmail   = request.AdminEmail,
-            Plan         = request.Plan,
-            MaxBuses     = request.MaxBuses,
-            Notes        = request.Notes
+            Name          = request.Name,
+            City          = request.City,
+            ContactEmail  = request.ContactEmail,
+            PhoneNumber   = request.PhoneNumber,
+            AdminEmail    = request.AdminEmail,
+            Plan          = request.Plan,
+            MaxBuses      = request.MaxBuses,
+            MaxDrivers    = request.MaxDrivers,
+            MaxAssistants = request.MaxAssistants,
+            MaxStudents   = request.MaxStudents,
+            Notes         = request.Notes
         };
 
         await _unitOfWork.Schools.AddAsync(school, cancellationToken);

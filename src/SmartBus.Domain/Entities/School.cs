@@ -12,6 +12,9 @@ public class School : BaseEntity
     public string AdminEmail { get; set; } = default!;
     public PlanType Plan { get; set; } = PlanType.Basic;
     public int MaxBuses { get; set; } = 5;
+    public int MaxDrivers { get; set; } = 5;
+    public int MaxAssistants { get; set; } = 5;
+    public int MaxStudents { get; set; } = 100;
     public bool IsActive { get; set; } = true;
     public string? LogoUrl { get; set; }
     public string? Notes { get; set; }

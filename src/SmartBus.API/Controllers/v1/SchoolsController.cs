@@ -43,7 +43,9 @@ public class SchoolsController : ControllerBase
     {
         var result = await _mediator.Send(
             new CreateSchoolCommand(request.Name, request.City, request.ContactEmail, request.PhoneNumber,
-                request.AdminEmail, request.Plan, request.MaxBuses, request.Notes, request.AdminPassword),
+                request.AdminEmail, request.Plan, request.MaxBuses,
+                request.MaxDrivers, request.MaxAssistants, request.MaxStudents,
+                request.Notes, request.AdminPassword),
             cancellationToken);
         return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
     }
@@ -54,7 +56,9 @@ public class SchoolsController : ControllerBase
     {
         var result = await _mediator.Send(
             new UpdateSchoolCommand(id, request.Name, request.City, request.ContactEmail, request.PhoneNumber,
-                request.AdminEmail, request.Plan, request.MaxBuses, request.IsActive, request.Notes),
+                request.AdminEmail, request.Plan, request.MaxBuses,
+                request.MaxDrivers, request.MaxAssistants, request.MaxStudents,
+                request.IsActive, request.Notes),
             cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
@@ -69,7 +73,9 @@ public class SchoolsController : ControllerBase
 }
 
 public record CreateSchoolRequest(string Name, string City, string ContactEmail, string PhoneNumber,
-    string AdminEmail, PlanType Plan, int MaxBuses, string? Notes, string AdminPassword = "Admin@123456");
+    string AdminEmail, PlanType Plan, int MaxBuses, int MaxDrivers, int MaxAssistants, int MaxStudents,
+    string? Notes, string AdminPassword = "Admin@123456");
 
 public record UpdateSchoolRequest(string Name, string City, string ContactEmail, string PhoneNumber,
-    string AdminEmail, PlanType Plan, int MaxBuses, bool IsActive, string? Notes);
+    string AdminEmail, PlanType Plan, int MaxBuses, int MaxDrivers, int MaxAssistants, int MaxStudents,
+    bool IsActive, string? Notes);

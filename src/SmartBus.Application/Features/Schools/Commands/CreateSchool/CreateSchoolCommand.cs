@@ -12,6 +12,9 @@ public record CreateSchoolCommand(
     string AdminEmail,
     PlanType Plan,
     int MaxBuses,
+    int MaxDrivers,
+    int MaxAssistants,
+    int MaxStudents,
     string? Notes,
     string AdminPassword = "Admin@123456"
 ) : IRequest<Result<Guid>>;
