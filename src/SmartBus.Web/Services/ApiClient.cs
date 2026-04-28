@@ -192,23 +192,6 @@ public class ApiClient : IApiClient
 
     public Task<bool> DeleteTripAsync(Guid id) => DeleteAsync($"api/v1/trips/{id}");
 
-    public async Task<(bool Ok, string? Message)> GenerateTodayTripsAsync()
-    {
-        var content = new StringContent("{}", Encoding.UTF8, "application/json");
-        using var req = AuthorizedRequest(HttpMethod.Post, "api/v1/trips/generate-today", content);
-        using var response = await _httpClient.SendAsync(req);
-        var body = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode) return (false, ExtractError(body));
-        try
-        {
-            using var doc = JsonDocument.Parse(body);
-            if (doc.RootElement.TryGetProperty("message", out var msg) && msg.ValueKind == JsonValueKind.String)
-                return (true, msg.GetString());
-        }
-        catch { }
-        return (true, null);
-    }
-
     public Task<BusScheduleDto?> GetBusScheduleAsync(Guid busId)
         => GetAsync<BusScheduleDto>($"api/v1/trips/bus/{busId}/schedule");
 

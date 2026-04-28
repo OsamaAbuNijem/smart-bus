@@ -220,6 +220,9 @@
   <data name="Bus_SearchNumber"   xml:space="preserve"><value>Search by plate number...</value></data>
   <data name="Bus_SearchPerson"   xml:space="preserve"><value>Search by driver or assistant name...</value></data>
   <data name="Bus_TypeLabel"      xml:space="preserve"><value>bus</value></data>
+  <data name="Bus_QRTitle"        xml:space="preserve"><value>Bus QR Code</value></data>
+  <data name="Bus_QRHint"         xml:space="preserve"><value>The driver or assistant scans this code from the mobile app to start the trip automatically.</value></data>
+  <data name="Bus_QRPrint"        xml:space="preserve"><value>Print</value></data>
   <data name="Bus_AddBtn"         xml:space="preserve"><value>Add Bus</value></data>
   <data name="Bus_AddTitle"       xml:space="preserve"><value>Add New Bus</value></data>
   <data name="Bus_EditTitle"      xml:space="preserve"><value>Edit Bus</value></data>
@@ -237,7 +240,6 @@
   <data name="Trip_None"          xml:space="preserve"><value>No trips</value></data>
   <data name="Trip_PagerInfo"     xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
   <data name="Trip_TypeLabel"     xml:space="preserve"><value>trip</value></data>
-  <data name="Trip_GenerateBtn"   xml:space="preserve"><value>Generate Today</value></data>
   <data name="Trip_StudentsTitle" xml:space="preserve"><value>Trip Students</value></data>
   <data name="Trip_StudentsNone"  xml:space="preserve"><value>No students on this trip</value></data>
   <data name="Trip_Morning"       xml:space="preserve"><value>Morning</value></data>
@@ -271,7 +273,6 @@
   <data name="Trip_BoardingAbsent"   xml:space="preserve"><value>Absent</value></data>
   <data name="JS_TripStarted"     xml:space="preserve"><value>Trip started ✓</value></data>
   <data name="JS_TripCompleted"   xml:space="preserve"><value>Trip completed ✓</value></data>
-  <data name="JS_TripsGenerated"  xml:space="preserve"><value>Today's trips generated ✓</value></data>
   <data name="JS_ConfirmStartTrip"    xml:space="preserve"><value>Start this trip?</value></data>
   <data name="JS_ConfirmCompleteTrip" xml:space="preserve"><value>Mark this trip as completed?</value></data>
   <data name="Confirm_Title"          xml:space="preserve"><value>Confirm</value></data>

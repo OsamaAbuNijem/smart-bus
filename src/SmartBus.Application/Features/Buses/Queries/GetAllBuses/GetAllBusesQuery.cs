@@ -28,5 +28,6 @@ public record BusDto(
     double? LastLatitude,
     double? LastLongitude,
     DateTime CreatedAt,
-    bool IsScheduleComplete
+    bool IsScheduleComplete,
+    string? QrToken
 );

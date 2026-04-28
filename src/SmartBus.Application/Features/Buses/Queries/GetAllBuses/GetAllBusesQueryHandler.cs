@@ -87,7 +87,8 @@ public class GetAllBusesQueryHandler : IRequestHandler<GetAllBusesQuery, PagedRe
                 ids ?? Array.Empty<Guid>(),
                 b.LastLocation?.Latitude, b.LastLocation?.Longitude,
                 b.CreatedAt,
-                sched?.HasAllAssignments ?? false);
+                sched?.HasAllAssignments ?? false,
+                b.QrToken);
         }).ToList();
 
         return PagedResult<BusDto>.Create(buses, totalCount, request.PageNumber, request.PageSize);

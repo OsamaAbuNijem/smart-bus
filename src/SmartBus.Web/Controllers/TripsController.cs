@@ -50,14 +50,6 @@ public class TripsController : AdminControllerBase
         return await SuccessWithList(_l["JS_DeletedSuccess"], page);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> GenerateToday(int page = 1)
-    {
-        var (ok, message) = await ApiClient.GenerateTodayTripsAsync();
-        if (!ok) return StatusCode(502, new { result = message ?? "Upstream API error" });
-        return await SuccessWithList(message ?? _l["JS_TripsGenerated"].Value, page);
-    }
-
     private async Task<IActionResult> SuccessWithList(string message, int page)
     {
         var data = await ApiClient.GetTripsAsync(page, 10);

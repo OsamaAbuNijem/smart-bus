@@ -203,14 +203,11 @@ try
         job => job.UpdateInactiveBusStatusAsync(),
         Cron.Minutely);
 
-    // Daily trip generation — runs at 12:05 AM (configurable).
-    // Creates both ذهاب and إياب trips for every bus whose schedule matches today.
-    // Override: "Jobs": { "TripGenerationCron": "5 3 * * *" }
-    var tripCron = app.Configuration["Jobs:TripGenerationCron"] ?? "5 0 * * *";
-    RecurringJob.AddOrUpdate<SmartBus.Infrastructure.Jobs.TripGenerationJob>(
-        "generate-daily-trips",
-        job => job.ExecuteAsync(false),
-        tripCron);
+    // Trips are now created on-demand when the driver/assistant scans a bus
+    // QR via POST /api/v1/trips/scan — no recurring trip-generation job.
+    // Drop the previously-registered "generate-daily-trips" recurring entry
+    // so it stops firing on existing Hangfire DBs.
+    RecurringJob.RemoveIfExists("generate-daily-trips");
 
     await app.RunAsync();
 }

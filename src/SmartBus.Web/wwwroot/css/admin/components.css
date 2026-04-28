@@ -282,7 +282,14 @@ tr.row-incomplete:hover { background: #FEF3C7; }
 .tbl-btn.complete { color: #16A34A; background: transparent; }
 .tbl-edit { background: #EFF6FF; }
 .tbl-del  { background: #FEF2F2; }
+.tbl-qr   { background: #F5F3FF; }
 .tbl-actions { display: flex; gap: 6px; }
+
+/* Bus QR modal — canvas + token caption */
+.bus-qr-canvas { display: flex; justify-content: center; padding: 8px 0 4px; }
+.bus-qr-canvas canvas { border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.bus-qr-token { font-size: 10px; color: #94A3B8; margin: 12px 0 10px; word-break: break-all; font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; }
+.modal-header-sub { font-size: 12px; color: #64748B; margin-top: 2px; }
 
 /* Schedule state button (buses table) */
 .sched-btn { border-radius: 6px; padding: 3px 6px; }

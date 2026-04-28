@@ -174,6 +174,25 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
 .modal-close-btn:hover{background:var(--rl);}
 .modal-body{padding:22px;overflow-y:auto;flex:1;}
 .modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;}
+
+/* Employee QR tokens modal */
+.qr-section{margin-bottom:22px;}
+.qr-section h4{font-size:13px;font-weight:800;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #94A3B8;display:flex;align-items:center;gap:8px;}
+.qr-count{background:#F1F5F9;color:#475569;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;}
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+.qr-card{position:relative;border:1px solid var(--border);border-radius:12px;padding:14px 12px;background:var(--card);text-align:center;}
+.qr-card.is-used{opacity:.65;background:#F8FAFC;}
+.qr-card-head{display:flex;justify-content:flex-end;margin-bottom:6px;}
+.qr-badge{font-size:10px;font-weight:700;border-radius:999px;padding:2px 8px;}
+.qr-badge-fresh{background:#F0FDF4;color:#15803D;}
+.qr-badge-used{background:#FEF2F2;color:#B91C1C;}
+.qr-canvas{display:flex;justify-content:center;}
+.qr-canvas canvas{border-radius:8px;}
+.qr-token{font-size:9px;color:#94A3B8;margin-top:8px;word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace;}
+.qr-used-info{font-size:11px;color:var(--text2);margin-top:8px;line-height:1.4;}
+.qr-used-phone{font-size:10px;color:var(--text3);}
+.tbl-btn.tbl-qr{background:#F5F3FF;}
+.tbl-btn.tbl-qr-students{background:#F0FDF4;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 .form-row.full{grid-template-columns:1fr;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
@@ -571,6 +590,66 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
   </div>
 </div>
 
+<!-- MODAL: EMPLOYEE QR TOKENS -->
+<div class="modal-overlay" id="modal-school-qr">
+  <div class="modal-box lg">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:9px;background:var(--pul);display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="17"/><line x1="17" y1="14" x2="21" y2="14"/></svg>
+        </div>
+        <div>
+          <div class="modal-header-title" id="qr-tokens-title">رموز QR للسائقين والمساعدين</div>
+          <div class="modal-header-sub" id="qr-tokens-sub" style="font-size:12px;color:var(--text3);"></div>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal('modal-school-qr')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="qr-tokens-body">
+      <div class="u-empty-state" id="qr-tokens-loading">جاري التحميل...</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="qr-tokens-print" onclick="printAllQrTokens()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        طباعة الكل
+      </button>
+      <button class="btn-secondary" onclick="closeModal('modal-school-qr')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: STUDENT QR TOKENS -->
+<div class="modal-overlay" id="modal-school-students-qr">
+  <div class="modal-box lg">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:9px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><rect x="14" y="11" width="7" height="7" rx="1"/></svg>
+        </div>
+        <div>
+          <div class="modal-header-title" id="qr-students-title">رموز QR للطلاب</div>
+          <div class="modal-header-sub" id="qr-students-sub" style="font-size:12px;color:var(--text3);"></div>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal('modal-school-students-qr')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="qr-students-body">
+      <div class="u-empty-state" id="qr-students-loading">جاري التحميل...</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="qr-students-print" onclick="printAllStudentQrTokens()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        طباعة الكل
+      </button>
+      <button class="btn-secondary" onclick="closeModal('modal-school-students-qr')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: DELETE CONFIRM -->
 <div class="modal-overlay" id="modal-delete">
   <div class="modal-box" style="max-width:400px;">
@@ -668,6 +747,7 @@ window.T = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
     dir   = _dir,
 }));
 </script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script src="~/js/superadmin.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

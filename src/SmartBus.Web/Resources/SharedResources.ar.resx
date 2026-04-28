@@ -220,6 +220,9 @@
   <data name="Bus_SearchNumber"   xml:space="preserve"><value>ابحث برقم الباص...</value></data>
   <data name="Bus_SearchPerson"   xml:space="preserve"><value>ابحث باسم السائق أو المساعد...</value></data>
   <data name="Bus_TypeLabel"      xml:space="preserve"><value>باص</value></data>
+  <data name="Bus_QRTitle"        xml:space="preserve"><value>رمز QR للباص</value></data>
+  <data name="Bus_QRHint"         xml:space="preserve"><value>يقوم السائق أو المساعد بمسح هذا الرمز من تطبيق الجوّال لبدء الرحلة تلقائياً.</value></data>
+  <data name="Bus_QRPrint"        xml:space="preserve"><value>طباعة</value></data>
   <data name="Bus_AddBtn"         xml:space="preserve"><value>إضافة باص</value></data>
   <data name="Bus_AddTitle"       xml:space="preserve"><value>إضافة باص جديد</value></data>
   <data name="Bus_EditTitle"      xml:space="preserve"><value>تعديل بيانات باص</value></data>
@@ -237,7 +240,6 @@
   <data name="Trip_None"          xml:space="preserve"><value>لا توجد رحلات</value></data>
   <data name="Trip_PagerInfo"     xml:space="preserve"><value>عرض {0} من {1} رحلة — الصفحة {2} من {3}</value></data>
   <data name="Trip_TypeLabel"     xml:space="preserve"><value>رحلة</value></data>
-  <data name="Trip_GenerateBtn"   xml:space="preserve"><value>تشغيل الجدول الآن</value></data>
   <data name="Trip_StudentsTitle" xml:space="preserve"><value>طلاب الرحلة</value></data>
   <data name="Trip_StudentsNone"  xml:space="preserve"><value>لا يوجد طلاب مسجلون في هذه الرحلة</value></data>
   <data name="Trip_Morning"       xml:space="preserve"><value>ذهاب</value></data>
@@ -271,7 +273,6 @@
   <data name="Trip_BoardingAbsent"   xml:space="preserve"><value>غائب</value></data>
   <data name="JS_TripStarted"     xml:space="preserve"><value>تم بدء الرحلة ✓</value></data>
   <data name="JS_TripCompleted"   xml:space="preserve"><value>تم إتمام الرحلة ✓</value></data>
-  <data name="JS_TripsGenerated"  xml:space="preserve"><value>تم إنشاء رحلات اليوم بنجاح ✓</value></data>
   <data name="JS_ConfirmStartTrip"    xml:space="preserve"><value>هل تريد بدء هذه الرحلة؟</value></data>
   <data name="JS_ConfirmCompleteTrip" xml:space="preserve"><value>هل تريد إتمام هذه الرحلة؟</value></data>
   <data name="Confirm_Title"          xml:space="preserve"><value>تأكيد</value></data>

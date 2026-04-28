@@ -12,6 +12,9 @@ public class BusRepository : GenericRepository<Bus>, IBusRepository
     public async Task<Bus?> GetByPlateNumberAsync(string plateNumber, CancellationToken cancellationToken = default)
         => await _dbSet.FirstOrDefaultAsync(b => b.PlateNumber == plateNumber, cancellationToken);
 
+    public async Task<Bus?> GetByQrTokenAsync(string qrToken, CancellationToken cancellationToken = default)
+        => await _dbSet.FirstOrDefaultAsync(b => b.QrToken == qrToken, cancellationToken);
+
     public async Task<IReadOnlyList<Bus>> GetByStatusAsync(BusStatus status, CancellationToken cancellationToken = default)
         => await _dbSet.Where(b => b.Status == status).ToListAsync(cancellationToken);
 }

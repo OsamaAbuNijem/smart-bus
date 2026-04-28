@@ -90,6 +90,58 @@ const buses = {
     }
   },
 
+  // ── QR modal — render the bus's QR sticker for printing ────────────────
+  openQr(btn) {
+    const token = btn?.dataset?.qr;
+    const plate = btn?.dataset?.plate || '';
+    if (!token) { SB.ShowMessage('QR token missing'); return; }
+
+    const plateEl = document.getElementById('bus-qr-plate');
+    if (plateEl) plateEl.textContent = plate;
+    const tokenEl = document.getElementById('bus-qr-token');
+    if (tokenEl) tokenEl.textContent = token;
+
+    const canvas = document.getElementById('bus-qr-canvas');
+    if (canvas) {
+      canvas.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        QRCode.toCanvas(token, { width: 240, margin: 1, errorCorrectionLevel: 'M' }, (err, c) => {
+          if (!err && c) canvas.appendChild(c);
+        });
+      }
+    }
+
+    const printBtn = document.getElementById('bus-qr-print');
+    if (printBtn) printBtn.onclick = () => this._printQr(plate, token);
+
+    SB.openModal('modal-bus-qr');
+  },
+
+  _printQr(plate, token) {
+    const canvas = document.querySelector('#bus-qr-canvas canvas');
+    if (!canvas) return;
+    const dataUrl = canvas.toDataURL('image/png');
+    const w = window.open('', '_blank', 'width=480,height=640');
+    if (!w) return;
+    w.document.write(`
+      <!DOCTYPE html><html dir="${document.documentElement.dir || 'rtl'}"><head><meta charset="UTF-8">
+      <title>QR — ${plate}</title>
+      <style>
+        body { font-family:'Cairo',sans-serif; text-align:center; padding:40px; }
+        h1 { font-size:22px; margin-bottom:8px; }
+        .plate { font-size:32px; font-weight:800; margin:12px 0 24px; letter-spacing:1px; }
+        img { width:280px; height:280px; }
+        .token { font-size:11px; color:#64748B; margin-top:16px; word-break:break-all; }
+      </style></head><body>
+      <h1>SmartBus</h1>
+      <div class="plate">${plate}</div>
+      <img src="${dataUrl}" alt="QR"/>
+      <div class="token">${token}</div>
+      <script>setTimeout(()=>{window.print();},250);<\/script>
+      </body></html>`);
+    w.document.close();
+  },
+
   // ── Schedule modal ──────────────────────────────────────────────────────
   async openSchedule(id) {
     const res = await fetch(`/Buses/Schedule?id=${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });

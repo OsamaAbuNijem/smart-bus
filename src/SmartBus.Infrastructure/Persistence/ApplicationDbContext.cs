@@ -29,6 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<School> Schools => Set<School>();
     public DbSet<BusSchedule> BusSchedules => Set<BusSchedule>();
     public DbSet<BusScheduleStudent> BusScheduleStudents => Set<BusScheduleStudent>();
+    public DbSet<EmployeeQrToken> EmployeeQrTokens => Set<EmployeeQrToken>();
+    public DbSet<StudentQrToken>  StudentQrTokens  => Set<StudentQrToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -54,6 +56,44 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<StudentAllergy>().HasQueryFilter(a => !a.IsDeleted);
         builder.Entity<School>().HasQueryFilter(s => !s.IsDeleted);
         builder.Entity<BusSchedule>().HasQueryFilter(s => !s.IsDeleted);
+        builder.Entity<EmployeeQrToken>().HasQueryFilter(t => !t.IsDeleted);
+
+        // Token uniqueness — soft-deleted rows excluded so reissues don't collide.
+        builder.Entity<EmployeeQrToken>()
+            .HasIndex(t => t.Token)
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
+
+        builder.Entity<EmployeeQrToken>()
+            .HasIndex(t => new { t.SchoolId, t.Type, t.IsUsed });
+
+        builder.Entity<EmployeeQrToken>()
+            .HasOne(t => t.School)
+            .WithMany()
+            .HasForeignKey(t => t.SchoolId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<StudentQrToken>().HasQueryFilter(t => !t.IsDeleted);
+
+        builder.Entity<StudentQrToken>()
+            .HasIndex(t => t.Token)
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
+
+        builder.Entity<StudentQrToken>()
+            .HasIndex(t => new { t.SchoolId, t.IsRegistered });
+
+        builder.Entity<StudentQrToken>()
+            .HasOne(t => t.School)
+            .WithMany()
+            .HasForeignKey(t => t.SchoolId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<StudentQrToken>()
+            .HasOne(t => t.Student)
+            .WithMany()
+            .HasForeignKey(t => t.StudentId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         // One schedule per bus
         builder.Entity<BusSchedule>()

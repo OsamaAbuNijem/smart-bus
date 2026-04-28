@@ -67,7 +67,6 @@ const trips = {
       onConfirm:   () => this._action(`/Trips/Complete?id=${id}`)
     });
   },
-  async generate()   { await this._action('/Trips/GenerateToday'); },
 
   async _action(url) {
     const page = document.getElementById('trips-page').value;

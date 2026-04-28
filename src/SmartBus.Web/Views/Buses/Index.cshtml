@@ -93,6 +93,31 @@
   </div>
 </div>
 
+<!-- Bus QR modal — shows the QR poster the driver/assistant scans to start a trip -->
+<div class="modal-overlay" id="modal-bus-qr">
+  <div class="modal-box sm">
+    <div class="modal-header">
+      <div>
+        <div class="modal-header-title">@L["Bus_QRTitle"]</div>
+        <div class="modal-header-sub" id="bus-qr-plate"></div>
+      </div>
+      <button class="modal-close-btn" data-action="modal-close" data-target="modal-bus-qr">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body center">
+      <div id="bus-qr-canvas" class="bus-qr-canvas"></div>
+      <div class="bus-qr-token" id="bus-qr-token"></div>
+      <div class="modal-body-line">@L["Bus_QRHint"]</div>
+    </div>
+    <div class="modal-footer center">
+      <button class="btn-primary" id="bus-qr-print">@L["Bus_QRPrint"]</button>
+      <button class="btn-secondary" data-action="modal-close" data-target="modal-bus-qr">@L["Del_Cancel"]</button>
+    </div>
+  </div>
+</div>
+
 @section Scripts {
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="~/js/admin/buses.js" asp-append-version="true"></script>
 }

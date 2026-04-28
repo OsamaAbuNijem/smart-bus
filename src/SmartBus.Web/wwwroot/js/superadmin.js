@@ -316,6 +316,12 @@ function renderSchoolRow(s) {
         <button class="tbl-btn tbl-view" title="عرض التفاصيل" onclick="openDrawer(getSchoolById('${s.id}'))">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
+        <button class="tbl-btn tbl-qr" title="رموز QR للموظفين" onclick="openSchoolQrTokens('${s.id}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="17"/><line x1="17" y1="14" x2="21" y2="14"/><line x1="14" y1="20" x2="17" y2="20"/><line x1="20" y1="17" x2="20" y2="21"/></svg>
+        </button>
+        <button class="tbl-btn tbl-qr-students" title="رموز QR للطلاب" onclick="openSchoolStudentQrTokens('${s.id}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><rect x="14" y="11" width="7" height="7" rx="1"/></svg>
+        </button>
         <button class="tbl-btn tbl-edit" title="تعديل" onclick="openEditSchool(getSchoolById('${s.id}'))">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
         </button>
@@ -896,6 +902,205 @@ async function changePassword() {
   }
 }
 
+// ── Employee QR tokens (per school) ─────────────────────────────────────────
+let _qrTokensCurrent = null; // { schoolName, drivers:[], assistants:[] }
+
+async function openSchoolQrTokens(schoolId) {
+  const body = document.getElementById('qr-tokens-body');
+  const sub  = document.getElementById('qr-tokens-sub');
+  if (!body) return;
+  body.innerHTML = '<div class="u-empty-state" id="qr-tokens-loading">جاري التحميل...</div>';
+  if (sub) sub.textContent = '';
+  openModal('modal-school-qr');
+
+  const data = await apiGet(`/schools/${schoolId}/employee-qr-tokens`);
+  if (!data) { body.innerHTML = '<div class="u-empty-state">تعذر تحميل الرموز.</div>'; return; }
+  _qrTokensCurrent = data;
+  if (sub) sub.textContent = data.schoolName || '';
+
+  const driversHtml    = renderQrTokenSection('السائقون',  data.drivers    || [], '#7C3AED');
+  const assistantsHtml = renderQrTokenSection('المساعدون', data.assistants || [], '#0EA5E9');
+  body.innerHTML = driversHtml + assistantsHtml;
+
+  // Render every QR canvas after the DOM is in place.
+  if (typeof QRCode !== 'undefined') {
+    body.querySelectorAll('[data-qr]').forEach(el => {
+      const token = el.getAttribute('data-qr');
+      QRCode.toCanvas(token, { width: 140, margin: 1, errorCorrectionLevel: 'M' }, (err, c) => {
+        if (!err && c) el.appendChild(c);
+      });
+    });
+  }
+}
+
+function renderQrTokenSection(title, items, color) {
+  if (!items.length) return `<div class="qr-section"><h4>${title}</h4><div class="u-empty-state">لا توجد رموز.</div></div>`;
+  const cells = items.map(t => {
+    const usedBadge = t.isUsed
+      ? `<span class="qr-badge qr-badge-used">مفعّل</span>`
+      : `<span class="qr-badge qr-badge-fresh">جاهز</span>`;
+    const usedInfo = t.isUsed
+      ? `<div class="qr-used-info">${escHtml(t.usedFullName || '')}<br/><span class="qr-used-phone">${escHtml(t.usedPhoneNumber || '')}</span></div>`
+      : '';
+    return `<div class="qr-card ${t.isUsed ? 'is-used' : ''}">
+        <div class="qr-card-head">${usedBadge}</div>
+        <div class="qr-canvas" data-qr="${escHtml(t.token)}"></div>
+        <div class="qr-token">${escHtml(t.token)}</div>
+        ${usedInfo}
+      </div>`;
+  }).join('');
+  return `<div class="qr-section">
+      <h4 style="border-color:${color};">${title} <span class="qr-count">${items.length}</span></h4>
+      <div class="qr-grid">${cells}</div>
+    </div>`;
+}
+
+function printAllQrTokens() {
+  if (!_qrTokensCurrent) return;
+  const all = [
+    ...(_qrTokensCurrent.drivers    || []).map(t => ({ ...t, role: 'سائق'  })),
+    ...(_qrTokensCurrent.assistants || []).map(t => ({ ...t, role: 'مساعد' }))
+  ];
+  if (!all.length) return;
+
+  // Build the print sheet — one card per token.
+  const w = window.open('', '_blank', 'width=900,height=720');
+  if (!w) return;
+  const cards = all.map(t => `
+      <div class="card">
+        <div class="brand">SmartBus</div>
+        <div class="school">${escHtml(_qrTokensCurrent.schoolName || '')}</div>
+        <div class="role">${t.role}</div>
+        <canvas id="c-${t.id}" width="200" height="200"></canvas>
+        <div class="token">${escHtml(t.token)}</div>
+      </div>`).join('');
+  w.document.write(`
+    <!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
+    <title>QR Sheet — ${escHtml(_qrTokensCurrent.schoolName || '')}</title>
+    <style>
+      @media print { @page { size: A4; margin: 12mm; } }
+      body { font-family:'Cairo',sans-serif; padding:18px; }
+      .grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:18px; }
+      .card { border:1px dashed #94A3B8; border-radius:12px; padding:18px; text-align:center; break-inside:avoid; }
+      .brand { font-size:13px; color:#7C3AED; font-weight:800; }
+      .school { font-size:18px; font-weight:800; margin:4px 0; }
+      .role { font-size:13px; color:#475569; margin-bottom:10px; }
+      canvas { display:block; margin:0 auto; }
+      .token { font-size:9px; color:#94A3B8; margin-top:10px; word-break:break-all; font-family:ui-monospace,Menlo,Consolas,monospace; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"><\/script>
+    </head><body>
+    <h2 style="margin:0 0 16px;">رموز QR للموظفين — ${escHtml(_qrTokensCurrent.schoolName || '')}</h2>
+    <div class="grid">${cards}</div>
+    <script>
+      const tokens = ${JSON.stringify(all.map(t => ({ id: t.id, token: t.token })))};
+      let pending = tokens.length;
+      tokens.forEach(t => {
+        QRCode.toCanvas(document.getElementById('c-' + t.id), t.token, { width: 200, margin: 1 }, () => {
+          if (--pending === 0) setTimeout(() => window.print(), 200);
+        });
+      });
+    <\/script>
+    </body></html>`);
+  w.document.close();
+}
+
+// ── Student QR tokens (per school) ──────────────────────────────────────────
+let _studentQrTokensCurrent = null; // { schoolName, totalCount, registeredCount, tokens:[] }
+
+async function openSchoolStudentQrTokens(schoolId) {
+  const body = document.getElementById('qr-students-body');
+  const sub  = document.getElementById('qr-students-sub');
+  if (!body) return;
+  body.innerHTML = '<div class="u-empty-state">جاري التحميل...</div>';
+  if (sub) sub.textContent = '';
+  openModal('modal-school-students-qr');
+
+  const data = await apiGet(`/schools/${schoolId}/student-qr-tokens`);
+  if (!data) { body.innerHTML = '<div class="u-empty-state">تعذر تحميل الرموز.</div>'; return; }
+  _studentQrTokensCurrent = data;
+  if (sub) sub.textContent = `${data.schoolName} — ${data.registeredCount} / ${data.totalCount} مسجَّل`;
+
+  if (!data.tokens?.length) {
+    body.innerHTML = '<div class="u-empty-state">لم يتم توليد أي رموز للطلاب بعد.</div>';
+    return;
+  }
+
+  const cells = data.tokens.map(t => {
+    const badge = t.isRegistered
+      ? `<span class="qr-badge qr-badge-used">مسجَّل</span>`
+      : `<span class="qr-badge qr-badge-fresh">جاهز</span>`;
+    const studentInfo = t.isRegistered
+      ? `<div class="qr-used-info">${escHtml(t.studentName || '')}<br/><span class="qr-used-phone">${escHtml(t.studentGrade || '')}</span></div>`
+      : '';
+    return `<div class="qr-card ${t.isRegistered ? 'is-used' : ''}">
+        <div class="qr-card-head">${badge}</div>
+        <div class="qr-canvas" data-qr="${escHtml(t.token)}"></div>
+        <div class="qr-token">${escHtml(t.token)}</div>
+        ${studentInfo}
+      </div>`;
+  }).join('');
+
+  body.innerHTML = `<div class="qr-section">
+      <h4 style="border-color:#16A34A;">الطلاب <span class="qr-count">${data.tokens.length}</span></h4>
+      <div class="qr-grid">${cells}</div>
+    </div>`;
+
+  if (typeof QRCode !== 'undefined') {
+    body.querySelectorAll('[data-qr]').forEach(el => {
+      const token = el.getAttribute('data-qr');
+      QRCode.toCanvas(token, { width: 140, margin: 1, errorCorrectionLevel: 'M' }, (err, c) => {
+        if (!err && c) el.appendChild(c);
+      });
+    });
+  }
+}
+
+function printAllStudentQrTokens() {
+  if (!_studentQrTokensCurrent?.tokens?.length) return;
+  const all = _studentQrTokensCurrent.tokens;
+
+  const w = window.open('', '_blank', 'width=900,height=720');
+  if (!w) return;
+  const cards = all.map(t => `
+      <div class="card">
+        <div class="brand">SmartBus</div>
+        <div class="school">${escHtml(_studentQrTokensCurrent.schoolName || '')}</div>
+        <div class="role">${t.isRegistered ? escHtml(t.studentName || 'طالب') : 'طالب'}</div>
+        <canvas id="c-${t.id}" width="200" height="200"></canvas>
+        <div class="token">${escHtml(t.token)}</div>
+      </div>`).join('');
+  w.document.write(`
+    <!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
+    <title>QR Sheet — Students — ${escHtml(_studentQrTokensCurrent.schoolName || '')}</title>
+    <style>
+      @media print { @page { size: A4; margin: 12mm; } }
+      body { font-family:'Cairo',sans-serif; padding:18px; }
+      .grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:18px; }
+      .card { border:1px dashed #94A3B8; border-radius:12px; padding:18px; text-align:center; break-inside:avoid; }
+      .brand { font-size:13px; color:#16A34A; font-weight:800; }
+      .school { font-size:18px; font-weight:800; margin:4px 0; }
+      .role { font-size:13px; color:#475569; margin-bottom:10px; }
+      canvas { display:block; margin:0 auto; }
+      .token { font-size:9px; color:#94A3B8; margin-top:10px; word-break:break-all; font-family:ui-monospace,Menlo,Consolas,monospace; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"><\/script>
+    </head><body>
+    <h2 style="margin:0 0 16px;">رموز QR للطلاب — ${escHtml(_studentQrTokensCurrent.schoolName || '')}</h2>
+    <div class="grid">${cards}</div>
+    <script>
+      const tokens = ${JSON.stringify(all.map(t => ({ id: t.id, token: t.token })))};
+      let pending = tokens.length;
+      tokens.forEach(t => {
+        QRCode.toCanvas(document.getElementById('c-' + t.id), t.token, { width: 200, margin: 1 }, () => {
+          if (--pending === 0) setTimeout(() => window.print(), 200);
+        });
+      });
+    <\/script>
+    </body></html>`);
+  w.document.close();
+}
+
 // ── Window exports ─────────────────────────────────────────────────────────
 Object.defineProperty(window, 'schoolsPage', { get: () => schoolsPage });
 window.showPage              = showPage;
@@ -923,6 +1128,10 @@ window.bulkDelete            = bulkDelete;
 window.exportCSV             = exportCSV;
 window.getSchoolById         = getSchoolById;
 window.openChangePassword    = openChangePassword;
+window.openSchoolQrTokens    = openSchoolQrTokens;
+window.printAllQrTokens      = printAllQrTokens;
+window.openSchoolStudentQrTokens = openSchoolStudentQrTokens;
+window.printAllStudentQrTokens   = printAllStudentQrTokens;
 
 })();
 window.changePassword        = changePassword;

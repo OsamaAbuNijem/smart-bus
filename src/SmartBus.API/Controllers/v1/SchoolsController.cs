@@ -8,6 +8,8 @@ using SmartBus.Application.Features.Schools.Commands.DeleteSchool;
 using SmartBus.Application.Features.Schools.Commands.UpdateSchool;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Schools.Queries.GetMySchool;
+using SmartBus.Application.Features.Schools.Queries.GetSchoolEmployeeQrTokens;
+using SmartBus.Application.Features.Schools.Queries.GetSchoolStudentQrTokens;
 using SmartBus.Domain.Enums;
 
 namespace SmartBus.API.Controllers.v1;
@@ -69,6 +71,24 @@ public class SchoolsController : ControllerBase
     {
         var result = await _mediator.Send(new DeleteSchoolCommand(id), cancellationToken);
         return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>SuperAdmin: list every employee-registration QR token for a school.</summary>
+    [HttpGet("{id:guid}/employee-qr-tokens")]
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> GetEmployeeQrTokens(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetSchoolEmployeeQrTokensQuery(id), cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>SuperAdmin: list every student-registration QR token for a school.</summary>
+    [HttpGet("{id:guid}/student-qr-tokens")]
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> GetStudentQrTokens(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetSchoolStudentQrTokensQuery(id), cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
     }
 }
 

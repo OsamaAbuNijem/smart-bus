@@ -27,7 +27,11 @@ public class CreateBusCommandHandler : IRequestHandler<CreateBusCommand, Result<
         {
             PlateNumber = request.PlateNumber,
             Capacity    = request.Capacity,
-            Status      = status
+            Status      = status,
+            // Stamp a one-shot QR token so admins can immediately print the
+            // bus's QR sticker. Token is opaque — the mobile app POSTs it back
+            // verbatim to /trips/scan to spin up a trip.
+            QrToken     = Guid.NewGuid().ToString("N")
         };
 
         await _unitOfWork.Buses.AddAsync(bus, cancellationToken);

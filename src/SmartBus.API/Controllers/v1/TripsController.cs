@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Trips.Commands.CreateTrip;
 using SmartBus.Application.Features.Trips.Commands.DeleteTrip;
+using SmartBus.Application.Features.Trips.Commands.ScanBusQr;
 using SmartBus.Application.Features.Trips.Commands.SetBusSchedule;
 using SmartBus.Application.Features.Trips.Commands.UpdateTrip;
 using SmartBus.Application.Features.Trips.Commands.UpdateTripStatus;
@@ -12,7 +13,6 @@ using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
 using SmartBus.Application.Features.Trips.Queries.GetTripStudents;
 using SmartBus.Domain.Enums;
-using SmartBus.Infrastructure.Jobs;
 
 namespace SmartBus.API.Controllers.v1;
 
@@ -70,24 +70,18 @@ public class TripsController : ControllerBase
     }
 
     /// <summary>
-    /// Manually trigger today's trip generation for both ذهاب and إياب.
-    /// Runs synchronously and bypasses the RepeatDays day-of-week filter
-    /// so every bus with a schedule gets trips regardless of today's weekday.
+    /// Mobile-app entry point — driver/assistant scans a bus QR sticker.
+    /// On success, the server creates (or returns the existing) trip and the
+    /// app navigates straight into the live tracking / boarding view.
     /// </summary>
-    [HttpPost("generate-today")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GenerateToday(
-        [FromServices] TripGenerationJob tripJob,
-        CancellationToken cancellationToken)
+    [HttpPost("scan")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> Scan([FromBody] ScanBusQrRequest request, CancellationToken cancellationToken)
     {
-        var created = await tripJob.RunAsync(forceToday: true);
-        return Ok(new
-        {
-            message = created > 0
-                ? $"تم إنشاء {created} رحلة لليوم."
-                : "جميع رحلات اليوم موجودة مسبقاً أو لا توجد جداول محددة.",
-            created
-        });
+        var result = await _mediator.Send(new ScanBusQrCommand(request.QrToken), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
     }
 
     /// <summary>Get all saved bus schedules (used by the buses grid to show schedule status).</summary>
@@ -169,6 +163,7 @@ public class TripsController : ControllerBase
 
 public record UpdateStatusRequest(TripStatus Status, string? Notes);
 public record UpdateTripRequest(string Name, TripType Type, Guid BusId, Guid? RouteId, DateTime ScheduledDeparture, byte RepeatDays, string? Notes);
+public record ScanBusQrRequest(string QrToken);
 public record BusScheduleRequest(
     string MorningTime,
     string ReturnTime,

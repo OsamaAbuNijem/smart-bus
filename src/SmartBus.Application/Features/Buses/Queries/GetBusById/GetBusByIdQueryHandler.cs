@@ -49,7 +49,8 @@ public class GetBusByIdQueryHandler : IRequestHandler<GetBusByIdQuery, Result<Bu
             schedule?.StudentCount ?? studentIds.Count, studentIds,
             busEntity.LastLocation?.Latitude, busEntity.LastLocation?.Longitude,
             busEntity.CreatedAt,
-            isComplete);
+            isComplete,
+            busEntity.QrToken);
 
         return Result<BusDto>.Success(bus);
     }

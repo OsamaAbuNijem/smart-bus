@@ -47,7 +47,6 @@ public interface IApiClient
     Task<(bool Ok, string? Error)> StartTripAsync(Guid id);
     Task<(bool Ok, string? Error)> CompleteTripAsync(Guid id);
     Task<bool> DeleteTripAsync(Guid id);
-    Task<(bool Ok, string? Message)> GenerateTodayTripsAsync();
     Task<BusScheduleDto?> GetBusScheduleAsync(Guid busId);
     Task<(bool Ok, string? Error)> SetBusScheduleAsync(Guid busId, BusScheduleInput input);
 

@@ -24,6 +24,8 @@ public interface IApplicationDbContext
     DbSet<School> Schools { get; }
     DbSet<BusSchedule> BusSchedules { get; }
     DbSet<BusScheduleStudent> BusScheduleStudents { get; }
+    DbSet<EmployeeQrToken> EmployeeQrTokens { get; }
+    DbSet<StudentQrToken>  StudentQrTokens  { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

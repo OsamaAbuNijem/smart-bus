@@ -120,7 +120,6 @@ public static class DependencyInjection
             opts.ServerTimeout            = TimeSpan.FromMinutes(5);
         });
         services.AddScoped<BusTrackingCleanupJob>();
-        services.AddScoped<TripGenerationJob>();
 
         // Note: ISignalRNotificationService is registered in the API layer (needs Hub type)
 

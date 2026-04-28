@@ -12,6 +12,13 @@ public class Bus : BaseEntity
     public BusStatus Status { get; set; } = BusStatus.Inactive;
     public DateOnly? LastMaintenanceDate { get; set; }
 
+    /// <summary>
+    /// Opaque token printed on the bus's QR sticker. Drivers/assistants scan
+    /// this from the mobile app to start a trip on demand. Generated once at
+    /// bus-creation time and never reused.
+    /// </summary>
+    public string QrToken { get; set; } = default!;
+
     // Pointer to the most recent GPS location (updated on each location push)
     public Guid? LastLocationId { get; set; }
     public BusLocation? LastLocation { get; set; }
