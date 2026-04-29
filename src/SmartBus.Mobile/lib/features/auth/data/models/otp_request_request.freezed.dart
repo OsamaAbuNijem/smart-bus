@@ -1,0 +1,280 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'otp_request_request.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+// dart format off
+T _$identity<T>(T value) => value;
+
+/// @nodoc
+mixin _$OtpRequestRequest {
+
+ String get phoneNumber; String get role;
+/// Create a copy of OtpRequestRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$OtpRequestRequestCopyWith<OtpRequestRequest> get copyWith => _$OtpRequestRequestCopyWithImpl<OtpRequestRequest>(this as OtpRequestRequest, _$identity);
+
+  /// Serializes this OtpRequestRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpRequestRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.role, role) || other.role == role));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,phoneNumber,role);
+
+@override
+String toString() {
+  return 'OtpRequestRequest(phoneNumber: $phoneNumber, role: $role)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $OtpRequestRequestCopyWith<$Res>  {
+  factory $OtpRequestRequestCopyWith(OtpRequestRequest value, $Res Function(OtpRequestRequest) _then) = _$OtpRequestRequestCopyWithImpl;
+@useResult
+$Res call({
+ String phoneNumber, String role
+});
+
+
+
+
+}
+/// @nodoc
+class _$OtpRequestRequestCopyWithImpl<$Res>
+    implements $OtpRequestRequestCopyWith<$Res> {
+  _$OtpRequestRequestCopyWithImpl(this._self, this._then);
+
+  final OtpRequestRequest _self;
+  final $Res Function(OtpRequestRequest) _then;
+
+/// Create a copy of OtpRequestRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? phoneNumber = null,Object? role = null,}) {
+  return _then(_self.copyWith(
+phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [OtpRequestRequest].
+extension OtpRequestRequestPatterns on OtpRequestRequest {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _OtpRequestRequest value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _OtpRequestRequest() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _OtpRequestRequest value)  $default,){
+final _that = this;
+switch (_that) {
+case _OtpRequestRequest():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _OtpRequestRequest value)?  $default,){
+final _that = this;
+switch (_that) {
+case _OtpRequestRequest() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String phoneNumber,  String role)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _OtpRequestRequest() when $default != null:
+return $default(_that.phoneNumber,_that.role);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String phoneNumber,  String role)  $default,) {final _that = this;
+switch (_that) {
+case _OtpRequestRequest():
+return $default(_that.phoneNumber,_that.role);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String phoneNumber,  String role)?  $default,) {final _that = this;
+switch (_that) {
+case _OtpRequestRequest() when $default != null:
+return $default(_that.phoneNumber,_that.role);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _OtpRequestRequest implements OtpRequestRequest {
+  const _OtpRequestRequest({required this.phoneNumber, required this.role});
+  factory _OtpRequestRequest.fromJson(Map<String, dynamic> json) => _$OtpRequestRequestFromJson(json);
+
+@override final  String phoneNumber;
+@override final  String role;
+
+/// Create a copy of OtpRequestRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$OtpRequestRequestCopyWith<_OtpRequestRequest> get copyWith => __$OtpRequestRequestCopyWithImpl<_OtpRequestRequest>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$OtpRequestRequestToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpRequestRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.role, role) || other.role == role));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,phoneNumber,role);
+
+@override
+String toString() {
+  return 'OtpRequestRequest(phoneNumber: $phoneNumber, role: $role)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$OtpRequestRequestCopyWith<$Res> implements $OtpRequestRequestCopyWith<$Res> {
+  factory _$OtpRequestRequestCopyWith(_OtpRequestRequest value, $Res Function(_OtpRequestRequest) _then) = __$OtpRequestRequestCopyWithImpl;
+@override @useResult
+$Res call({
+ String phoneNumber, String role
+});
+
+
+
+
+}
+/// @nodoc
+class __$OtpRequestRequestCopyWithImpl<$Res>
+    implements _$OtpRequestRequestCopyWith<$Res> {
+  __$OtpRequestRequestCopyWithImpl(this._self, this._then);
+
+  final _OtpRequestRequest _self;
+  final $Res Function(_OtpRequestRequest) _then;
+
+/// Create a copy of OtpRequestRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? phoneNumber = null,Object? role = null,}) {
+  return _then(_OtpRequestRequest(
+phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+// dart format on

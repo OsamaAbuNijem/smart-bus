@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          field_rename: pascal
+          explicit_to_json: true
+          create_to_json: true
+          create_factory: true
+          include_if_null: false

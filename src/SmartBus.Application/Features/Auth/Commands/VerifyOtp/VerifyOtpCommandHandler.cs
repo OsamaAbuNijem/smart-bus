@@ -8,7 +8,14 @@ namespace SmartBus.Application.Features.Auth.Commands.VerifyOtp;
 
 public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<OtpLoginResponse>>
 {
-    private const int MaxAttempts = 5;
+    private const int    MaxAttempts  = 5;
+    private const string MasterDevOtp = "1234";
+
+    private static bool IsDevEnvironment()
+        => string.Equals(
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+            "Development",
+            StringComparison.OrdinalIgnoreCase);
 
     private readonly IUnitOfWork  _unitOfWork;
     private readonly ICacheService _cache;
@@ -33,7 +40,21 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
     {
         var phone    = request.PhoneNumber.Trim();
         var role     = request.Role.Trim();
+        var otp      = request.Otp.Trim();
         var cacheKey = $"otp:{role.ToLower()}:{phone}";
+
+        // ── Master OTP for development testing only ───────────────────────
+        if (IsDevEnvironment() && otp == MasterDevOtp)
+        {
+            await _cache.RemoveAsync(cacheKey, cancellationToken);
+            return role.ToLower() switch
+            {
+                "parent"    => await HandleParentAsync(phone, cancellationToken),
+                "driver"    => await HandleDriverAsync(phone, cancellationToken),
+                "assistant" => await HandleAssistantAsync(phone, cancellationToken),
+                _           => Result<OtpLoginResponse>.Failure(T("دور غير معروف.", "Unknown role."))
+            };
+        }
 
         // ── Load OTP record ────────────────────────────────────────────────
         var record = await _cache.GetAsync<OtpRecord>(cacheKey, cancellationToken);
@@ -52,7 +73,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         }
 
         // ── Validate OTP ───────────────────────────────────────────────────
-        if (record.Code != request.Otp.Trim())
+        if (record.Code != otp)
         {
             // Increment attempts
             var updated = record with { Attempts = record.Attempts + 1 };

@@ -1,0 +1,69 @@
+{
+  "@@locale": "en",
+  "appTitle": "SmartBus",
+
+  "loginTitle": "Sign In",
+  "loginAppName": "School Bus Tracker",
+  "loginAppSubtitle": "Keep your child safe on the road",
+  "loginFeatureSafety": "Safety",
+  "loginFeatureLiveTrack": "Live Track",
+  "loginFeaturePeace": "Peace",
+  "loginPhonePlaceholder": "7X XXX XXXX",
+  "loginSendOtp": "Send Verification Code",
+  "loginSendOtpHint": "Get a 4-digit code on your phone",
+  "loginTerms": "Accept Terms & Privacy Policy",
+  "loginInvalidPhone": "Enter a valid phone number",
+  "loginUnknownError": "Something went wrong. Please try again.",
+
+  "otpTitle": "Enter Verification Code",
+  "otpConfirm": "Confirm & Sign In",
+  "otpResendPrefix": "Didn't receive it?",
+  "otpResend": "Resend",
+  "otpExpires": "Expires {time}",
+  "@otpExpires": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "otpInvalid": "Invalid or expired code",
+  "otpFooter": "Your code is private, never share it with anyone",
+
+  "navDashboard": "Dashboard",
+  "navTrips": "Trips",
+  "navStudents": "Students",
+  "navDrivers": "Drivers",
+  "navBuses": "Buses",
+  "navAlerts": "Alerts",
+  "navSettings": "Settings",
+  "navLogout": "Sign out",
+
+  "validationRequired": "This field is required",
+  "validationEmail": "Enter a valid email",
+  "validationPhone": "Enter a valid phone number",
+  "validationNationalNumber": "Enter a valid national number",
+  "validationMinLength": "Must be at least {n} characters",
+  "@validationMinLength": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+
+  "commonRetry": "Retry",
+  "commonCancel": "Cancel",
+  "commonOk": "OK",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonEdit": "Edit",
+  "commonLoading": "Loading…",
+
+  "homeWelcome": "Welcome, {name}",
+  "@homeWelcome": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Next",
+  "onboardingGetStarted": "Get started",
+  "onboardingTitle1": "Track buses in real time",
+  "onboardingDescription1": "See exactly where your child's bus is, every step of the way.",
+  "onboardingTitle2": "Arrival alerts",
+  "onboardingDescription2": "Get notified for pickup, drop-off, and unexpected delays.",
+  "onboardingTitle3": "Stay connected",
+  "onboardingDescription3": "Direct line to drivers and school staff when it matters."
+}
