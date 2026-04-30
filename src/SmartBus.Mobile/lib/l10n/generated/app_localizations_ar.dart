@@ -12,43 +12,81 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appTitle => 'سمارت باص';
 
   @override
-  String get loginTitle => 'تسجيل الدخول';
-
-  @override
   String get loginAppName => 'متعقّب الباص المدرسي';
 
   @override
-  String get loginAppSubtitle => 'حافظ على سلامة طفلك في الطريق';
+  String get loginAppSubtitle => 'حافظ على سلامة طفلك في كل رحلة';
 
   @override
-  String get loginFeatureSafety => 'الأمان';
+  String get loginBadgeSecure => 'آمن';
 
   @override
-  String get loginFeatureLiveTrack => 'تتبّع مباشر';
+  String get loginBadgeLiveGps => 'تتبّع حي';
 
   @override
-  String get loginFeaturePeace => 'راحة بال';
+  String get loginBadgeTrusted => 'موثوق';
+
+  @override
+  String get loginEyebrow => 'أهلاً بعودتك';
+
+  @override
+  String get loginCardTitle => 'سجّل الدخول للمتابعة';
+
+  @override
+  String get loginCardDesc => 'اختر طريقة الدخول إلى حسابك';
+
+  @override
+  String get loginTabPhone => 'الهاتف';
+
+  @override
+  String get loginTabScan => 'مسح البطاقة';
+
+  @override
+  String get loginPhoneLabel => 'رقم الهاتف';
 
   @override
   String get loginPhonePlaceholder => '7X XXX XXXX';
 
   @override
+  String get loginPhoneHelp => 'سنرسل لك رمز تحقق من 4 أرقام';
+
+  @override
   String get loginSendOtp => 'إرسال رمز التحقق';
 
   @override
-  String get loginSendOtpHint => 'ستصلك رسالة برمز من 4 أرقام';
+  String get loginTerms => 'بمتابعتك فإنك توافق على الشروط وسياسة الخصوصية';
 
   @override
-  String get loginTerms => 'الموافقة على الشروط وسياسة الخصوصية';
+  String get loginScanComingSoon => 'تسجيل الدخول بالبطاقة قريباً';
 
   @override
   String get loginInvalidPhone => 'أدخل رقم هاتف صحيحاً';
 
   @override
+  String get loginPhoneNotRegistered =>
+      'هذا الرقم غير مسجّل لدينا. يرجى التواصل مع إدارة المدرسة.';
+
+  @override
+  String get loginNetworkError =>
+      'خطأ في الشبكة. تحقّق من الاتصال وحاول مرة أخرى.';
+
+  @override
   String get loginUnknownError => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
 
   @override
-  String get otpTitle => 'أدخل رمز التحقق';
+  String get otpHeroTitle => 'تأكيد رقمك';
+
+  @override
+  String get otpHeroSubtitle => 'تم إرسال رمز إلى جهازك';
+
+  @override
+  String get otpEyebrow => 'التحقق';
+
+  @override
+  String get otpTitle => 'أدخل الرمز المكوّن من 4 أرقام';
+
+  @override
+  String get otpSentTo => 'أُرسل إلى';
 
   @override
   String get otpConfirm => 'تأكيد وتسجيل الدخول';
@@ -60,15 +98,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get otpResend => 'إعادة الإرسال';
 
   @override
-  String otpExpires(String time) {
-    return 'ينتهي بعد $time';
-  }
-
-  @override
   String get otpInvalid => 'الرمز غير صحيح أو منتهي الصلاحية';
 
   @override
-  String get otpFooter => 'رمزك خاص بك، لا تشاركه مع أي شخص';
+  String get otpFooter =>
+      'لا تشارك هذا الرمز — لن يطلبه منك متعقّب الباص المدرسي أبداً';
 
   @override
   String get navDashboard => 'لوحة التحكم';
@@ -136,6 +170,123 @@ class AppLocalizationsAr extends AppLocalizations {
   String homeWelcome(String name) {
     return 'مرحباً، $name';
   }
+
+  @override
+  String get homeParentTitle => 'لوحة ولي الأمر';
+
+  @override
+  String get homeDriverTitle => 'لوحة السائق';
+
+  @override
+  String get homeAssistantTitle => 'لوحة المساعد';
+
+  @override
+  String get homeParentTrack => 'تتبّع الباص';
+
+  @override
+  String get homeParentTrips => 'رحلة اليوم';
+
+  @override
+  String get homeParentAbsence => 'الإبلاغ عن غياب';
+
+  @override
+  String get homeDriverStartTrip => 'بدء رحلة';
+
+  @override
+  String get homeDriverActiveTrip => 'الرحلة الحالية';
+
+  @override
+  String get homeDriverHistory => 'سجلّ الرحلات';
+
+  @override
+  String get homeDriverAttendance => 'الحضور';
+
+  @override
+  String get homeAssistantBoarding => 'تسجيل الصعود';
+
+  @override
+  String get homeAssistantScan => 'مسح البطاقة';
+
+  @override
+  String get homeAssistantRoster => 'كشف اليوم';
+
+  @override
+  String get parentGreetingEyebrow => 'صباح الخير';
+
+  @override
+  String get parentNoChildren => 'لا يوجد أطفال مرتبطون بحسابك حتى الآن.';
+
+  @override
+  String get parentNoTrips => 'لا توجد رحلات بعد.';
+
+  @override
+  String get parentTripEyebrow => 'آخر رحلة';
+
+  @override
+  String get parentTripPickup => 'الاستلام';
+
+  @override
+  String get parentTripDropoff => 'التوصيل';
+
+  @override
+  String get parentMetaBus => 'الحافلة';
+
+  @override
+  String get parentMetaDriver => 'السائق';
+
+  @override
+  String get parentMetaDuration => 'المدة';
+
+  @override
+  String get parentDayToday => 'اليوم';
+
+  @override
+  String get parentDayYesterday => 'أمس';
+
+  @override
+  String get parentStatusArrived => 'وصل بأمان';
+
+  @override
+  String get parentStatusOnBus => 'في الحافلة';
+
+  @override
+  String get parentStatusAwaiting => 'بانتظار اليوم';
+
+  @override
+  String get parentSectionQuickActions => 'إجراءات سريعة';
+
+  @override
+  String get parentSectionRecentTrips => 'آخر الرحلات';
+
+  @override
+  String get parentViewAll => 'عرض الكل';
+
+  @override
+  String get parentActionStudentInfo => 'معلومات الطالب';
+
+  @override
+  String get parentActionStudentInfoSub => 'عرض التفاصيل';
+
+  @override
+  String get parentActionTripHistory => 'سجل الرحلات';
+
+  @override
+  String get parentActionTripHistorySub => 'الرحلات السابقة';
+
+  @override
+  String get parentActionAbsence => 'الإبلاغ عن غياب';
+
+  @override
+  String get parentActionAbsenceSub => 'إعلام السائق';
+
+  @override
+  String get parentTagOnTime => 'في الموعد';
+
+  @override
+  String get parentTagAbsent => 'غائب';
+
+  @override
+  String get parentTagPending => 'قيد الانتظار';
 
   @override
   String get onboardingSkip => 'تخطّي';

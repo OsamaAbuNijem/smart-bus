@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sign In — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#F5C518;
+    --yellow-deep:#E0AE08;
+    --yellow-soft:#FFF8DC;
+    --yellow-tint:#FFFBEB;
+    --ink:#0F172A;
+    --ink-soft:#1E293B;
+    --slate-700:#334155;
+    --slate-500:#64748B;
+    --slate-400:#94A3B8;
+    --slate-300:#CBD5E1;
+    --slate-200:#E2E8F0;
+    --slate-100:#F1F5F9;
+    --slate-50:#F8FAFC;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+    --emerald:#059669;
+    --emerald-soft:#D1FAE5;
+    --violet:#7C3AED;
+    --violet-soft:#EDE9FE;
+    --white:#FFFFFF;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+    --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.08), 0 8px 10px -6px rgba(15,23,42,0.04);
+    --shadow-yellow: 0 8px 24px -8px rgba(245,197,24,0.55);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+
+  body{
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 10%, #FFF8DC 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 90%, #EFF6FF 0%, transparent 55%),
+      #F4F4F5;
+    background-attachment: fixed;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:56px 24px;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+
+  .sw{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .sl{
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-500);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sl::before, .sl::after{
+    content:'';
+    width:24px;
+    height:1.5px;
+    background:var(--slate-300);
+  }
+
+  .phone{
+    width:380px;
+    min-height:824px;
+    background:#fff;
+    border-radius:54px;
+    border:9px solid #0a0a0a;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:
+      0 0 0 2px #1f1f1f,
+      0 30px 60px -20px rgba(15,23,42,0.30),
+      0 18px 36px -18px rgba(15,23,42,0.20);
+    position:relative;
+  }
+  .notch{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:28px;
+    background:#0a0a0a;
+    border-radius:0 0 18px 18px;
+    z-index:50;
+  }
+
+  .statusbar{
+    height:46px;
+    background:transparent;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 28px 6px;
+    flex-shrink:0;
+    position:relative;
+    z-index:5;
+  }
+  .statusbar.dark{color:#fff;}
+  .statusbar .time{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-0.01em;}
+  .statusbar.dark .time{color:#fff;}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;color:var(--ink);}
+  .statusbar.dark .icons{color:#fff;}
+
+  .screen{
+    background:linear-gradient(180deg, var(--yellow-tint) 0%, #FFFFFF 60%);
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .orb{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(40px);
+    opacity:0.5;
+    pointer-events:none;
+  }
+  .orb-1{width:200px;height:200px;background:var(--yellow);top:-60px;left:-50px;}
+  .orb-2{width:160px;height:160px;background:var(--blue-soft);top:120px;right:-40px;opacity:0.7;}
+
+  .lang-btn{
+    position:absolute;
+    top:18px;
+    right:22px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(255,255,255,0.85);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border:1px solid rgba(15,23,42,0.06);
+    border-radius:100px;
+    padding:7px 12px 7px 9px;
+    cursor:pointer;
+    text-decoration:none;
+    z-index:20;
+    transition:all 0.2s ease;
+    box-shadow:var(--shadow-sm);
+  }
+  .lang-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-md);}
+  .lang-btn svg{flex-shrink:0;}
+  .lang-btn span{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    font-family:'Cairo',sans-serif;
+  }
+
+  .top{
+    padding:34px 28px 14px;
+    text-align:center;
+    flex-shrink:0;
+    position:relative;
+    z-index:2;
+  }
+
+  .app-icon{
+    width:76px;
+    height:76px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    border-radius:22px;
+    margin:0 auto 16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:
+      var(--shadow-yellow),
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -2px 0 rgba(0,0,0,0.08);
+    position:relative;
+  }
+  .app-icon::after{
+    content:'';
+    position:absolute;
+    inset:-4px;
+    border-radius:26px;
+    background:linear-gradient(135deg, rgba(245,197,24,0.3), transparent);
+    z-index:-1;
+    filter:blur(8px);
+  }
+
+  .bus-svg{width:42px;height:42px;}
+
+  .app-name{
+    font-size:24px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.025em;
+    line-height:1.1;
+  }
+  .app-sub{
+    font-size:13px;
+    color:var(--slate-500);
+    margin-top:6px;
+    font-weight:500;
+    letter-spacing:-0.005em;
+  }
+
+  .badges{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:18px;
+    flex-wrap:wrap;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 10px;
+    background:rgba(255,255,255,0.7);
+    backdrop-filter:blur(8px);
+    border:1px solid var(--slate-200);
+    border-radius:100px;
+    font-size:11px;
+    font-weight:600;
+    color:var(--slate-700);
+    letter-spacing:-0.005em;
+  }
+  .badge.b-blue{color:var(--blue);border-color:#BFDBFE;background:rgba(239,246,255,0.8);}
+  .badge.b-emerald{color:var(--emerald);border-color:#A7F3D0;background:rgba(209,250,229,0.6);}
+  .badge.b-violet{color:var(--violet);border-color:#DDD6FE;background:rgba(237,233,254,0.6);}
+  .badge svg{flex-shrink:0;}
+
+  .card-wrap{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:18px 20px 14px;
+    position:relative;
+    z-index:2;
+  }
+  .card{
+    background:#FFFFFF;
+    border-radius:24px;
+    border:1px solid var(--slate-200);
+    padding:26px 22px 22px;
+    box-shadow:var(--shadow-lg);
+    position:relative;
+  }
+
+  .card-eyebrow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--yellow-deep);
+    margin-bottom:8px;
+  }
+  .card-eyebrow::before, .card-eyebrow::after{
+    content:'';
+    width:14px;
+    height:1.5px;
+    background:linear-gradient(90deg, transparent, var(--yellow));
+  }
+  .card-eyebrow::after{background:linear-gradient(270deg, transparent, var(--yellow));}
+
+  .card-title{
+    font-size:22px;
+    font-weight:800;
+    color:var(--ink);
+    text-align:center;
+    margin-bottom:4px;
+    letter-spacing:-0.03em;
+  }
+  .card-desc{
+    font-size:13px;
+    color:var(--slate-500);
+    text-align:center;
+    margin-bottom:20px;
+    line-height:1.5;
+    font-weight:500;
+  }
+
+  .seg{
+    display:flex;
+    background:var(--slate-100);
+    border-radius:14px;
+    padding:4px;
+    margin-bottom:20px;
+  }
+  .seg-btn{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:9px 8px;
+    border-radius:11px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--slate-500);
+    cursor:pointer;
+    font-family:inherit;
+    letter-spacing:-0.01em;
+    text-decoration:none;
+    text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    transition:all 0.2s;
+  }
+  .seg-btn.active{
+    background:#FFFFFF;
+    color:var(--ink);
+    box-shadow:var(--shadow-sm);
+  }
+  .seg-btn svg{flex-shrink:0;}
+
+  .field-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-700);
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+    display:block;
+  }
+
+  .phone-row{
+    display:flex;
+    align-items:center;
+    background:var(--slate-50);
+    border:1.5px solid var(--slate-200);
+    border-radius:14px;
+    padding:0 14px;
+    margin-bottom:6px;
+    height:58px;
+    direction:ltr;
+    transition:all 0.2s;
+  }
+  .phone-row:focus-within{
+    border-color:var(--yellow-deep);
+    background:#FFFFFF;
+    box-shadow:0 0 0 4px rgba(245,197,24,0.12);
+  }
+  .flag{font-size:20px;flex-shrink:0;margin-right:10px;line-height:1;}
+  .code{
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    flex-shrink:0;
+    padding-right:12px;
+    border-right:1.5px solid var(--slate-200);
+    margin-right:12px;
+    height:24px;
+    display:flex;
+    align-items:center;
+    letter-spacing:-0.01em;
+  }
+  .pnum{
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--ink);
+    font-family:inherit;
+    direction:ltr;
+    text-align:left;
+    letter-spacing:0.01em;
+  }
+  .pnum::placeholder{color:var(--slate-400);font-weight:500;}
+
+  .field-help{
+    font-size:11.5px;
+    color:var(--slate-400);
+    margin-bottom:18px;
+    padding-left:4px;
+    font-weight:500;
+  }
+
+  .btn{
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    border-radius:14px;
+    padding:16px;
+    text-align:center;
+    cursor:pointer;
+    border:none;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    box-shadow:
+      var(--shadow-yellow),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+    transition:all 0.15s;
+    font-family:inherit;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 12px 28px -8px rgba(245,197,24,0.65), inset 0 1px 0 rgba(255,255,255,0.4);}
+  .btn span{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;}
+  .btn svg{color:var(--ink);}
+
+  .terms{
+    font-size:11px;
+    color:var(--slate-400);
+    text-align:center;
+    padding:14px 28px 22px;
+    line-height:1.6;
+    margin-top:auto;
+    font-weight:500;
+    position:relative;
+    z-index:2;
+  }
+  .terms a{color:var(--slate-700);font-weight:600;text-decoration:none;border-bottom:1px solid var(--slate-300);}
+
+  .otp-boxes{display:flex;justify-content:center;gap:10px;margin:8px 0 22px;}
+  .otp-b{
+    width:58px;
+    height:64px;
+    background:var(--slate-50);
+    border:1.5px solid var(--slate-200);
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    font-weight:700;
+    color:var(--ink);
+    transition:all 0.2s;
+  }
+  .otp-b.filled{
+    border-color:var(--yellow-deep);
+    background:var(--yellow-tint);
+    color:var(--ink);
+    box-shadow:0 0 0 4px rgba(245,197,24,0.10);
+  }
+  .otp-b.active{
+    border-color:var(--yellow-deep);
+    border-width:2px;
+    background:#FFFFFF;
+    box-shadow:0 0 0 4px rgba(245,197,24,0.18);
+    position:relative;
+  }
+  .otp-b.active::after{
+    content:'';
+    width:1.5px;
+    height:24px;
+    background:var(--yellow-deep);
+    animation:blink 1s infinite;
+  }
+  @keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+
+  .rt-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:0 4px;}
+  .rt-left{font-size:12.5px;color:var(--slate-500);font-weight:500;}
+  .rt-left b{color:var(--blue);font-weight:700;cursor:pointer;border-bottom:1.5px solid currentColor;}
+  .rt-right{font-size:12.5px;color:var(--slate-500);font-weight:600;display:inline-flex;align-items:center;gap:5px;}
+  .rt-right svg{color:var(--slate-400);}
+
+  .otp-sent{font-size:12.5px;color:var(--slate-500);text-align:center;margin-bottom:14px;font-weight:500;}
+  .otp-sent b{color:var(--ink);font-weight:700;}
+
+  /* ========== SCANNER SCREEN (DARK CAMERA) ========== */
+  .screen-scanner{
+    background:#0a0a0a;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .camera-feed{
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse at 30% 20%, #2a2520 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, #1a1814 0%, transparent 55%),
+      linear-gradient(135deg, #1a1814 0%, #0a0a0a 60%, #141210 100%);
+    z-index:1;
+  }
+  .camera-feed::before{
+    content:'';
+    position:absolute;
+    width:280px;
+    height:200px;
+    background:radial-gradient(ellipse, rgba(120,90,60,0.15) 0%, transparent 70%);
+    top:30%;
+    left:10%;
+    filter:blur(30px);
+  }
+  .camera-feed::after{
+    content:'';
+    position:absolute;
+    width:240px;
+    height:180px;
+    background:radial-gradient(ellipse, rgba(60,80,120,0.12) 0%, transparent 70%);
+    bottom:20%;
+    right:5%;
+    filter:blur(35px);
+  }
+
+  .camera-grain{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    opacity:0.35;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.6'/></svg>");
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+
+  .scan-top{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    padding:14px 22px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    z-index:30;
+  }
+  .scan-back, .scan-flash{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    text-decoration:none;
+    color:#fff;
+    transition:all 0.2s;
+  }
+  .scan-back:hover, .scan-flash:hover{background:rgba(255,255,255,0.2);}
+  .scan-title{
+    font-size:14px;
+    font-weight:700;
+    color:#fff;
+    letter-spacing:-0.01em;
+  }
+  .scan-flash.on{
+    background:var(--yellow);
+    border-color:var(--yellow);
+    color:var(--ink);
+    box-shadow:0 0 16px rgba(245,197,24,0.5);
+  }
+
+  .scanner-area{
+    position:absolute;
+    inset:0;
+    z-index:10;
+  }
+
+  .scan-window{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-58%);
+    width:260px;
+    height:260px;
+    border-radius:32px;
+    box-shadow:0 0 0 9999px rgba(10,10,10,0.78);
+    z-index:15;
+  }
+  .scan-window::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:32px;
+    box-shadow:inset 0 0 60px rgba(245,197,24,0.08);
+  }
+
+  .sc-corner{
+    position:absolute;
+    width:38px;
+    height:38px;
+    border:3px solid var(--yellow);
+    filter:drop-shadow(0 0 6px rgba(245,197,24,0.5));
+  }
+  .sc-tl{top:-2px;left:-2px;border-right:none;border-bottom:none;border-radius:14px 0 0 0;}
+  .sc-tr{top:-2px;right:-2px;border-left:none;border-bottom:none;border-radius:0 14px 0 0;}
+  .sc-bl{bottom:-2px;left:-2px;border-right:none;border-top:none;border-radius:0 0 0 14px;}
+  .sc-br{bottom:-2px;right:-2px;border-left:none;border-top:none;border-radius:0 0 14px 0;}
+
+  .scan-line{
+    position:absolute;
+    left:14px;
+    right:14px;
+    height:2px;
+    border-radius:2px;
+    background:linear-gradient(90deg, transparent 0%, var(--yellow) 20%, #FFE066 50%, var(--yellow) 80%, transparent 100%);
+    box-shadow:0 0 16px var(--yellow), 0 0 30px rgba(245,197,24,0.6);
+    top:0;
+    animation:scan 2.6s ease-in-out infinite;
+  }
+  @keyframes scan{
+    0%,100%{top:14px;opacity:0.95;}
+    50%{top:calc(100% - 16px);opacity:1;}
+  }
+
+  .scan-glow{
+    position:absolute;
+    inset:14px;
+    border-radius:20px;
+    background:linear-gradient(180deg, rgba(245,197,24,0.04) 0%, rgba(245,197,24,0.10) 50%, rgba(245,197,24,0.04) 100%);
+  }
+
+  /* Floating physical-card preview inside the camera view */
+  .card-preview{
+    position:absolute;
+    inset:30px;
+    border-radius:14px;
+    background:linear-gradient(135deg, #1a1612 0%, #2a241a 100%);
+    border:1px solid rgba(255,255,255,0.08);
+    transform:rotate(-5deg);
+    display:flex;
+    flex-direction:column;
+    padding:14px;
+    overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,0.5);
+    opacity:0.85;
+  }
+  .card-preview::before{
+    content:'';
+    position:absolute;
+    top:-30%;
+    left:-30%;
+    width:160%;
+    height:60%;
+    background:linear-gradient(120deg, transparent 30%, rgba(245,197,24,0.12) 50%, transparent 70%);
+    transform:rotate(-15deg);
+  }
+  .cp-brand{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:var(--yellow);
+    font-size:8.5px;
+    font-weight:800;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:auto;
+  }
+  .cp-brand-icon{
+    width:14px;
+    height:14px;
+    background:var(--yellow);
+    border-radius:3px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .cp-bottom{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .cp-qr{
+    width:74px;
+    height:74px;
+    background:#fff;
+    border-radius:6px;
+    padding:5px;
+    flex-shrink:0;
+  }
+  .cp-qr svg{width:100%;height:100%;}
+  .cp-info{
+    color:rgba(255,255,255,0.7);
+    font-size:7.5px;
+    font-weight:600;
+    letter-spacing:0.05em;
+    text-align:right;
+    line-height:1.5;
+    padding-bottom:2px;
+  }
+  .cp-info-num{
+    color:#fff;
+    font-size:9px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:0.08em;
+  }
+
+  .scan-status{
+    position:absolute;
+    top:calc(50% + 145px);
+    left:50%;
+    transform:translateX(-50%);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    background:rgba(255,255,255,0.10);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:100px;
+    z-index:20;
+  }
+  .scan-status .pulse-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 0 0 rgba(245,197,24,0.6);
+    animation:pulseY 1.6s infinite;
+  }
+  @keyframes pulseY{
+    0%{box-shadow:0 0 0 0 rgba(245,197,24,0.7);}
+    70%{box-shadow:0 0 0 8px rgba(245,197,24,0);}
+    100%{box-shadow:0 0 0 0 rgba(245,197,24,0);}
+  }
+  .scan-status span{
+    font-size:11.5px;
+    font-weight:700;
+    color:#fff;
+    letter-spacing:0.01em;
+  }
+
+  .scan-sheet{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    background:linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.85) 25%, #0a0a0a 50%);
+    padding:32px 22px 26px;
+    z-index:25;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .scan-instruction{
+    text-align:center;
+    color:#fff;
+    margin-bottom:4px;
+  }
+  .scan-instruction h3{
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:6px;
+  }
+  .scan-instruction p{
+    font-size:13px;
+    color:rgba(255,255,255,0.65);
+    font-weight:500;
+    line-height:1.5;
+    max-width:280px;
+    margin:0 auto;
+  }
+
+  .help-row{
+    display:flex;
+    gap:10px;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:14px;
+    padding:12px 14px;
+    align-items:center;
+  }
+  .help-icon{
+    width:32px;
+    height:32px;
+    border-radius:9px;
+    background:rgba(245,197,24,0.15);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--yellow);
+    flex-shrink:0;
+  }
+  .help-text{
+    flex:1;
+    font-size:12px;
+    color:rgba(255,255,255,0.85);
+    line-height:1.4;
+    font-weight:500;
+  }
+  .help-text b{color:#fff;font-weight:700;}
+
+  .scan-actions{
+    display:flex;
+    gap:10px;
+    margin-top:4px;
+  }
+  .scan-action{
+    flex:1;
+    padding:13px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:13px;
+    color:#fff;
+    font-size:12.5px;
+    font-weight:700;
+    text-align:center;
+    cursor:pointer;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    transition:all 0.2s;
+    font-family:inherit;
+  }
+  .scan-action:hover{background:rgba(255,255,255,0.14);}
+  .scan-action.primary{
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    border-color:transparent;
+    color:var(--ink);
+    box-shadow:0 8px 20px -6px rgba(245,197,24,0.55);
+  }
+
+  @media (max-width: 900px){
+    body{padding:32px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================ SCREEN 1: SIGN IN ============================ -->
+<div class="sw">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+
+      <a class="lang-btn" href="login-ar.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>عربي</span>
+      </a>
+
+      <div class="top">
+        <div class="app-icon">
+          <svg class="bus-svg" viewBox="0 0 48 48" fill="none">
+            <rect x="8" y="14" width="32" height="22" rx="5" fill="#fff"/>
+            <rect x="11" y="18" width="6" height="7" rx="1.5" fill="#F5C518" stroke="#B8960C" stroke-width="1"/>
+            <rect x="19" y="18" width="6" height="7" rx="1.5" fill="#F5C518" stroke="#B8960C" stroke-width="1"/>
+            <rect x="27" y="18" width="6" height="7" rx="1.5" fill="#F5C518" stroke="#B8960C" stroke-width="1"/>
+            <rect x="35" y="20" width="3" height="5" rx="1" fill="#fff" stroke="#B8960C" stroke-width="0.8"/>
+            <circle cx="15" cy="38" r="3.5" fill="#0F172A"/>
+            <circle cx="15" cy="38" r="1.5" fill="#fff"/>
+            <circle cx="33" cy="38" r="3.5" fill="#0F172A"/>
+            <circle cx="33" cy="38" r="1.5" fill="#fff"/>
+            <rect x="9" y="29" width="3" height="2" rx="0.5" fill="#EF4444"/>
+          </svg>
+        </div>
+        <div class="app-name">School Bus Tracker</div>
+        <div class="app-sub">Keep your child safe on every ride</div>
+        <div class="badges">
+          <span class="badge b-blue">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secure
+          </span>
+          <span class="badge b-emerald">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Live GPS
+          </span>
+          <span class="badge b-violet">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
+            Trusted
+          </span>
+        </div>
+      </div>
+
+      <div class="card-wrap">
+        <div class="card">
+          <div class="card-eyebrow">Welcome Back</div>
+          <div class="card-title">Sign in to continue</div>
+          <div class="card-desc">Choose how you'd like to access your account</div>
+
+          <div class="seg">
+            <button class="seg-btn active">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Phone
+            </button>
+            <a class="seg-btn" href="#scanner-screen">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7V5a2 2 0 0 0-2-2h-2"/><path d="M3 17v2a2 2 0 0 0 2 2h2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M5 3a2 2 0 0 0-2 2v2"/><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+              Scan Card
+            </a>
+          </div>
+
+          <label class="field-label">Phone number</label>
+          <div class="phone-row">
+            <span class="flag">🇯🇴</span>
+            <div class="code">+962</div>
+            <input class="pnum" type="tel" placeholder="7X XXX XXXX"/>
+          </div>
+          <div class="field-help">We'll send a 4-digit verification code</div>
+
+          <button class="btn">
+            <span>Send verification code</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="terms">
+        By continuing you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="sl">01 — Sign In</div>
+</div>
+
+<!-- ============================ SCREEN 2: QR CARD SCANNER ============================ -->
+<div class="sw" id="scanner-screen">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar dark">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen-scanner">
+      <!-- Simulated dark camera feed -->
+      <div class="camera-feed"></div>
+      <div class="camera-grain"></div>
+
+      <!-- Top header: back / title / flash -->
+      <div class="scan-top">
+        <a class="scan-back" href="#" aria-label="Back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <div class="scan-title">Scan your card</div>
+        <button class="scan-flash on" aria-label="Toggle flash">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </button>
+      </div>
+
+      <!-- Scanner area -->
+      <div class="scanner-area">
+        <div class="scan-window">
+          <div class="scan-glow"></div>
+
+          <!-- Floating physical card preview inside the camera frame -->
+          <div class="card-preview">
+            <div class="cp-brand">
+              <div class="cp-brand-icon">
+                <svg width="9" height="9" viewBox="0 0 48 48" fill="none">
+                  <rect x="8" y="14" width="32" height="22" rx="5" fill="#0F172A"/>
+                  <rect x="12" y="19" width="6" height="6" fill="#F5C518"/>
+                  <rect x="20" y="19" width="6" height="6" fill="#F5C518"/>
+                  <rect x="28" y="19" width="6" height="6" fill="#F5C518"/>
+                </svg>
+              </div>
+              Bus Tracker
+            </div>
+            <div class="cp-bottom">
+              <div class="cp-qr">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="100" height="100" fill="#fff"/>
+                  <g fill="#0F172A">
+                    <rect x="6" y="6" width="22" height="22" rx="3"/>
+                    <rect x="10" y="10" width="14" height="14" rx="1.5" fill="#fff"/>
+                    <rect x="13" y="13" width="8" height="8" rx="1" fill="#0F172A"/>
+                    <rect x="72" y="6" width="22" height="22" rx="3"/>
+                    <rect x="76" y="10" width="14" height="14" rx="1.5" fill="#fff"/>
+                    <rect x="79" y="13" width="8" height="8" rx="1" fill="#0F172A"/>
+                    <rect x="6" y="72" width="22" height="22" rx="3"/>
+                    <rect x="10" y="76" width="14" height="14" rx="1.5" fill="#fff"/>
+                    <rect x="13" y="79" width="8" height="8" rx="1" fill="#0F172A"/>
+
+                    <rect x="34" y="6" width="4" height="4"/><rect x="44" y="6" width="4" height="4"/><rect x="54" y="6" width="4" height="4"/><rect x="64" y="6" width="4" height="4"/>
+                    <rect x="40" y="14" width="4" height="4"/><rect x="50" y="14" width="4" height="4"/><rect x="60" y="14" width="4" height="4"/>
+                    <rect x="34" y="22" width="4" height="4"/><rect x="46" y="22" width="4" height="4"/><rect x="56" y="22" width="4" height="4"/><rect x="66" y="22" width="4" height="4"/>
+
+                    <rect x="6" y="34" width="4" height="4"/><rect x="16" y="34" width="4" height="4"/><rect x="26" y="34" width="4" height="4"/><rect x="36" y="34" width="4" height="4"/><rect x="46" y="34" width="4" height="4"/><rect x="56" y="34" width="4" height="4"/><rect x="66" y="34" width="4" height="4"/><rect x="76" y="34" width="4" height="4"/><rect x="86" y="34" width="4" height="4"/>
+                    <rect x="10" y="42" width="4" height="4"/><rect x="22" y="42" width="4" height="4"/><rect x="32" y="42" width="4" height="4"/><rect x="42" y="42" width="4" height="4"/><rect x="52" y="42" width="4" height="4"/><rect x="62" y="42" width="4" height="4"/><rect x="72" y="42" width="4" height="4"/><rect x="82" y="42" width="4" height="4"/><rect x="90" y="42" width="4" height="4"/>
+                    <rect x="6" y="50" width="4" height="4"/><rect x="18" y="50" width="4" height="4"/><rect x="28" y="50" width="4" height="4"/><rect x="38" y="50" width="4" height="4"/><rect x="48" y="50" width="4" height="4"/><rect x="58" y="50" width="4" height="4"/><rect x="68" y="50" width="4" height="4"/><rect x="78" y="50" width="4" height="4"/><rect x="88" y="50" width="4" height="4"/>
+                    <rect x="14" y="58" width="4" height="4"/><rect x="24" y="58" width="4" height="4"/><rect x="34" y="58" width="4" height="4"/><rect x="44" y="58" width="4" height="4"/><rect x="54" y="58" width="4" height="4"/><rect x="64" y="58" width="4" height="4"/><rect x="74" y="58" width="4" height="4"/><rect x="84" y="58" width="4" height="4"/>
+
+                    <rect x="34" y="66" width="4" height="4"/><rect x="44" y="66" width="4" height="4"/><rect x="54" y="66" width="4" height="4"/><rect x="64" y="66" width="4" height="4"/><rect x="74" y="66" width="4" height="4"/><rect x="84" y="66" width="4" height="4"/>
+                    <rect x="34" y="74" width="4" height="4"/><rect x="46" y="74" width="4" height="4"/><rect x="56" y="74" width="4" height="4"/><rect x="68" y="74" width="4" height="4"/><rect x="78" y="74" width="4" height="4"/><rect x="88" y="74" width="4" height="4"/>
+                    <rect x="38" y="82" width="4" height="4"/><rect x="50" y="82" width="4" height="4"/><rect x="62" y="82" width="4" height="4"/><rect x="74" y="82" width="4" height="4"/><rect x="84" y="82" width="4" height="4"/>
+                    <rect x="34" y="90" width="4" height="4"/><rect x="44" y="90" width="4" height="4"/><rect x="54" y="90" width="4" height="4"/><rect x="64" y="90" width="4" height="4"/><rect x="78" y="90" width="4" height="4"/><rect x="88" y="90" width="4" height="4"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="cp-info">
+                MEMBER<br/>
+                <span class="cp-info-num">•••• 4821</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scanning laser line -->
+          <div class="scan-line"></div>
+
+          <!-- Corner brackets -->
+          <div class="sc-corner sc-tl"></div>
+          <div class="sc-corner sc-tr"></div>
+          <div class="sc-corner sc-bl"></div>
+          <div class="sc-corner sc-br"></div>
+        </div>
+
+        <!-- Live status pill -->
+        <div class="scan-status">
+          <div class="pulse-dot"></div>
+          <span>Looking for QR code…</span>
+        </div>
+      </div>
+
+      <!-- Bottom info / actions -->
+      <div class="scan-sheet">
+        <div class="scan-instruction">
+          <h3>Hold your card steady</h3>
+          <p>Place your School Bus Tracker card inside the frame to sign in or register</p>
+        </div>
+
+        <div class="help-row">
+          <div class="help-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <div class="help-text">No card yet? Get one from your school's <b>transport office</b></div>
+        </div>
+
+        <div class="scan-actions">
+          <a class="scan-action" href="#">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="12" x2="6" y2="12.01"/><line x1="10" y1="12" x2="10" y2="12.01"/><line x1="14" y1="12" x2="14" y2="12.01"/><line x1="18" y1="12" x2="18" y2="12.01"/></svg>
+            Enter code manually
+          </a>
+          <a class="scan-action primary" href="#">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Use phone instead
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sl">02 — Scan Card</div>
+</div>
+
+<!-- ============================ SCREEN 3: OTP ============================ -->
+<div class="sw">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+
+      <a class="lang-btn" href="login-ar.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>عربي</span>
+      </a>
+
+      <div class="top">
+        <div class="app-icon">
+          <svg class="bus-svg" viewBox="0 0 48 48" fill="none">
+            <rect x="8" y="14" width="32" height="22" rx="5" fill="#fff"/>
+            <rect x="11" y="18" width="6" height="7" rx="1.5" fill="#F5C518" stroke="#B8960C" stroke-width="1"/>
+            <rect x="19" y="18" width="6" height="7" rx="1.5" fill="#F5C518" stroke="#B8960C" stroke-width="1"/>
+            <rect x="27" y="18" width="6" height="7" rx="1.5" fill="#F5C518" stroke="#B8960C" stroke-width="1"/>
+            <rect x="35" y="20" width="3" height="5" rx="1" fill="#fff" stroke="#B8960C" stroke-width="0.8"/>
+            <circle cx="15" cy="38" r="3.5" fill="#0F172A"/>
+            <circle cx="15" cy="38" r="1.5" fill="#fff"/>
+            <circle cx="33" cy="38" r="3.5" fill="#0F172A"/>
+            <circle cx="33" cy="38" r="1.5" fill="#fff"/>
+            <rect x="9" y="29" width="3" height="2" rx="0.5" fill="#EF4444"/>
+          </svg>
+        </div>
+        <div class="app-name">Verify your number</div>
+        <div class="app-sub">A code was sent to your device</div>
+      </div>
+
+      <div class="card-wrap">
+        <div class="card">
+          <div class="card-eyebrow">Verification</div>
+          <div class="card-title">Enter the 4-digit code</div>
+          <div class="otp-sent">Sent to <b>+962 79 123 4567</b></div>
+
+          <div class="otp-boxes">
+            <div class="otp-b filled">3</div>
+            <div class="otp-b filled">7</div>
+            <div class="otp-b active"></div>
+            <div class="otp-b"></div>
+          </div>
+
+          <button class="btn">
+            <span>Confirm &amp; sign in</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+
+          <div class="rt-row">
+            <span class="rt-left">Didn't receive it? <b>Resend</b></span>
+            <span class="rt-right">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              02:41
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="terms">
+        Never share this code — School Bus Tracker will never ask for it
+      </div>
+    </div>
+  </div>
+  <div class="sl">03 — Verification</div>
+</div>
+
+</body>
+</html>

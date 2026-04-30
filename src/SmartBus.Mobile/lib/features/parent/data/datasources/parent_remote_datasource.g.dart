@@ -1,26 +1,29 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'otp_controller.dart';
+part of 'parent_remote_datasource.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$otpControllerHash() => r'ea56f2d4c8b07c14e19ee821e67dc049ebef831c';
+String _$parentRemoteDataSourceHash() =>
+    r'c5ab0e8c3b4d365927c5a963dfb525c9a5082978';
 
-/// See also [OtpController].
-@ProviderFor(OtpController)
-final otpControllerProvider =
-    NotifierProvider<OtpController, AsyncValue<OtpFlow>>.internal(
-      OtpController.new,
-      name: r'otpControllerProvider',
+/// See also [parentRemoteDataSource].
+@ProviderFor(parentRemoteDataSource)
+final parentRemoteDataSourceProvider =
+    Provider<ParentRemoteDataSource>.internal(
+      parentRemoteDataSource,
+      name: r'parentRemoteDataSourceProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$otpControllerHash,
+          : _$parentRemoteDataSourceHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$OtpController = Notifier<AsyncValue<OtpFlow>>;
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ParentRemoteDataSourceRef = ProviderRef<ParentRemoteDataSource>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

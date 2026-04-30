@@ -25,8 +25,8 @@ Dio dioClient(Ref ref) {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      // Don't auto-throw on 4xx so interceptors / mappers can inspect bodies.
-      validateStatus: (code) => code != null && code < 500,
+      // Default Dio behaviour: 2xx success, anything else throws DioException.
+      // The mapper in api_exception.dart turns 4xx/5xx into typed Failures.
     ),
   );
 

@@ -6,6 +6,7 @@ using SmartBus.Application.Features.Parents.Commands.CreateParent;
 using SmartBus.Application.Features.Parents.Commands.DeleteParent;
 using SmartBus.Application.Features.Parents.Queries.GetAllParents;
 using SmartBus.Application.Features.Parents.Queries.GetParentById;
+using SmartBus.Application.Features.Parents.Queries.GetStudentTrips;
 
 namespace SmartBus.API.Controllers.v1;
 
@@ -47,5 +48,23 @@ public class ParentsController : ControllerBase
     {
         var result = await _mediator.Send(new DeleteParentCommand(id), cancellationToken);
         return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Recent trips for one of the parent's children, with everything the
+    /// parent dashboard needs (pickup/dropoff labels, bus, driver, boarding
+    /// status, on-time/late/absent classification).
+    /// </summary>
+    [HttpGet("{parentId:guid}/students/{studentId:guid}/trips")]
+    public async Task<IActionResult> GetStudentTrips(
+        Guid parentId,
+        Guid studentId,
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _mediator.Send(
+            new GetStudentTripsQuery(parentId, studentId, pageSize),
+            cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
     }
 }

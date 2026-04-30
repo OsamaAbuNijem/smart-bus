@@ -8,12 +8,12 @@ part of 'otp_request_request.dart';
 
 _OtpRequestRequest _$OtpRequestRequestFromJson(Map<String, dynamic> json) =>
     _OtpRequestRequest(
-      phoneNumber: json['PhoneNumber'] as String,
-      role: json['Role'] as String,
+      phoneNumber: json['phoneNumber'] as String,
+      role: json['role'] as String,
     );
 
 Map<String, dynamic> _$OtpRequestRequestToJson(_OtpRequestRequest instance) =>
     <String, dynamic>{
-      'PhoneNumber': instance.phoneNumber,
-      'Role': instance.role,
+      'phoneNumber': instance.phoneNumber,
+      'role': instance.role,
     };

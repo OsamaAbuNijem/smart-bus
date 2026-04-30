@@ -104,12 +104,6 @@ abstract class AppLocalizations {
   /// **'SmartBus'**
   String get appTitle;
 
-  /// No description provided for @loginTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign In'**
-  String get loginTitle;
-
   /// No description provided for @loginAppName.
   ///
   /// In en, this message translates to:
@@ -119,26 +113,62 @@ abstract class AppLocalizations {
   /// No description provided for @loginAppSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Keep your child safe on the road'**
+  /// **'Keep your child safe on every ride'**
   String get loginAppSubtitle;
 
-  /// No description provided for @loginFeatureSafety.
+  /// No description provided for @loginBadgeSecure.
   ///
   /// In en, this message translates to:
-  /// **'Safety'**
-  String get loginFeatureSafety;
+  /// **'Secure'**
+  String get loginBadgeSecure;
 
-  /// No description provided for @loginFeatureLiveTrack.
+  /// No description provided for @loginBadgeLiveGps.
   ///
   /// In en, this message translates to:
-  /// **'Live Track'**
-  String get loginFeatureLiveTrack;
+  /// **'Live GPS'**
+  String get loginBadgeLiveGps;
 
-  /// No description provided for @loginFeaturePeace.
+  /// No description provided for @loginBadgeTrusted.
   ///
   /// In en, this message translates to:
-  /// **'Peace'**
-  String get loginFeaturePeace;
+  /// **'Trusted'**
+  String get loginBadgeTrusted;
+
+  /// No description provided for @loginEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get loginEyebrow;
+
+  /// No description provided for @loginCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to continue'**
+  String get loginCardTitle;
+
+  /// No description provided for @loginCardDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you\'d like to access your account'**
+  String get loginCardDesc;
+
+  /// No description provided for @loginTabPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get loginTabPhone;
+
+  /// No description provided for @loginTabScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Card'**
+  String get loginTabScan;
+
+  /// No description provided for @loginPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get loginPhoneLabel;
 
   /// No description provided for @loginPhonePlaceholder.
   ///
@@ -146,23 +176,29 @@ abstract class AppLocalizations {
   /// **'7X XXX XXXX'**
   String get loginPhonePlaceholder;
 
+  /// No description provided for @loginPhoneHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send a 4-digit verification code'**
+  String get loginPhoneHelp;
+
   /// No description provided for @loginSendOtp.
   ///
   /// In en, this message translates to:
-  /// **'Send Verification Code'**
+  /// **'Send verification code'**
   String get loginSendOtp;
-
-  /// No description provided for @loginSendOtpHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Get a 4-digit code on your phone'**
-  String get loginSendOtpHint;
 
   /// No description provided for @loginTerms.
   ///
   /// In en, this message translates to:
-  /// **'Accept Terms & Privacy Policy'**
+  /// **'By continuing you agree to our Terms and Privacy Policy'**
   String get loginTerms;
+
+  /// No description provided for @loginScanComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan card sign-in is coming soon'**
+  String get loginScanComingSoon;
 
   /// No description provided for @loginInvalidPhone.
   ///
@@ -170,22 +206,58 @@ abstract class AppLocalizations {
   /// **'Enter a valid phone number'**
   String get loginInvalidPhone;
 
+  /// No description provided for @loginPhoneNotRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone number isn\'t registered. Please contact your school administration.'**
+  String get loginPhoneNotRegistered;
+
+  /// No description provided for @loginNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Check your connection and try again.'**
+  String get loginNetworkError;
+
   /// No description provided for @loginUnknownError.
   ///
   /// In en, this message translates to:
   /// **'Something went wrong. Please try again.'**
   String get loginUnknownError;
 
+  /// No description provided for @otpHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your number'**
+  String get otpHeroTitle;
+
+  /// No description provided for @otpHeroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A code was sent to your device'**
+  String get otpHeroSubtitle;
+
+  /// No description provided for @otpEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification'**
+  String get otpEyebrow;
+
   /// No description provided for @otpTitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter Verification Code'**
+  /// **'Enter the 4-digit code'**
   String get otpTitle;
+
+  /// No description provided for @otpSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to'**
+  String get otpSentTo;
 
   /// No description provided for @otpConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Confirm & Sign In'**
+  /// **'Confirm & sign in'**
   String get otpConfirm;
 
   /// No description provided for @otpResendPrefix.
@@ -200,12 +272,6 @@ abstract class AppLocalizations {
   /// **'Resend'**
   String get otpResend;
 
-  /// No description provided for @otpExpires.
-  ///
-  /// In en, this message translates to:
-  /// **'Expires {time}'**
-  String otpExpires(String time);
-
   /// No description provided for @otpInvalid.
   ///
   /// In en, this message translates to:
@@ -215,7 +281,7 @@ abstract class AppLocalizations {
   /// No description provided for @otpFooter.
   ///
   /// In en, this message translates to:
-  /// **'Your code is private, never share it with anyone'**
+  /// **'Never share this code — School Bus Tracker will never ask for it'**
   String get otpFooter;
 
   /// No description provided for @navDashboard.
@@ -343,6 +409,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Welcome, {name}'**
   String homeWelcome(String name);
+
+  /// No description provided for @homeParentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent Dashboard'**
+  String get homeParentTitle;
+
+  /// No description provided for @homeDriverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver Dashboard'**
+  String get homeDriverTitle;
+
+  /// No description provided for @homeAssistantTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant Dashboard'**
+  String get homeAssistantTitle;
+
+  /// No description provided for @homeParentTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Track Bus'**
+  String get homeParentTrack;
+
+  /// No description provided for @homeParentTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Trip'**
+  String get homeParentTrips;
+
+  /// No description provided for @homeParentAbsence.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Absence'**
+  String get homeParentAbsence;
+
+  /// No description provided for @homeDriverStartTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a Trip'**
+  String get homeDriverStartTrip;
+
+  /// No description provided for @homeDriverActiveTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Trip'**
+  String get homeDriverActiveTrip;
+
+  /// No description provided for @homeDriverHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip History'**
+  String get homeDriverHistory;
+
+  /// No description provided for @homeDriverAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendance'**
+  String get homeDriverAttendance;
+
+  /// No description provided for @homeAssistantBoarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark Boarding'**
+  String get homeAssistantBoarding;
+
+  /// No description provided for @homeAssistantScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Card'**
+  String get homeAssistantScan;
+
+  /// No description provided for @homeAssistantRoster.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Roster'**
+  String get homeAssistantRoster;
+
+  /// No description provided for @parentGreetingEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get parentGreetingEyebrow;
+
+  /// No description provided for @parentNoChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'No children linked to your account yet.'**
+  String get parentNoChildren;
+
+  /// No description provided for @parentNoTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips yet.'**
+  String get parentNoTrips;
+
+  /// No description provided for @parentTripEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Trip'**
+  String get parentTripEyebrow;
+
+  /// No description provided for @parentTripPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick-up'**
+  String get parentTripPickup;
+
+  /// No description provided for @parentTripDropoff.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop-off'**
+  String get parentTripDropoff;
+
+  /// No description provided for @parentMetaBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus'**
+  String get parentMetaBus;
+
+  /// No description provided for @parentMetaDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get parentMetaDriver;
+
+  /// No description provided for @parentMetaDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get parentMetaDuration;
+
+  /// No description provided for @parentDayToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get parentDayToday;
+
+  /// No description provided for @parentDayYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get parentDayYesterday;
+
+  /// No description provided for @parentStatusArrived.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrived safely'**
+  String get parentStatusArrived;
+
+  /// No description provided for @parentStatusOnBus.
+  ///
+  /// In en, this message translates to:
+  /// **'On the bus'**
+  String get parentStatusOnBus;
+
+  /// No description provided for @parentStatusAwaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting today'**
+  String get parentStatusAwaiting;
+
+  /// No description provided for @parentSectionQuickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get parentSectionQuickActions;
+
+  /// No description provided for @parentSectionRecentTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent trips'**
+  String get parentSectionRecentTrips;
+
+  /// No description provided for @parentViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get parentViewAll;
+
+  /// No description provided for @parentActionStudentInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Student Info'**
+  String get parentActionStudentInfo;
+
+  /// No description provided for @parentActionStudentInfoSub.
+  ///
+  /// In en, this message translates to:
+  /// **'View details'**
+  String get parentActionStudentInfoSub;
+
+  /// No description provided for @parentActionTripHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip History'**
+  String get parentActionTripHistory;
+
+  /// No description provided for @parentActionTripHistorySub.
+  ///
+  /// In en, this message translates to:
+  /// **'Past trips'**
+  String get parentActionTripHistorySub;
+
+  /// No description provided for @parentActionAbsence.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Absence'**
+  String get parentActionAbsence;
+
+  /// No description provided for @parentActionAbsenceSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify driver'**
+  String get parentActionAbsenceSub;
+
+  /// No description provided for @parentTagOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'On time'**
+  String get parentTagOnTime;
+
+  /// No description provided for @parentTagAbsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Absent'**
+  String get parentTagAbsent;
+
+  /// No description provided for @parentTagPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get parentTagPending;
 
   /// No description provided for @onboardingSkip.
   ///

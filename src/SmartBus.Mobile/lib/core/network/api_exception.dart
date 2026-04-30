@@ -47,7 +47,12 @@ Failure mapDioErrorToFailure(Object error) {
 
 String? _extractMessage(Object? body) {
   if (body is Map) {
-    final m = body['Message'] ?? body['message'] ?? body['Title'] ?? body['title'];
+    final m = body['error'] ??
+        body['Error'] ??
+        body['message'] ??
+        body['Message'] ??
+        body['title'] ??
+        body['Title'];
     if (m is String && m.isNotEmpty) return m;
   }
   return null;

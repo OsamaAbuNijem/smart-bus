@@ -8,20 +8,20 @@ part of 'otp_login_response.dart';
 
 _OtpLoginResponse _$OtpLoginResponseFromJson(Map<String, dynamic> json) =>
     _OtpLoginResponse(
-      token: json['Token'] as String,
-      expiresAt: DateTime.parse(json['ExpiresAt'] as String),
-      role: json['Role'] as String,
-      fullName: json['FullName'] as String,
-      phoneNumber: json['PhoneNumber'] as String,
-      entityId: json['EntityId'] as String,
+      token: json['token'] as String,
+      expiresAt: DateTime.parse(json['expiresAt'] as String),
+      role: json['role'] as String,
+      fullName: json['fullName'] as String,
+      phoneNumber: json['phoneNumber'] as String,
+      entityId: json['entityId'] as String,
     );
 
 Map<String, dynamic> _$OtpLoginResponseToJson(_OtpLoginResponse instance) =>
     <String, dynamic>{
-      'Token': instance.token,
-      'ExpiresAt': instance.expiresAt.toIso8601String(),
-      'Role': instance.role,
-      'FullName': instance.fullName,
-      'PhoneNumber': instance.phoneNumber,
-      'EntityId': instance.entityId,
+      'token': instance.token,
+      'expiresAt': instance.expiresAt.toIso8601String(),
+      'role': instance.role,
+      'fullName': instance.fullName,
+      'phoneNumber': instance.phoneNumber,
+      'entityId': instance.entityId,
     };

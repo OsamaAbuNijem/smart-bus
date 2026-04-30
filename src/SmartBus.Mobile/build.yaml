@@ -3,7 +3,8 @@ targets:
     builders:
       json_serializable:
         options:
-          field_rename: pascal
+          # API uses camelCase for both responses and requests, so leave
+          # field names as-is (Dart's natural camelCase).
           explicit_to_json: true
           create_to_json: true
           create_factory: true
