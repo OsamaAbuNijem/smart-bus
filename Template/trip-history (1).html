@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Trip History — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#F5C518;
+    --yellow-deep:#E0AE08;
+    --yellow-tint:#FFFBEB;
+    --ink:#0F172A;
+    --ink-soft:#1E293B;
+    --slate-700:#334155;
+    --slate-600:#475569;
+    --slate-500:#64748B;
+    --slate-400:#94A3B8;
+    --slate-300:#CBD5E1;
+    --slate-200:#E2E8F0;
+    --slate-100:#F1F5F9;
+    --slate-50:#F8FAFC;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+    --emerald:#059669;
+    --emerald-soft:#D1FAE5;
+    --rose:#E11D48;
+    --rose-soft:#FFE4E6;
+    --amber:#D97706;
+    --amber-soft:#FEF3C7;
+    --violet:#7C3AED;
+    --violet-soft:#EDE9FE;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+    --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.08), 0 8px 10px -6px rgba(15,23,42,0.04);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+
+  body{
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 10%, #FFF8DC 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 90%, #EFF6FF 0%, transparent 55%),
+      #F4F4F5;
+    background-attachment:fixed;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:56px 24px;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+
+  .sw{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .sl{
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-500);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sl::before, .sl::after{
+    content:'';
+    width:24px;
+    height:1.5px;
+    background:var(--slate-300);
+  }
+  .sw[dir="rtl"] .sl{font-family:'Cairo',sans-serif;letter-spacing:0.1em;}
+
+  /* PHONE */
+  .phone{
+    width:380px;
+    height:824px;
+    background:#fff;
+    border-radius:54px;
+    border:9px solid #0a0a0a;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:
+      0 0 0 2px #1f1f1f,
+      0 30px 60px -20px rgba(15,23,42,0.30),
+      0 18px 36px -18px rgba(15,23,42,0.20);
+    position:relative;
+  }
+  .notch{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:28px;
+    background:#0a0a0a;
+    border-radius:0 0 18px 18px;
+    z-index:50;
+  }
+  .statusbar{
+    height:46px;
+    background:#0a0a0a;
+    color:#fff;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 28px 6px;
+    flex-shrink:0;
+  }
+  .statusbar .time{font-size:14px;font-weight:600;letter-spacing:-0.01em;}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;}
+
+  .screen{
+    background:#FAFAFA;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* ============== HERO HEADER ============== */
+  .hero{
+    background:linear-gradient(180deg, #0a0a0a 0%, #1A1F2E 60%, #0F172A 100%);
+    color:#fff;
+    padding:8px 18px 22px;
+    flex-shrink:0;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';
+    position:absolute;
+    width:280px;
+    height:280px;
+    background:radial-gradient(circle, rgba(245,197,24,0.18) 0%, transparent 60%);
+    top:-150px;
+    right:-60px;
+    pointer-events:none;
+  }
+  [dir="rtl"] .hero::before{right:auto;left:-60px;}
+  .hero::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100' height='100' filter='url(%23n)' opacity='0.4'/></svg>");
+    opacity:0.05;
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+  .hero-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    position:relative;
+    z-index:2;
+  }
+  .icon-btn{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+    text-decoration:none;
+    transition:all 0.15s;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,0.14);}
+  .hero-eyebrow{
+    font-size:10px;
+    color:rgba(255,255,255,0.5);
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+  }
+  [dir="rtl"] .hero-eyebrow{font-family:'Cairo',sans-serif;letter-spacing:0.06em;}
+
+  .hero-title-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:14px;
+    position:relative;
+    z-index:2;
+  }
+  .hero-title{
+    font-size:24px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.03em;
+    line-height:1.1;
+  }
+  [dir="rtl"] .hero-title{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .hero-sub{
+    font-size:12px;
+    color:rgba(255,255,255,0.6);
+    font-weight:500;
+    margin-top:5px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  [dir="rtl"] .hero-sub{font-family:'Cairo',sans-serif;}
+  .hero-sub-dot{
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.35);
+  }
+  .hero-week-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 11px;
+    background:rgba(245,197,24,0.15);
+    border:1px solid rgba(245,197,24,0.3);
+    border-radius:100px;
+    font-size:11px;
+    font-weight:700;
+    color:#FCD34D;
+    letter-spacing:-0.005em;
+    flex-shrink:0;
+    margin-bottom:2px;
+  }
+  [dir="rtl"] .hero-week-pill{font-family:'Cairo',sans-serif;}
+
+  /* ============== BODY ============== */
+  .body{
+    flex:1;
+    overflow-y:auto;
+    margin-top:-12px;
+    border-radius:20px 20px 0 0;
+    background:#FAFAFA;
+    padding:14px 14px 20px;
+    position:relative;
+    z-index:3;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .body::-webkit-scrollbar{display:none;}
+
+  /* DAY GROUP */
+  .day-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .day-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 4px 2px;
+  }
+  .day-head-left{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .day-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:32px;
+    height:32px;
+    padding:0 9px;
+    border-radius:10px;
+    background:#fff;
+    border:1px solid var(--slate-200);
+    font-size:12px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.02em;
+    box-shadow:var(--shadow-sm);
+  }
+  .day-pill.today{
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    border-color:transparent;
+    box-shadow:0 4px 10px -3px rgba(245,197,24,0.5);
+  }
+  .day-name{
+    font-size:13px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.015em;
+  }
+  [dir="rtl"] .day-name{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .day-date{
+    font-size:11px;
+    color:var(--slate-400);
+    font-weight:600;
+    margin-left:6px;
+    letter-spacing:0;
+  }
+  [dir="rtl"] .day-date{font-family:'Cairo',sans-serif;margin-left:0;margin-right:6px;}
+
+  /* TRIP CARD */
+  .trip{
+    background:#fff;
+    border-radius:16px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-sm);
+    padding:13px 14px;
+    transition:all 0.15s;
+    cursor:pointer;
+  }
+  .trip:hover{
+    transform:translateY(-1px);
+    box-shadow:var(--shadow-md);
+    border-color:var(--slate-300);
+  }
+
+  .trip-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .trip-type-icon{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    border:1px solid;
+  }
+  .trip-type-icon.morning{
+    background:var(--amber-soft);
+    border-color:#FDE68A;
+    color:var(--amber);
+  }
+  .trip-type-icon.afternoon{
+    background:var(--violet-soft);
+    border-color:#DDD6FE;
+    color:var(--violet);
+  }
+  .trip-type-info{flex:1;min-width:0;}
+  .trip-type{
+    font-size:13.5px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.02em;
+    line-height:1.2;
+    margin-bottom:2px;
+  }
+  [dir="rtl"] .trip-type{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .trip-time{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:11.5px;
+    color:var(--slate-500);
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+  }
+  [dir="rtl"] .trip-time{font-family:'Cairo',sans-serif;}
+  .trip-time svg{color:var(--slate-400);}
+
+  .trip-status{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 10px;
+    border-radius:100px;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:-0.005em;
+    flex-shrink:0;
+    border:1px solid;
+  }
+  [dir="rtl"] .trip-status{font-family:'Cairo',sans-serif;}
+  .trip-status.ok{
+    background:var(--emerald-soft);
+    color:var(--emerald);
+    border-color:#A7F3D0;
+  }
+  .trip-status.late{
+    background:var(--amber-soft);
+    color:var(--amber);
+    border-color:#FDE68A;
+  }
+  .trip-status.missed{
+    background:var(--rose-soft);
+    color:var(--rose);
+    border-color:#FECDD3;
+  }
+  .trip-status .status-dot{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:currentColor;
+  }
+
+  /* CREW STRIP */
+  .crew{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--slate-200);
+  }
+  .crew-person{
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+  }
+  .crew-avatar{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:10px;
+    font-weight:800;
+    flex-shrink:0;
+    letter-spacing:-0.02em;
+    border:1.5px solid #fff;
+    box-shadow:0 0 0 1.5px var(--slate-200);
+  }
+  [dir="rtl"] .crew-avatar{font-family:'Cairo',sans-serif;}
+  .crew-avatar.driver{
+    background:linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%);
+    color:#1E40AF;
+  }
+  .crew-avatar.assistant{
+    background:linear-gradient(135deg, #FEF3C7 0%, #FCD34D 100%);
+    color:#92400E;
+  }
+  .crew-text{flex:1;min-width:0;}
+  .crew-role{
+    font-size:9px;
+    color:var(--slate-400);
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    line-height:1.1;
+    margin-bottom:1px;
+  }
+  [dir="rtl"] .crew-role{font-family:'Cairo',sans-serif;letter-spacing:0.04em;}
+  .crew-name{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+    line-height:1.15;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  [dir="rtl"] .crew-name{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .crew-divider{
+    width:1px;
+    height:24px;
+    background:var(--slate-200);
+    flex-shrink:0;
+  }
+
+  @media (max-width: 900px){
+    body{padding:32px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== ENGLISH ==================== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="Back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </a>
+          <span class="hero-eyebrow">Ahmed M. Khaldi</span>
+          <a class="icon-btn" href="#" title="More">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </a>
+        </div>
+        <div class="hero-title-row">
+          <div>
+            <div class="hero-title">Trip History</div>
+            <div class="hero-sub">
+              Last 7 days
+              <span class="hero-sub-dot"></span>
+              Apr 24 — 30
+            </div>
+          </div>
+          <span class="hero-week-pill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            This week
+          </span>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- ===== TODAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill today">30</div>
+              <span class="day-name">Today<span class="day-date">· Wed, Apr 30</span></span>
+            </div>
+          </div>
+
+          <!-- Morning -->
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">Morning Pickup</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  7:31 AM — 8:04 AM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                On time
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">KS</div>
+                <div class="crew-text">
+                  <div class="crew-role">Driver</div>
+                  <div class="crew-name">Khaled Sami</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">LH</div>
+                <div class="crew-text">
+                  <div class="crew-role">Assistant</div>
+                  <div class="crew-name">Layla Hassan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== YESTERDAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill">29</div>
+              <span class="day-name">Yesterday<span class="day-date">· Tue, Apr 29</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon afternoon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">Afternoon Drop-off</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  2:00 PM — 2:42 PM
+                </div>
+              </div>
+              <span class="trip-status late">
+                <span class="status-dot"></span>
+                +6 min late
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">KS</div>
+                <div class="crew-text">
+                  <div class="crew-role">Driver</div>
+                  <div class="crew-name">Khaled Sami</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">LH</div>
+                <div class="crew-text">
+                  <div class="crew-role">Assistant</div>
+                  <div class="crew-name">Layla Hassan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">Morning Pickup</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  7:30 AM — 8:02 AM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                On time
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">KS</div>
+                <div class="crew-text">
+                  <div class="crew-role">Driver</div>
+                  <div class="crew-name">Khaled Sami</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">LH</div>
+                <div class="crew-text">
+                  <div class="crew-role">Assistant</div>
+                  <div class="crew-name">Layla Hassan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MONDAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill">28</div>
+              <span class="day-name">Monday<span class="day-date">· Apr 28</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">Morning Pickup</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Reported absent
+                </div>
+              </div>
+              <span class="trip-status missed">
+                <span class="status-dot"></span>
+                Absent
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">KS</div>
+                <div class="crew-text">
+                  <div class="crew-role">Driver</div>
+                  <div class="crew-name">Khaled Sami</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">LH</div>
+                <div class="crew-text">
+                  <div class="crew-role">Assistant</div>
+                  <div class="crew-name">Layla Hassan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SUNDAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill">27</div>
+              <span class="day-name">Sunday<span class="day-date">· Apr 27</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon afternoon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">Afternoon Drop-off</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  2:00 PM — 2:38 PM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                On time
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">KS</div>
+                <div class="crew-text">
+                  <div class="crew-role">Driver</div>
+                  <div class="crew-name">Khaled Sami</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">LH</div>
+                <div class="crew-text">
+                  <div class="crew-role">Assistant</div>
+                  <div class="crew-name">Layla Hassan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">Morning Pickup</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  7:32 AM — 8:05 AM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                On time
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">KS</div>
+                <div class="crew-text">
+                  <div class="crew-role">Driver</div>
+                  <div class="crew-name">Khaled Sami</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">LH</div>
+                <div class="crew-text">
+                  <div class="crew-role">Assistant</div>
+                  <div class="crew-name">Layla Hassan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SATURDAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill">26</div>
+              <span class="day-name">Saturday<span class="day-date">· Apr 26</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon afternoon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">Afternoon Drop-off</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  2:00 PM — 2:46 PM
+                </div>
+              </div>
+              <span class="trip-status late">
+                <span class="status-dot"></span>
+                +14 min late
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">KS</div>
+                <div class="crew-text">
+                  <div class="crew-role">Driver</div>
+                  <div class="crew-name">Khaled Sami</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">LH</div>
+                <div class="crew-text">
+                  <div class="crew-role">Assistant</div>
+                  <div class="crew-name">Layla Hassan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">Morning Pickup</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  7:30 AM — 8:01 AM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                On time
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">KS</div>
+                <div class="crew-text">
+                  <div class="crew-role">Driver</div>
+                  <div class="crew-name">Khaled Sami</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">LH</div>
+                <div class="crew-text">
+                  <div class="crew-role">Assistant</div>
+                  <div class="crew-name">Layla Hassan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">Trip History — English</div>
+</div>
+
+<!-- ==================== ARABIC ==================== -->
+<div class="sw" dir="rtl" style="font-family:'Cairo',sans-serif;">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="direction:ltr;">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="رجوع">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <span class="hero-eyebrow">أحمد محمد الخالدي</span>
+          <a class="icon-btn" href="#" title="المزيد">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </a>
+        </div>
+        <div class="hero-title-row">
+          <div>
+            <div class="hero-title">سجل الرحلات</div>
+            <div class="hero-sub">
+              آخر ٧ أيام
+              <span class="hero-sub-dot"></span>
+              <span style="direction:ltr;">Apr 24 — 30</span>
+            </div>
+          </div>
+          <span class="hero-week-pill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            هذا الأسبوع
+          </span>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- ===== TODAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill today">٣٠</div>
+              <span class="day-name">اليوم<span class="day-date">· الأربعاء، ٣٠ نيسان</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">رحلة الذهاب</div>
+                <div class="trip-time" style="direction:ltr;justify-content:flex-end;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  7:31 AM — 8:04 AM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                في الموعد
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">خس</div>
+                <div class="crew-text">
+                  <div class="crew-role">السائق</div>
+                  <div class="crew-name">خالد سامي</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">له</div>
+                <div class="crew-text">
+                  <div class="crew-role">المرافِقة</div>
+                  <div class="crew-name">ليلى حسن</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== YESTERDAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill">٢٩</div>
+              <span class="day-name">الأمس<span class="day-date">· الثلاثاء، ٢٩ نيسان</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon afternoon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">رحلة العودة</div>
+                <div class="trip-time" style="direction:ltr;justify-content:flex-end;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  2:00 PM — 2:42 PM
+                </div>
+              </div>
+              <span class="trip-status late">
+                <span class="status-dot"></span>
+                متأخر ٦ د
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">خس</div>
+                <div class="crew-text">
+                  <div class="crew-role">السائق</div>
+                  <div class="crew-name">خالد سامي</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">له</div>
+                <div class="crew-text">
+                  <div class="crew-role">المرافِقة</div>
+                  <div class="crew-name">ليلى حسن</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">رحلة الذهاب</div>
+                <div class="trip-time" style="direction:ltr;justify-content:flex-end;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  7:30 AM — 8:02 AM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                في الموعد
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">خس</div>
+                <div class="crew-text">
+                  <div class="crew-role">السائق</div>
+                  <div class="crew-name">خالد سامي</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">له</div>
+                <div class="crew-text">
+                  <div class="crew-role">المرافِقة</div>
+                  <div class="crew-name">ليلى حسن</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MONDAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill">٢٨</div>
+              <span class="day-name">الإثنين<span class="day-date">· ٢٨ نيسان</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">رحلة الذهاب</div>
+                <div class="trip-time">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  تم الإبلاغ عن الغياب
+                </div>
+              </div>
+              <span class="trip-status missed">
+                <span class="status-dot"></span>
+                غائب
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">خس</div>
+                <div class="crew-text">
+                  <div class="crew-role">السائق</div>
+                  <div class="crew-name">خالد سامي</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">له</div>
+                <div class="crew-text">
+                  <div class="crew-role">المرافِقة</div>
+                  <div class="crew-name">ليلى حسن</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SUNDAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill">٢٧</div>
+              <span class="day-name">الأحد<span class="day-date">· ٢٧ نيسان</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon afternoon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">رحلة العودة</div>
+                <div class="trip-time" style="direction:ltr;justify-content:flex-end;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  2:00 PM — 2:38 PM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                في الموعد
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">خس</div>
+                <div class="crew-text">
+                  <div class="crew-role">السائق</div>
+                  <div class="crew-name">خالد سامي</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">له</div>
+                <div class="crew-text">
+                  <div class="crew-role">المرافِقة</div>
+                  <div class="crew-name">ليلى حسن</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">رحلة الذهاب</div>
+                <div class="trip-time" style="direction:ltr;justify-content:flex-end;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  7:32 AM — 8:05 AM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                في الموعد
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">خس</div>
+                <div class="crew-text">
+                  <div class="crew-role">السائق</div>
+                  <div class="crew-name">خالد سامي</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">له</div>
+                <div class="crew-text">
+                  <div class="crew-role">المرافِقة</div>
+                  <div class="crew-name">ليلى حسن</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SATURDAY ===== -->
+        <div class="day-group">
+          <div class="day-head">
+            <div class="day-head-left">
+              <div class="day-pill">٢٦</div>
+              <span class="day-name">السبت<span class="day-date">· ٢٦ نيسان</span></span>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon afternoon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">رحلة العودة</div>
+                <div class="trip-time" style="direction:ltr;justify-content:flex-end;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  2:00 PM — 2:46 PM
+                </div>
+              </div>
+              <span class="trip-status late">
+                <span class="status-dot"></span>
+                متأخر ١٤ د
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">خس</div>
+                <div class="crew-text">
+                  <div class="crew-role">السائق</div>
+                  <div class="crew-name">خالد سامي</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">له</div>
+                <div class="crew-text">
+                  <div class="crew-role">المرافِقة</div>
+                  <div class="crew-name">ليلى حسن</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trip">
+            <div class="trip-head">
+              <div class="trip-type-icon morning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              </div>
+              <div class="trip-type-info">
+                <div class="trip-type">رحلة الذهاب</div>
+                <div class="trip-time" style="direction:ltr;justify-content:flex-end;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  7:30 AM — 8:01 AM
+                </div>
+              </div>
+              <span class="trip-status ok">
+                <span class="status-dot"></span>
+                في الموعد
+              </span>
+            </div>
+            <div class="crew">
+              <div class="crew-person">
+                <div class="crew-avatar driver">خس</div>
+                <div class="crew-text">
+                  <div class="crew-role">السائق</div>
+                  <div class="crew-name">خالد سامي</div>
+                </div>
+              </div>
+              <div class="crew-divider"></div>
+              <div class="crew-person">
+                <div class="crew-avatar assistant">له</div>
+                <div class="crew-text">
+                  <div class="crew-role">المرافِقة</div>
+                  <div class="crew-name">ليلى حسن</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">سجل الرحلات — عربي</div>
+</div>
+
+</body>
+</html>

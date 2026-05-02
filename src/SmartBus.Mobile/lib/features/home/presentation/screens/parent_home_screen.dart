@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:smart_bus/core/routing/app_router.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
 import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
 import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
@@ -350,11 +352,13 @@ class _ChildPanel extends ConsumerWidget {
                   const SizedBox(height: 14),
                   _SectionHead(title: l.parentSectionQuickActions),
                   const SizedBox(height: 8),
-                  _Actions(l: l),
+                  _Actions(l: l, studentId: child.id),
                   const SizedBox(height: 14),
                   _SectionHead(
                     title: l.parentSectionRecentTrips,
                     trailing: l.parentViewAll,
+                    onTrailingTap: () =>
+                        context.push(AppRoute.studentTripsFor(child.id)),
                   ),
                   const SizedBox(height: 8),
                   if (trips.isEmpty)
@@ -782,9 +786,10 @@ class _MetaDivider extends StatelessWidget {
 // ─── Section heading ───────────────────────────────────────────────────
 
 class _SectionHead extends StatelessWidget {
-  const _SectionHead({required this.title, this.trailing});
+  const _SectionHead({required this.title, this.trailing, this.onTrailingTap});
   final String title;
   final String? trailing;
+  final VoidCallback? onTrailingTap;
 
   @override
   Widget build(BuildContext context) {
@@ -804,20 +809,25 @@ class _SectionHead extends StatelessWidget {
             ),
           ),
           if (trailing != null)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  trailing!,
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.blue,
+            GestureDetector(
+              onTap: onTrailingTap,
+              behavior: HitTestBehavior.opaque,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    trailing!,
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.blue,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 2),
-                const Icon(Icons.chevron_right, size: 14, color: AppColors.blue),
-              ],
+                  const SizedBox(width: 2),
+                  const Icon(Icons.chevron_right,
+                      size: 14, color: AppColors.blue),
+                ],
+              ),
             ),
         ],
       ),
@@ -828,8 +838,9 @@ class _SectionHead extends StatelessWidget {
 // ─── Quick actions ────────────────────────────────────────────────────
 
 class _Actions extends StatelessWidget {
-  const _Actions({required this.l});
+  const _Actions({required this.l, required this.studentId});
   final AppLocalizations l;
+  final String studentId;
 
   @override
   Widget build(BuildContext context) {
@@ -842,6 +853,7 @@ class _Actions extends StatelessWidget {
             iconBg: AppColors.blueSoft,
             title: l.parentActionStudentInfo,
             sub: l.parentActionStudentInfoSub,
+            onTap: () => context.push(AppRoute.studentInfoFor(studentId)),
           ),
         ),
         const SizedBox(width: 10),
@@ -852,6 +864,7 @@ class _Actions extends StatelessWidget {
             iconBg: const Color(0xFFFEF3C7),
             title: l.parentActionTripHistory,
             sub: l.parentActionTripHistorySub,
+            onTap: () => context.push(AppRoute.studentTripsFor(studentId)),
           ),
         ),
         const SizedBox(width: 10),
@@ -862,6 +875,7 @@ class _Actions extends StatelessWidget {
             iconBg: const Color(0xFFFFE4E6),
             title: l.parentActionAbsence,
             sub: l.parentActionAbsenceSub,
+            onTap: () => context.push(AppRoute.studentAbsenceFor(studentId)),
           ),
         ),
       ],
@@ -876,62 +890,76 @@ class _ActionTile extends StatelessWidget {
     required this.iconBg,
     required this.title,
     required this.sub,
+    this.onTap,
   });
   final IconData icon;
   final Color iconColor;
   final Color iconBg;
   final String title;
   final String sub;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 14, 10, 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.slate200),
-        boxShadow: AppShadows.sm,
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.fromLTRB(10, 14, 10, 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.slate200),
+            boxShadow: AppShadows.sm,
+          ),
+          child: _tileBody(),
+        ),
       ),
-      child: Column(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: iconBg,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            alignment: Alignment.center,
-            child: Icon(icon, color: iconColor, size: 20),
+    );
+  }
+
+  Widget _tileBody() {
+    return Column(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: iconBg,
+            borderRadius: BorderRadius.circular(13),
           ),
-          const SizedBox(height: 9),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: AppColors.ink,
-              letterSpacing: -0.1,
-            ),
+          alignment: Alignment.center,
+          child: Icon(icon, color: iconColor, size: 20),
+        ),
+        const SizedBox(height: 9),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+            letterSpacing: -0.1,
           ),
-          const SizedBox(height: 1),
-          Text(
-            sub,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: AppColors.slate400,
-            ),
+        ),
+        const SizedBox(height: 1),
+        Text(
+          sub,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: AppColors.slate400,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -290,6 +290,229 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentTagPending => 'Pending';
 
   @override
+  String get studentInfoTitle => 'Student Info';
+
+  @override
+  String get studentInfoIdLabel => 'ID';
+
+  @override
+  String get studentInfoClassPrefix => 'Class';
+
+  @override
+  String get studentInfoGeneral => 'General Information';
+
+  @override
+  String get studentInfoDob => 'Date of Birth';
+
+  @override
+  String get studentInfoSchool => 'School';
+
+  @override
+  String get studentInfoHomeAddress => 'Home Address';
+
+  @override
+  String get studentInfoRoute => 'Route';
+
+  @override
+  String get studentInfoNotes => 'Parent Notes';
+
+  @override
+  String get studentInfoEmergency => 'Emergency Contact';
+
+  @override
+  String get studentInfoParentContact => 'Parent Contact';
+
+  @override
+  String get studentInfoNoContacts => 'No contact on file.';
+
+  @override
+  String get studentEditEyebrow => 'Editing';
+
+  @override
+  String get studentEditBasicInfo => 'Basic Information';
+
+  @override
+  String get studentEditFullName => 'Full Name';
+
+  @override
+  String get studentEditFullNameHint => 'Student full name';
+
+  @override
+  String get studentEditStudentId => 'Student ID';
+
+  @override
+  String get studentEditAuto => 'Auto';
+
+  @override
+  String get studentEditGrade => 'Grade';
+
+  @override
+  String get studentEditClass => 'Class';
+
+  @override
+  String get studentEditClassHint => 'e.g. A';
+
+  @override
+  String get studentEditNotes => 'Parent Notes';
+
+  @override
+  String get studentEditDriverNote => 'Note for the driver';
+
+  @override
+  String get studentEditNotesHint => 'Anything the driver should know?';
+
+  @override
+  String get studentEditParentInfo => 'Parent Info';
+
+  @override
+  String get studentEditVerified => 'Verified';
+
+  @override
+  String get studentEditParentNameHint => 'Parent full name';
+
+  @override
+  String get studentEditMobile => 'Mobile Number';
+
+  @override
+  String get studentEditSave => 'Save changes';
+
+  @override
+  String get studentEditSaved => 'Saved';
+
+  @override
+  String get studentEditFailed => 'Couldn\'t save. Please try again.';
+
+  @override
+  String get studentEditMissingFields => 'Please fill in the required fields.';
+
+  @override
+  String get tripHistoryTitle => 'Trip History';
+
+  @override
+  String get tripHistoryLast7 => 'Last 7 days';
+
+  @override
+  String get tripHistoryThisWeek => 'This week';
+
+  @override
+  String get tripHistoryToday => 'Today';
+
+  @override
+  String get tripHistoryYesterday => 'Yesterday';
+
+  @override
+  String get tripHistoryMorningPickup => 'Morning Pickup';
+
+  @override
+  String get tripHistoryAfternoonDropoff => 'Afternoon Drop-off';
+
+  @override
+  String get tripHistoryOnTime => 'On time';
+
+  @override
+  String tripHistoryLateMinutes(int n) {
+    return '+$n min late';
+  }
+
+  @override
+  String get tripHistoryAbsent => 'Absent';
+
+  @override
+  String get tripHistoryPending => 'Pending';
+
+  @override
+  String get tripHistoryDriver => 'Driver';
+
+  @override
+  String get tripHistoryAssistant => 'Assistant';
+
+  @override
+  String get tripHistoryReportedAbsent => 'Reported absent';
+
+  @override
+  String get tripHistoryEmpty => 'No trips yet for this child.';
+
+  @override
+  String get absenceEyebrow => 'New Request';
+
+  @override
+  String get absenceTitle => 'Report Absence';
+
+  @override
+  String get absenceSubtitle =>
+      'The driver and school will be notified instantly';
+
+  @override
+  String get absenceSectionStudent => 'Student';
+
+  @override
+  String get absenceSectionDate => 'Absence Date';
+
+  @override
+  String get absenceSectionService => 'Bus Service';
+
+  @override
+  String get absenceSectionReason => 'Reason';
+
+  @override
+  String get absenceSectionNote => 'Note for the driver';
+
+  @override
+  String get absenceOptional => '(optional)';
+
+  @override
+  String get absenceOptionFullTitle => 'Full day off';
+
+  @override
+  String get absenceOptionFullDesc => 'Student will not attend school today';
+
+  @override
+  String get absenceFullNote =>
+      'No bus service today. Driver and school will be notified.';
+
+  @override
+  String get absenceOptionMorningTitle => 'Skip morning bus';
+
+  @override
+  String get absenceOptionMorningDesc =>
+      'Parent will drop the student at school';
+
+  @override
+  String get absenceOptionReturnTitle => 'Skip return bus';
+
+  @override
+  String get absenceOptionReturnDesc =>
+      'Parent will pick up the student from school';
+
+  @override
+  String get absenceReasonIllness => 'Illness';
+
+  @override
+  String get absenceReasonAppointment => 'Medical Appt';
+
+  @override
+  String get absenceReasonFamily => 'Family Matter';
+
+  @override
+  String get absenceReasonOther => 'Other';
+
+  @override
+  String get absenceNoteHint => 'Anything else the driver should know?';
+
+  @override
+  String get absenceInfoBox =>
+      'You can cancel this request up to 30 minutes before the bus departs';
+
+  @override
+  String get absenceSubmit => 'Submit absence request';
+
+  @override
+  String get absenceSubmitted => 'Absence reported';
+
+  @override
+  String get absenceFailed => 'Couldn\'t submit. Please try again.';
+
+  @override
   String get onboardingSkip => 'Skip';
 
   @override

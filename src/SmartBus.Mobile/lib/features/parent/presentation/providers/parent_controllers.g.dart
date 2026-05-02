@@ -26,7 +26,7 @@ final parentChildrenProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ParentChildrenRef = AutoDisposeFutureProviderRef<List<ParentChild>>;
-String _$childTripsHash() => r'8dd46075b99cd080345a54732c3ee14fddcbe30e';
+String _$studentInfoHash() => r'353fb49a6867a5d6e1cdf7fa11028eb788c7bd8e';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -48,6 +48,137 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// Detail for a single child (student info screen).
+///
+/// Copied from [studentInfo].
+@ProviderFor(studentInfo)
+const studentInfoProvider = StudentInfoFamily();
+
+/// Detail for a single child (student info screen).
+///
+/// Copied from [studentInfo].
+class StudentInfoFamily extends Family<AsyncValue<StudentInfo>> {
+  /// Detail for a single child (student info screen).
+  ///
+  /// Copied from [studentInfo].
+  const StudentInfoFamily();
+
+  /// Detail for a single child (student info screen).
+  ///
+  /// Copied from [studentInfo].
+  StudentInfoProvider call(String studentId) {
+    return StudentInfoProvider(studentId);
+  }
+
+  @override
+  StudentInfoProvider getProviderOverride(
+    covariant StudentInfoProvider provider,
+  ) {
+    return call(provider.studentId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'studentInfoProvider';
+}
+
+/// Detail for a single child (student info screen).
+///
+/// Copied from [studentInfo].
+class StudentInfoProvider extends AutoDisposeFutureProvider<StudentInfo> {
+  /// Detail for a single child (student info screen).
+  ///
+  /// Copied from [studentInfo].
+  StudentInfoProvider(String studentId)
+    : this._internal(
+        (ref) => studentInfo(ref as StudentInfoRef, studentId),
+        from: studentInfoProvider,
+        name: r'studentInfoProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$studentInfoHash,
+        dependencies: StudentInfoFamily._dependencies,
+        allTransitiveDependencies: StudentInfoFamily._allTransitiveDependencies,
+        studentId: studentId,
+      );
+
+  StudentInfoProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+  }) : super.internal();
+
+  final String studentId;
+
+  @override
+  Override overrideWith(
+    FutureOr<StudentInfo> Function(StudentInfoRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: StudentInfoProvider._internal(
+        (ref) => create(ref as StudentInfoRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<StudentInfo> createElement() {
+    return _StudentInfoProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is StudentInfoProvider && other.studentId == studentId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin StudentInfoRef on AutoDisposeFutureProviderRef<StudentInfo> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+}
+
+class _StudentInfoProviderElement
+    extends AutoDisposeFutureProviderElement<StudentInfo>
+    with StudentInfoRef {
+  _StudentInfoProviderElement(super.provider);
+
+  @override
+  String get studentId => (origin as StudentInfoProvider).studentId;
+}
+
+String _$childTripsHash() => r'8dd46075b99cd080345a54732c3ee14fddcbe30e';
 
 /// Trips for the currently selected child. Family on studentId so each child
 /// can be cached independently.
@@ -182,6 +313,137 @@ class _ChildTripsProviderElement
 
   @override
   String get studentId => (origin as ChildTripsProvider).studentId;
+}
+
+String _$tripHistoryHash() => r'bbd53f6c29e16b822ceab88be233acc6bb29121e';
+
+/// Larger trip window for the dedicated history screen (last ~30 entries).
+///
+/// Copied from [tripHistory].
+@ProviderFor(tripHistory)
+const tripHistoryProvider = TripHistoryFamily();
+
+/// Larger trip window for the dedicated history screen (last ~30 entries).
+///
+/// Copied from [tripHistory].
+class TripHistoryFamily extends Family<AsyncValue<List<ChildTrip>>> {
+  /// Larger trip window for the dedicated history screen (last ~30 entries).
+  ///
+  /// Copied from [tripHistory].
+  const TripHistoryFamily();
+
+  /// Larger trip window for the dedicated history screen (last ~30 entries).
+  ///
+  /// Copied from [tripHistory].
+  TripHistoryProvider call(String studentId) {
+    return TripHistoryProvider(studentId);
+  }
+
+  @override
+  TripHistoryProvider getProviderOverride(
+    covariant TripHistoryProvider provider,
+  ) {
+    return call(provider.studentId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'tripHistoryProvider';
+}
+
+/// Larger trip window for the dedicated history screen (last ~30 entries).
+///
+/// Copied from [tripHistory].
+class TripHistoryProvider extends AutoDisposeFutureProvider<List<ChildTrip>> {
+  /// Larger trip window for the dedicated history screen (last ~30 entries).
+  ///
+  /// Copied from [tripHistory].
+  TripHistoryProvider(String studentId)
+    : this._internal(
+        (ref) => tripHistory(ref as TripHistoryRef, studentId),
+        from: tripHistoryProvider,
+        name: r'tripHistoryProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$tripHistoryHash,
+        dependencies: TripHistoryFamily._dependencies,
+        allTransitiveDependencies: TripHistoryFamily._allTransitiveDependencies,
+        studentId: studentId,
+      );
+
+  TripHistoryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+  }) : super.internal();
+
+  final String studentId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ChildTrip>> Function(TripHistoryRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TripHistoryProvider._internal(
+        (ref) => create(ref as TripHistoryRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ChildTrip>> createElement() {
+    return _TripHistoryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TripHistoryProvider && other.studentId == studentId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin TripHistoryRef on AutoDisposeFutureProviderRef<List<ChildTrip>> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+}
+
+class _TripHistoryProviderElement
+    extends AutoDisposeFutureProviderElement<List<ChildTrip>>
+    with TripHistoryRef {
+  _TripHistoryProviderElement(super.provider);
+
+  @override
+  String get studentId => (origin as TripHistoryProvider).studentId;
 }
 
 String _$selectedChildIndexHash() =>

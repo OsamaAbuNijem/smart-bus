@@ -644,6 +644,438 @@ abstract class AppLocalizations {
   /// **'Pending'**
   String get parentTagPending;
 
+  /// No description provided for @studentInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Student Info'**
+  String get studentInfoTitle;
+
+  /// No description provided for @studentInfoIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ID'**
+  String get studentInfoIdLabel;
+
+  /// No description provided for @studentInfoClassPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Class'**
+  String get studentInfoClassPrefix;
+
+  /// No description provided for @studentInfoGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General Information'**
+  String get studentInfoGeneral;
+
+  /// No description provided for @studentInfoDob.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Birth'**
+  String get studentInfoDob;
+
+  /// No description provided for @studentInfoSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get studentInfoSchool;
+
+  /// No description provided for @studentInfoHomeAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Address'**
+  String get studentInfoHomeAddress;
+
+  /// No description provided for @studentInfoRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get studentInfoRoute;
+
+  /// No description provided for @studentInfoNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent Notes'**
+  String get studentInfoNotes;
+
+  /// No description provided for @studentInfoEmergency.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Contact'**
+  String get studentInfoEmergency;
+
+  /// No description provided for @studentInfoParentContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent Contact'**
+  String get studentInfoParentContact;
+
+  /// No description provided for @studentInfoNoContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'No contact on file.'**
+  String get studentInfoNoContacts;
+
+  /// No description provided for @studentEditEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Editing'**
+  String get studentEditEyebrow;
+
+  /// No description provided for @studentEditBasicInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Information'**
+  String get studentEditBasicInfo;
+
+  /// No description provided for @studentEditFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get studentEditFullName;
+
+  /// No description provided for @studentEditFullNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Student full name'**
+  String get studentEditFullNameHint;
+
+  /// No description provided for @studentEditStudentId.
+  ///
+  /// In en, this message translates to:
+  /// **'Student ID'**
+  String get studentEditStudentId;
+
+  /// No description provided for @studentEditAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get studentEditAuto;
+
+  /// No description provided for @studentEditGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Grade'**
+  String get studentEditGrade;
+
+  /// No description provided for @studentEditClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Class'**
+  String get studentEditClass;
+
+  /// No description provided for @studentEditClassHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. A'**
+  String get studentEditClassHint;
+
+  /// No description provided for @studentEditNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent Notes'**
+  String get studentEditNotes;
+
+  /// No description provided for @studentEditDriverNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note for the driver'**
+  String get studentEditDriverNote;
+
+  /// No description provided for @studentEditNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything the driver should know?'**
+  String get studentEditNotesHint;
+
+  /// No description provided for @studentEditParentInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent Info'**
+  String get studentEditParentInfo;
+
+  /// No description provided for @studentEditVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get studentEditVerified;
+
+  /// No description provided for @studentEditParentNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent full name'**
+  String get studentEditParentNameHint;
+
+  /// No description provided for @studentEditMobile.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Number'**
+  String get studentEditMobile;
+
+  /// No description provided for @studentEditSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get studentEditSave;
+
+  /// No description provided for @studentEditSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get studentEditSaved;
+
+  /// No description provided for @studentEditFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Please try again.'**
+  String get studentEditFailed;
+
+  /// No description provided for @studentEditMissingFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in the required fields.'**
+  String get studentEditMissingFields;
+
+  /// No description provided for @tripHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip History'**
+  String get tripHistoryTitle;
+
+  /// No description provided for @tripHistoryLast7.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get tripHistoryLast7;
+
+  /// No description provided for @tripHistoryThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get tripHistoryThisWeek;
+
+  /// No description provided for @tripHistoryToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get tripHistoryToday;
+
+  /// No description provided for @tripHistoryYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get tripHistoryYesterday;
+
+  /// No description provided for @tripHistoryMorningPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Pickup'**
+  String get tripHistoryMorningPickup;
+
+  /// No description provided for @tripHistoryAfternoonDropoff.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon Drop-off'**
+  String get tripHistoryAfternoonDropoff;
+
+  /// No description provided for @tripHistoryOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'On time'**
+  String get tripHistoryOnTime;
+
+  /// No description provided for @tripHistoryLateMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'+{n} min late'**
+  String tripHistoryLateMinutes(int n);
+
+  /// No description provided for @tripHistoryAbsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Absent'**
+  String get tripHistoryAbsent;
+
+  /// No description provided for @tripHistoryPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get tripHistoryPending;
+
+  /// No description provided for @tripHistoryDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get tripHistoryDriver;
+
+  /// No description provided for @tripHistoryAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant'**
+  String get tripHistoryAssistant;
+
+  /// No description provided for @tripHistoryReportedAbsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported absent'**
+  String get tripHistoryReportedAbsent;
+
+  /// No description provided for @tripHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips yet for this child.'**
+  String get tripHistoryEmpty;
+
+  /// No description provided for @absenceEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'New Request'**
+  String get absenceEyebrow;
+
+  /// No description provided for @absenceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Absence'**
+  String get absenceTitle;
+
+  /// No description provided for @absenceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The driver and school will be notified instantly'**
+  String get absenceSubtitle;
+
+  /// No description provided for @absenceSectionStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Student'**
+  String get absenceSectionStudent;
+
+  /// No description provided for @absenceSectionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Absence Date'**
+  String get absenceSectionDate;
+
+  /// No description provided for @absenceSectionService.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus Service'**
+  String get absenceSectionService;
+
+  /// No description provided for @absenceSectionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get absenceSectionReason;
+
+  /// No description provided for @absenceSectionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note for the driver'**
+  String get absenceSectionNote;
+
+  /// No description provided for @absenceOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'(optional)'**
+  String get absenceOptional;
+
+  /// No description provided for @absenceOptionFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Full day off'**
+  String get absenceOptionFullTitle;
+
+  /// No description provided for @absenceOptionFullDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Student will not attend school today'**
+  String get absenceOptionFullDesc;
+
+  /// No description provided for @absenceFullNote.
+  ///
+  /// In en, this message translates to:
+  /// **'No bus service today. Driver and school will be notified.'**
+  String get absenceFullNote;
+
+  /// No description provided for @absenceOptionMorningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip morning bus'**
+  String get absenceOptionMorningTitle;
+
+  /// No description provided for @absenceOptionMorningDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent will drop the student at school'**
+  String get absenceOptionMorningDesc;
+
+  /// No description provided for @absenceOptionReturnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip return bus'**
+  String get absenceOptionReturnTitle;
+
+  /// No description provided for @absenceOptionReturnDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent will pick up the student from school'**
+  String get absenceOptionReturnDesc;
+
+  /// No description provided for @absenceReasonIllness.
+  ///
+  /// In en, this message translates to:
+  /// **'Illness'**
+  String get absenceReasonIllness;
+
+  /// No description provided for @absenceReasonAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical Appt'**
+  String get absenceReasonAppointment;
+
+  /// No description provided for @absenceReasonFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Matter'**
+  String get absenceReasonFamily;
+
+  /// No description provided for @absenceReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get absenceReasonOther;
+
+  /// No description provided for @absenceNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything else the driver should know?'**
+  String get absenceNoteHint;
+
+  /// No description provided for @absenceInfoBox.
+  ///
+  /// In en, this message translates to:
+  /// **'You can cancel this request up to 30 minutes before the bus departs'**
+  String get absenceInfoBox;
+
+  /// No description provided for @absenceSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit absence request'**
+  String get absenceSubmit;
+
+  /// No description provided for @absenceSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Absence reported'**
+  String get absenceSubmitted;
+
+  /// No description provided for @absenceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t submit. Please try again.'**
+  String get absenceFailed;
+
   /// No description provided for @onboardingSkip.
   ///
   /// In en, this message translates to:

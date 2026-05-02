@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_bus/features/parent/data/datasources/parent_remote_datasource.dart';
 import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
 import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
+import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
 
 part 'parent_repository.g.dart';
 
@@ -24,6 +25,80 @@ class ParentRepository {
               homeArea: c.homeArea,
             ))
         .toList();
+  }
+
+  Future<StudentInfo> getStudent({
+    required String parentId,
+    required String studentId,
+  }) async {
+    final dto = await _remote.getStudent(
+      parentId: parentId,
+      studentId: studentId,
+    );
+    return StudentInfo(
+      id: dto.id,
+      fullName: dto.fullName,
+      fullNameEn: dto.fullNameEn,
+      nationalNumber: dto.nationalNumber,
+      grade: dto.grade,
+      className: dto.className,
+      dateOfBirth: dto.dateOfBirth,
+      schoolName: dto.schoolName,
+      homeAddress: dto.homeAddress,
+      homeArea: dto.homeArea,
+      homeStreet: dto.homeStreet,
+      notes: dto.notes,
+      routeName: dto.routeName,
+      pickupStopName: dto.pickupStopName,
+      allergies: dto.allergies,
+      parent: dto.parent == null
+          ? null
+          : StudentContact(
+              id: dto.parent!.id,
+              name: dto.parent!.name,
+              phoneNumber: dto.parent!.phoneNumber,
+              relation: dto.parent!.relation,
+              address: dto.parent!.address,
+            ),
+    );
+  }
+
+  Future<String> submitAbsenceRequest({
+    required String studentId,
+    required DateTime date,
+    required String tripType,
+    required String reason,
+    String? driverNote,
+  }) {
+    return _remote.submitAbsenceRequest(
+      studentId: studentId,
+      date: date,
+      tripType: tripType,
+      reason: reason,
+      driverNote: driverNote,
+    );
+  }
+
+  Future<void> updateChildProfile({
+    required String parentId,
+    required String studentId,
+    required String fullName,
+    required String grade,
+    String? className,
+    String? notes,
+    required String parentName,
+    required String parentPhone,
+  }) {
+    return _remote.updateChildProfile(
+      parentId: parentId,
+      studentId: studentId,
+      fullName: fullName,
+      grade: grade,
+      className: className,
+      notes: notes,
+      parentName: parentName,
+      parentPhone: parentPhone,
+    );
   }
 
   Future<List<ChildTrip>> getChildTrips({

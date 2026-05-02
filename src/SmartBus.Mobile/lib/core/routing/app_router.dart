@@ -14,6 +14,10 @@ import 'package:smart_bus/features/home/presentation/screens/driver_home_screen.
 import 'package:smart_bus/features/home/presentation/screens/parent_home_screen.dart';
 import 'package:smart_bus/features/onboarding/presentation/providers/onboarding_controller.dart';
 import 'package:smart_bus/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:smart_bus/features/parent/presentation/screens/report_absence_screen.dart';
+import 'package:smart_bus/features/parent/presentation/screens/student_edit_screen.dart';
+import 'package:smart_bus/features/parent/presentation/screens/student_info_screen.dart';
+import 'package:smart_bus/features/parent/presentation/screens/trip_history_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -25,6 +29,18 @@ abstract class AppRoute {
   static const homeParent = '/home/parent';
   static const homeDriver = '/home/driver';
   static const homeAssistant = '/home/assistant';
+  static const studentInfo = '/students/:studentId';
+  static const studentEdit = '/students/:studentId/edit';
+  static const studentTrips = '/students/:studentId/trips';
+  static const studentAbsence = '/students/:studentId/absence';
+
+  static String studentInfoFor(String studentId) => '/students/$studentId';
+  static String studentEditFor(String studentId) =>
+      '/students/$studentId/edit';
+  static String studentTripsFor(String studentId) =>
+      '/students/$studentId/trips';
+  static String studentAbsenceFor(String studentId) =>
+      '/students/$studentId/absence';
 
   static String homeFor(UserRole role) => switch (role) {
         UserRole.parent => homeParent,
@@ -115,6 +131,30 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoute.homeAssistant,
         builder: (_, _) => const AssistantHomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.studentInfo,
+        builder: (context, state) => StudentInfoScreen(
+          studentId: state.pathParameters['studentId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.studentEdit,
+        builder: (context, state) => StudentEditScreen(
+          studentId: state.pathParameters['studentId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.studentTrips,
+        builder: (context, state) => TripHistoryScreen(
+          studentId: state.pathParameters['studentId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.studentAbsence,
+        builder: (context, state) => ReportAbsenceScreen(
+          studentId: state.pathParameters['studentId']!,
+        ),
       ),
     ],
   );

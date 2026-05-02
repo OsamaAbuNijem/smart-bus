@@ -289,6 +289,226 @@ class AppLocalizationsAr extends AppLocalizations {
   String get parentTagPending => 'قيد الانتظار';
 
   @override
+  String get studentInfoTitle => 'معلومات الطالب';
+
+  @override
+  String get studentInfoIdLabel => 'رقم الطالب';
+
+  @override
+  String get studentInfoClassPrefix => 'فصل';
+
+  @override
+  String get studentInfoGeneral => 'المعلومات الأساسية';
+
+  @override
+  String get studentInfoDob => 'تاريخ الميلاد';
+
+  @override
+  String get studentInfoSchool => 'المدرسة';
+
+  @override
+  String get studentInfoHomeAddress => 'عنوان المنزل';
+
+  @override
+  String get studentInfoRoute => 'المسار';
+
+  @override
+  String get studentInfoNotes => 'ملاحظات الوالدين';
+
+  @override
+  String get studentInfoEmergency => 'جهة الطوارئ';
+
+  @override
+  String get studentInfoParentContact => 'جهة الاتصال — ولي الأمر';
+
+  @override
+  String get studentInfoNoContacts => 'لا توجد جهة اتصال مسجّلة.';
+
+  @override
+  String get studentEditEyebrow => 'تعديل البيانات';
+
+  @override
+  String get studentEditBasicInfo => 'المعلومات الأساسية';
+
+  @override
+  String get studentEditFullName => 'الاسم الكامل';
+
+  @override
+  String get studentEditFullNameHint => 'الاسم الكامل للطالب';
+
+  @override
+  String get studentEditStudentId => 'رقم الطالب';
+
+  @override
+  String get studentEditAuto => 'تلقائي';
+
+  @override
+  String get studentEditGrade => 'الصف';
+
+  @override
+  String get studentEditClass => 'الفصل';
+
+  @override
+  String get studentEditClassHint => 'مثال: أ';
+
+  @override
+  String get studentEditNotes => 'ملاحظات الوالدين';
+
+  @override
+  String get studentEditDriverNote => 'ملاحظة للسائق';
+
+  @override
+  String get studentEditNotesHint => 'هل هناك شيء يجب أن يعرفه السائق؟';
+
+  @override
+  String get studentEditParentInfo => 'معلومات ولي الأمر';
+
+  @override
+  String get studentEditVerified => 'موثّق';
+
+  @override
+  String get studentEditParentNameHint => 'الاسم الكامل لولي الأمر';
+
+  @override
+  String get studentEditMobile => 'رقم الجوال';
+
+  @override
+  String get studentEditSave => 'حفظ التغييرات';
+
+  @override
+  String get studentEditSaved => 'تم الحفظ';
+
+  @override
+  String get studentEditFailed => 'تعذّر الحفظ. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get studentEditMissingFields => 'يرجى تعبئة الحقول المطلوبة.';
+
+  @override
+  String get tripHistoryTitle => 'سجل الرحلات';
+
+  @override
+  String get tripHistoryLast7 => 'آخر 7 أيام';
+
+  @override
+  String get tripHistoryThisWeek => 'هذا الأسبوع';
+
+  @override
+  String get tripHistoryToday => 'اليوم';
+
+  @override
+  String get tripHistoryYesterday => 'أمس';
+
+  @override
+  String get tripHistoryMorningPickup => 'رحلة الصباح';
+
+  @override
+  String get tripHistoryAfternoonDropoff => 'رحلة العودة';
+
+  @override
+  String get tripHistoryOnTime => 'في الموعد';
+
+  @override
+  String tripHistoryLateMinutes(int n) {
+    return 'تأخير $n دقيقة';
+  }
+
+  @override
+  String get tripHistoryAbsent => 'غائب';
+
+  @override
+  String get tripHistoryPending => 'قيد الانتظار';
+
+  @override
+  String get tripHistoryDriver => 'السائق';
+
+  @override
+  String get tripHistoryAssistant => 'المساعد';
+
+  @override
+  String get tripHistoryReportedAbsent => 'تم الإبلاغ عن الغياب';
+
+  @override
+  String get tripHistoryEmpty => 'لا توجد رحلات لهذا الطفل بعد.';
+
+  @override
+  String get absenceEyebrow => 'طلب جديد';
+
+  @override
+  String get absenceTitle => 'تسجيل غياب';
+
+  @override
+  String get absenceSubtitle => 'سيتم إبلاغ السائق والمدرسة فوراً';
+
+  @override
+  String get absenceSectionStudent => 'الطالب';
+
+  @override
+  String get absenceSectionDate => 'تاريخ الغياب';
+
+  @override
+  String get absenceSectionService => 'خدمة الحافلة';
+
+  @override
+  String get absenceSectionReason => 'السبب';
+
+  @override
+  String get absenceSectionNote => 'ملاحظة للسائق';
+
+  @override
+  String get absenceOptional => '(اختياري)';
+
+  @override
+  String get absenceOptionFullTitle => 'غياب يوم كامل';
+
+  @override
+  String get absenceOptionFullDesc => 'لن يحضر الطالب إلى المدرسة اليوم';
+
+  @override
+  String get absenceFullNote =>
+      'لا توجد خدمة حافلة اليوم. سيتم إبلاغ السائق والمدرسة.';
+
+  @override
+  String get absenceOptionMorningTitle => 'إلغاء حافلة الصباح';
+
+  @override
+  String get absenceOptionMorningDesc => 'ولي الأمر سيوصل الطالب إلى المدرسة';
+
+  @override
+  String get absenceOptionReturnTitle => 'إلغاء حافلة العودة';
+
+  @override
+  String get absenceOptionReturnDesc => 'ولي الأمر سيستلم الطالب من المدرسة';
+
+  @override
+  String get absenceReasonIllness => 'مرض';
+
+  @override
+  String get absenceReasonAppointment => 'موعد طبي';
+
+  @override
+  String get absenceReasonFamily => 'ظرف عائلي';
+
+  @override
+  String get absenceReasonOther => 'أخرى';
+
+  @override
+  String get absenceNoteHint => 'هل هناك شيء آخر يجب أن يعرفه السائق؟';
+
+  @override
+  String get absenceInfoBox =>
+      'يمكنك إلغاء هذا الطلب حتى 30 دقيقة قبل انطلاق الحافلة';
+
+  @override
+  String get absenceSubmit => 'إرسال طلب الغياب';
+
+  @override
+  String get absenceSubmitted => 'تم تسجيل الغياب';
+
+  @override
+  String get absenceFailed => 'تعذّر الإرسال. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get onboardingSkip => 'تخطّي';
 
   @override

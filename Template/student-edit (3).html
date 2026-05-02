@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Edit Student — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#F5C518;
+    --yellow-deep:#E0AE08;
+    --yellow-tint:#FFFBEB;
+    --ink:#0F172A;
+    --ink-soft:#1E293B;
+    --slate-700:#334155;
+    --slate-600:#475569;
+    --slate-500:#64748B;
+    --slate-400:#94A3B8;
+    --slate-300:#CBD5E1;
+    --slate-200:#E2E8F0;
+    --slate-100:#F1F5F9;
+    --slate-50:#F8FAFC;
+    --emerald:#059669;
+    --emerald-soft:#D1FAE5;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+    --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.08), 0 8px 10px -6px rgba(15,23,42,0.04);
+    --shadow-yellow: 0 8px 24px -8px rgba(245,197,24,0.55);
+    --focus-ring: 0 0 0 3px rgba(245,197,24,0.18);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+
+  body{
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 10%, #FFF8DC 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 90%, #EFF6FF 0%, transparent 55%),
+      #F4F4F5;
+    background-attachment: fixed;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:56px 24px;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+
+  .sw{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .sl{
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-500);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sl::before, .sl::after{
+    content:'';
+    width:24px;
+    height:1.5px;
+    background:var(--slate-300);
+  }
+  .sw[dir="rtl"] .sl{font-family:'Cairo',sans-serif;letter-spacing:0.1em;}
+
+  /* PHONE */
+  .phone{
+    width:380px;
+    height:824px;
+    background:#fff;
+    border-radius:54px;
+    border:9px solid #0a0a0a;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:
+      0 0 0 2px #1f1f1f,
+      0 30px 60px -20px rgba(15,23,42,0.30),
+      0 18px 36px -18px rgba(15,23,42,0.20);
+    position:relative;
+  }
+  .notch{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:28px;
+    background:#0a0a0a;
+    border-radius:0 0 18px 18px;
+    z-index:50;
+  }
+  .statusbar{
+    height:46px;
+    background:#0a0a0a;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 28px 6px;
+    flex-shrink:0;
+    color:#fff;
+  }
+  .statusbar .time{font-size:14px;font-weight:600;letter-spacing:-0.01em;}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;}
+
+  .screen{
+    background:#FAFAFA;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* ============== HERO HEADER ============== */
+  .hero{
+    background:linear-gradient(180deg, #0a0a0a 0%, #1A1F2E 60%, #0F172A 100%);
+    color:#fff;
+    padding:6px 18px 22px;
+    flex-shrink:0;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';
+    position:absolute;
+    width:280px;
+    height:280px;
+    background:radial-gradient(circle, rgba(245,197,24,0.18) 0%, transparent 60%);
+    top:-150px;
+    right:-60px;
+    pointer-events:none;
+  }
+  [dir="rtl"] .hero::before{right:auto;left:-60px;}
+  .hero::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100' height='100' filter='url(%23n)' opacity='0.4'/></svg>");
+    opacity:0.05;
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+
+  .hero-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    position:relative;
+    z-index:2;
+  }
+  .icon-btn{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+    transition:all 0.15s;
+    text-decoration:none;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,0.14);}
+  .hero-eyebrow{
+    font-size:10px;
+    color:rgba(255,255,255,0.5);
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+  }
+  [dir="rtl"] .hero-eyebrow{font-family:'Cairo',sans-serif;letter-spacing:0.06em;}
+
+  .hero-bottom{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    position:relative;
+    z-index:2;
+  }
+  .hero-avatar{
+    width:54px;
+    height:54px;
+    border-radius:16px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    font-size:18px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    letter-spacing:-0.025em;
+    flex-shrink:0;
+    box-shadow:
+      0 8px 16px -4px rgba(245,197,24,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -2px 0 rgba(0,0,0,0.08);
+  }
+  [dir="rtl"] .hero-avatar{font-family:'Cairo',sans-serif;}
+  .hero-info{flex:1;min-width:0;}
+  .hero-title{
+    font-size:18px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.025em;
+    line-height:1.15;
+    margin-bottom:3px;
+  }
+  [dir="rtl"] .hero-title{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .hero-meta{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:11px;
+    color:rgba(255,255,255,0.55);
+    font-weight:600;
+    letter-spacing:0.01em;
+    font-variant-numeric:tabular-nums;
+  }
+  [dir="rtl"] .hero-meta{font-family:'Cairo',sans-serif;}
+  .hero-meta-dot{
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.3);
+  }
+
+  /* ============== BODY ============== */
+  .body{
+    flex:1;
+    padding:14px 14px 8px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    overflow:hidden;
+    margin-top:-12px;
+    border-radius:20px 20px 0 0;
+    background:#FAFAFA;
+    position:relative;
+    z-index:3;
+  }
+
+  /* SECTION HEAD */
+  .sect-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 4px 2px;
+  }
+  .sect-title{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:10px;
+    font-weight:800;
+    color:var(--slate-700);
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+  }
+  [dir="rtl"] .sect-title{font-family:'Cairo',sans-serif;letter-spacing:0.06em;}
+  .sect-title .dot{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 0 2px rgba(245,197,24,0.2);
+  }
+  .sect-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:3px 8px;
+    border-radius:100px;
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:-0.005em;
+    background:var(--emerald-soft);
+    color:var(--emerald);
+    border:1px solid #A7F3D0;
+  }
+  [dir="rtl"] .sect-pill{font-family:'Cairo',sans-serif;}
+
+  /* CARD */
+  .card{
+    background:#fff;
+    border-radius:18px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-sm);
+    overflow:hidden;
+  }
+
+  /* FIELD */
+  .field{
+    display:flex;
+    align-items:stretch;
+    border-bottom:1px solid var(--slate-100);
+    transition:background 0.15s;
+  }
+  .field:last-child{border-bottom:none;}
+  .field:focus-within{background:var(--yellow-tint);}
+
+  .field-icon{
+    width:42px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--slate-400);
+    border-right:1px solid var(--slate-100);
+    transition:color 0.15s;
+  }
+  [dir="rtl"] .field-icon{border-right:none;border-left:1px solid var(--slate-100);}
+  .field:focus-within .field-icon{color:var(--yellow-deep);}
+
+  .field-content{
+    flex:1;
+    min-width:0;
+    padding:7px 14px 8px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .field-label{
+    font-size:9.5px;
+    color:var(--slate-500);
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:1px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  [dir="rtl"] .field-label{font-family:'Cairo',sans-serif;letter-spacing:0.04em;}
+  .field-label-tag{
+    font-size:8.5px;
+    font-weight:700;
+    color:var(--slate-500);
+    background:var(--slate-100);
+    padding:1px 6px;
+    border-radius:100px;
+    letter-spacing:0.04em;
+  }
+  [dir="rtl"] .field-label-tag{font-family:'Cairo',sans-serif;letter-spacing:0;}
+
+  .field-input,
+  .field-select,
+  .field-textarea{
+    width:100%;
+    background:transparent;
+    border:none;
+    padding:0;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--ink);
+    font-family:inherit;
+    outline:none;
+    letter-spacing:-0.015em;
+  }
+  [dir="rtl"] .field-input,
+  [dir="rtl"] .field-select,
+  [dir="rtl"] .field-textarea{font-family:'Cairo',sans-serif;letter-spacing:0;}
+
+  .field-input:read-only{
+    color:var(--slate-500);
+    cursor:default;
+  }
+  .field-input::placeholder,
+  .field-textarea::placeholder{color:var(--slate-400);font-weight:500;}
+
+  /* Select */
+  .field-select{
+    appearance:none;
+    -webkit-appearance:none;
+    cursor:pointer;
+    padding-right:16px;
+    background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 0 center;
+  }
+  [dir="rtl"] .field-select{
+    padding-right:0;
+    padding-left:16px;
+    background-position:left 0 center;
+  }
+
+  /* Textarea */
+  .field-textarea{
+    resize:none;
+    height:42px;
+    line-height:1.45;
+    font-size:13px;
+    font-weight:600;
+    margin-top:1px;
+  }
+  [dir="rtl"] .field-textarea{line-height:1.55;}
+
+  /* Field-row (Grade & Class) */
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    border-bottom:1px solid var(--slate-100);
+  }
+  .field-row .field{
+    border-bottom:none;
+  }
+  .field-row .field:first-child{
+    border-right:1px solid var(--slate-100);
+  }
+  [dir="rtl"] .field-row .field:first-child{
+    border-right:none;
+    border-left:1px solid var(--slate-100);
+  }
+
+  /* Phone field with country prefix */
+  .phone-prefix{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+    padding-right:10px;
+    border-right:1px solid var(--slate-200);
+    margin-right:10px;
+  }
+  [dir="rtl"] .phone-prefix{
+    padding-right:0;
+    padding-left:10px;
+    border-right:none;
+    border-left:1px solid var(--slate-200);
+    margin-right:0;
+    margin-left:10px;
+  }
+  .phone-flag{font-size:14px;line-height:1;}
+  .phone-code{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--slate-700);
+    letter-spacing:-0.01em;
+    font-variant-numeric:tabular-nums;
+  }
+  [dir="rtl"] .phone-code{direction:ltr;}
+  .phone-input-wrap{
+    display:flex;
+    align-items:center;
+    margin-top:2px;
+  }
+  .phone-input-wrap .field-input{
+    flex:1;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* SAVE BAR */
+  .save-bar{
+    flex-shrink:0;
+    padding:10px 14px 14px;
+    background:#fff;
+    border-top:1px solid var(--slate-100);
+    display:flex;
+    gap:8px;
+    box-shadow:0 -8px 24px -12px rgba(15,23,42,0.08);
+  }
+  .btn-secondary{
+    background:#fff;
+    border:1.5px solid var(--slate-200);
+    border-radius:12px;
+    padding:11px 18px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--slate-700);
+    cursor:pointer;
+    font-family:inherit;
+    letter-spacing:-0.01em;
+    transition:all 0.15s;
+  }
+  [dir="rtl"] .btn-secondary{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .btn-secondary:hover{background:var(--slate-50);color:var(--ink);}
+
+  .btn-primary{
+    flex:1;
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    border:none;
+    border-radius:12px;
+    padding:11px 18px;
+    font-size:13.5px;
+    font-weight:800;
+    color:var(--ink);
+    cursor:pointer;
+    font-family:inherit;
+    letter-spacing:-0.015em;
+    box-shadow:var(--shadow-yellow), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition:all 0.15s;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+  [dir="rtl"] .btn-primary{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .btn-primary:hover{transform:translateY(-1px);}
+
+  @media (max-width: 900px){
+    body{padding:32px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== ENGLISH ==================== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO HEADER -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="Back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </a>
+          <span class="hero-eyebrow">Editing</span>
+          <a class="icon-btn" href="#" title="More">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </a>
+        </div>
+        <div class="hero-bottom">
+          <div class="hero-avatar">AH</div>
+          <div class="hero-info">
+            <div class="hero-title">Ahmed M. Khaldi</div>
+            <div class="hero-meta">
+              SE2024001
+              <span class="hero-meta-dot"></span>
+              Kindergarten B · A
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- BASIC INFO -->
+        <div class="sect-head">
+          <span class="sect-title"><span class="dot"></span>Basic Information</span>
+        </div>
+        <div class="card">
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">Full Name</label>
+              <input class="field-input" type="text" value="Ahmed M. Khaldi" placeholder="Student full name"/>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="15" x2="11" y2="15"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">
+                Student ID
+                <span class="field-label-tag">Auto</span>
+              </label>
+              <input class="field-input" type="text" value="SE2024001" readonly/>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <div class="field-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              </div>
+              <div class="field-content">
+                <label class="field-label">Grade</label>
+                <select class="field-select">
+                  <option>KG-A</option>
+                  <option selected>KG-B</option>
+                  <option>Grade 1</option>
+                  <option>Grade 2</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+              </div>
+              <div class="field-content">
+                <label class="field-label">Class</label>
+                <input class="field-input" type="text" value="A" placeholder="e.g. A"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PARENT NOTES -->
+        <div class="sect-head">
+          <span class="sect-title"><span class="dot"></span>Parent Notes</span>
+        </div>
+        <div class="card">
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">Note for the driver</label>
+              <textarea class="field-textarea" placeholder="Anything the driver should know?">Ahmed needs extra time to adjust. Please give him a minute when boarding.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- PARENT INFO -->
+        <div class="sect-head">
+          <span class="sect-title"><span class="dot"></span>Parent Info</span>
+          <span class="sect-pill">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Verified
+          </span>
+        </div>
+        <div class="card">
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">Full Name</label>
+              <input class="field-input" type="text" value="Sarah Khaldi" placeholder="Parent full name"/>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">Mobile Number</label>
+              <div class="phone-input-wrap">
+                <span class="phone-prefix">
+                  <span class="phone-flag">🇯🇴</span>
+                  <span class="phone-code">+962</span>
+                </span>
+                <input class="field-input" type="tel" value="79 123 4567" placeholder="7X XXX XXXX"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SAVE BAR -->
+      <div class="save-bar">
+        <button class="btn-secondary">Cancel</button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Save changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">Edit Student — English</div>
+</div>
+
+<!-- ==================== ARABIC ==================== -->
+<div class="sw" dir="rtl" style="font-family:'Cairo',sans-serif;">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="direction:ltr;">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO HEADER -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="رجوع">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <span class="hero-eyebrow">تعديل البيانات</span>
+          <a class="icon-btn" href="#" title="المزيد">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </a>
+        </div>
+        <div class="hero-bottom">
+          <div class="hero-avatar">أح</div>
+          <div class="hero-info">
+            <div class="hero-title">أحمد محمد الخالدي</div>
+            <div class="hero-meta" style="direction:ltr;justify-content:flex-end;">
+              SE2024001
+              <span class="hero-meta-dot"></span>
+              <span style="font-family:'Cairo',sans-serif;direction:rtl;">روضة ب · أ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- BASIC INFO -->
+        <div class="sect-head">
+          <span class="sect-title"><span class="dot"></span>المعلومات الأساسية</span>
+        </div>
+        <div class="card">
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">الاسم الكامل</label>
+              <input class="field-input" type="text" value="أحمد محمد الخالدي" placeholder="الاسم الكامل للطالب"/>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="15" x2="11" y2="15"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">
+                رقم الطالب
+                <span class="field-label-tag">تلقائي</span>
+              </label>
+              <input class="field-input" type="text" value="SE2024001" readonly style="direction:ltr;text-align:right;"/>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <div class="field-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              </div>
+              <div class="field-content">
+                <label class="field-label">الصف</label>
+                <select class="field-select">
+                  <option>روضة أ</option>
+                  <option selected>روضة ب</option>
+                  <option>الصف الأول</option>
+                  <option>الصف الثاني</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+              </div>
+              <div class="field-content">
+                <label class="field-label">الفصل</label>
+                <input class="field-input" type="text" value="أ" placeholder="مثال: أ"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PARENT NOTES -->
+        <div class="sect-head">
+          <span class="sect-title"><span class="dot"></span>ملاحظات الوالدين</span>
+        </div>
+        <div class="card">
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">ملاحظة للسائق</label>
+              <textarea class="field-textarea" placeholder="هل هناك شيء يجب أن يعرفه السائق؟">أحمد يحتاج وقتاً إضافياً للتكيف. يرجى إعطاؤه دقيقة عند الصعود.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- PARENT INFO -->
+        <div class="sect-head">
+          <span class="sect-title"><span class="dot"></span>معلومات ولي الأمر</span>
+          <span class="sect-pill">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            موثّق
+          </span>
+        </div>
+        <div class="card">
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">الاسم الكامل</label>
+              <input class="field-input" type="text" value="سارة الخالدي" placeholder="الاسم الكامل لولي الأمر"/>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="field-content">
+              <label class="field-label">رقم الهاتف المحمول</label>
+              <div class="phone-input-wrap" style="direction:ltr;">
+                <span class="phone-prefix">
+                  <span class="phone-flag">🇯🇴</span>
+                  <span class="phone-code">+962</span>
+                </span>
+                <input class="field-input" type="tel" value="79 123 4567" placeholder="7X XXX XXXX"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SAVE BAR -->
+      <div class="save-bar">
+        <button class="btn-secondary">إلغاء</button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          حفظ التغييرات
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">تعديل بيانات الطالب — عربي</div>
+</div>
+
+</body>
+</html>
