@@ -4,9 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import 'package:smart_bus/core/routing/app_router.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
+import 'dart:math' as math;
+
 import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
 import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
+import 'package:smart_bus/features/parent/domain/entities/live_tracking.dart';
 import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
+import 'package:smart_bus/features/parent/presentation/providers/live_tracking_controller.dart';
 import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
 
@@ -380,7 +384,7 @@ class _ChildPanel extends ConsumerWidget {
 
 // ─── Trip hero ─────────────────────────────────────────────────────────
 
-class _TripHero extends StatelessWidget {
+class _TripHero extends ConsumerWidget {
   const _TripHero({
     required this.trip,
     required this.l,
@@ -399,7 +403,14 @@ class _TripHero extends StatelessWidget {
       trip.tripPhase == TripPhase.scheduled;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // While the trip is active, swap the "Duration" cell for live ETA so the
+    // home card stays useful as the bus moves.
+    final liveEtaMin = _showTrackButton
+        ? _liveEtaMinutes(
+            ref.watch(liveTrackingControllerProvider(studentId)).valueOrNull,
+          )
+        : null;
     final statusColor = _pending ? const Color(0xFFFCD34D) : const Color(0xFF6EE7B7);
     final statusBg =
         _pending ? const Color(0x2EF59E0B) : const Color(0x2E10B981);
@@ -530,10 +541,14 @@ class _TripHero extends StatelessWidget {
                 Expanded(
                   child: _MetaItem(
                     icon: Icons.access_time,
-                    label: l.parentMetaDuration,
-                    value: trip.durationMinutes != null
-                        ? '${trip.durationMinutes} min'
-                        : '—',
+                    label: liveEtaMin != null
+                        ? l.liveTrackingArrives
+                        : l.parentMetaDuration,
+                    value: liveEtaMin != null
+                        ? '$liveEtaMin min'
+                        : (trip.durationMinutes != null
+                            ? '${trip.durationMinutes} min'
+                            : '—'),
                   ),
                 ),
               ],
@@ -1370,4 +1385,32 @@ String _monthAbbrev(int month) {
     'Dec',
   ];
   return months[month.clamp(1, 12)];
+}
+
+int? _liveEtaMinutes(LiveTracking? data) {
+  if (data == null) return null;
+  final bus = data.busLocation;
+  if (bus == null) return null;
+  if (data.homeLatitude == null || data.homeLongitude == null) return null;
+  final meters = _haversineMeters(
+    bus.latitude,
+    bus.longitude,
+    data.homeLatitude!,
+    data.homeLongitude!,
+  );
+  // Use reported speed when the bus is actually moving; otherwise assume an
+  // urban average of 30 km/h so the value still reflects something meaningful.
+  final mps = (bus.speed != null && bus.speed! > 1.0) ? bus.speed! : 30 * 1000 / 3600;
+  return (meters / mps / 60).round().clamp(0, 999);
+}
+
+double _haversineMeters(double lat1, double lng1, double lat2, double lng2) {
+  const r = 6371000.0;
+  double rad(double d) => d * math.pi / 180.0;
+  final dLat = rad(lat2 - lat1);
+  final dLng = rad(lng2 - lng1);
+  final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+      math.cos(rad(lat1)) * math.cos(rad(lat2)) *
+          math.sin(dLng / 2) * math.sin(dLng / 2);
+  return 2 * r * math.atan2(math.sqrt(a), math.sqrt(1 - a));
 }
