@@ -509,6 +509,59 @@ class AppLocalizationsAr extends AppLocalizations {
   String get absenceFailed => 'تعذّر الإرسال. يرجى المحاولة مرة أخرى.';
 
   @override
+  String get parentTrackLive => 'التتبّع المباشر';
+
+  @override
+  String get liveTrackingLive => 'مباشر';
+
+  @override
+  String get liveTrackingMin => 'د';
+
+  @override
+  String get liveTrackingOnTime => 'في الموعد';
+
+  @override
+  String get liveTrackingOnTheWaySchool => 'في الطريق إلى المدرسة';
+
+  @override
+  String get liveTrackingOnTheWayHome => 'في الطريق إلى المنزل';
+
+  @override
+  String get liveTrackingHome => 'المنزل';
+
+  @override
+  String get liveTrackingBoarded => 'الصعود';
+
+  @override
+  String get liveTrackingDistance => 'المسافة';
+
+  @override
+  String get liveTrackingSpeed => 'السرعة';
+
+  @override
+  String get liveTrackingArrives => 'الوصول';
+
+  @override
+  String get liveTrackingDriver => 'السائق';
+
+  @override
+  String get liveTrackingAssistant => 'المساعد';
+
+  @override
+  String get liveTrackingNoCrew => 'لم يُعيّن طاقم بعد';
+
+  @override
+  String liveTrackingLastUpdated(String when) {
+    return 'آخر تحديث $when';
+  }
+
+  @override
+  String get liveTrackingJustNow => 'الآن';
+
+  @override
+  String get liveTrackingNever => '—';
+
+  @override
   String get onboardingSkip => 'تخطّي';
 
   @override

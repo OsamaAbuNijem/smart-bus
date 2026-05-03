@@ -348,7 +348,10 @@ class _ChildPanel extends ConsumerWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (last != null) _TripHero(trip: last, l: l) else _NoTripsHero(l: l),
+                  if (last != null)
+                    _TripHero(trip: last, l: l, studentId: child.id)
+                  else
+                    _NoTripsHero(l: l),
                   const SizedBox(height: 14),
                   _SectionHead(title: l.parentSectionQuickActions),
                   const SizedBox(height: 8),
@@ -378,13 +381,22 @@ class _ChildPanel extends ConsumerWidget {
 // ─── Trip hero ─────────────────────────────────────────────────────────
 
 class _TripHero extends StatelessWidget {
-  const _TripHero({required this.trip, required this.l});
+  const _TripHero({
+    required this.trip,
+    required this.l,
+    required this.studentId,
+  });
   final ChildTrip trip;
   final AppLocalizations l;
+  final String studentId;
 
   bool get _pending =>
       trip.tripPhase != TripPhase.completed &&
       trip.boardingStatus != BoardingStatus.absent;
+
+  bool get _showTrackButton =>
+      trip.tripPhase == TripPhase.inProgress ||
+      trip.tripPhase == TripPhase.scheduled;
 
   @override
   Widget build(BuildContext context) {
@@ -527,7 +539,87 @@ class _TripHero extends StatelessWidget {
               ],
             ),
           ),
+          if (_showTrackButton) ...[
+            const SizedBox(height: 14),
+            _TrackLiveBtn(
+              label: l.parentTrackLive,
+              onTap: () =>
+                  context.push(AppRoute.studentLiveFor(studentId)),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _TrackLiveBtn extends StatelessWidget {
+  const _TrackLiveBtn({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(13),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.yellow.withValues(alpha: 0.40),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(13),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(13),
+            onTap: onTap,
+            child: Ink(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(13),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.yellow, AppColors.yellowDeep],
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFFE11D48),
+                      boxShadow: [
+                        BoxShadow(color: Color(0xFFE11D48), blurRadius: 6),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.location_on, size: 15, color: AppColors.ink),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:smart_bus/features/parent/data/datasources/parent_remote_datasource.dart';
 import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
+import 'package:smart_bus/features/parent/domain/entities/live_tracking.dart';
 import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
 import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
 
@@ -25,6 +26,46 @@ class ParentRepository {
               homeArea: c.homeArea,
             ))
         .toList();
+  }
+
+  Future<LiveTracking> getLiveTracking({
+    required String parentId,
+    required String studentId,
+  }) async {
+    final dto = await _remote.getLiveTracking(
+      parentId: parentId,
+      studentId: studentId,
+    );
+    return LiveTracking(
+      tripId: dto.tripId,
+      tripStatus: dto.tripStatus,
+      tripType: dto.tripType,
+      scheduledDeparture: dto.scheduledDeparture,
+      actualDeparture: dto.actualDeparture,
+      actualArrival: dto.actualArrival,
+      boardingTime: dto.boardingTime,
+      boardingStatus: dto.boardingStatus,
+      busId: dto.busId,
+      busPlateNumber: dto.busPlateNumber,
+      busLocation: dto.busLocation == null
+          ? null
+          : BusLocation(
+              latitude: dto.busLocation!.latitude,
+              longitude: dto.busLocation!.longitude,
+              speed: dto.busLocation!.speed,
+              heading: dto.busLocation!.heading,
+              timestamp: dto.busLocation!.timestamp,
+            ),
+      driverName: dto.driverName,
+      driverPhone: dto.driverPhone,
+      assistantName: dto.assistantName,
+      assistantPhone: dto.assistantPhone,
+      studentFullName: dto.studentFullName,
+      homeLatitude: dto.homeLatitude,
+      homeLongitude: dto.homeLongitude,
+      homeAddress: dto.homeAddress,
+      schoolName: dto.schoolName,
+    );
   }
 
   Future<StudentInfo> getStudent({

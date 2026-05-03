@@ -1076,6 +1076,108 @@ abstract class AppLocalizations {
   /// **'Couldn\'t submit. Please try again.'**
   String get absenceFailed;
 
+  /// No description provided for @parentTrackLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Track Live'**
+  String get parentTrackLive;
+
+  /// No description provided for @liveTrackingLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get liveTrackingLive;
+
+  /// No description provided for @liveTrackingMin.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get liveTrackingMin;
+
+  /// No description provided for @liveTrackingOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'On time'**
+  String get liveTrackingOnTime;
+
+  /// No description provided for @liveTrackingOnTheWaySchool.
+  ///
+  /// In en, this message translates to:
+  /// **'On the way to school'**
+  String get liveTrackingOnTheWaySchool;
+
+  /// No description provided for @liveTrackingOnTheWayHome.
+  ///
+  /// In en, this message translates to:
+  /// **'On the way home'**
+  String get liveTrackingOnTheWayHome;
+
+  /// No description provided for @liveTrackingHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get liveTrackingHome;
+
+  /// No description provided for @liveTrackingBoarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Boarded'**
+  String get liveTrackingBoarded;
+
+  /// No description provided for @liveTrackingDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get liveTrackingDistance;
+
+  /// No description provided for @liveTrackingSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get liveTrackingSpeed;
+
+  /// No description provided for @liveTrackingArrives.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrives'**
+  String get liveTrackingArrives;
+
+  /// No description provided for @liveTrackingDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get liveTrackingDriver;
+
+  /// No description provided for @liveTrackingAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant'**
+  String get liveTrackingAssistant;
+
+  /// No description provided for @liveTrackingNoCrew.
+  ///
+  /// In en, this message translates to:
+  /// **'Crew not assigned yet'**
+  String get liveTrackingNoCrew;
+
+  /// No description provided for @liveTrackingLastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated {when}'**
+  String liveTrackingLastUpdated(String when);
+
+  /// No description provided for @liveTrackingJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get liveTrackingJustNow;
+
+  /// No description provided for @liveTrackingNever.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get liveTrackingNever;
+
   /// No description provided for @onboardingSkip.
   ///
   /// In en, this message translates to:

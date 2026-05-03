@@ -115,14 +115,32 @@ try
     {
         o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
         o.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
-            RateLimitPartition.GetFixedWindowLimiter(
+        {
+            // SignalR negotiates and (especially) long-polling fire many requests per
+            // second per client. Excluding /hubs prevents the global 60/min cap from
+            // tearing down live connections in a reconnect loop.
+            // Bus location ingestion is also high-frequency by design — a moving bus
+            // posts every 1–2s — so exclude it too. AuthN/AuthZ still gate it.
+            var path = ctx.Request.Path;
+            if (path.StartsWithSegments("/hubs") ||
+                path.StartsWithSegments("/health") ||
+                (ctx.Request.Method == HttpMethods.Post &&
+                 path.Value != null &&
+                 path.Value.Contains("/buses/", StringComparison.OrdinalIgnoreCase) &&
+                 path.Value.EndsWith("/location", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RateLimitPartition.GetNoLimiter<string>("unlimited");
+            }
+
+            return RateLimitPartition.GetFixedWindowLimiter(
                 partitionKey: ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                 factory: _ => new FixedWindowRateLimiterOptions
                 {
                     PermitLimit = 60,
                     Window = TimeSpan.FromMinutes(1),
                     QueueLimit = 0
-                }));
+                });
+        });
         o.AddPolicy("auth", ctx => RateLimitPartition.GetFixedWindowLimiter(
             partitionKey: ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             factory: _ => new FixedWindowRateLimiterOptions

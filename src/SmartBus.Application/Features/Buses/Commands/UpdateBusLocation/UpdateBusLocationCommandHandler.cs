@@ -43,11 +43,28 @@ public class UpdateBusLocationCommandHandler : IRequestHandler<UpdateBusLocation
         await _context.BusLocations.AddAsync(location, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        var cacheKey = $"bus-location:{request.BusId}";
-        await _cacheService.SetAsync(cacheKey, location, TimeSpan.FromMinutes(5), cancellationToken);
+        // Cache is best-effort — if Redis is unavailable we still want the
+        // DB write and SignalR broadcast to succeed so live tracking works.
+        try
+        {
+            var cacheKey = $"bus-location:{request.BusId}";
+            await _cacheService.SetAsync(
+                cacheKey, location, TimeSpan.FromMinutes(5), cancellationToken);
+        }
+        catch
+        {
+            // ignore cache failures
+        }
 
-        await _notificationService.SendBusLocationUpdateAsync(
-            request.BusId, request.Latitude, request.Longitude, request.Speed, cancellationToken);
+        try
+        {
+            await _notificationService.SendBusLocationUpdateAsync(
+                request.BusId, request.Latitude, request.Longitude, request.Speed, cancellationToken);
+        }
+        catch
+        {
+            // ignore broadcast failures (DB write already persisted)
+        }
 
         return Result.Success();
     }

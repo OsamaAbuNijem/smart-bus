@@ -184,6 +184,27 @@
   "absenceSubmitted": "Absence reported",
   "absenceFailed": "Couldn't submit. Please try again.",
 
+  "parentTrackLive": "Track Live",
+  "liveTrackingLive": "Live",
+  "liveTrackingMin": "min",
+  "liveTrackingOnTime": "On time",
+  "liveTrackingOnTheWaySchool": "On the way to school",
+  "liveTrackingOnTheWayHome": "On the way home",
+  "liveTrackingHome": "Home",
+  "liveTrackingBoarded": "Boarded",
+  "liveTrackingDistance": "Distance",
+  "liveTrackingSpeed": "Speed",
+  "liveTrackingArrives": "Arrives",
+  "liveTrackingDriver": "Driver",
+  "liveTrackingAssistant": "Assistant",
+  "liveTrackingNoCrew": "Crew not assigned yet",
+  "liveTrackingLastUpdated": "Last updated {when}",
+  "@liveTrackingLastUpdated": {
+    "placeholders": { "when": { "type": "String" } }
+  },
+  "liveTrackingJustNow": "just now",
+  "liveTrackingNever": "—",
+
   "onboardingSkip": "Skip",
   "onboardingNext": "Next",
   "onboardingGetStarted": "Get started",

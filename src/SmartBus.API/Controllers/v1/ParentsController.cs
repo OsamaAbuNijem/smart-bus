@@ -7,6 +7,7 @@ using SmartBus.Application.Features.Parents.Commands.DeleteParent;
 using SmartBus.Application.Features.Parents.Commands.UpdateChildProfile;
 using SmartBus.Application.Features.Parents.Queries.GetAllParents;
 using SmartBus.Application.Features.Parents.Queries.GetParentById;
+using SmartBus.Application.Features.Parents.Queries.GetLiveTracking;
 using SmartBus.Application.Features.Parents.Queries.GetStudentInfo;
 using SmartBus.Application.Features.Parents.Queries.GetStudentTrips;
 
@@ -98,6 +99,23 @@ public class ParentsController : ControllerBase
         var result = await _mediator.Send(
             new GetStudentInfoQuery(parentId, studentId),
             cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Live tracking snapshot for the parent's child — most relevant trip
+    /// (in-progress / scheduled today / most recent), bus + crew + home/school
+    /// info. Combine with the SignalR hub `bus-{busId}` group for real-time
+    /// location updates.
+    /// </summary>
+    [HttpGet("{parentId:guid}/students/{studentId:guid}/live")]
+    public async Task<IActionResult> GetLiveTracking(
+        Guid parentId,
+        Guid studentId,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _mediator.Send(
+            new GetLiveTrackingQuery(parentId, studentId), cancellationToken);
         return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
     }
 

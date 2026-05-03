@@ -14,6 +14,7 @@ import 'package:smart_bus/features/home/presentation/screens/driver_home_screen.
 import 'package:smart_bus/features/home/presentation/screens/parent_home_screen.dart';
 import 'package:smart_bus/features/onboarding/presentation/providers/onboarding_controller.dart';
 import 'package:smart_bus/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:smart_bus/features/parent/presentation/screens/live_tracking_screen.dart';
 import 'package:smart_bus/features/parent/presentation/screens/report_absence_screen.dart';
 import 'package:smart_bus/features/parent/presentation/screens/student_edit_screen.dart';
 import 'package:smart_bus/features/parent/presentation/screens/student_info_screen.dart';
@@ -33,6 +34,7 @@ abstract class AppRoute {
   static const studentEdit = '/students/:studentId/edit';
   static const studentTrips = '/students/:studentId/trips';
   static const studentAbsence = '/students/:studentId/absence';
+  static const studentLive = '/students/:studentId/live';
 
   static String studentInfoFor(String studentId) => '/students/$studentId';
   static String studentEditFor(String studentId) =>
@@ -41,6 +43,8 @@ abstract class AppRoute {
       '/students/$studentId/trips';
   static String studentAbsenceFor(String studentId) =>
       '/students/$studentId/absence';
+  static String studentLiveFor(String studentId) =>
+      '/students/$studentId/live';
 
   static String homeFor(UserRole role) => switch (role) {
         UserRole.parent => homeParent,
@@ -153,6 +157,12 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoute.studentAbsence,
         builder: (context, state) => ReportAbsenceScreen(
+          studentId: state.pathParameters['studentId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.studentLive,
+        builder: (context, state) => LiveTrackingScreen(
           studentId: state.pathParameters['studentId']!,
         ),
       ),

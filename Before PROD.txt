@@ -1,0 +1,10 @@
+adding Mapbox for map
+
+● Saved. Plan logged: when we pick this up, swap to Mapbox + cache by (busId, tripId) so we fetch one route per trip instead of   
+  every bus move — that's what keeps it inside the 100K/month free tier.                  
+                                                                                                                                  
+  For now the app keeps using the OSRM public demo (fine for dev/demo). Ping me when you're ready to do the production swap.   
+
+https://account.mapbox.com/auth/signup/
+smart-bus
+O#43829001a

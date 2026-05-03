@@ -513,6 +513,59 @@ class AppLocalizationsEn extends AppLocalizations {
   String get absenceFailed => 'Couldn\'t submit. Please try again.';
 
   @override
+  String get parentTrackLive => 'Track Live';
+
+  @override
+  String get liveTrackingLive => 'Live';
+
+  @override
+  String get liveTrackingMin => 'min';
+
+  @override
+  String get liveTrackingOnTime => 'On time';
+
+  @override
+  String get liveTrackingOnTheWaySchool => 'On the way to school';
+
+  @override
+  String get liveTrackingOnTheWayHome => 'On the way home';
+
+  @override
+  String get liveTrackingHome => 'Home';
+
+  @override
+  String get liveTrackingBoarded => 'Boarded';
+
+  @override
+  String get liveTrackingDistance => 'Distance';
+
+  @override
+  String get liveTrackingSpeed => 'Speed';
+
+  @override
+  String get liveTrackingArrives => 'Arrives';
+
+  @override
+  String get liveTrackingDriver => 'Driver';
+
+  @override
+  String get liveTrackingAssistant => 'Assistant';
+
+  @override
+  String get liveTrackingNoCrew => 'Crew not assigned yet';
+
+  @override
+  String liveTrackingLastUpdated(String when) {
+    return 'Last updated $when';
+  }
+
+  @override
+  String get liveTrackingJustNow => 'just now';
+
+  @override
+  String get liveTrackingNever => '—';
+
+  @override
   String get onboardingSkip => 'Skip';
 
   @override

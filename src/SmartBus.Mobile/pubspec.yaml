@@ -31,6 +31,13 @@ dependencies:
   # External actions (tel:, sms:)
   url_launcher: ^6.3.1
 
+  # Map (OpenStreetMap)
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+
+  # Real-time (SignalR)
+  signalr_netcore: ^1.4.4
+
   # Models / serialization
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0

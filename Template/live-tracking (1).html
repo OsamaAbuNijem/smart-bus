@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Live Tracking — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#F5C518;
+    --yellow-deep:#E0AE08;
+    --yellow-tint:#FFFBEB;
+    --ink:#0F172A;
+    --slate-700:#334155;
+    --slate-600:#475569;
+    --slate-500:#64748B;
+    --slate-400:#94A3B8;
+    --slate-300:#CBD5E1;
+    --slate-200:#E2E8F0;
+    --slate-100:#F1F5F9;
+    --slate-50:#F8FAFC;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+    --emerald:#059669;
+    --emerald-soft:#D1FAE5;
+    --rose:#E11D48;
+    --rose-soft:#FFE4E6;
+    --amber:#D97706;
+    --amber-soft:#FEF3C7;
+    --violet:#7C3AED;
+    --violet-soft:#EDE9FE;
+    --whatsapp:#25D366;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+    --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.08), 0 8px 10px -6px rgba(15,23,42,0.04);
+    --shadow-yellow: 0 8px 24px -8px rgba(245,197,24,0.55);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+
+  body{
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 10%, #FFF8DC 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 90%, #EFF6FF 0%, transparent 55%),
+      #F4F4F5;
+    background-attachment:fixed;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:56px 24px;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+
+  .sw{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .sl{
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-500);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sl::before, .sl::after{
+    content:'';
+    width:24px;
+    height:1.5px;
+    background:var(--slate-300);
+  }
+  .sw[dir="rtl"] .sl{font-family:'Cairo',sans-serif;letter-spacing:0.1em;}
+
+  /* PHONE */
+  .phone{
+    width:380px;
+    height:824px;
+    background:#fff;
+    border-radius:54px;
+    border:9px solid #0a0a0a;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:
+      0 0 0 2px #1f1f1f,
+      0 30px 60px -20px rgba(15,23,42,0.30),
+      0 18px 36px -18px rgba(15,23,42,0.20);
+    position:relative;
+  }
+  .notch{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:28px;
+    background:#0a0a0a;
+    border-radius:0 0 18px 18px;
+    z-index:50;
+  }
+  .statusbar{
+    height:46px;
+    background:#0a0a0a;
+    color:#fff;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 28px 6px;
+    flex-shrink:0;
+  }
+  .statusbar .time{font-size:14px;font-weight:600;letter-spacing:-0.01em;}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;}
+
+  .screen{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    background:#0a0a0a;
+  }
+
+  /* ============== HERO STRIP ============== */
+  .hero{
+    background:linear-gradient(180deg, #0a0a0a 0%, #1A1F2E 50%, #0F172A 100%);
+    color:#fff;
+    padding:6px 18px 14px;
+    flex-shrink:0;
+    position:relative;
+    overflow:hidden;
+    z-index:5;
+  }
+  .hero::before{
+    content:'';
+    position:absolute;
+    width:280px;
+    height:200px;
+    background:radial-gradient(circle, rgba(245,197,24,0.18) 0%, transparent 60%);
+    top:-100px;
+    right:-60px;
+    pointer-events:none;
+  }
+  [dir="rtl"] .hero::before{right:auto;left:-60px;}
+
+  .hero-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+    position:relative;
+    z-index:2;
+  }
+  .icon-btn{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+    text-decoration:none;
+    transition:all 0.15s;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,0.14);}
+
+  .hero-title-block{
+    text-align:center;
+    flex:1;
+  }
+  .hero-eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:9.5px;
+    color:#6EE7B7;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    margin-bottom:1px;
+  }
+  [dir="rtl"] .hero-eyebrow{font-family:'Cairo',sans-serif;letter-spacing:0.06em;}
+  .live-pulse{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#34D399;
+    box-shadow:0 0 0 0 rgba(52,211,153,0.55);
+    animation:livePulse 1.5s infinite;
+  }
+  @keyframes livePulse{
+    0%{box-shadow:0 0 0 0 rgba(52,211,153,0.6);}
+    70%{box-shadow:0 0 0 6px rgba(52,211,153,0);}
+    100%{box-shadow:0 0 0 0 rgba(52,211,153,0);}
+  }
+  .hero-name{
+    font-size:14px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.02em;
+    line-height:1.1;
+  }
+  [dir="rtl"] .hero-name{font-family:'Cairo',sans-serif;letter-spacing:0;}
+
+  /* ETA BAR */
+  .eta-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;
+    padding:10px 12px;
+    position:relative;
+    z-index:2;
+  }
+  .eta-bus-icon{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:
+      0 4px 10px -3px rgba(245,197,24,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .eta-info{flex:1;min-width:0;}
+  .eta-label{
+    font-size:9.5px;
+    color:rgba(255,255,255,0.55);
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    line-height:1;
+    margin-bottom:3px;
+  }
+  [dir="rtl"] .eta-label{font-family:'Cairo',sans-serif;letter-spacing:0.04em;}
+  .eta-value{
+    display:flex;
+    align-items:baseline;
+    gap:4px;
+  }
+  .eta-num{
+    font-size:18px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.025em;
+    line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  [dir="rtl"] .eta-num{font-family:'Cairo',sans-serif;}
+  .eta-unit{
+    font-size:11px;
+    font-weight:600;
+    color:rgba(255,255,255,0.55);
+    letter-spacing:-0.005em;
+  }
+  [dir="rtl"] .eta-unit{font-family:'Cairo',sans-serif;}
+  .eta-status-pill{
+    flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 10px;
+    background:rgba(16,185,129,0.18);
+    border:1px solid rgba(16,185,129,0.3);
+    border-radius:100px;
+    font-size:10px;
+    font-weight:700;
+    color:#6EE7B7;
+    letter-spacing:-0.005em;
+  }
+  [dir="rtl"] .eta-status-pill{font-family:'Cairo',sans-serif;}
+
+  /* ============== MAP ============== */
+  .map-area{
+    flex:1;
+    background:#E8F4F1;
+    position:relative;
+    overflow:hidden;
+    min-height:0;
+  }
+
+  /* Map background gradient for "satellite" feel */
+  .map-area::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at 25% 30%, rgba(167,243,208,0.25) 0%, transparent 40%),
+      radial-gradient(circle at 75% 70%, rgba(165,180,252,0.20) 0%, transparent 45%),
+      linear-gradient(135deg, #DCF2EC 0%, #E8F0F7 100%);
+  }
+
+  /* Subtle grid */
+  .map-grid{
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(148,163,184,0.10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,163,184,0.10) 1px, transparent 1px);
+    background-size:36px 36px;
+  }
+
+  /* Roads as soft white bands with shadow */
+  .road{
+    position:absolute;
+    background:#fff;
+    box-shadow:0 1px 3px rgba(15,23,42,0.06);
+  }
+  .road.h1{top:24%;left:0;right:0;height:14px;}
+  .road.h2{top:62%;left:0;right:0;height:14px;}
+  .road.v1{top:0;bottom:0;left:32%;width:14px;}
+  .road.v2{top:0;bottom:0;left:74%;width:14px;}
+
+  /* Lane dashes */
+  .road.h1::after, .road.h2::after{
+    content:'';
+    position:absolute;
+    top:50%;
+    left:0;
+    right:0;
+    height:1.5px;
+    transform:translateY(-50%);
+    background:repeating-linear-gradient(90deg, var(--slate-300) 0 7px, transparent 7px 14px);
+  }
+  .road.v1::after, .road.v2::after{
+    content:'';
+    position:absolute;
+    left:50%;
+    top:0;
+    bottom:0;
+    width:1.5px;
+    transform:translateX(-50%);
+    background:repeating-linear-gradient(180deg, var(--slate-300) 0 7px, transparent 7px 14px);
+  }
+
+  /* Park / building blocks for depth */
+  .map-park{
+    position:absolute;
+    background:linear-gradient(135deg, #BBF7D0 0%, #86EFAC 100%);
+    border-radius:14px;
+    opacity:0.55;
+  }
+  .map-block{
+    position:absolute;
+    background:linear-gradient(135deg, #fff 0%, #F1F5F9 100%);
+    border-radius:8px;
+    box-shadow:0 1px 3px rgba(15,23,42,0.04);
+    border:1px solid rgba(148,163,184,0.15);
+  }
+
+  /* Route line */
+  .route-svg{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:2;
+  }
+
+  /* Pins */
+  .pin{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    z-index:5;
+  }
+  .pin-bus{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    border:3.5px solid #fff;
+    box-shadow:
+      0 6px 14px rgba(15,23,42,0.20),
+      0 0 0 3px rgba(245,197,24,0.20);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--ink);
+  }
+  .pin-pulse{
+    position:absolute;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background:rgba(245,197,24,0.20);
+    transform:translate(-50%,-50%);
+    z-index:4;
+    animation:mapPulse 2s infinite ease-out;
+  }
+  @keyframes mapPulse{
+    0%{transform:translate(-50%,-50%) scale(0.4);opacity:0.7;}
+    100%{transform:translate(-50%,-50%) scale(1.2);opacity:0;}
+  }
+  .pin-loc{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:3px solid #fff;
+    box-shadow:0 4px 10px rgba(15,23,42,0.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+  }
+  .pin-loc.home{background:linear-gradient(135deg, #FB7185 0%, #E11D48 100%);}
+  .pin-loc.school{background:linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);}
+
+  .pin-tag{
+    position:absolute;
+    top:-26px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#fff;
+    border-radius:8px;
+    padding:3px 9px;
+    box-shadow:0 4px 10px rgba(15,23,42,0.10);
+    border:1px solid var(--slate-100);
+    font-size:10px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+    white-space:nowrap;
+  }
+  [dir="rtl"] .pin-tag{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .pin-tag::after{
+    content:'';
+    position:absolute;
+    bottom:-4px;
+    left:50%;
+    transform:translateX(-50%) rotate(45deg);
+    width:7px;
+    height:7px;
+    background:#fff;
+    border-right:1px solid var(--slate-100);
+    border-bottom:1px solid var(--slate-100);
+  }
+
+  /* Map Controls */
+  .map-controls{
+    position:absolute;
+    top:14px;
+    right:14px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    z-index:10;
+  }
+  [dir="rtl"] .map-controls{right:auto;left:14px;}
+  .map-ctrl{
+    width:36px;
+    height:36px;
+    background:#fff;
+    border-radius:11px;
+    box-shadow:var(--shadow-md);
+    border:1px solid var(--slate-100);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:var(--slate-700);
+    transition:all 0.15s;
+  }
+  .map-ctrl:hover{background:var(--slate-50);}
+  .map-ctrl.locate{color:var(--blue);}
+
+  .map-zoom{
+    position:absolute;
+    bottom:14px;
+    right:14px;
+    display:flex;
+    flex-direction:column;
+    background:#fff;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow-md);
+    border:1px solid var(--slate-100);
+    z-index:10;
+  }
+  [dir="rtl"] .map-zoom{right:auto;left:14px;}
+  .zoom-btn{
+    width:36px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:var(--slate-700);
+    transition:background 0.15s;
+  }
+  .zoom-btn:hover{background:var(--slate-50);}
+  .zoom-btn:not(:last-child){border-bottom:1px solid var(--slate-100);}
+
+  /* ============== BOTTOM SHEET ============== */
+  .sheet{
+    background:#fff;
+    border-top-left-radius:24px;
+    border-top-right-radius:24px;
+    flex-shrink:0;
+    padding:8px 14px 14px;
+    box-shadow:0 -10px 30px -10px rgba(15,23,42,0.12);
+    position:relative;
+    z-index:5;
+  }
+  .sheet-handle{
+    width:38px;
+    height:4px;
+    border-radius:2px;
+    background:var(--slate-200);
+    margin:0 auto 12px;
+  }
+
+  /* STATS GRID — 2x2 for: boarding, distance, speed, ETA */
+  .stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .stat{
+    background:var(--slate-50);
+    border:1px solid var(--slate-100);
+    border-radius:12px;
+    padding:9px 10px 10px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .stat-icon{
+    width:30px;
+    height:30px;
+    border-radius:9px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid;
+  }
+  .stat-icon.amber{background:var(--amber-soft);border-color:#FDE68A;color:var(--amber);}
+  .stat-icon.blue{background:var(--blue-soft);border-color:#BFDBFE;color:var(--blue);}
+  .stat-icon.violet{background:var(--violet-soft);border-color:#DDD6FE;color:var(--violet);}
+  .stat-icon.emerald{background:var(--emerald-soft);border-color:#A7F3D0;color:var(--emerald);}
+
+  .stat-text{flex:1;min-width:0;line-height:1.1;}
+  .stat-label{
+    font-size:9.5px;
+    color:var(--slate-500);
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    margin-bottom:3px;
+  }
+  [dir="rtl"] .stat-label{font-family:'Cairo',sans-serif;letter-spacing:0.03em;}
+  .stat-value{
+    font-size:13.5px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.02em;
+    font-variant-numeric:tabular-nums;
+    display:inline-flex;
+    align-items:baseline;
+    gap:2px;
+  }
+  [dir="rtl"] .stat-value{font-family:'Cairo',sans-serif;}
+  .stat-value-unit{
+    font-size:10px;
+    font-weight:600;
+    color:var(--slate-500);
+    letter-spacing:-0.01em;
+  }
+
+  /* CREW STRIP */
+  .crew-card{
+    background:#fff;
+    border:1px solid var(--slate-200);
+    border-radius:14px;
+    overflow:hidden;
+    margin-bottom:0;
+  }
+  .crew-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    border-bottom:1px solid var(--slate-100);
+  }
+  .crew-row:last-child{border-bottom:none;}
+  .crew-avatar{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11.5px;
+    font-weight:800;
+    flex-shrink:0;
+    letter-spacing:-0.02em;
+    border:1.5px solid #fff;
+    box-shadow:0 0 0 1.5px var(--slate-200);
+  }
+  [dir="rtl"] .crew-avatar{font-family:'Cairo',sans-serif;}
+  .crew-avatar.driver{
+    background:linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%);
+    color:#1E40AF;
+  }
+  .crew-avatar.assistant{
+    background:linear-gradient(135deg, #FEF3C7 0%, #FCD34D 100%);
+    color:#92400E;
+  }
+  .crew-info{flex:1;min-width:0;line-height:1.15;}
+  .crew-role{
+    font-size:9.5px;
+    color:var(--slate-400);
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    margin-bottom:2px;
+  }
+  [dir="rtl"] .crew-role{font-family:'Cairo',sans-serif;letter-spacing:0.03em;}
+  .crew-name{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  [dir="rtl"] .crew-name{font-family:'Cairo',sans-serif;letter-spacing:0;}
+
+  .crew-actions{
+    display:flex;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .ca-btn{
+    width:34px;
+    height:34px;
+    border-radius:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    text-decoration:none;
+    transition:all 0.15s;
+    border:none;
+  }
+  .ca-btn:hover{transform:translateY(-1px);}
+
+  .ca-btn.call{
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    box-shadow:0 4px 10px -3px rgba(245,197,24,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .ca-btn.whatsapp{
+    background:linear-gradient(180deg, #34D399 0%, #25D366 100%);
+    color:#fff;
+    box-shadow:0 4px 10px -3px rgba(37,211,102,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+
+  /* LAST UPDATE */
+  .last-upd{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    margin-top:10px;
+    font-size:10.5px;
+    color:var(--slate-400);
+    font-weight:600;
+    letter-spacing:-0.005em;
+  }
+  [dir="rtl"] .last-upd{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .last-upd .live-dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#34D399;
+    box-shadow:0 0 6px #34D399;
+  }
+  .last-upd b{color:var(--slate-700);font-weight:700;font-variant-numeric:tabular-nums;}
+
+  @media (max-width: 900px){
+    body{padding:32px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== ENGLISH ==================== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="Back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </a>
+          <div class="hero-title-block">
+            <div class="hero-eyebrow"><span class="live-pulse"></span>Live</div>
+            <div class="hero-name">Ahmed M. Khaldi</div>
+          </div>
+          <div style="width:36px;"></div>
+        </div>
+
+        <div class="eta-bar">
+          <div class="eta-bus-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M16 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
+          </div>
+          <div class="eta-info">
+            <div class="eta-label">On the way to school</div>
+            <div class="eta-value">
+              <span class="eta-num">8</span>
+              <span class="eta-unit">min · Bus #38</span>
+            </div>
+          </div>
+          <span class="eta-status-pill">
+            <span class="live-pulse"></span>
+            On time
+          </span>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="map-area">
+        <div class="map-grid"></div>
+
+        <!-- Park / blocks for depth -->
+        <div class="map-park" style="top:35%;left:8%;width:18%;height:22%;"></div>
+        <div class="map-block" style="top:8%;left:38%;width:30%;height:14%;"></div>
+        <div class="map-block" style="top:32%;left:42%;width:26%;height:24%;"></div>
+        <div class="map-block" style="top:70%;left:10%;width:18%;height:22%;"></div>
+        <div class="map-block" style="top:72%;left:50%;width:18%;height:22%;"></div>
+
+        <!-- Roads -->
+        <div class="road h1"></div>
+        <div class="road h2"></div>
+        <div class="road v1"></div>
+        <div class="road v2"></div>
+
+        <!-- Route SVG -->
+        <svg class="route-svg" viewBox="0 0 380 380" preserveAspectRatio="none">
+          <path d="M 80 300 L 80 250 L 130 250 L 130 130 L 290 130 L 290 50" stroke="#F5C518" stroke-width="3.5" stroke-dasharray="6 4" fill="none" stroke-linecap="round" opacity="0.85"/>
+          <path d="M 130 250 L 130 130" stroke="#10B981" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.65"/>
+          <path d="M 80 300 L 80 250 L 130 250" stroke="#10B981" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.65"/>
+        </svg>
+
+        <!-- Home pin -->
+        <div class="pin" style="top:78%;left:21%;">
+          <div class="pin-tag">Home</div>
+          <div class="pin-loc home">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+        </div>
+
+        <!-- Bus pin -->
+        <div class="pin-pulse" style="top:34%;left:34%;"></div>
+        <div class="pin" style="top:34%;left:34%;">
+          <div class="pin-tag">Bus #38</div>
+          <div class="pin-bus">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M16 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
+          </div>
+        </div>
+
+        <!-- School pin -->
+        <div class="pin" style="top:13%;left:76%;">
+          <div class="pin-tag">School</div>
+          <div class="pin-loc school">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          </div>
+        </div>
+
+        <!-- Map controls -->
+        <div class="map-controls">
+          <div class="map-ctrl locate" title="My location">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          </div>
+          <div class="map-ctrl" title="Layers">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          </div>
+        </div>
+
+        <div class="map-zoom">
+          <div class="zoom-btn" title="Zoom in">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="zoom-btn" title="Zoom out">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM SHEET -->
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+
+        <!-- 2x2 STATS -->
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-icon amber">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </div>
+            <div class="stat-text">
+              <div class="stat-label">Boarded</div>
+              <div class="stat-value">7:31<span class="stat-value-unit">AM</span></div>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon blue">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="stat-text">
+              <div class="stat-label">Distance</div>
+              <div class="stat-value">2.3<span class="stat-value-unit">km</span></div>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon violet">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div class="stat-text">
+              <div class="stat-label">Speed</div>
+              <div class="stat-value">37<span class="stat-value-unit">km/h</span></div>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon emerald">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-text">
+              <div class="stat-label">Arrives</div>
+              <div class="stat-value">8:04<span class="stat-value-unit">AM</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CREW: Driver + Assistant with Call & WhatsApp -->
+        <div class="crew-card">
+          <div class="crew-row">
+            <div class="crew-avatar driver">KS</div>
+            <div class="crew-info">
+              <div class="crew-role">Driver</div>
+              <div class="crew-name">Khaled Sami</div>
+            </div>
+            <div class="crew-actions">
+              <a class="ca-btn whatsapp" href="https://wa.me/962791234567" title="WhatsApp">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg>
+              </a>
+              <a class="ca-btn call" href="tel:+962791234567" title="Call">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-avatar assistant">LH</div>
+            <div class="crew-info">
+              <div class="crew-role">Assistant</div>
+              <div class="crew-name">Layla Hassan</div>
+            </div>
+            <div class="crew-actions">
+              <a class="ca-btn whatsapp" href="https://wa.me/962799876543" title="WhatsApp">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg>
+              </a>
+              <a class="ca-btn call" href="tel:+962799876543" title="Call">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="last-upd">
+          <span class="live-dot"></span>
+          Last updated <b>just now</b>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">Live Tracking — English</div>
+</div>
+
+<!-- ==================== ARABIC ==================== -->
+<div class="sw" dir="rtl" style="font-family:'Cairo',sans-serif;">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="direction:ltr;">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="رجوع">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <div class="hero-title-block">
+            <div class="hero-eyebrow"><span class="live-pulse"></span>مباشر</div>
+            <div class="hero-name">أحمد محمد الخالدي</div>
+          </div>
+          <div style="width:36px;"></div>
+        </div>
+
+        <div class="eta-bar">
+          <div class="eta-bus-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M16 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
+          </div>
+          <div class="eta-info">
+            <div class="eta-label">في الطريق إلى المدرسة</div>
+            <div class="eta-value">
+              <span class="eta-num">٨</span>
+              <span class="eta-unit">د · باص ٣٨</span>
+            </div>
+          </div>
+          <span class="eta-status-pill">
+            <span class="live-pulse"></span>
+            في الموعد
+          </span>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="map-area">
+        <div class="map-grid"></div>
+
+        <div class="map-park" style="top:35%;right:8%;width:18%;height:22%;"></div>
+        <div class="map-block" style="top:8%;right:38%;width:30%;height:14%;"></div>
+        <div class="map-block" style="top:32%;right:42%;width:26%;height:24%;"></div>
+        <div class="map-block" style="top:70%;right:10%;width:18%;height:22%;"></div>
+        <div class="map-block" style="top:72%;right:50%;width:18%;height:22%;"></div>
+
+        <div class="road h1"></div>
+        <div class="road h2"></div>
+        <div class="road v1" style="left:auto;right:32%;"></div>
+        <div class="road v2" style="left:auto;right:74%;"></div>
+
+        <svg class="route-svg" viewBox="0 0 380 380" preserveAspectRatio="none">
+          <path d="M 300 300 L 300 250 L 250 250 L 250 130 L 90 130 L 90 50" stroke="#F5C518" stroke-width="3.5" stroke-dasharray="6 4" fill="none" stroke-linecap="round" opacity="0.85"/>
+        </svg>
+
+        <div class="pin" style="top:78%;right:21%;left:auto;">
+          <div class="pin-tag">المنزل</div>
+          <div class="pin-loc home">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+        </div>
+
+        <div class="pin-pulse" style="top:34%;right:34%;left:auto;"></div>
+        <div class="pin" style="top:34%;right:34%;left:auto;">
+          <div class="pin-tag">باص ٣٨</div>
+          <div class="pin-bus">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M16 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
+          </div>
+        </div>
+
+        <div class="pin" style="top:13%;right:76%;left:auto;">
+          <div class="pin-tag">المدرسة</div>
+          <div class="pin-loc school">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          </div>
+        </div>
+
+        <div class="map-controls">
+          <div class="map-ctrl locate" title="موقعي">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          </div>
+          <div class="map-ctrl" title="الطبقات">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          </div>
+        </div>
+
+        <div class="map-zoom">
+          <div class="zoom-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="zoom-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM SHEET -->
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-icon amber">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </div>
+            <div class="stat-text">
+              <div class="stat-label">وقت الركوب</div>
+              <div class="stat-value" style="direction:ltr;">7:31<span class="stat-value-unit"> ص</span></div>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon blue">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="stat-text">
+              <div class="stat-label">المسافة</div>
+              <div class="stat-value">٢٫٣<span class="stat-value-unit"> كم</span></div>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon violet">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div class="stat-text">
+              <div class="stat-label">السرعة</div>
+              <div class="stat-value">٣٧<span class="stat-value-unit"> كم/س</span></div>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon emerald">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-text">
+              <div class="stat-label">الوصول</div>
+              <div class="stat-value" style="direction:ltr;">8:04<span class="stat-value-unit"> ص</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="crew-card">
+          <div class="crew-row">
+            <div class="crew-avatar driver">خس</div>
+            <div class="crew-info">
+              <div class="crew-role">السائق</div>
+              <div class="crew-name">خالد سامي</div>
+            </div>
+            <div class="crew-actions">
+              <a class="ca-btn whatsapp" href="https://wa.me/962791234567" title="واتساب">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg>
+              </a>
+              <a class="ca-btn call" href="tel:+962791234567" title="اتصال">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-avatar assistant">له</div>
+            <div class="crew-info">
+              <div class="crew-role">المرافِقة</div>
+              <div class="crew-name">ليلى حسن</div>
+            </div>
+            <div class="crew-actions">
+              <a class="ca-btn whatsapp" href="https://wa.me/962799876543" title="واتساب">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg>
+              </a>
+              <a class="ca-btn call" href="tel:+962799876543" title="اتصال">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="last-upd">
+          <span class="live-dot"></span>
+          آخر تحديث <b>الآن</b>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">التتبع المباشر — عربي</div>
+</div>
+
+</body>
+</html>
