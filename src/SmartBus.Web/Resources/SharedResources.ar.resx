@@ -195,6 +195,18 @@
   <data name="Student_ColActions"  xml:space="preserve"><value>إجراءات</value></data>
   <data name="Student_AriaEdit"    xml:space="preserve"><value>تعديل الطالب {0}</value></data>
   <data name="Student_AriaDelete"  xml:space="preserve"><value>حذف الطالب {0}</value></data>
+  <data name="Student_AriaSendPush" xml:space="preserve"><value>إرسال إشعار لولي أمر {0}</value></data>
+  <data name="Push_ModalTitle"      xml:space="preserve"><value>إرسال إشعار</value></data>
+  <data name="Push_ModalSub"        xml:space="preserve"><value>المستلم: ولي أمر {0}</value></data>
+  <data name="Push_TitleLabel"      xml:space="preserve"><value>العنوان</value></data>
+  <data name="Push_BodyLabel"       xml:space="preserve"><value>الرسالة</value></data>
+  <data name="Push_TitlePlaceholder" xml:space="preserve"><value>مثال: الحافلة قاربت الوصول</value></data>
+  <data name="Push_BodyPlaceholder" xml:space="preserve"><value>اكتب نص الرسالة...</value></data>
+  <data name="Push_SendBtn"         xml:space="preserve"><value>إرسال</value></data>
+  <data name="Push_TitleBodyRequired" xml:space="preserve"><value>العنوان والرسالة مطلوبان.</value></data>
+  <data name="Push_Sent"            xml:space="preserve"><value>تم الإرسال إلى {0} جهاز.</value></data>
+  <data name="Push_SentNoDevices"   xml:space="preserve"><value>تم الإرسال — ولكن لا توجد أجهزة مسجلة لولي الأمر.</value></data>
+  <data name="Push_Failed"          xml:space="preserve"><value>فشل إرسال الإشعار.</value></data>
   <data name="Student_AriaAdd"     xml:space="preserve"><value>إضافة طالب جديد</value></data>
   <data name="Student_AriaTable"   xml:space="preserve"><value>جدول الطلاب</value></data>
   <data name="Student_Export"      xml:space="preserve"><value>تصدير Excel</value></data>

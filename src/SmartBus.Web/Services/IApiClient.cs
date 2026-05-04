@@ -53,4 +53,7 @@ public interface IApiClient
     // Alerts
     Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null);
     Task<bool> SetAlertStatusAsync(Guid id, int status);
+
+    // Notifications
+    Task<(bool Ok, int Delivered, string? Error)> SendPushToStudentParentAsync(Guid studentId, string title, string body);
 }

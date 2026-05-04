@@ -7,7 +7,7 @@ part of 'live_tracking_controller.dart';
 // **************************************************************************
 
 String _$liveTrackingControllerHash() =>
-    r'1a067c35329f11ea5d162ca712a801b2389db1c8';
+    r'7fede14ee7797a83987996f6713057b728c04b43';
 
 /// Copied from Dart SDK
 class _SystemHash {

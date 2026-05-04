@@ -90,6 +90,19 @@ public class StudentsController : AdminControllerBase
         return await SuccessWithList(_l["JS_DeletedSuccess"], page, name, grade, homeArea);
     }
 
+    // ── Push notification to parent ─────────────────────────────────────────
+    public record SendPushInput(string Title, string Body);
+
+    [HttpPost]
+    public async Task<IActionResult> SendPush(Guid id, [FromBody] SendPushInput input)
+    {
+        if (input is null || string.IsNullOrWhiteSpace(input.Title) || string.IsNullOrWhiteSpace(input.Body))
+            return BadRequest(new { error = _l["Push_TitleBodyRequired"].Value });
+        var (ok, delivered, error) = await ApiClient.SendPushToStudentParentAsync(id, input.Title, input.Body);
+        if (!ok) return StatusCode(502, new { error = error ?? _l["JS_SaveFailed"].Value });
+        return Ok(new { delivered });
+    }
+
     // ── Export ─────────────────────────────────────────────────────────────
     [HttpGet]
     public async Task<IActionResult> Export(string? name = null, string? grade = null, string? homeArea = null)

@@ -38,6 +38,11 @@ dependencies:
   # Real-time (SignalR)
   signalr_netcore: ^1.4.4
 
+  # Push notifications (Firebase Cloud Messaging)
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+  flutter_local_notifications: ^18.0.1
+
   # Models / serialization
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0

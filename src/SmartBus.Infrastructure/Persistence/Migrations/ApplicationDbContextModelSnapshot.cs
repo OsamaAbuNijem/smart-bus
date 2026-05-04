@@ -361,8 +361,7 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("QrToken")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -373,10 +372,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LastLocationId");
-
-                    b.HasIndex("QrToken")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
 
                     b.HasIndex("IsDeleted", "CreatedAt");
 
@@ -544,55 +539,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.ToTable("Drivers");
                 });
 
-            modelBuilder.Entity("SmartBus.Domain.Entities.EmployeeQrToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("SchoolId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UsedAssistantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UsedDriverId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Token")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.HasIndex("SchoolId", "Type", "IsUsed");
-
-                    b.ToTable("EmployeeQrTokens");
-                });
-
             modelBuilder.Entity("SmartBus.Domain.Entities.EmergencyContact", b =>
                 {
                     b.Property<Guid>("Id")
@@ -627,6 +573,54 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("EmergencyContacts");
+                });
+
+            modelBuilder.Entity("SmartBus.Domain.Entities.EmployeeQrToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UsedAssistantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UsedDriverId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("SchoolId", "Type", "IsUsed");
+
+                    b.ToTable("EmployeeQrTokens");
                 });
 
             modelBuilder.Entity("SmartBus.Domain.Entities.Notification", b =>
@@ -988,8 +982,7 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1107,6 +1100,47 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.HasIndex("Status", "ScheduledDeparture");
 
                     b.ToTable("Trips");
+                });
+
+            modelBuilder.Entity("SmartBus.Domain.Entities.UserDeviceToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Token")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("UserDeviceTokens");
                 });
 
             modelBuilder.Entity("SmartBus.Infrastructure.Identity.ApplicationUser", b =>
@@ -1341,17 +1375,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("SmartBus.Domain.Entities.EmployeeQrToken", b =>
-                {
-                    b.HasOne("SmartBus.Domain.Entities.School", "School")
-                        .WithMany()
-                        .HasForeignKey("SchoolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("School");
-                });
-
             modelBuilder.Entity("SmartBus.Domain.Entities.EmergencyContact", b =>
                 {
                     b.HasOne("SmartBus.Domain.Entities.Student", "Student")
@@ -1361,6 +1384,17 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("SmartBus.Domain.Entities.EmployeeQrToken", b =>
+                {
+                    b.HasOne("SmartBus.Domain.Entities.School", "School")
+                        .WithMany()
+                        .HasForeignKey("SchoolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("School");
                 });
 
             modelBuilder.Entity("SmartBus.Domain.Entities.Stop", b =>

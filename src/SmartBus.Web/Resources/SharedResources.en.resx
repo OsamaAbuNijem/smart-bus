@@ -195,6 +195,18 @@
   <data name="Student_ColActions"  xml:space="preserve"><value>Actions</value></data>
   <data name="Student_AriaEdit"    xml:space="preserve"><value>Edit student {0}</value></data>
   <data name="Student_AriaDelete"  xml:space="preserve"><value>Delete student {0}</value></data>
+  <data name="Student_AriaSendPush" xml:space="preserve"><value>Send push to {0}'s parent</value></data>
+  <data name="Push_ModalTitle"      xml:space="preserve"><value>Send Push Notification</value></data>
+  <data name="Push_ModalSub"        xml:space="preserve"><value>Recipient: {0}'s parent</value></data>
+  <data name="Push_TitleLabel"      xml:space="preserve"><value>Title</value></data>
+  <data name="Push_BodyLabel"       xml:space="preserve"><value>Message</value></data>
+  <data name="Push_TitlePlaceholder" xml:space="preserve"><value>e.g. Bus is approaching</value></data>
+  <data name="Push_BodyPlaceholder" xml:space="preserve"><value>Type the message body...</value></data>
+  <data name="Push_SendBtn"         xml:space="preserve"><value>Send</value></data>
+  <data name="Push_TitleBodyRequired" xml:space="preserve"><value>Title and message are required.</value></data>
+  <data name="Push_Sent"            xml:space="preserve"><value>Push delivered to {0} device(s).</value></data>
+  <data name="Push_SentNoDevices"   xml:space="preserve"><value>Sent — but the parent has no registered devices.</value></data>
+  <data name="Push_Failed"          xml:space="preserve"><value>Failed to send push.</value></data>
   <data name="Student_AriaAdd"     xml:space="preserve"><value>Add new student</value></data>
   <data name="Student_AriaTable"   xml:space="preserve"><value>Students table</value></data>
   <data name="Student_Export"      xml:space="preserve"><value>Export Excel</value></data>

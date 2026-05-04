@@ -212,5 +212,31 @@ public class ApiClient : IApiClient
         return ok;
     }
 
+    public async Task<(bool Ok, int Delivered, string? Error)> SendPushToStudentParentAsync(
+        Guid studentId, string title, string body)
+    {
+        var url = $"api/v1/notifications/students/{studentId}/push";
+        var content = new StringContent(
+            JsonSerializer.Serialize(new { title, body }, _jsonOptions),
+            Encoding.UTF8, "application/json");
+        using var req = AuthorizedRequest(HttpMethod.Post, url, content);
+        using var response = await _httpClient.SendAsync(req);
+        var resBody = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("POST {Url} failed. Status={Status} Body={Body}", url, response.StatusCode, resBody);
+            return (false, 0, ExtractError(resBody));
+        }
+        var delivered = 0;
+        try
+        {
+            using var doc = JsonDocument.Parse(resBody);
+            if (doc.RootElement.TryGetProperty("delivered", out var d))
+                delivered = d.GetInt32();
+        }
+        catch { /* tolerate non-JSON responses */ }
+        return (true, delivered, null);
+    }
+
     private record LoginResult(string Token, string Email, IEnumerable<string> Roles, DateTime ExpiresAt);
 }

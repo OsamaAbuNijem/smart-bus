@@ -31,6 +31,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<BusScheduleStudent> BusScheduleStudents => Set<BusScheduleStudent>();
     public DbSet<EmployeeQrToken> EmployeeQrTokens => Set<EmployeeQrToken>();
     public DbSet<StudentQrToken>  StudentQrTokens  => Set<StudentQrToken>();
+    public DbSet<UserDeviceToken> UserDeviceTokens => Set<UserDeviceToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -213,6 +214,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
         // Latest-location lookup on BusLocation:
         builder.Entity<BusLocation>().HasIndex(l => new { l.BusId, l.Timestamp });
+
+        // FCM device tokens — one user can have many; (UserId, Token) unique
+        // so re-registering an existing device is a true upsert. Token is
+        // capped at 512 chars (FCM tokens are ~163 today; cap with headroom)
+        // so the column can participate in a unique index.
+        builder.Entity<UserDeviceToken>().HasQueryFilter(t => !t.IsDeleted);
+        builder.Entity<UserDeviceToken>().Property(t => t.Token).HasMaxLength(512).IsRequired();
+        builder.Entity<UserDeviceToken>().Property(t => t.Platform).HasMaxLength(16).IsRequired();
+        builder.Entity<UserDeviceToken>()
+            .HasIndex(t => new { t.UserId, t.Token })
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

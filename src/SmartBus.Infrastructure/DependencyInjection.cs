@@ -1,3 +1,5 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -120,6 +122,22 @@ public static class DependencyInjection
             opts.ServerTimeout            = TimeSpan.FromMinutes(5);
         });
         services.AddScoped<BusTrackingCleanupJob>();
+
+        // Firebase Cloud Messaging — initialize once with the service-account
+        // JSON whose path is in Firebase:CredentialsPath. App still boots if
+        // the file is missing; pushes will just fail gracefully at send time.
+        var fcmCredsPath = configuration["Firebase:CredentialsPath"];
+        if (!string.IsNullOrWhiteSpace(fcmCredsPath) && File.Exists(fcmCredsPath))
+        {
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                FirebaseApp.Create(new AppOptions
+                {
+                    Credential = GoogleCredential.FromFile(fcmCredsPath),
+                });
+            }
+        }
+        services.AddScoped<IPushNotificationService, FcmPushNotificationService>();
 
         // Note: ISignalRNotificationService is registered in the API layer (needs Hub type)
 
