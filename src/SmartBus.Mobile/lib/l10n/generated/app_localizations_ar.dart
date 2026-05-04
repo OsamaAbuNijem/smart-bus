@@ -590,4 +590,45 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get onboardingDescription3 =>
       'خط مباشر مع السائقين وطاقم المدرسة وقت الحاجة.';
+
+  @override
+  String get notificationsTitle => 'الإشعارات';
+
+  @override
+  String get notificationsEyebrow => 'النشاط';
+
+  @override
+  String get notificationsMarkAllRead => 'تعيين الكل كمقروء';
+
+  @override
+  String notificationsCountSummary(int newCount, int total) {
+    return '$newCount جديد · $total إجمالاً';
+  }
+
+  @override
+  String get notificationsToday => 'اليوم';
+
+  @override
+  String get notificationsYesterday => 'الأمس';
+
+  @override
+  String notificationsDaysAgo(int days) {
+    return 'منذ $days أيام';
+  }
+
+  @override
+  String notificationsCountNew(int count) {
+    return '$count جديدة';
+  }
+
+  @override
+  String notificationsCountItems(int count) {
+    return '$count عناصر';
+  }
+
+  @override
+  String get notificationsEmptyTitle => 'لا توجد إشعارات بعد';
+
+  @override
+  String get notificationsEmptySub => 'ستظهر هنا أي تحديثات عن رحلة طفلك.';
 }

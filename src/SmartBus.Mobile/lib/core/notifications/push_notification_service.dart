@@ -67,8 +67,18 @@ class PushNotificationService {
 
   Stream<String> get tokenRefreshStream => _messaging.onTokenRefresh;
 
+  /// Stream of FCM messages received while the app is foregrounded. Used by
+  /// the notifications inbox to refresh itself live.
+  Stream<RemoteMessage> get foregroundMessageStream =>
+      FirebaseMessaging.onMessage;
+
   void _showForegroundNotification(RemoteMessage message) {
     final notification = message.notification;
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print('[FCM] foreground message: title="${notification?.title}" '
+          'body="${notification?.body}" data=${message.data}');
+    }
     if (notification == null) return;
     _localNotifications.show(
       notification.hashCode,
@@ -81,6 +91,7 @@ class PushNotificationService {
           channelDescription: _channel.description,
           importance: Importance.high,
           priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
         ),
       ),
       payload: message.data.isEmpty ? null : message.data.toString(),
@@ -121,6 +132,12 @@ Future<String?> fcmDeviceToken(Ref ref) async {
 @Riverpod(keepAlive: true)
 Stream<String> fcmTokenStream(Ref ref) =>
     ref.watch(pushNotificationServiceProvider).tokenRefreshStream;
+
+/// Stream of foreground FCM messages. Listeners use this to react to
+/// incoming pushes (e.g. refresh the inbox).
+@Riverpod(keepAlive: true)
+Stream<RemoteMessage> fcmForegroundMessages(Ref ref) =>
+    ref.watch(pushNotificationServiceProvider).foregroundMessageStream;
 
 /// Background message handler must be registered before runApp(). Call from
 /// main() before Firebase.initializeApp().

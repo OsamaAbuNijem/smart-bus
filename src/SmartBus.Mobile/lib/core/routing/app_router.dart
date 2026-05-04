@@ -12,6 +12,7 @@ import 'package:smart_bus/features/auth/presentation/screens/splash_screen.dart'
 import 'package:smart_bus/features/home/presentation/screens/assistant_home_screen.dart';
 import 'package:smart_bus/features/home/presentation/screens/driver_home_screen.dart';
 import 'package:smart_bus/features/home/presentation/screens/parent_home_screen.dart';
+import 'package:smart_bus/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:smart_bus/features/onboarding/presentation/providers/onboarding_controller.dart';
 import 'package:smart_bus/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:smart_bus/features/parent/presentation/screens/live_tracking_screen.dart';
@@ -35,6 +36,7 @@ abstract class AppRoute {
   static const studentTrips = '/students/:studentId/trips';
   static const studentAbsence = '/students/:studentId/absence';
   static const studentLive = '/students/:studentId/live';
+  static const notifications = '/notifications';
 
   static String studentInfoFor(String studentId) => '/students/$studentId';
   static String studentEditFor(String studentId) =>
@@ -165,6 +167,10 @@ GoRouter appRouter(Ref ref) {
         builder: (context, state) => LiveTrackingScreen(
           studentId: state.pathParameters['studentId']!,
         ),
+      ),
+      GoRoute(
+        path: AppRoute.notifications,
+        builder: (_, _) => const NotificationsScreen(),
       ),
     ],
   );

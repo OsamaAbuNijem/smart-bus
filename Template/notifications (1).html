@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Notifications — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#F5C518;
+    --yellow-deep:#E0AE08;
+    --yellow-tint:#FFFBEB;
+    --ink:#0F172A;
+    --slate-700:#334155;
+    --slate-600:#475569;
+    --slate-500:#64748B;
+    --slate-400:#94A3B8;
+    --slate-300:#CBD5E1;
+    --slate-200:#E2E8F0;
+    --slate-100:#F1F5F9;
+    --slate-50:#F8FAFC;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+    --emerald:#059669;
+    --emerald-soft:#D1FAE5;
+    --rose:#E11D48;
+    --rose-soft:#FFE4E6;
+    --amber:#D97706;
+    --amber-soft:#FEF3C7;
+    --violet:#7C3AED;
+    --violet-soft:#EDE9FE;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+    --shadow-yellow: 0 8px 24px -8px rgba(245,197,24,0.55);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+
+  body{
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 10%, #FFF8DC 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 90%, #EFF6FF 0%, transparent 55%),
+      #F4F4F5;
+    background-attachment:fixed;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:56px 24px;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+
+  .sw{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .sl{
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-500);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sl::before, .sl::after{
+    content:'';
+    width:24px;
+    height:1.5px;
+    background:var(--slate-300);
+  }
+  .sw[dir="rtl"] .sl{font-family:'Cairo',sans-serif;letter-spacing:0.1em;}
+
+  /* PHONE */
+  .phone{
+    width:380px;
+    height:824px;
+    background:#fff;
+    border-radius:54px;
+    border:9px solid #0a0a0a;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:
+      0 0 0 2px #1f1f1f,
+      0 30px 60px -20px rgba(15,23,42,0.30),
+      0 18px 36px -18px rgba(15,23,42,0.20);
+    position:relative;
+  }
+  .notch{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:28px;
+    background:#0a0a0a;
+    border-radius:0 0 18px 18px;
+    z-index:50;
+  }
+  .statusbar{
+    height:46px;
+    background:#0a0a0a;
+    color:#fff;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 28px 6px;
+    flex-shrink:0;
+  }
+  .statusbar .time{font-size:14px;font-weight:600;letter-spacing:-0.01em;}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;}
+
+  .screen{
+    background:#FAFAFA;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* ============== HERO ============== */
+  .hero{
+    background:linear-gradient(180deg, #0a0a0a 0%, #1A1F2E 60%, #0F172A 100%);
+    color:#fff;
+    padding:8px 18px 22px;
+    flex-shrink:0;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';
+    position:absolute;
+    width:280px;
+    height:280px;
+    background:radial-gradient(circle, rgba(245,197,24,0.18) 0%, transparent 60%);
+    top:-150px;
+    right:-60px;
+    pointer-events:none;
+  }
+  [dir="rtl"] .hero::before{right:auto;left:-60px;}
+  .hero::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100' height='100' filter='url(%23n)' opacity='0.4'/></svg>");
+    opacity:0.05;
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+
+  .hero-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    position:relative;
+    z-index:2;
+  }
+  .icon-btn{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+    text-decoration:none;
+    transition:all 0.15s;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,0.14);}
+  .hero-eyebrow{
+    font-size:10px;
+    color:rgba(255,255,255,0.5);
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+  }
+  [dir="rtl"] .hero-eyebrow{font-family:'Cairo',sans-serif;letter-spacing:0.06em;}
+
+  .hero-title-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    position:relative;
+    z-index:2;
+  }
+  .hero-title-block{flex:1;min-width:0;}
+  .hero-title{
+    font-size:24px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.03em;
+    line-height:1.1;
+  }
+  [dir="rtl"] .hero-title{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .hero-sub{
+    font-size:12px;
+    color:rgba(255,255,255,0.6);
+    font-weight:500;
+    margin-top:5px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  [dir="rtl"] .hero-sub{font-family:'Cairo',sans-serif;}
+  .hero-sub b{
+    color:var(--yellow);
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+  .hero-sub-dot{
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.35);
+  }
+
+  .mark-all-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(245,197,24,0.15);
+    border:1px solid rgba(245,197,24,0.3);
+    border-radius:100px;
+    padding:7px 12px;
+    font-size:11px;
+    font-weight:700;
+    color:#FCD34D;
+    letter-spacing:-0.005em;
+    cursor:pointer;
+    text-decoration:none;
+    flex-shrink:0;
+    transition:all 0.15s;
+    margin-bottom:2px;
+    font-family:inherit;
+  }
+  [dir="rtl"] .mark-all-btn{font-family:'Cairo',sans-serif;}
+  .mark-all-btn:hover{background:rgba(245,197,24,0.22);}
+
+  /* ============== BODY ============== */
+  .body{
+    flex:1;
+    overflow-y:auto;
+    margin-top:-12px;
+    border-radius:20px 20px 0 0;
+    background:#FAFAFA;
+    padding:14px 14px 20px;
+    position:relative;
+    z-index:3;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .body::-webkit-scrollbar{display:none;}
+
+  /* DAY GROUP */
+  .day-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .day-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 4px;
+  }
+  .day-name{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:11px;
+    font-weight:800;
+    color:var(--slate-700);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+  }
+  [dir="rtl"] .day-name{font-family:'Cairo',sans-serif;letter-spacing:0.05em;}
+  .day-name .dot{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 0 2px rgba(245,197,24,0.2);
+  }
+  .day-count{
+    font-size:11px;
+    color:var(--slate-400);
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+  }
+  [dir="rtl"] .day-count{font-family:'Cairo',sans-serif;}
+
+  /* NOTIF CARD STACK */
+  .notif-stack{
+    background:#fff;
+    border-radius:16px;
+    border:1px solid var(--slate-200);
+    overflow:hidden;
+    box-shadow:var(--shadow-sm);
+  }
+
+  /* NOTIFICATION ROW */
+  .notif{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:12px 14px;
+    border-bottom:1px solid var(--slate-100);
+    cursor:pointer;
+    transition:background 0.15s;
+    position:relative;
+  }
+  .notif:last-child{border-bottom:none;}
+  .notif:hover{background:var(--slate-50);}
+
+  /* Unread treatment: subtle gradient + left accent bar */
+  .notif.unread{
+    background:linear-gradient(90deg, var(--yellow-tint) 0%, #fff 80%);
+  }
+  [dir="rtl"] .notif.unread{
+    background:linear-gradient(270deg, var(--yellow-tint) 0%, #fff 80%);
+  }
+  .notif.unread::before{
+    content:'';
+    position:absolute;
+    left:0;
+    top:14px;
+    bottom:14px;
+    width:3px;
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    border-radius:0 3px 3px 0;
+  }
+  [dir="rtl"] .notif.unread::before{
+    left:auto;
+    right:0;
+    border-radius:3px 0 0 3px;
+  }
+
+  .notif-icon{
+    width:38px;
+    height:38px;
+    border-radius:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    border:1px solid;
+  }
+  .notif-icon.amber{background:var(--amber-soft);border-color:#FDE68A;color:var(--amber);}
+  .notif-icon.emerald{background:var(--emerald-soft);border-color:#A7F3D0;color:var(--emerald);}
+  .notif-icon.blue{background:var(--blue-soft);border-color:#BFDBFE;color:var(--blue);}
+  .notif-icon.rose{background:var(--rose-soft);border-color:#FECDD3;color:var(--rose);}
+  .notif-icon.violet{background:var(--violet-soft);border-color:#DDD6FE;color:var(--violet);}
+  .notif-icon.yellow{background:var(--yellow-tint);border-color:#FDE68A;color:var(--yellow-deep);}
+
+  .notif-body{
+    flex:1;
+    min-width:0;
+  }
+  .notif-title{
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--ink);
+    letter-spacing:-0.015em;
+    line-height:1.3;
+    margin-bottom:3px;
+  }
+  [dir="rtl"] .notif-title{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .notif.unread .notif-title{font-weight:800;}
+  .notif-desc{
+    font-size:12px;
+    color:var(--slate-500);
+    font-weight:500;
+    line-height:1.45;
+    letter-spacing:-0.005em;
+    overflow:hidden;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+  }
+  [dir="rtl"] .notif-desc{font-family:'Cairo',sans-serif;letter-spacing:0;line-height:1.55;}
+
+  .notif-aside{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+    flex-shrink:0;
+  }
+  [dir="rtl"] .notif-aside{align-items:flex-start;}
+  .notif-time{
+    font-size:10.5px;
+    color:var(--slate-400);
+    font-weight:600;
+    letter-spacing:-0.005em;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  [dir="rtl"] .notif-time{font-family:'Cairo',sans-serif;}
+  .unread-pulse{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    box-shadow:0 0 0 0 rgba(245,197,24,0.55);
+    animation:unreadPulse 2s infinite;
+  }
+  @keyframes unreadPulse{
+    0%{box-shadow:0 0 0 0 rgba(245,197,24,0.6);}
+    70%{box-shadow:0 0 0 6px rgba(245,197,24,0);}
+    100%{box-shadow:0 0 0 0 rgba(245,197,24,0);}
+  }
+
+  @media (max-width: 900px){
+    body{padding:32px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== ENGLISH ==================== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="Back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </a>
+          <span class="hero-eyebrow">Activity</span>
+          <div style="width:36px;"></div>
+        </div>
+        <div class="hero-title-row">
+          <div class="hero-title-block">
+            <div class="hero-title">Notifications</div>
+            <div class="hero-sub">
+              <b>3</b> new
+              <span class="hero-sub-dot"></span>
+              7 total
+            </div>
+          </div>
+          <button class="mark-all-btn">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Mark all read
+          </button>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- TODAY -->
+        <div class="day-group">
+          <div class="day-head">
+            <span class="day-name"><span class="dot"></span>Today</span>
+            <span class="day-count">3 new</span>
+          </div>
+          <div class="notif-stack">
+
+            <div class="notif unread">
+              <div class="notif-icon amber">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Bus is 5 minutes away</div>
+                <div class="notif-desc">Bus #38 is approaching Al-Zeitoun stop — get ready</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time">7:26 AM</span>
+                <div class="unread-pulse"></div>
+              </div>
+            </div>
+
+            <div class="notif unread">
+              <div class="notif-icon emerald">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Ahmed boarded safely</div>
+                <div class="notif-desc">Boarded from Al-Zeitoun stop — Bus #38</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time">7:31 AM</span>
+                <div class="unread-pulse"></div>
+              </div>
+            </div>
+
+            <div class="notif unread">
+              <div class="notif-icon blue">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Arrived at school</div>
+                <div class="notif-desc">Ahmed arrived safely at Al-Manar School</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time">7:52 AM</span>
+                <div class="unread-pulse"></div>
+              </div>
+            </div>
+
+            <div class="notif">
+              <div class="notif-icon violet">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Message from Driver Khaled</div>
+                <div class="notif-desc">"I'll be 5 minutes late today due to traffic"</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time">7:10 AM</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- YESTERDAY -->
+        <div class="day-group">
+          <div class="day-head">
+            <span class="day-name"><span class="dot"></span>Yesterday</span>
+            <span class="day-count">3 items</span>
+          </div>
+          <div class="notif-stack">
+
+            <div class="notif">
+              <div class="notif-icon rose">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Bus #38 delayed</div>
+                <div class="notif-desc">Bus is 10 min late due to traffic near Al-Zeitoun</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time">7:44 AM</span>
+              </div>
+            </div>
+
+            <div class="notif">
+              <div class="notif-icon yellow">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Absence request confirmed</div>
+                <div class="notif-desc">Sara's absence on Thursday Apr 10 was accepted</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time">8:10 PM</span>
+              </div>
+            </div>
+
+            <div class="notif">
+              <div class="notif-icon emerald">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Ahmed arrived home</div>
+                <div class="notif-desc">Return trip completed — dropped off at Al-Zeitoun</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time">2:39 PM</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2 DAYS AGO -->
+        <div class="day-group">
+          <div class="day-head">
+            <span class="day-name"><span class="dot"></span>2 days ago</span>
+            <span class="day-count">1 item</span>
+          </div>
+          <div class="notif-stack">
+
+            <div class="notif">
+              <div class="notif-icon blue">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">School notice</div>
+                <div class="notif-desc">Tomorrow is a public holiday — no bus service on Thursday</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time">3:00 PM</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">Notifications — English</div>
+</div>
+
+<!-- ==================== ARABIC ==================== -->
+<div class="sw" dir="rtl" style="font-family:'Cairo',sans-serif;">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="direction:ltr;">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="رجوع">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <span class="hero-eyebrow">النشاط</span>
+          <div style="width:36px;"></div>
+        </div>
+        <div class="hero-title-row">
+          <div class="hero-title-block">
+            <div class="hero-title">الإشعارات</div>
+            <div class="hero-sub">
+              <b>٣</b> جديد
+              <span class="hero-sub-dot"></span>
+              ٧ إجمالاً
+            </div>
+          </div>
+          <button class="mark-all-btn">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            تعيين الكل كمقروء
+          </button>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- TODAY -->
+        <div class="day-group">
+          <div class="day-head">
+            <span class="day-name"><span class="dot"></span>اليوم</span>
+            <span class="day-count">٣ جديدة</span>
+          </div>
+          <div class="notif-stack">
+
+            <div class="notif unread">
+              <div class="notif-icon amber">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">الباص على بُعد ٥ دقائق</div>
+                <div class="notif-desc">باص ٣٨ يقترب من محطة الزيتون — استعد للصعود</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time" style="direction:ltr;">7:26 AM</span>
+                <div class="unread-pulse"></div>
+              </div>
+            </div>
+
+            <div class="notif unread">
+              <div class="notif-icon emerald">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">صعد أحمد إلى الباص بأمان</div>
+                <div class="notif-desc">صعد من محطة الزيتون — باص ٣٨</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time" style="direction:ltr;">7:31 AM</span>
+                <div class="unread-pulse"></div>
+              </div>
+            </div>
+
+            <div class="notif unread">
+              <div class="notif-icon blue">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">وصل إلى المدرسة</div>
+                <div class="notif-desc">وصل أحمد بأمان إلى مدرسة المنار</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time" style="direction:ltr;">7:52 AM</span>
+                <div class="unread-pulse"></div>
+              </div>
+            </div>
+
+            <div class="notif">
+              <div class="notif-icon violet">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">رسالة من السائق خالد</div>
+                <div class="notif-desc">"سأتأخر ٥ دقائق اليوم بسبب الازدحام"</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time" style="direction:ltr;">7:10 AM</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- YESTERDAY -->
+        <div class="day-group">
+          <div class="day-head">
+            <span class="day-name"><span class="dot"></span>الأمس</span>
+            <span class="day-count">٣ عناصر</span>
+          </div>
+          <div class="notif-stack">
+
+            <div class="notif">
+              <div class="notif-icon rose">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">تأخر باص ٣٨</div>
+                <div class="notif-desc">الباص متأخر ١٠ دقائق بسبب الازدحام قرب الزيتون</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time" style="direction:ltr;">7:44 AM</span>
+              </div>
+            </div>
+
+            <div class="notif">
+              <div class="notif-icon yellow">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">تأكيد طلب الغياب</div>
+                <div class="notif-desc">تم قبول غياب سارة يوم الخميس ١٠ نيسان</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time" style="direction:ltr;">8:10 PM</span>
+              </div>
+            </div>
+
+            <div class="notif">
+              <div class="notif-icon emerald">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">وصل أحمد إلى المنزل</div>
+                <div class="notif-desc">اكتملت رحلة العودة — تم النزول في محطة الزيتون</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time" style="direction:ltr;">2:39 PM</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2 DAYS AGO -->
+        <div class="day-group">
+          <div class="day-head">
+            <span class="day-name"><span class="dot"></span>منذ يومين</span>
+            <span class="day-count">١ عنصر</span>
+          </div>
+          <div class="notif-stack">
+
+            <div class="notif">
+              <div class="notif-icon blue">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">إشعار من المدرسة</div>
+                <div class="notif-desc">غداً إجازة رسمية — لن يكون هناك باص يوم الخميس</div>
+              </div>
+              <div class="notif-aside">
+                <span class="notif-time" style="direction:ltr;">3:00 PM</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">الإشعارات — عربي</div>
+</div>
+
+</body>
+</html>

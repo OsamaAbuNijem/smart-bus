@@ -201,5 +201,32 @@
   "onboardingTitle2": "تنبيهات الوصول",
   "onboardingDescription2": "إشعارات للاستلام والتوصيل وأي تأخير غير متوقع.",
   "onboardingTitle3": "ابقَ على تواصل",
-  "onboardingDescription3": "خط مباشر مع السائقين وطاقم المدرسة وقت الحاجة."
+  "onboardingDescription3": "خط مباشر مع السائقين وطاقم المدرسة وقت الحاجة.",
+
+  "notificationsTitle": "الإشعارات",
+  "notificationsEyebrow": "النشاط",
+  "notificationsMarkAllRead": "تعيين الكل كمقروء",
+  "notificationsCountSummary": "{newCount} جديد · {total} إجمالاً",
+  "@notificationsCountSummary": {
+    "placeholders": {
+      "newCount": { "type": "int" },
+      "total":    { "type": "int" }
+    }
+  },
+  "notificationsToday": "اليوم",
+  "notificationsYesterday": "الأمس",
+  "notificationsDaysAgo": "منذ {days} أيام",
+  "@notificationsDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "notificationsCountNew": "{count} جديدة",
+  "@notificationsCountNew": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "notificationsCountItems": "{count} عناصر",
+  "@notificationsCountItems": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "notificationsEmptyTitle": "لا توجد إشعارات بعد",
+  "notificationsEmptySub": "ستظهر هنا أي تحديثات عن رحلة طفلك."
 }

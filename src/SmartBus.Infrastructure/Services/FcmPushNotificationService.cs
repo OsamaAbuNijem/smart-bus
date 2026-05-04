@@ -2,6 +2,7 @@ using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartBus.Application.Common.Interfaces;
+using SmartBus.Domain.Enums;
 using SmartBus.Infrastructure.Persistence;
 
 namespace SmartBus.Infrastructure.Services;
@@ -27,9 +28,22 @@ public class FcmPushNotificationService : IPushNotificationService
         string userId,
         string title,
         string body,
+        NotificationType type = NotificationType.SystemAlert,
         IDictionary<string, string>? data = null,
         CancellationToken cancellationToken = default)
     {
+        // Persist to the inbox first — even if FCM is unreachable the user
+        // will see the notification next time they open the app.
+        _db.Notifications.Add(new SmartBus.Domain.Entities.Notification
+        {
+            Title = title,
+            Message = body,
+            Type = type,
+            RecipientId = userId,
+            IsRead = false,
+        });
+        await _db.SaveChangesAsync(cancellationToken);
+
         var tokens = await _db.UserDeviceTokens
             .Where(t => t.UserId == userId)
             .Select(t => t.Token)

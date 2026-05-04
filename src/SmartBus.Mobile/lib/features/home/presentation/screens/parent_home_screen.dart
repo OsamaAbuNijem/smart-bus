@@ -8,6 +8,7 @@ import 'dart:math' as math;
 
 import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
 import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
+import 'package:smart_bus/features/notifications/presentation/providers/notifications_controller.dart';
 import 'package:smart_bus/features/parent/domain/entities/live_tracking.dart';
 import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
 import 'package:smart_bus/features/parent/presentation/providers/live_tracking_controller.dart';
@@ -151,9 +152,10 @@ class _Header extends ConsumerWidget {
               ],
             ),
           ),
-          const _HeaderIcon(
+          _HeaderIcon(
             icon: Icons.notifications_none,
-            badge: true,
+            badge: ref.watch(notificationsUnreadCountProvider) > 0,
+            onTap: () => context.push(AppRoute.notifications),
           ),
           const SizedBox(width: 8),
           _HeaderIcon(

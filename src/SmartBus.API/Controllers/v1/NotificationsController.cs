@@ -35,9 +35,23 @@ public class NotificationsController : ControllerBase
     }
 
     /// <summary>Get notifications for a recipient (parent/driver/assistant userId).</summary>
-    [HttpGet("{recipientId}")]
+    /// <remarks>
+    /// The :guid constraint keeps this from swallowing literal sibling routes
+    /// like /me — without it the catch-all would win for /notifications/me.
+    /// </remarks>
+    [HttpGet("{recipientId:guid}")]
     public async Task<IActionResult> GetByRecipient(string recipientId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
         => Ok(await _mediator.Send(new GetNotificationsByRecipientQuery(recipientId, pageNumber, pageSize), cancellationToken));
+
+    /// <summary>Get notifications for the calling user. Mobile clients use this
+    /// so they don't need to know their Identity user id.</summary>
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMine([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    {
+        var userId = _currentUser.UserId;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+        return Ok(await _mediator.Send(new GetNotificationsByRecipientQuery(userId, pageNumber, pageSize), cancellationToken));
+    }
 
     /// <summary>Send a notification (admin only).</summary>
     [HttpPost]
@@ -54,6 +68,22 @@ public class NotificationsController : ControllerBase
     {
         var result = await _mediator.Send(new MarkNotificationAsReadCommand(id), cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>Mark every notification for the calling user as read.</summary>
+    [HttpPatch("read-all")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken)
+    {
+        var userId = _currentUser.UserId;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+        await _db.Notifications
+            .Where(n => n.RecipientId == userId && !n.IsRead)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(n => n.IsRead, true)
+                .SetProperty(n => n.UpdatedAt, DateTime.UtcNow),
+                cancellationToken);
+        return NoContent();
     }
 
     /// <summary>Register / refresh the FCM device token for the current user.</summary>

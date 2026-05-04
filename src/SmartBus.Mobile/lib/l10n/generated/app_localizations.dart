@@ -1231,6 +1231,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Direct line to drivers and school staff when it matters.'**
   String get onboardingDescription3;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsTitle;
+
+  /// No description provided for @notificationsEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get notificationsEyebrow;
+
+  /// No description provided for @notificationsMarkAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get notificationsMarkAllRead;
+
+  /// No description provided for @notificationsCountSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{newCount} new · {total} total'**
+  String notificationsCountSummary(int newCount, int total);
+
+  /// No description provided for @notificationsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get notificationsToday;
+
+  /// No description provided for @notificationsYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get notificationsYesterday;
+
+  /// No description provided for @notificationsDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days ago'**
+  String notificationsDaysAgo(int days);
+
+  /// No description provided for @notificationsCountNew.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new'**
+  String notificationsCountNew(int count);
+
+  /// No description provided for @notificationsCountItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String notificationsCountItems(int count);
+
+  /// No description provided for @notificationsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get notificationsEmptyTitle;
+
+  /// No description provided for @notificationsEmptySub.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates about your child\'s trip will appear here.'**
+  String get notificationsEmptySub;
 }
 
 class _AppLocalizationsDelegate

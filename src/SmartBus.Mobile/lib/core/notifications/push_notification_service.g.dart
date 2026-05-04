@@ -62,5 +62,26 @@ final fcmTokenStreamProvider = StreamProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FcmTokenStreamRef = StreamProviderRef<String>;
+String _$fcmForegroundMessagesHash() =>
+    r'bf573f7da843e442f0fb856019c000965406ba68';
+
+/// Stream of foreground FCM messages. Listeners use this to react to
+/// incoming pushes (e.g. refresh the inbox).
+///
+/// Copied from [fcmForegroundMessages].
+@ProviderFor(fcmForegroundMessages)
+final fcmForegroundMessagesProvider = StreamProvider<RemoteMessage>.internal(
+  fcmForegroundMessages,
+  name: r'fcmForegroundMessagesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$fcmForegroundMessagesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef FcmForegroundMessagesRef = StreamProviderRef<RemoteMessage>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

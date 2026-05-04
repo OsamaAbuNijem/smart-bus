@@ -594,4 +594,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingDescription3 =>
       'Direct line to drivers and school staff when it matters.';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get notificationsEyebrow => 'Activity';
+
+  @override
+  String get notificationsMarkAllRead => 'Mark all read';
+
+  @override
+  String notificationsCountSummary(int newCount, int total) {
+    return '$newCount new · $total total';
+  }
+
+  @override
+  String get notificationsToday => 'Today';
+
+  @override
+  String get notificationsYesterday => 'Yesterday';
+
+  @override
+  String notificationsDaysAgo(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String notificationsCountNew(int count) {
+    return '$count new';
+  }
+
+  @override
+  String notificationsCountItems(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get notificationsEmptyTitle => 'No notifications yet';
+
+  @override
+  String get notificationsEmptySub =>
+      'Updates about your child\'s trip will appear here.';
 }

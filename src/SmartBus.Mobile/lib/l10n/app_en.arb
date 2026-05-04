@@ -213,5 +213,32 @@
   "onboardingTitle2": "Arrival alerts",
   "onboardingDescription2": "Get notified for pickup, drop-off, and unexpected delays.",
   "onboardingTitle3": "Stay connected",
-  "onboardingDescription3": "Direct line to drivers and school staff when it matters."
+  "onboardingDescription3": "Direct line to drivers and school staff when it matters.",
+
+  "notificationsTitle": "Notifications",
+  "notificationsEyebrow": "Activity",
+  "notificationsMarkAllRead": "Mark all read",
+  "notificationsCountSummary": "{newCount} new · {total} total",
+  "@notificationsCountSummary": {
+    "placeholders": {
+      "newCount": { "type": "int" },
+      "total":    { "type": "int" }
+    }
+  },
+  "notificationsToday": "Today",
+  "notificationsYesterday": "Yesterday",
+  "notificationsDaysAgo": "{days} days ago",
+  "@notificationsDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "notificationsCountNew": "{count} new",
+  "@notificationsCountNew": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "notificationsCountItems": "{count} items",
+  "@notificationsCountItems": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "notificationsEmptyTitle": "No notifications yet",
+  "notificationsEmptySub": "Updates about your child's trip will appear here."
 }

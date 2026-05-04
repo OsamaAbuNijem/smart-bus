@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Settings — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#F5C518;
+    --yellow-deep:#E0AE08;
+    --yellow-tint:#FFFBEB;
+    --ink:#0F172A;
+    --slate-700:#334155;
+    --slate-600:#475569;
+    --slate-500:#64748B;
+    --slate-400:#94A3B8;
+    --slate-300:#CBD5E1;
+    --slate-200:#E2E8F0;
+    --slate-100:#F1F5F9;
+    --slate-50:#F8FAFC;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+    --emerald:#059669;
+    --emerald-soft:#D1FAE5;
+    --rose:#E11D48;
+    --rose-soft:#FFE4E6;
+    --violet:#7C3AED;
+    --violet-soft:#EDE9FE;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+    --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.08), 0 8px 10px -6px rgba(15,23,42,0.04);
+    --shadow-yellow: 0 8px 24px -8px rgba(245,197,24,0.55);
+    --focus-ring: 0 0 0 3px rgba(245,197,24,0.18);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+
+  body{
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 10%, #FFF8DC 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 90%, #EFF6FF 0%, transparent 55%),
+      #F4F4F5;
+    background-attachment:fixed;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:56px 24px;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+
+  .sw{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .sl{
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-500);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sl::before, .sl::after{
+    content:'';
+    width:24px;
+    height:1.5px;
+    background:var(--slate-300);
+  }
+  .sw[dir="rtl"] .sl{font-family:'Cairo',sans-serif;letter-spacing:0.1em;}
+
+  /* PHONE */
+  .phone{
+    width:380px;
+    height:824px;
+    background:#fff;
+    border-radius:54px;
+    border:9px solid #0a0a0a;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:
+      0 0 0 2px #1f1f1f,
+      0 30px 60px -20px rgba(15,23,42,0.30),
+      0 18px 36px -18px rgba(15,23,42,0.20);
+    position:relative;
+  }
+  .notch{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:28px;
+    background:#0a0a0a;
+    border-radius:0 0 18px 18px;
+    z-index:50;
+  }
+  .statusbar{
+    height:46px;
+    background:#0a0a0a;
+    color:#fff;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 28px 6px;
+    flex-shrink:0;
+  }
+  .statusbar .time{font-size:14px;font-weight:600;letter-spacing:-0.01em;}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;}
+
+  .screen{
+    background:#FAFAFA;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* ============== HERO (compact) ============== */
+  .hero{
+    background:linear-gradient(180deg, #0a0a0a 0%, #1A1F2E 60%, #0F172A 100%);
+    color:#fff;
+    padding:6px 18px 26px;
+    flex-shrink:0;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';
+    position:absolute;
+    width:280px;
+    height:280px;
+    background:radial-gradient(circle, rgba(245,197,24,0.18) 0%, transparent 60%);
+    top:-150px;
+    right:-60px;
+    pointer-events:none;
+  }
+  [dir="rtl"] .hero::before{right:auto;left:-60px;}
+
+  .hero-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:6px;
+    position:relative;
+    z-index:2;
+  }
+  .icon-btn{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+    text-decoration:none;
+    transition:all 0.15s;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,0.14);}
+  .hero-eyebrow{
+    font-size:10px;
+    color:rgba(255,255,255,0.5);
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+  }
+  [dir="rtl"] .hero-eyebrow{font-family:'Cairo',sans-serif;letter-spacing:0.06em;}
+  .hero-title{
+    font-size:18px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.025em;
+    line-height:1.15;
+    text-align:center;
+  }
+  [dir="rtl"] .hero-title{font-family:'Cairo',sans-serif;letter-spacing:0;}
+
+  /* ============== BODY ============== */
+  .body{
+    flex:1;
+    overflow-y:auto;
+    margin-top:-16px;
+    border-radius:24px 24px 0 0;
+    background:#FAFAFA;
+    padding:0 14px 14px;
+    position:relative;
+    z-index:3;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .body::-webkit-scrollbar{display:none;}
+
+  /* ============== EDITABLE PROFILE CARD ============== */
+  .profile-card{
+    margin-top:-32px;
+    background:#fff;
+    border-radius:20px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-lg);
+    padding:18px 16px 14px;
+    position:relative;
+    z-index:5;
+  }
+
+  .pc-avatar-wrap{
+    width:72px;
+    height:72px;
+    margin:0 auto 12px;
+    position:relative;
+  }
+  .pc-avatar{
+    width:72px;
+    height:72px;
+    border-radius:22px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    font-size:22px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    letter-spacing:-0.025em;
+    box-shadow:
+      0 8px 20px -4px rgba(245,197,24,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -2px 0 rgba(0,0,0,0.08);
+  }
+  [dir="rtl"] .pc-avatar{font-family:'Cairo',sans-serif;}
+  .pc-camera{
+    position:absolute;
+    bottom:-3px;
+    right:-3px;
+    width:26px;
+    height:26px;
+    border-radius:9px;
+    background:#fff;
+    border:2.5px solid var(--ink);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:transform 0.15s;
+  }
+  [dir="rtl"] .pc-camera{right:auto;left:-3px;}
+  .pc-camera:hover{transform:scale(1.05);}
+
+  /* Editable field inside the profile card */
+  .pc-field{
+    background:var(--slate-50);
+    border:1.5px solid var(--slate-200);
+    border-radius:13px;
+    padding:9px 12px 10px;
+    margin-bottom:8px;
+    transition:all 0.15s;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .pc-field:last-child{margin-bottom:0;}
+  .pc-field:focus-within{
+    border-color:var(--yellow-deep);
+    background:#fff;
+    box-shadow:var(--focus-ring);
+  }
+
+  .pc-field-icon{
+    width:28px;
+    height:28px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    border:1px solid;
+  }
+  .pc-field-icon.blue{background:var(--blue-soft);border-color:#BFDBFE;color:var(--blue);}
+  .pc-field-icon.emerald{background:var(--emerald-soft);border-color:#A7F3D0;color:var(--emerald);}
+
+  .pc-field-content{
+    flex:1;
+    min-width:0;
+    line-height:1.1;
+  }
+  .pc-label{
+    font-size:9.5px;
+    color:var(--slate-500);
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    margin-bottom:3px;
+    display:block;
+  }
+  [dir="rtl"] .pc-label{font-family:'Cairo',sans-serif;letter-spacing:0.03em;}
+
+  .pc-input{
+    width:100%;
+    background:transparent;
+    border:none;
+    padding:0;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--ink);
+    font-family:inherit;
+    outline:none;
+    letter-spacing:-0.01em;
+    line-height:1.25;
+  }
+  [dir="rtl"] .pc-input{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .pc-input::placeholder{color:var(--slate-400);font-weight:500;}
+
+  /* Phone field with country prefix */
+  .pc-phone{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:0;
+  }
+  .pc-prefix{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    flex-shrink:0;
+    padding-right:8px;
+    border-right:1.5px solid var(--slate-200);
+  }
+  [dir="rtl"] .pc-prefix{
+    padding-right:0;
+    padding-left:8px;
+    border-right:none;
+    border-left:1.5px solid var(--slate-200);
+  }
+  .pc-flag{font-size:14px;line-height:1;}
+  .pc-code{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--slate-700);
+    letter-spacing:-0.005em;
+    font-variant-numeric:tabular-nums;
+  }
+  [dir="rtl"] .pc-code{direction:ltr;}
+  .pc-phone .pc-input{
+    font-variant-numeric:tabular-nums;
+    flex:1;
+  }
+
+  /* Save row inside the profile card */
+  .pc-save-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--slate-200);
+  }
+  .pc-save-hint{
+    font-size:10.5px;
+    color:var(--slate-500);
+    font-weight:600;
+    letter-spacing:-0.005em;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  [dir="rtl"] .pc-save-hint{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .pc-save-hint svg{color:var(--emerald);}
+  .pc-save-btn{
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    border:none;
+    border-radius:10px;
+    padding:7px 14px;
+    font-size:12px;
+    font-weight:800;
+    color:var(--ink);
+    cursor:pointer;
+    font-family:inherit;
+    letter-spacing:-0.01em;
+    box-shadow:0 4px 10px -3px rgba(245,197,24,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    transition:transform 0.15s;
+  }
+  [dir="rtl"] .pc-save-btn{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .pc-save-btn:hover{transform:translateY(-1px);}
+
+  /* SECTION HEAD */
+  .sect-head{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:0 4px 2px;
+    margin-top:2px;
+  }
+  .sect-title{
+    font-size:10.5px;
+    font-weight:800;
+    color:var(--slate-700);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+  }
+  [dir="rtl"] .sect-title{font-family:'Cairo',sans-serif;letter-spacing:0.05em;}
+  .sect-head .dot{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 0 2px rgba(245,197,24,0.2);
+  }
+
+  /* GROUP CARD */
+  .group{
+    background:#fff;
+    border-radius:16px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-sm);
+    overflow:hidden;
+  }
+
+  /* SETTING ROW */
+  .row{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:11px 13px;
+    border-bottom:1px solid var(--slate-100);
+    cursor:pointer;
+    transition:background 0.15s;
+    text-decoration:none;
+  }
+  .row:last-child{border-bottom:none;}
+  .row:hover{background:var(--slate-50);}
+
+  .row-icon{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    border:1px solid;
+  }
+  .row-icon.blue{background:var(--blue-soft);border-color:#BFDBFE;color:var(--blue);}
+  .row-icon.emerald{background:var(--emerald-soft);border-color:#A7F3D0;color:var(--emerald);}
+  .row-icon.violet{background:var(--violet-soft);border-color:#DDD6FE;color:var(--violet);}
+  .row-icon.slate{background:var(--slate-100);border-color:var(--slate-200);color:var(--slate-600);}
+
+  .row-main{flex:1;min-width:0;}
+  .row-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+    line-height:1.25;
+    margin-bottom:1px;
+  }
+  [dir="rtl"] .row-label{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .row-sub{
+    font-size:10.5px;
+    color:var(--slate-500);
+    font-weight:500;
+    line-height:1.35;
+    letter-spacing:-0.005em;
+  }
+  [dir="rtl"] .row-sub{font-family:'Cairo',sans-serif;letter-spacing:0;}
+
+  .row-aside{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    flex-shrink:0;
+    color:var(--slate-400);
+  }
+  .row-value{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-size:11.5px;
+    color:var(--slate-700);
+    font-weight:700;
+    letter-spacing:-0.005em;
+    background:var(--slate-50);
+    border:1px solid var(--slate-100);
+    border-radius:100px;
+    padding:3px 9px;
+  }
+  [dir="rtl"] .row-value{font-family:'Cairo',sans-serif;}
+  .row-value-flag{font-size:11px;line-height:1;}
+
+  /* TOGGLE */
+  .toggle{
+    width:42px;
+    height:24px;
+    border-radius:12px;
+    position:relative;
+    flex-shrink:0;
+    cursor:pointer;
+    transition:background 0.2s;
+  }
+  .toggle.on{
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.3), 0 0 0 1px rgba(224,174,8,0.2);
+  }
+  .toggle.off{
+    background:var(--slate-200);
+    box-shadow:inset 0 1px 2px rgba(15,23,42,0.06);
+  }
+  .toggle-knob{
+    position:absolute;
+    top:3px;
+    width:18px;
+    height:18px;
+    background:#fff;
+    border-radius:50%;
+    box-shadow:0 1px 3px rgba(15,23,42,0.2);
+    transition:left 0.2s ease, right 0.2s ease;
+  }
+  .toggle.on .toggle-knob{left:auto;right:3px;}
+  .toggle.off .toggle-knob{left:3px;right:auto;}
+
+  /* SIGN OUT */
+  .signout-btn{
+    background:#fff;
+    border:1.5px solid #FECDD3;
+    border-radius:14px;
+    padding:11px 14px;
+    display:flex;
+    align-items:center;
+    gap:11px;
+    cursor:pointer;
+    width:100%;
+    transition:all 0.15s;
+    box-shadow:var(--shadow-sm);
+    font-family:inherit;
+    text-align:left;
+  }
+  [dir="rtl"] .signout-btn{font-family:'Cairo',sans-serif;text-align:right;}
+  .signout-btn:hover{
+    background:var(--rose-soft);
+    border-color:#FDA4AF;
+  }
+  .signout-icon{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    background:var(--rose-soft);
+    border:1px solid #FECDD3;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--rose);
+    flex-shrink:0;
+  }
+  .signout-text{flex:1;min-width:0;}
+  .signout-label{
+    font-size:13px;
+    font-weight:800;
+    color:var(--rose);
+    letter-spacing:-0.015em;
+    line-height:1.25;
+    margin-bottom:1px;
+  }
+  [dir="rtl"] .signout-label{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .signout-sub{
+    font-size:10.5px;
+    color:#9F1239;
+    font-weight:500;
+    letter-spacing:-0.005em;
+  }
+  [dir="rtl"] .signout-sub{font-family:'Cairo',sans-serif;letter-spacing:0;}
+
+  /* VERSION */
+  .version-foot{
+    text-align:center;
+    padding:6px 0 2px;
+  }
+  .version-app{
+    font-size:10.5px;
+    color:var(--slate-400);
+    font-weight:600;
+    letter-spacing:-0.005em;
+    margin-bottom:3px;
+  }
+  [dir="rtl"] .version-app{font-family:'Cairo',sans-serif;letter-spacing:0;}
+  .version-app b{color:var(--slate-700);font-weight:700;}
+  .version-build{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:10px;
+    color:var(--slate-400);
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
+  }
+  [dir="rtl"] .version-build{font-family:'Cairo',sans-serif;}
+  .version-build .dot{
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:var(--slate-300);
+  }
+
+  @media (max-width: 900px){
+    body{padding:32px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== ENGLISH ==================== -->
+<div class="sw" dir="ltr">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="Back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </a>
+          <span class="hero-eyebrow">Account</span>
+          <div style="width:36px;"></div>
+        </div>
+        <div class="hero-title">Settings</div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- EDITABLE PROFILE CARD (overlapping the hero) -->
+        <div class="profile-card">
+          <div class="pc-avatar-wrap">
+            <div class="pc-avatar">SK</div>
+            <div class="pc-camera" title="Change photo">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+          </div>
+
+          <!-- Name field -->
+          <div class="pc-field">
+            <div class="pc-field-icon blue">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="pc-field-content">
+              <label class="pc-label">Full Name</label>
+              <input class="pc-input" type="text" value="Sarah Khaldi" placeholder="Your full name"/>
+            </div>
+          </div>
+
+          <!-- Phone field -->
+          <div class="pc-field">
+            <div class="pc-field-icon emerald">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="pc-field-content">
+              <label class="pc-label">Mobile Number</label>
+              <div class="pc-phone">
+                <span class="pc-prefix">
+                  <span class="pc-flag">🇯🇴</span>
+                  <span class="pc-code">+962</span>
+                </span>
+                <input class="pc-input" type="tel" value="79 123 4567" placeholder="7X XXX XXXX"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc-save-row">
+            <span class="pc-save-hint">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Tap a field to edit
+            </span>
+            <button class="pc-save-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Save
+            </button>
+          </div>
+        </div>
+
+        <!-- PREFERENCES -->
+        <div class="sect-head">
+          <span class="dot"></span>
+          <span class="sect-title">Preferences</span>
+        </div>
+        <div class="group">
+
+          <a class="row" href="#">
+            <div class="row-icon blue">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="row-main">
+              <div class="row-label">Language</div>
+            </div>
+            <div class="row-aside">
+              <span class="row-value">
+                <span class="row-value-flag">🇬🇧</span>
+                English
+              </span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </a>
+
+          <div class="row">
+            <div class="row-icon emerald">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 11V7a5 5 0 0 0-10 0v4"/><rect x="5" y="11" width="14" height="11" rx="2"/><circle cx="12" cy="16" r="1.5"/></svg>
+            </div>
+            <div class="row-main">
+              <div class="row-label">Fingerprint / Face ID</div>
+              <div class="row-sub">Secure unlock with biometrics</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+
+        </div>
+
+        <!-- LEGAL -->
+        <div class="sect-head">
+          <span class="dot"></span>
+          <span class="sect-title">Legal</span>
+        </div>
+        <div class="group">
+
+          <a class="row" href="#">
+            <div class="row-icon slate">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="row-main">
+              <div class="row-label">Terms &amp; Conditions</div>
+            </div>
+            <div class="row-aside">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </a>
+
+          <a class="row" href="#">
+            <div class="row-icon violet">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="row-main">
+              <div class="row-label">App Version</div>
+            </div>
+            <div class="row-aside">
+              <span class="row-value">v1.0.0</span>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- SIGN OUT -->
+        <button class="signout-btn">
+          <div class="signout-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </div>
+          <div class="signout-text">
+            <div class="signout-label">Sign Out</div>
+            <div class="signout-sub">You'll need to sign in again</div>
+          </div>
+        </button>
+
+        <!-- VERSION FOOTER -->
+        <div class="version-foot">
+          <div class="version-app">School Bus Tracker · <b>v1.0.0</b></div>
+          <div class="version-build">
+            Build 2026.04.30
+            <span class="dot"></span>
+            All systems operational
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">Settings — English</div>
+</div>
+
+<!-- ==================== ARABIC ==================== -->
+<div class="sw" dir="rtl" style="font-family:'Cairo',sans-serif;">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="direction:ltr;">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <a class="icon-btn" href="#" title="رجوع">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <span class="hero-eyebrow">الحساب</span>
+          <div style="width:36px;"></div>
+        </div>
+        <div class="hero-title">الإعدادات</div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- EDITABLE PROFILE CARD -->
+        <div class="profile-card">
+          <div class="pc-avatar-wrap">
+            <div class="pc-avatar">سخ</div>
+            <div class="pc-camera" title="تغيير الصورة">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+          </div>
+
+          <div class="pc-field">
+            <div class="pc-field-icon blue">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="pc-field-content">
+              <label class="pc-label">الاسم الكامل</label>
+              <input class="pc-input" type="text" value="سارة الخالدي" placeholder="اسمك الكامل"/>
+            </div>
+          </div>
+
+          <div class="pc-field">
+            <div class="pc-field-icon emerald">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="pc-field-content">
+              <label class="pc-label">رقم الهاتف</label>
+              <div class="pc-phone" style="direction:ltr;">
+                <span class="pc-prefix">
+                  <span class="pc-flag">🇯🇴</span>
+                  <span class="pc-code">+962</span>
+                </span>
+                <input class="pc-input" type="tel" value="79 123 4567" placeholder="7X XXX XXXX"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc-save-row">
+            <span class="pc-save-hint">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              اضغط على الحقل للتعديل
+            </span>
+            <button class="pc-save-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              حفظ
+            </button>
+          </div>
+        </div>
+
+        <!-- PREFERENCES -->
+        <div class="sect-head">
+          <span class="dot"></span>
+          <span class="sect-title">التفضيلات</span>
+        </div>
+        <div class="group">
+
+          <a class="row" href="#">
+            <div class="row-icon blue">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="row-main">
+              <div class="row-label">اللغة</div>
+            </div>
+            <div class="row-aside">
+              <span class="row-value">
+                <span class="row-value-flag">🇯🇴</span>
+                العربية
+              </span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+          </a>
+
+          <div class="row">
+            <div class="row-icon emerald">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 11V7a5 5 0 0 0-10 0v4"/><rect x="5" y="11" width="14" height="11" rx="2"/><circle cx="12" cy="16" r="1.5"/></svg>
+            </div>
+            <div class="row-main">
+              <div class="row-label">البصمة / Face ID</div>
+              <div class="row-sub">فتح آمن بالقياسات الحيوية</div>
+            </div>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+
+        </div>
+
+        <!-- LEGAL -->
+        <div class="sect-head">
+          <span class="dot"></span>
+          <span class="sect-title">قانوني</span>
+        </div>
+        <div class="group">
+
+          <a class="row" href="#">
+            <div class="row-icon slate">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="row-main">
+              <div class="row-label">الشروط والأحكام</div>
+            </div>
+            <div class="row-aside">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+          </a>
+
+          <a class="row" href="#">
+            <div class="row-icon violet">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="row-main">
+              <div class="row-label">إصدار التطبيق</div>
+            </div>
+            <div class="row-aside">
+              <span class="row-value" style="direction:ltr;">v1.0.0</span>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- SIGN OUT -->
+        <button class="signout-btn">
+          <div class="signout-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21h4a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-4"/><polyline points="8 17 3 12 8 7"/><line x1="3" y1="12" x2="15" y2="12"/></svg>
+          </div>
+          <div class="signout-text">
+            <div class="signout-label">تسجيل الخروج</div>
+            <div class="signout-sub">ستحتاج إلى تسجيل الدخول مرة أخرى</div>
+          </div>
+        </button>
+
+        <!-- VERSION FOOTER -->
+        <div class="version-foot">
+          <div class="version-app">School Bus Tracker · <b>v1.0.0</b></div>
+          <div class="version-build" style="direction:ltr;">
+            Build 2026.04.30
+            <span class="dot"></span>
+            <span style="font-family:'Cairo',sans-serif;direction:rtl;">جميع الأنظمة تعمل</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">الإعدادات — عربي</div>
+</div>
+
+</body>
+</html>
