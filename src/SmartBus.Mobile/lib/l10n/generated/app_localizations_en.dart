@@ -30,10 +30,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginEyebrow => 'Welcome Back';
 
   @override
-  String get loginCardTitle => 'Sign in to continue';
+  String get loginTagline => 'Track every ride. Every child. Every time.';
 
   @override
-  String get loginCardDesc => 'Choose how you\'d like to access your account';
+  String get loginCardTitle => 'Sign in';
+
+  @override
+  String get loginCardDesc => 'Enter your phone number to continue';
 
   @override
   String get loginTabPhone => 'Phone';
@@ -51,11 +54,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginPhoneHelp => 'We\'ll send a 4-digit verification code';
 
   @override
-  String get loginSendOtp => 'Send verification code';
+  String get loginSendOtp => 'Send code';
 
   @override
-  String get loginTerms =>
-      'By continuing you agree to our Terms and Privacy Policy';
+  String get loginRegisterPrompt => 'New to SmartBus?';
+
+  @override
+  String get loginRegisterCta => 'Scan card to register';
+
+  @override
+  String get loginTerms => 'By continuing you agree to our Terms and Privacy';
 
   @override
   String get loginScanComingSoon => 'Scan card sign-in is coming soon';
@@ -84,13 +92,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get otpEyebrow => 'Verification';
 
   @override
-  String get otpTitle => 'Enter the 4-digit code';
+  String get otpTitle => 'Verify your number';
 
   @override
   String get otpSentTo => 'Sent to';
 
   @override
-  String get otpConfirm => 'Confirm & sign in';
+  String get otpConfirm => 'Verify';
 
   @override
   String get otpResendPrefix => 'Didn\'t receive it?';
@@ -103,7 +111,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get otpFooter =>
-      'Never share this code — School Bus Tracker will never ask for it';
+      'Never share this code — SmartBus will never ask for it';
+
+  @override
+  String get otpBack => 'Back';
+
+  @override
+  String get scanTitle => 'Register';
+
+  @override
+  String get scanSubtitle => 'Scan your student card';
+
+  @override
+  String get scanTip => 'Hold the card inside the frame';
+
+  @override
+  String get scanCantTitle => 'Can\'t scan?';
+
+  @override
+  String get scanCantSub => 'Enter the 8-digit code printed on your card';
+
+  @override
+  String get scanCodeHint => 'XXXX-XXXX';
+
+  @override
+  String get scanContinue => 'Continue';
 
   @override
   String get navDashboard => 'Dashboard';
@@ -572,28 +604,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingNext => 'Next';
 
   @override
-  String get onboardingGetStarted => 'Get started';
+  String get onboardingContinue => 'Continue';
 
   @override
-  String get onboardingTitle1 => 'Track buses in real time';
+  String get onboardingGetStarted => 'Get Started';
+
+  @override
+  String get onboardingHasAccount => 'I already have an account';
+
+  @override
+  String get onboardingLangSwitch => 'عربي';
+
+  @override
+  String onboardingStep(int step, int total) {
+    return 'Step $step of $total';
+  }
+
+  @override
+  String get onboardingTitle1 => 'Track every ride <b>in real time</b>';
 
   @override
   String get onboardingDescription1 =>
-      'See exactly where your child\'s bus is, every step of the way.';
+      'See exactly where your child\'s bus is — from the first pickup to the school gate, on a live map.';
 
   @override
-  String get onboardingTitle2 => 'Arrival alerts';
+  String get onboardingTitle2 => 'Get notified <b>the moment</b> it matters';
 
   @override
   String get onboardingDescription2 =>
-      'Get notified for pickup, drop-off, and unexpected delays.';
+      'Pickup, drop-off, delays, arrivals — instant alerts so you\'re never left wondering.';
 
   @override
-  String get onboardingTitle3 => 'Stay connected';
+  String get onboardingTitle3 => 'Verified drivers, <b>safer rides</b>';
 
   @override
   String get onboardingDescription3 =>
-      'Direct line to drivers and school staff when it matters.';
+      'Every driver is screened, every trip is logged. Peace of mind from morning bell to home.';
+
+  @override
+  String get onboardingFooter1 =>
+      'Trusted by thousands of families across Jordan';
+
+  @override
+  String get onboardingFooter2 => 'Allow notifications anytime in Settings';
+
+  @override
+  String get onboardingFooterTermsPrefix => 'By continuing, you agree to our ';
+
+  @override
+  String get onboardingFooterTerms => 'Terms';
+
+  @override
+  String get onboardingFooterAnd => ' & ';
+
+  @override
+  String get onboardingFooterPrivacy => 'Privacy';
+
+  @override
+  String get onboardingMiniCardPickedUp => 'Picked up';
+
+  @override
+  String get onboardingMiniCardPickedUpSub => '7:42 AM';
+
+  @override
+  String get onboardingMiniCardEta => '5 min away';
+
+  @override
+  String get onboardingMiniCardEtaSub => 'From school';
+
+  @override
+  String get onboardingMiniCardOnTheWay => 'On the way';
+
+  @override
+  String get onboardingMiniCardOnTheWaySub => 'Driver: Ahmad';
 
   @override
   String get notificationsTitle => 'Notifications';

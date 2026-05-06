@@ -8,6 +8,7 @@ import 'package:smart_bus/features/auth/presentation/providers/auth_controller.d
 import 'package:smart_bus/features/auth/presentation/providers/otp_controller.dart';
 import 'package:smart_bus/features/auth/presentation/screens/login_screen.dart';
 import 'package:smart_bus/features/auth/presentation/screens/otp_screen.dart';
+import 'package:smart_bus/features/auth/presentation/screens/qr_scan_screen.dart';
 import 'package:smart_bus/features/auth/presentation/screens/splash_screen.dart';
 import 'package:smart_bus/features/home/presentation/screens/assistant_home_screen.dart';
 import 'package:smart_bus/features/home/presentation/screens/driver_home_screen.dart';
@@ -28,6 +29,7 @@ abstract class AppRoute {
   static const onboarding = '/onboarding';
   static const login = '/login';
   static const otp = '/otp';
+  static const scanCard = '/scan-card';
   static const homeParent = '/home/parent';
   static const homeDriver = '/home/driver';
   static const homeAssistant = '/home/assistant';
@@ -89,7 +91,9 @@ GoRouter appRouter(Ref ref) {
             ref.read(otpControllerProvider).valueOrNull is OtpPending;
         if (otpPending && loc != AppRoute.otp) return AppRoute.otp;
         if (!otpPending && loc == AppRoute.otp) return AppRoute.login;
-        if (loc != AppRoute.login && loc != AppRoute.otp) {
+        if (loc != AppRoute.login &&
+            loc != AppRoute.otp &&
+            loc != AppRoute.scanCard) {
           return AppRoute.login;
         }
         return null;
@@ -101,6 +105,7 @@ GoRouter appRouter(Ref ref) {
       if (loc == AppRoute.splash ||
           loc == AppRoute.login ||
           loc == AppRoute.otp ||
+          loc == AppRoute.scanCard ||
           loc == AppRoute.onboarding) {
         return correctHome;
       }
@@ -125,6 +130,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoute.otp,
         builder: (_, _) => const OtpScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.scanCard,
+        builder: (_, _) => const QrScanScreen(),
       ),
       GoRoute(
         path: AppRoute.homeParent,

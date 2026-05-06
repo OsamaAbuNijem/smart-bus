@@ -30,10 +30,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginEyebrow => 'أهلاً بعودتك';
 
   @override
-  String get loginCardTitle => 'سجّل الدخول للمتابعة';
+  String get loginTagline => 'تابع كل رحلة. كل طفل. كل لحظة.';
 
   @override
-  String get loginCardDesc => 'اختر طريقة الدخول إلى حسابك';
+  String get loginCardTitle => 'تسجيل الدخول';
+
+  @override
+  String get loginCardDesc => 'أدخل رقم هاتفك للمتابعة';
 
   @override
   String get loginTabPhone => 'الهاتف';
@@ -51,7 +54,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginPhoneHelp => 'سنرسل لك رمز تحقق من 4 أرقام';
 
   @override
-  String get loginSendOtp => 'إرسال رمز التحقق';
+  String get loginSendOtp => 'إرسال الرمز';
+
+  @override
+  String get loginRegisterPrompt => 'جديد على سمارت باص؟';
+
+  @override
+  String get loginRegisterCta => 'امسح البطاقة للتسجيل';
 
   @override
   String get loginTerms => 'بمتابعتك فإنك توافق على الشروط وسياسة الخصوصية';
@@ -83,13 +92,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get otpEyebrow => 'التحقق';
 
   @override
-  String get otpTitle => 'أدخل الرمز المكوّن من 4 أرقام';
+  String get otpTitle => 'تأكيد رقمك';
 
   @override
   String get otpSentTo => 'أُرسل إلى';
 
   @override
-  String get otpConfirm => 'تأكيد وتسجيل الدخول';
+  String get otpConfirm => 'تأكيد';
 
   @override
   String get otpResendPrefix => 'لم تستلم الرمز؟';
@@ -101,8 +110,31 @@ class AppLocalizationsAr extends AppLocalizations {
   String get otpInvalid => 'الرمز غير صحيح أو منتهي الصلاحية';
 
   @override
-  String get otpFooter =>
-      'لا تشارك هذا الرمز — لن يطلبه منك متعقّب الباص المدرسي أبداً';
+  String get otpFooter => 'لا تشارك هذا الرمز — لن يطلبه منك سمارت باص أبداً';
+
+  @override
+  String get otpBack => 'رجوع';
+
+  @override
+  String get scanTitle => 'التسجيل';
+
+  @override
+  String get scanSubtitle => 'امسح بطاقة الطالب';
+
+  @override
+  String get scanTip => 'ضع البطاقة داخل الإطار';
+
+  @override
+  String get scanCantTitle => 'لا يمكنك المسح؟';
+
+  @override
+  String get scanCantSub => 'أدخل الرمز المكوّن من 8 خانات المطبوع على البطاقة';
+
+  @override
+  String get scanCodeHint => 'XXXX-XXXX';
+
+  @override
+  String get scanContinue => 'متابعة';
 
   @override
   String get navDashboard => 'لوحة التحكم';
@@ -568,28 +600,78 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingNext => 'التالي';
 
   @override
+  String get onboardingContinue => 'متابعة';
+
+  @override
   String get onboardingGetStarted => 'ابدأ الآن';
 
   @override
-  String get onboardingTitle1 => 'تتبّع الحافلات لحظة بلحظة';
+  String get onboardingHasAccount => 'لديّ حساب بالفعل';
+
+  @override
+  String get onboardingLangSwitch => 'English';
+
+  @override
+  String onboardingStep(int step, int total) {
+    return 'الخطوة $step من $total';
+  }
+
+  @override
+  String get onboardingTitle1 => 'تتبّع كل رحلة <b>لحظة بلحظة</b>';
 
   @override
   String get onboardingDescription1 =>
-      'اعرف موقع حافلة طفلك في كل خطوة من الرحلة.';
+      'اعرف موقع حافلة طفلك بدقة — من أول محطة حتى باب المدرسة، على خريطة حيّة.';
 
   @override
-  String get onboardingTitle2 => 'تنبيهات الوصول';
+  String get onboardingTitle2 => 'نُنبّهك <b>في اللحظة</b> المناسبة';
 
   @override
   String get onboardingDescription2 =>
-      'إشعارات للاستلام والتوصيل وأي تأخير غير متوقع.';
+      'صعود، نزول، تأخير، وصول — إشعارات فورية كي لا تبقى في انتظار.';
 
   @override
-  String get onboardingTitle3 => 'ابقَ على تواصل';
+  String get onboardingTitle3 => 'سائقون موثّقون، <b>رحلات أأمن</b>';
 
   @override
   String get onboardingDescription3 =>
-      'خط مباشر مع السائقين وطاقم المدرسة وقت الحاجة.';
+      'كل سائق مفحوص وكل رحلة مسجّلة. راحة بال من جرس الصباح حتى عودة طفلك إلى البيت.';
+
+  @override
+  String get onboardingFooter1 => 'موثوق به من قبل آلاف العائلات في الأردن';
+
+  @override
+  String get onboardingFooter2 => 'يمكنك تفعيل الإشعارات لاحقًا من الإعدادات';
+
+  @override
+  String get onboardingFooterTermsPrefix => 'بمتابعتك توافق على ';
+
+  @override
+  String get onboardingFooterTerms => 'الشروط';
+
+  @override
+  String get onboardingFooterAnd => ' و ';
+
+  @override
+  String get onboardingFooterPrivacy => 'الخصوصية';
+
+  @override
+  String get onboardingMiniCardPickedUp => 'تم الصعود';
+
+  @override
+  String get onboardingMiniCardPickedUpSub => '7:42 ص';
+
+  @override
+  String get onboardingMiniCardEta => 'بعد ٥ دقائق';
+
+  @override
+  String get onboardingMiniCardEtaSub => 'من المدرسة';
+
+  @override
+  String get onboardingMiniCardOnTheWay => 'في الطريق';
+
+  @override
+  String get onboardingMiniCardOnTheWaySub => 'السائق: أحمد';
 
   @override
   String get notificationsTitle => 'الإشعارات';

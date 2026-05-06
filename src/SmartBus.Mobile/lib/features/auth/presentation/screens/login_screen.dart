@@ -9,7 +9,6 @@ import 'package:smart_bus/core/routing/app_router.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
 import 'package:smart_bus/features/auth/domain/entities/user.dart';
 import 'package:smart_bus/features/auth/presentation/providers/otp_controller.dart';
-import 'package:smart_bus/features/auth/presentation/widgets/login_top_section.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -61,9 +60,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
     if (!mounted) return;
     if (ok) {
-      // Belt + suspenders: the router auto-redirects when state flips to
-      // OtpPending, but call go() directly to avoid depending on the
-      // listenable propagation timing.
       context.go(AppRoute.otp);
       return;
     }
@@ -79,12 +75,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  void _scanCardComingSoon() {
-    final l = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(l.loginScanComingSoon)));
-  }
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -92,91 +82,72 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: LoginBackdrop(
+      body: AuthBackdrop(
         child: SafeArea(
           child: Stack(
             children: [
               Column(
                 children: [
-                  LoginTopSection(
-                    title: l.loginAppName,
-                    subtitle: l.loginAppSubtitle,
-                  ),
                   Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 14),
-                      child: _SignInCard(
-                        eyebrow: l.loginEyebrow,
-                        title: l.loginCardTitle,
-                        description: l.loginCardDesc,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _SegmentedControl(
-                              activeIndex: 0,
-                              labels: [l.loginTabPhone, l.loginTabScan],
-                              icons: const [Icons.call, Icons.qr_code_2],
-                              onChange: (i) {
-                                if (i == 1) _scanCardComingSoon();
-                              },
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(22, 56, 22, 12),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight - 68,
                             ),
-                            const SizedBox(height: 18),
-                            Text(
-                              l.loginPhoneLabel,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.slate700,
-                                letterSpacing: 0.4,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            _PhoneRow(
-                              controller: _phoneCtrl,
-                              focusNode: _phoneFocus,
-                              focused: _phoneFocused,
-                              flag: _flag,
-                              code: _countryCode,
-                              hint: l.loginPhonePlaceholder,
-                              enabled: !loading,
-                              onChanged: (_) => setState(() {}),
-                              onSubmitted: (_) => _submit(),
-                            ),
-                            const SizedBox(height: 6),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.only(start: 4),
-                              child: Text(
-                                l.loginPhoneHelp,
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.slate400,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const BrandBlock(),
+                                const SizedBox(height: 20),
+                                _SignInCard(
+                                  title: l.loginCardTitle,
+                                  description: l.loginCardDesc,
+                                  phoneLabel: l.loginPhoneLabel,
+                                  phoneHint: l.loginPhonePlaceholder,
+                                  phoneHelp: l.loginPhoneHelp,
+                                  sendLabel: l.loginSendOtp,
+                                  phoneCtrl: _phoneCtrl,
+                                  phoneFocus: _phoneFocus,
+                                  phoneFocused: _phoneFocused,
+                                  phoneValid: _phoneValid,
+                                  flag: _flag,
+                                  code: _countryCode,
+                                  loading: loading,
+                                  onChanged: (_) => setState(() {}),
+                                  onClear: () {
+                                    _phoneCtrl.clear();
+                                    setState(() {});
+                                  },
+                                  onSubmit: _phoneValid ? _submit : null,
                                 ),
-                              ),
+                                const SizedBox(height: 20),
+                                _RegisterHint(
+                                  prompt: l.loginRegisterPrompt,
+                                  cta: l.loginRegisterCta,
+                                  onTap: () => context.push(AppRoute.scanCard),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 18),
-                            _GradientButton(
-                              label: l.loginSendOtp,
-                              loading: loading,
-                              onPressed: _phoneValid ? _submit : null,
-                              trailingIcon: Icons.arrow_forward,
-                            ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(28, 8, 28, 18),
+                    padding: const EdgeInsets.fromLTRB(24, 4, 24, 14),
                     child: Text(
                       l.loginTerms,
+                      textAlign: TextAlign.center,
                       style: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.w500,
                         color: AppColors.slate400,
-                        height: 1.6,
+                        letterSpacing: -0.05,
+                        height: 1.5,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
@@ -190,167 +161,179 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-// ── Reusable widgets used by both Login and OTP screens ────────────────────
+// ── Backdrop (white phone-screen background, like the template) ────────────
+
+class AuthBackdrop extends StatelessWidget {
+  const AuthBackdrop({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      ColoredBox(color: Colors.white, child: child);
+}
+
+// ── Brand block (logo + tagline) ────────────────────────────────────────────
+
+class BrandBlock extends StatelessWidget {
+  const BrandBlock({super.key, this.showTagline = true});
+  final bool showTagline;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Column(
+      children: [
+        Image.asset(
+          'assets/images/tilmez_bus_logo.png',
+          height: 72,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+        ),
+        if (showTagline) ...[
+          const SizedBox(height: 14),
+          Text(
+            l.loginTagline,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.slate500,
+              letterSpacing: -0.05,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// ── Sign-in card ────────────────────────────────────────────────────────────
 
 class _SignInCard extends StatelessWidget {
   const _SignInCard({
-    required this.eyebrow,
     required this.title,
-    this.description,
-    required this.child,
+    required this.description,
+    required this.phoneLabel,
+    required this.phoneHint,
+    required this.phoneHelp,
+    required this.sendLabel,
+    required this.phoneCtrl,
+    required this.phoneFocus,
+    required this.phoneFocused,
+    required this.phoneValid,
+    required this.flag,
+    required this.code,
+    required this.loading,
+    required this.onChanged,
+    required this.onClear,
+    required this.onSubmit,
   });
-  final String eyebrow;
+
   final String title;
-  final String? description;
-  final Widget child;
+  final String description;
+  final String phoneLabel;
+  final String phoneHint;
+  final String phoneHelp;
+  final String sendLabel;
+  final TextEditingController phoneCtrl;
+  final FocusNode phoneFocus;
+  final bool phoneFocused;
+  final bool phoneValid;
+  final String flag;
+  final String code;
+  final bool loading;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+  final VoidCallback? onSubmit;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(color: AppColors.slate200),
         boxShadow: AppShadows.lg,
       ),
-      padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
       child: Column(
         children: [
-          _Eyebrow(label: eyebrow),
-          const SizedBox(height: 8),
           Text(
             title,
+            textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.w800,
               color: AppColors.ink,
-              letterSpacing: -0.6,
+              letterSpacing: -0.45,
+              height: 1.2,
             ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            description,
             textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w500,
+              color: AppColors.slate500,
+              letterSpacing: -0.05,
+              height: 1.45,
+            ),
           ),
-          if (description != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              description!,
+          const SizedBox(height: 18),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(
+              phoneLabel.toUpperCase(),
               style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.slate500,
-                height: 1.5,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: AppColors.slate700,
+                letterSpacing: 1.0,
               ),
-              textAlign: TextAlign.center,
             ),
-          ],
-          const SizedBox(height: 20),
-          child,
+          ),
+          const SizedBox(height: 7),
+          _PhoneRow(
+            controller: phoneCtrl,
+            focusNode: phoneFocus,
+            focused: phoneFocused,
+            valid: phoneValid,
+            flag: flag,
+            code: code,
+            hint: phoneHint,
+            enabled: !loading,
+            onChanged: onChanged,
+            onClear: onClear,
+            onSubmitted: (_) => onSubmit?.call(),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(start: 2),
+              child: Text(
+                phoneHelp,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.slate500,
+                  letterSpacing: -0.05,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          GradientButton(
+            label: sendLabel,
+            loading: loading,
+            onPressed: onSubmit,
+            trailingIcon: Icons.arrow_forward,
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class _Eyebrow extends StatelessWidget {
-  const _Eyebrow({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: 14,
-          height: 1.5,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.transparent, AppColors.yellow],
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 10.5,
-            fontWeight: FontWeight.w700,
-            color: AppColors.yellowDeep,
-            letterSpacing: 1.4,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          width: 14,
-          height: 1.5,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.yellow, Colors.transparent],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SegmentedControl extends StatelessWidget {
-  const _SegmentedControl({
-    required this.activeIndex,
-    required this.labels,
-    required this.icons,
-    required this.onChange,
-  });
-  final int activeIndex;
-  final List<String> labels;
-  final List<IconData> icons;
-  final ValueChanged<int> onChange;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppColors.slate100,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: List.generate(labels.length, (i) {
-          final active = i == activeIndex;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onChange(i),
-              behavior: HitTestBehavior.opaque,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                decoration: BoxDecoration(
-                  color: active ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(11),
-                  boxShadow: active ? AppShadows.sm : null,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      icons[i],
-                      size: 14,
-                      color: active ? AppColors.ink : AppColors.slate500,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      labels[i],
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: active ? AppColors.ink : AppColors.slate500,
-                        letterSpacing: -0.1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
       ),
     );
   }
@@ -361,110 +344,215 @@ class _PhoneRow extends StatelessWidget {
     required this.controller,
     required this.focusNode,
     required this.focused,
+    required this.valid,
     required this.flag,
     required this.code,
     required this.hint,
     required this.enabled,
     required this.onChanged,
+    required this.onClear,
     required this.onSubmitted,
   });
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool focused;
+  final bool valid;
   final String flag;
   final String code;
   final String hint;
   final bool enabled;
   final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
   final ValueChanged<String> onSubmitted;
 
   @override
   Widget build(BuildContext context) {
+    final hasText = controller.text.isNotEmpty;
+
     return Directionality(
       textDirection: TextDirection.ltr,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        height: 58,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
+        curve: Curves.easeOut,
         decoration: BoxDecoration(
           color: focused ? Colors.white : AppColors.slate50,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.zero,
+            bottomLeft: Radius.zero,
+            topRight: Radius.circular(14),
+            bottomRight: Radius.circular(14),
+          ),
           border: Border.all(
-            color: focused ? AppColors.yellowDeep : AppColors.slate200,
+            color: focused
+                ? AppColors.yellowDeep
+                : (valid ? AppColors.emerald : AppColors.slate200),
             width: 1.5,
           ),
-          boxShadow: focused
-              ? [
-                  BoxShadow(
-                    color: AppColors.yellow.withValues(alpha: 0.18),
-                    blurRadius: 12,
-                    offset: const Offset(0, 0),
-                    spreadRadius: 2,
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Text(flag, style: const TextStyle(fontSize: 20, height: 1)),
-            const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.only(right: 12),
-              margin: const EdgeInsets.only(right: 12),
-              decoration: const BoxDecoration(
-                border: Border(
-                  right: BorderSide(color: AppColors.slate200, width: 1.5),
-                ),
+          boxShadow: [
+            if (focused)
+              BoxShadow(
+                color: AppColors.yellow.withValues(alpha: 0.22),
+                blurRadius: 0,
+                spreadRadius: 4,
               ),
-              child: Text(
-                code,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ink,
-                  letterSpacing: -0.1,
-                ),
+            if (focused)
+              BoxShadow(
+                color: AppColors.ink.withValues(alpha: 0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-            ),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                enabled: enabled,
-                keyboardType: TextInputType.phone,
-                autofillHints: const [AutofillHints.telephoneNumberNational],
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9 ]')),
-                ],
-                style: const TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ink,
-                  letterSpacing: 0.1,
-                ),
-                decoration: InputDecoration(
-                  hintText: hint,
-                  hintStyle: const TextStyle(
-                    color: AppColors.slate400,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                onChanged: onChanged,
-                onSubmitted: onSubmitted,
-              ),
-            ),
           ],
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(12, 13, 12, 13),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    right: BorderSide(color: AppColors.slate200, width: 1),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(flag,
+                        style: const TextStyle(fontSize: 16, height: 1)),
+                    const SizedBox(width: 6),
+                    Text(
+                      code,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.slate700,
+                        letterSpacing: -0.1,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  enabled: enabled,
+                  keyboardType: TextInputType.phone,
+                  autofillHints: const [
+                    AutofillHints.telephoneNumberNational,
+                  ],
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(9),
+                    _JordanPhoneFormatter(),
+                  ],
+                  cursorColor: AppColors.yellowDeep,
+                  cursorWidth: 1.6,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                    letterSpacing: 0.2,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: const TextStyle(
+                      color: AppColors.slate400,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 13,
+                    ),
+                  ),
+                  onChanged: onChanged,
+                  onSubmitted: onSubmitted,
+                ),
+              ),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                transitionBuilder: (c, a) =>
+                    ScaleTransition(scale: a, child: FadeTransition(opacity: a, child: c)),
+                child: _trailingAdornment(hasText: hasText),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
+  Widget _trailingAdornment({required bool hasText}) {
+    if (valid) {
+      return Padding(
+        key: const ValueKey('check'),
+        padding: const EdgeInsetsDirectional.fromSTEB(6, 0, 12, 0),
+        child: Container(
+          width: 22,
+          height: 22,
+          decoration: BoxDecoration(
+            color: AppColors.emeraldSoft,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.emerald.withValues(alpha: 0.4),
+              width: 1,
+            ),
+          ),
+          child: const Icon(Icons.check, size: 13, color: AppColors.emerald),
+        ),
+      );
+    }
+    if (hasText) {
+      return Padding(
+        key: const ValueKey('clear'),
+        padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 6, 0),
+        child: IconButton(
+          onPressed: onClear,
+          tooltip: 'Clear',
+          splashRadius: 16,
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+          icon: const Icon(
+            Icons.cancel,
+            size: 18,
+            color: AppColors.slate400,
+          ),
+        ),
+      );
+    }
+    return const SizedBox(key: ValueKey('empty'), width: 0);
+  }
 }
 
-class _GradientButton extends StatelessWidget {
-  const _GradientButton({
+// Auto-format Jordanian mobile numbers as `7X XXX XXXX` while typing.
+class _JordanPhoneFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    final buf = StringBuffer();
+    for (var i = 0; i < digits.length; i++) {
+      if (i == 2 || i == 5) buf.write(' ');
+      buf.write(digits[i]);
+    }
+    final out = buf.toString();
+    return TextEditingValue(
+      text: out,
+      selection: TextSelection.collapsed(offset: out.length),
+    );
+  }
+}
+
+class GradientButton extends StatelessWidget {
+  const GradientButton({
+    super.key,
     required this.label,
     required this.loading,
     required this.onPressed,
@@ -500,14 +588,14 @@ class _GradientButton extends StatelessWidget {
                   colors: [AppColors.yellow, AppColors.yellowDeep],
                 ),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (loading)
                     const SizedBox(
-                      height: 20,
-                      width: 20,
+                      height: 18,
+                      width: 18,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.4,
                         color: AppColors.ink,
@@ -517,14 +605,14 @@ class _GradientButton extends StatelessWidget {
                     Text(
                       label,
                       style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
                         color: AppColors.ink,
-                        letterSpacing: -0.1,
+                        letterSpacing: -0.2,
                       ),
                     ),
                     if (trailingIcon != null) ...[
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 7),
                       Icon(trailingIcon, size: 14, color: AppColors.ink),
                     ],
                   ],
@@ -538,6 +626,78 @@ class _GradientButton extends StatelessWidget {
   }
 }
 
+// ── Register hint pill ──────────────────────────────────────────────────────
+
+class _RegisterHint extends StatelessWidget {
+  const _RegisterHint({
+    required this.prompt,
+    required this.cta,
+    required this.onTap,
+  });
+  final String prompt;
+  final String cta;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        Text(
+          prompt,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.slate500,
+            letterSpacing: -0.05,
+            height: 1.5,
+          ),
+        ),
+        Material(
+          color: AppColors.slate50,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+            side: const BorderSide(color: AppColors.slate100),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(100),
+            onTap: onTap,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.qr_code_scanner,
+                    size: 12,
+                    color: AppColors.yellowDeep,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    cta,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Language switcher (top-right) ───────────────────────────────────────────
+
 class LangSwitchButton extends ConsumerWidget {
   const LangSwitchButton({super.key});
 
@@ -549,30 +709,28 @@ class LangSwitchButton extends ConsumerWidget {
     final showLabel = current == 'en' ? 'عربي' : 'EN';
 
     return Material(
-      color: Colors.white.withValues(alpha: 0.85),
+      color: AppColors.slate50,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(100),
-        side: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
+        side: const BorderSide(color: AppColors.slate100),
       ),
-      shadowColor: Colors.black.withValues(alpha: 0.10),
-      elevation: 1,
       child: InkWell(
         borderRadius: BorderRadius.circular(100),
         onTap: () => ref.read(localeControllerProvider.notifier).toggleEnAr(),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(9, 7, 12, 7),
+          padding: const EdgeInsets.fromLTRB(11, 6, 11, 6),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.public, size: 14, color: AppColors.blue),
-              const SizedBox(width: 6),
+              const Icon(Icons.public, size: 13, color: AppColors.blue),
+              const SizedBox(width: 5),
               Text(
                 showLabel,
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.ink,
-                  letterSpacing: 0.3,
+                  color: AppColors.slate700,
+                  letterSpacing: -0.05,
                 ),
               ),
             ],
@@ -581,9 +739,4 @@ class LangSwitchButton extends ConsumerWidget {
       ),
     );
   }
-}
-
-// Re-export so OtpScreen imports from a single place.
-class LoginShared {
-  LoginShared._();
 }

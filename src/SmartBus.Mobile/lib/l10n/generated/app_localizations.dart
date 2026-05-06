@@ -140,16 +140,22 @@ abstract class AppLocalizations {
   /// **'Welcome Back'**
   String get loginEyebrow;
 
+  /// No description provided for @loginTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Track every ride. Every child. Every time.'**
+  String get loginTagline;
+
   /// No description provided for @loginCardTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to continue'**
+  /// **'Sign in'**
   String get loginCardTitle;
 
   /// No description provided for @loginCardDesc.
   ///
   /// In en, this message translates to:
-  /// **'Choose how you\'d like to access your account'**
+  /// **'Enter your phone number to continue'**
   String get loginCardDesc;
 
   /// No description provided for @loginTabPhone.
@@ -185,13 +191,25 @@ abstract class AppLocalizations {
   /// No description provided for @loginSendOtp.
   ///
   /// In en, this message translates to:
-  /// **'Send verification code'**
+  /// **'Send code'**
   String get loginSendOtp;
+
+  /// No description provided for @loginRegisterPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'New to SmartBus?'**
+  String get loginRegisterPrompt;
+
+  /// No description provided for @loginRegisterCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan card to register'**
+  String get loginRegisterCta;
 
   /// No description provided for @loginTerms.
   ///
   /// In en, this message translates to:
-  /// **'By continuing you agree to our Terms and Privacy Policy'**
+  /// **'By continuing you agree to our Terms and Privacy'**
   String get loginTerms;
 
   /// No description provided for @loginScanComingSoon.
@@ -245,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @otpTitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter the 4-digit code'**
+  /// **'Verify your number'**
   String get otpTitle;
 
   /// No description provided for @otpSentTo.
@@ -257,7 +275,7 @@ abstract class AppLocalizations {
   /// No description provided for @otpConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Confirm & sign in'**
+  /// **'Verify'**
   String get otpConfirm;
 
   /// No description provided for @otpResendPrefix.
@@ -281,8 +299,56 @@ abstract class AppLocalizations {
   /// No description provided for @otpFooter.
   ///
   /// In en, this message translates to:
-  /// **'Never share this code — School Bus Tracker will never ask for it'**
+  /// **'Never share this code — SmartBus will never ask for it'**
   String get otpFooter;
+
+  /// No description provided for @otpBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get otpBack;
+
+  /// No description provided for @scanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get scanTitle;
+
+  /// No description provided for @scanSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan your student card'**
+  String get scanSubtitle;
+
+  /// No description provided for @scanTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the card inside the frame'**
+  String get scanTip;
+
+  /// No description provided for @scanCantTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t scan?'**
+  String get scanCantTitle;
+
+  /// No description provided for @scanCantSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 8-digit code printed on your card'**
+  String get scanCantSub;
+
+  /// No description provided for @scanCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'XXXX-XXXX'**
+  String get scanCodeHint;
+
+  /// No description provided for @scanContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get scanContinue;
 
   /// No description provided for @navDashboard.
   ///
@@ -1190,47 +1256,143 @@ abstract class AppLocalizations {
   /// **'Next'**
   String get onboardingNext;
 
+  /// No description provided for @onboardingContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboardingContinue;
+
   /// No description provided for @onboardingGetStarted.
   ///
   /// In en, this message translates to:
-  /// **'Get started'**
+  /// **'Get Started'**
   String get onboardingGetStarted;
+
+  /// No description provided for @onboardingHasAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'I already have an account'**
+  String get onboardingHasAccount;
+
+  /// No description provided for @onboardingLangSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'عربي'**
+  String get onboardingLangSwitch;
+
+  /// No description provided for @onboardingStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {step} of {total}'**
+  String onboardingStep(int step, int total);
 
   /// No description provided for @onboardingTitle1.
   ///
   /// In en, this message translates to:
-  /// **'Track buses in real time'**
+  /// **'Track every ride <b>in real time</b>'**
   String get onboardingTitle1;
 
   /// No description provided for @onboardingDescription1.
   ///
   /// In en, this message translates to:
-  /// **'See exactly where your child\'s bus is, every step of the way.'**
+  /// **'See exactly where your child\'s bus is — from the first pickup to the school gate, on a live map.'**
   String get onboardingDescription1;
 
   /// No description provided for @onboardingTitle2.
   ///
   /// In en, this message translates to:
-  /// **'Arrival alerts'**
+  /// **'Get notified <b>the moment</b> it matters'**
   String get onboardingTitle2;
 
   /// No description provided for @onboardingDescription2.
   ///
   /// In en, this message translates to:
-  /// **'Get notified for pickup, drop-off, and unexpected delays.'**
+  /// **'Pickup, drop-off, delays, arrivals — instant alerts so you\'re never left wondering.'**
   String get onboardingDescription2;
 
   /// No description provided for @onboardingTitle3.
   ///
   /// In en, this message translates to:
-  /// **'Stay connected'**
+  /// **'Verified drivers, <b>safer rides</b>'**
   String get onboardingTitle3;
 
   /// No description provided for @onboardingDescription3.
   ///
   /// In en, this message translates to:
-  /// **'Direct line to drivers and school staff when it matters.'**
+  /// **'Every driver is screened, every trip is logged. Peace of mind from morning bell to home.'**
   String get onboardingDescription3;
+
+  /// No description provided for @onboardingFooter1.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted by thousands of families across Jordan'**
+  String get onboardingFooter1;
+
+  /// No description provided for @onboardingFooter2.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications anytime in Settings'**
+  String get onboardingFooter2;
+
+  /// No description provided for @onboardingFooterTermsPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our '**
+  String get onboardingFooterTermsPrefix;
+
+  /// No description provided for @onboardingFooterTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get onboardingFooterTerms;
+
+  /// No description provided for @onboardingFooterAnd.
+  ///
+  /// In en, this message translates to:
+  /// **' & '**
+  String get onboardingFooterAnd;
+
+  /// No description provided for @onboardingFooterPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get onboardingFooterPrivacy;
+
+  /// No description provided for @onboardingMiniCardPickedUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Picked up'**
+  String get onboardingMiniCardPickedUp;
+
+  /// No description provided for @onboardingMiniCardPickedUpSub.
+  ///
+  /// In en, this message translates to:
+  /// **'7:42 AM'**
+  String get onboardingMiniCardPickedUpSub;
+
+  /// No description provided for @onboardingMiniCardEta.
+  ///
+  /// In en, this message translates to:
+  /// **'5 min away'**
+  String get onboardingMiniCardEta;
+
+  /// No description provided for @onboardingMiniCardEtaSub.
+  ///
+  /// In en, this message translates to:
+  /// **'From school'**
+  String get onboardingMiniCardEtaSub;
+
+  /// No description provided for @onboardingMiniCardOnTheWay.
+  ///
+  /// In en, this message translates to:
+  /// **'On the way'**
+  String get onboardingMiniCardOnTheWay;
+
+  /// No description provided for @onboardingMiniCardOnTheWaySub.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver: Ahmad'**
+  String get onboardingMiniCardOnTheWaySub;
 
   /// No description provided for @notificationsTitle.
   ///

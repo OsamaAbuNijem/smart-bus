@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Assistant Home — School Bus Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow:#F5C518;
+    --yellow-deep:#E0AE08;
+    --yellow-tint:#FFFBEB;
+    --ink:#0F172A;
+    --slate-700:#334155;
+    --slate-600:#475569;
+    --slate-500:#64748B;
+    --slate-400:#94A3B8;
+    --slate-300:#CBD5E1;
+    --slate-200:#E2E8F0;
+    --slate-100:#F1F5F9;
+    --slate-50:#F8FAFC;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+    --emerald:#059669;
+    --emerald-soft:#D1FAE5;
+    --rose:#E11D48;
+    --rose-soft:#FFE4E6;
+    --amber:#D97706;
+    --amber-soft:#FEF3C7;
+    --violet:#7C3AED;
+    --violet-soft:#EDE9FE;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+    --shadow-lg: 0 10px 25px -5px rgba(15,23,42,0.08), 0 8px 10px -6px rgba(15,23,42,0.04);
+    --shadow-yellow: 0 8px 24px -8px rgba(245,197,24,0.55);
+    --focus-ring: 0 0 0 3px rgba(245,197,24,0.18);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+
+  body{
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 10%, #FFF8DC 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 90%, #EFF6FF 0%, transparent 55%),
+      #F4F4F5;
+    background-attachment:fixed;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:56px 24px;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+
+  .sw{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .sl{
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-500);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sl::before, .sl::after{
+    content:'';
+    width:24px;
+    height:1.5px;
+    background:var(--slate-300);
+  }
+
+  /* PHONE */
+  .phone{
+    width:380px;
+    height:824px;
+    background:#fff;
+    border-radius:54px;
+    border:9px solid #0a0a0a;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:
+      0 0 0 2px #1f1f1f,
+      0 30px 60px -20px rgba(15,23,42,0.30),
+      0 18px 36px -18px rgba(15,23,42,0.20);
+    position:relative;
+  }
+  .notch{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:28px;
+    background:#0a0a0a;
+    border-radius:0 0 18px 18px;
+    z-index:50;
+  }
+  .statusbar{
+    height:46px;
+    background:#0a0a0a;
+    color:#fff;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 28px 6px;
+    flex-shrink:0;
+  }
+  .statusbar .time{font-size:14px;font-weight:600;letter-spacing:-0.01em;}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;}
+
+  .screen{
+    background:#FAFAFA;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* ============== HERO (white variant for home only) ============== */
+  .hero-light{
+    background:#fff;
+    color:var(--ink);
+    padding:6px 18px 16px;
+    flex-shrink:0;
+    border-bottom:1px solid var(--slate-100);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-light::before{
+    content:'';
+    position:absolute;
+    width:240px;
+    height:240px;
+    background:radial-gradient(circle, rgba(245,197,24,0.10) 0%, transparent 70%);
+    top:-150px;
+    right:-50px;
+    pointer-events:none;
+  }
+  .hero-light .hero-row{margin-bottom:0;position:relative;z-index:2;}
+  .hero-light .hero-eyebrow{
+    color:var(--slate-500);
+  }
+  .hero-light .hero-name{
+    color:var(--ink);
+  }
+  .hero-light .icon-btn{
+    background:var(--slate-50);
+    border:1px solid var(--slate-100);
+    color:var(--slate-700);
+  }
+  .hero-light .icon-btn:hover{background:var(--slate-100);color:var(--ink);}
+  .hero-light .icon-btn-badge{
+    background:var(--rose);
+    border:1.5px solid #fff;
+  }
+
+  /* Greeting with avatar + name */
+  .greet-block{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    flex:1;
+    min-width:0;
+  }
+  .greet-avatar{
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    font-size:14px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    letter-spacing:-0.025em;
+    box-shadow:
+      0 4px 10px -3px rgba(245,197,24,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -2px 0 rgba(0,0,0,0.06);
+  }
+  .greet-text{flex:1;min-width:0;line-height:1.2;}
+  .greet-eyebrow{
+    font-size:10px;
+    color:var(--slate-500);
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    margin-bottom:1px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  .greet-eyebrow .wave{
+    display:inline-block;
+    animation:wave 1.6s ease-in-out infinite;
+    transform-origin:70% 70%;
+  }
+  @keyframes wave{
+    0%, 100%{transform:rotate(0deg);}
+    20%{transform:rotate(14deg);}
+    40%{transform:rotate(-8deg);}
+    60%{transform:rotate(14deg);}
+    80%{transform:rotate(-4deg);}
+  }
+  .greet-name{
+    font-size:16px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.025em;
+  }
+
+  /* Date · Time strip below the greeting */
+  .datetime-strip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-top:12px;
+    position:relative;
+    z-index:2;
+  }
+  .dt-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 10px;
+    background:var(--slate-50);
+    border:1px solid var(--slate-100);
+    border-radius:100px;
+    font-size:11px;
+    font-weight:700;
+    color:var(--slate-700);
+    letter-spacing:-0.005em;
+    font-variant-numeric:tabular-nums;
+  }
+  .dt-pill svg{color:var(--slate-400);flex-shrink:0;}
+  .dt-pill.live{
+    background:var(--emerald-soft);
+    border-color:#A7F3D0;
+    color:var(--emerald);
+  }
+  .dt-pill.live svg{color:var(--emerald);}
+  .dt-day{color:var(--slate-500);font-weight:600;}
+
+  /* ============== HERO (dark — used by setup screens) ============== */
+  .hero{
+    background:linear-gradient(180deg, #0a0a0a 0%, #1A1F2E 60%, #0F172A 100%);
+    color:#fff;
+    padding:8px 18px 22px;
+    flex-shrink:0;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';
+    position:absolute;
+    width:280px;
+    height:280px;
+    background:radial-gradient(circle, rgba(245,197,24,0.18) 0%, transparent 60%);
+    top:-150px;
+    right:-60px;
+    pointer-events:none;
+  }
+  .hero::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100' height='100' filter='url(%23n)' opacity='0.4'/></svg>");
+    opacity:0.05;
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+
+  .hero-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+    position:relative;
+    z-index:2;
+  }
+  .hero-greet{
+    flex:1;
+    min-width:0;
+  }
+  .hero-eyebrow{
+    font-size:10px;
+    color:rgba(255,255,255,0.5);
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    margin-bottom:3px;
+  }
+  .hero-name{
+    font-size:18px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.025em;
+    line-height:1.15;
+  }
+  .hero-actions{
+    display:flex;
+    gap:7px;
+    flex-shrink:0;
+  }
+  .icon-btn{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+    text-decoration:none;
+    transition:all 0.15s;
+    position:relative;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,0.14);}
+  .icon-btn-badge{
+    position:absolute;
+    top:5px;
+    right:5px;
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--rose);
+    border:1.5px solid #1A1F2E;
+  }
+
+  /* SHIFT STATUS BAR inside hero */
+  .shift-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;
+    padding:10px 12px;
+    position:relative;
+    z-index:2;
+  }
+  .shift-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+    flex:1;
+  }
+  .shift-avatar{
+    width:34px;
+    height:34px;
+    border-radius:11px;
+    background:linear-gradient(135deg, #FEF3C7 0%, #FCD34D 100%);
+    color:#92400E;
+    font-size:12px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    letter-spacing:-0.02em;
+  }
+  .shift-info{flex:1;min-width:0;}
+  .shift-label{
+    font-size:9.5px;
+    color:rgba(255,255,255,0.5);
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    line-height:1;
+    margin-bottom:2px;
+  }
+  .shift-name{
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+    letter-spacing:-0.01em;
+    line-height:1.2;
+  }
+  .shift-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 10px;
+    background:rgba(16,185,129,0.18);
+    border:1px solid rgba(16,185,129,0.3);
+    border-radius:100px;
+    font-size:10.5px;
+    font-weight:700;
+    color:#6EE7B7;
+    letter-spacing:-0.005em;
+    flex-shrink:0;
+  }
+  .shift-pill .dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#34D399;
+    box-shadow:0 0 0 0 rgba(52,211,153,0.55);
+    animation:liveP 1.5s infinite;
+  }
+  @keyframes liveP{
+    0%{box-shadow:0 0 0 0 rgba(52,211,153,0.6);}
+    70%{box-shadow:0 0 0 6px rgba(52,211,153,0);}
+    100%{box-shadow:0 0 0 0 rgba(52,211,153,0);}
+  }
+
+  /* ============== BODY ============== */
+  .body{
+    flex:1;
+    overflow-y:auto;
+    margin-top:-12px;
+    border-radius:20px 20px 0 0;
+    background:#FAFAFA;
+    padding:18px 16px;
+    position:relative;
+    z-index:3;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .body::-webkit-scrollbar{display:none;}
+
+  /* SECTION HEAD */
+  .sect-head{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:0 4px 2px;
+  }
+  .sect-title{
+    font-size:10.5px;
+    font-weight:800;
+    color:var(--slate-700);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+  }
+  .sect-head .dot{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 0 2px rgba(245,197,24,0.2);
+  }
+
+  /* ============== START TRIP HERO ACTION ============== */
+  /* Big QR scan card — primary CTA */
+  .scan-card{
+    background:linear-gradient(135deg, #1F2937 0%, #0F172A 100%);
+    border-radius:20px;
+    padding:20px 18px;
+    color:#fff;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+    transition:transform 0.15s;
+    box-shadow:0 12px 30px -10px rgba(15,23,42,0.4);
+  }
+  .scan-card:hover{transform:translateY(-2px);}
+  .scan-card::before{
+    content:'';
+    position:absolute;
+    width:200px;
+    height:200px;
+    background:radial-gradient(circle, rgba(245,197,24,0.22) 0%, transparent 60%);
+    top:-50px;
+    right:-40px;
+    pointer-events:none;
+  }
+  .scan-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    position:relative;
+    z-index:2;
+  }
+  .scan-icon-box{
+    width:56px;
+    height:56px;
+    border-radius:16px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:
+      0 8px 18px -4px rgba(245,197,24,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+    position:relative;
+  }
+  .scan-icon-box::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:16px;
+    background:repeating-linear-gradient(0deg, transparent 0 4px, rgba(15,23,42,0.06) 4px 5px);
+    pointer-events:none;
+  }
+  .scan-text{flex:1;min-width:0;}
+  .scan-eyebrow{
+    font-size:10px;
+    color:#FCD34D;
+    font-weight:800;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    margin-bottom:3px;
+  }
+  .scan-title{
+    font-size:18px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.025em;
+    line-height:1.15;
+    margin-bottom:3px;
+  }
+  .scan-sub{
+    font-size:11.5px;
+    color:rgba(255,255,255,0.6);
+    font-weight:500;
+    letter-spacing:-0.005em;
+    line-height:1.4;
+  }
+  .scan-arrow{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    flex-shrink:0;
+  }
+
+  /* OR DIVIDER */
+  .or-div{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:4px 0;
+  }
+  .or-div::before, .or-div::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background:var(--slate-200);
+  }
+  .or-div span{
+    font-size:9.5px;
+    font-weight:700;
+    color:var(--slate-400);
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+  }
+
+  /* MANUAL CARD */
+  .manual-card{
+    background:#fff;
+    border-radius:16px;
+    border:1.5px solid var(--slate-200);
+    padding:14px;
+    cursor:pointer;
+    transition:all 0.15s;
+    box-shadow:var(--shadow-sm);
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .manual-card:hover{
+    border-color:var(--slate-300);
+    transform:translateY(-1px);
+    box-shadow:var(--shadow-md);
+  }
+  .manual-icon{
+    width:44px;
+    height:44px;
+    border-radius:13px;
+    background:var(--yellow-tint);
+    border:1px solid #FDE68A;
+    color:var(--yellow-deep);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .manual-text{flex:1;min-width:0;}
+  .manual-title{
+    font-size:14px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.02em;
+    line-height:1.2;
+    margin-bottom:2px;
+  }
+  .manual-sub{
+    font-size:11.5px;
+    color:var(--slate-500);
+    font-weight:500;
+    letter-spacing:-0.005em;
+    line-height:1.4;
+  }
+  .manual-card .scan-arrow{
+    background:var(--slate-50);
+    border-color:var(--slate-200);
+    color:var(--slate-700);
+  }
+
+  /* ============== SIMPLIFIED START CARD ============== */
+  .start-card{
+    background:#fff;
+    border-radius:22px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-lg);
+    padding:18px 18px 16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+
+  /* Big scan frame — primary action */
+  .scan-frame{
+    position:relative;
+    width:100%;
+    aspect-ratio:1.3;
+    max-height:230px;
+    background:linear-gradient(135deg, #1F2937 0%, #0F172A 100%);
+    border-radius:24px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    cursor:pointer;
+    text-decoration:none;
+    overflow:hidden;
+    transition:transform 0.15s;
+    box-shadow:
+      0 16px 36px -10px rgba(15,23,42,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .scan-frame:hover{transform:translateY(-2px);}
+  .scan-frame::before{
+    content:'';
+    position:absolute;
+    width:340px;
+    height:340px;
+    background:radial-gradient(circle, rgba(245,197,24,0.20) 0%, transparent 60%);
+    top:-100px;
+    left:50%;
+    transform:translateX(-50%);
+    pointer-events:none;
+  }
+  .scan-frame::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100' height='100' filter='url(%23n)' opacity='0.4'/></svg>");
+    opacity:0.06;
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+
+  /* Yellow corner brackets — viewfinder feel */
+  .scan-frame-corners{
+    position:absolute;
+    inset:18px;
+    pointer-events:none;
+    z-index:2;
+  }
+  .sf-c{
+    position:absolute;
+    width:34px;
+    height:34px;
+    border:3px solid var(--yellow);
+    filter:drop-shadow(0 0 6px rgba(245,197,24,0.5));
+  }
+  .sf-tl{top:0;left:0;border-right:none;border-bottom:none;border-radius:14px 0 0 0;}
+  .sf-tr{top:0;right:0;border-left:none;border-bottom:none;border-radius:0 14px 0 0;}
+  .sf-bl{bottom:0;left:0;border-right:none;border-top:none;border-radius:0 0 0 14px;}
+  .sf-br{bottom:0;right:0;border-left:none;border-top:none;border-radius:0 0 14px 0;}
+
+  .scan-icon-big{
+    width:72px;
+    height:72px;
+    border-radius:20px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:
+      0 12px 28px -6px rgba(245,197,24,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -2px 0 rgba(0,0,0,0.08);
+    position:relative;
+    z-index:3;
+  }
+  .scan-frame-title{
+    position:relative;
+    z-index:3;
+    font-size:18px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.025em;
+    line-height:1.1;
+    margin-top:8px;
+  }
+  .scan-frame-note{
+    position:relative;
+    z-index:3;
+    margin-top:6px;
+    font-size:11px;
+    font-weight:500;
+    color:rgba(255,255,255,0.55);
+    letter-spacing:-0.005em;
+  }
+  .scan-frame-sub{
+    position:relative;
+    z-index:3;
+    font-size:11.5px;
+    color:rgba(255,255,255,0.55);
+    font-weight:600;
+    letter-spacing:-0.005em;
+  }
+
+  /* Manual link below */
+  .manual-link{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    margin-top:18px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--slate-600);
+    text-decoration:none;
+    padding:8px 12px;
+    border-radius:10px;
+    transition:all 0.15s;
+    letter-spacing:-0.01em;
+  }
+  .manual-link:hover{
+    background:var(--slate-50);
+    color:var(--ink);
+  }
+  .manual-link svg{color:var(--slate-400);transition:transform 0.15s;}
+  .manual-link:hover svg{transform:translateX(2px);color:var(--slate-700);}
+
+  /* ============== TODAY'S TRIPS — SIMPLE CARDS ============== */
+  .trips-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .trip-card{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:11px 13px;
+    background:#fff;
+    border-radius:14px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-sm);
+    text-decoration:none;
+    transition:all 0.15s;
+    position:relative;
+  }
+  .trip-card:hover{
+    transform:translateY(-1px);
+    box-shadow:var(--shadow-md);
+  }
+
+  .trip-card.live{
+    border-color:var(--yellow);
+    background:linear-gradient(135deg, var(--yellow-tint) 0%, #fff 80%);
+  }
+
+  .tc-icon{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    border:1px solid;
+  }
+  .tc-icon.morning{background:var(--amber-soft);border-color:#FDE68A;color:var(--amber);}
+  .tc-icon.afternoon{background:var(--violet-soft);border-color:#DDD6FE;color:var(--violet);}
+
+  .tc-info{flex:1;min-width:0;line-height:1.2;}
+  .tc-title{
+    font-size:13px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.015em;
+    margin-bottom:2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .tc-meta{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:11px;
+    color:var(--slate-500);
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-0.005em;
+  }
+  .tc-meta-dot{
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:var(--slate-300);
+  }
+
+  .tc-status{
+    flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 10px;
+    border-radius:100px;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:-0.005em;
+    border:1px solid;
+  }
+  .tc-status.completed{
+    background:var(--emerald-soft);
+    color:var(--emerald);
+    border-color:#A7F3D0;
+  }
+  .tc-status.live{
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    border-color:transparent;
+    box-shadow:0 3px 8px -2px rgba(245,197,24,0.55);
+  }
+  .tc-status .pulse-dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--ink);
+    animation:tcPulse 1.5s infinite;
+  }
+  @keyframes tcPulse{
+    0%, 100%{opacity:1;}
+    50%{opacity:0.4;}
+  }
+
+  .tc-chev{
+    flex-shrink:0;
+    color:var(--slate-400);
+    transition:transform 0.15s;
+  }
+  .trip-card:hover .tc-chev{transform:translateX(2px);color:var(--slate-700);}
+
+  /* ============== TRIP SETUP SHEET (state 2) ============== */
+  .setup-sheet{
+    flex:1;
+    overflow-y:auto;
+    margin-top:-12px;
+    border-radius:20px 20px 0 0;
+    background:#FAFAFA;
+    padding:14px 14px 92px;
+    position:relative;
+    z-index:3;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .setup-sheet::-webkit-scrollbar{display:none;}
+
+  /* Source pill (showing if QR or manual) */
+  .source-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 11px;
+    border-radius:100px;
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:-0.005em;
+    background:linear-gradient(135deg, var(--yellow-tint) 0%, #fff 100%);
+    border:1px solid var(--yellow);
+    color:var(--yellow-deep);
+    width:fit-content;
+  }
+
+  /* Bus card (auto-filled from QR or selectable) */
+  .bus-card-pick{
+    background:#fff;
+    border-radius:16px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-sm);
+    padding:14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .bus-card-pick.locked{
+    background:linear-gradient(135deg, var(--yellow-tint) 0%, #fff 100%);
+    border-color:var(--yellow);
+  }
+  .bus-icon-big{
+    width:46px;
+    height:46px;
+    border-radius:13px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:
+      var(--shadow-yellow),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .bus-info{flex:1;min-width:0;}
+  .bus-label{
+    font-size:9.5px;
+    color:var(--slate-500);
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:3px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  .bus-label svg{color:var(--emerald);}
+  .bus-num{
+    font-size:16px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.025em;
+    line-height:1.15;
+    font-variant-numeric:tabular-nums;
+    margin-bottom:2px;
+  }
+  .bus-route{
+    font-size:11.5px;
+    color:var(--slate-500);
+    font-weight:600;
+    letter-spacing:-0.005em;
+  }
+  .bus-locked-tag{
+    flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    padding:4px 9px;
+    background:var(--emerald-soft);
+    color:var(--emerald);
+    border:1px solid #A7F3D0;
+    border-radius:100px;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:-0.005em;
+    gap:4px;
+  }
+
+  /* Form group / field */
+  .fg-card{
+    background:#fff;
+    border-radius:16px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-sm);
+    overflow:hidden;
+  }
+  .field{
+    padding:11px 14px 12px;
+    border-bottom:1px solid var(--slate-100);
+  }
+  .field:last-child{border-bottom:none;}
+  .field-label{
+    font-size:9.5px;
+    color:var(--slate-500);
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:5px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  .field-label svg{color:var(--slate-400);}
+  .select{
+    width:100%;
+    background:transparent;
+    border:1.5px solid var(--slate-200);
+    border-radius:11px;
+    padding:9px 32px 9px 12px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    font-family:inherit;
+    outline:none;
+    letter-spacing:-0.01em;
+    appearance:none;
+    -webkit-appearance:none;
+    cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    transition:all 0.15s;
+  }
+  .select:focus{
+    border-color:var(--yellow-deep);
+    box-shadow:var(--focus-ring);
+  }
+
+  /* Trip type — radio cards */
+  .trip-type-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .tt-opt{
+    background:#fff;
+    border:1.5px solid var(--slate-200);
+    border-radius:13px;
+    padding:11px 10px;
+    cursor:pointer;
+    transition:all 0.15s;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .tt-opt:hover{border-color:var(--slate-300);}
+  .tt-opt.active{
+    border-color:var(--yellow-deep);
+    background:linear-gradient(135deg, var(--yellow-tint) 0%, #fff 100%);
+    box-shadow:0 0 0 3px rgba(245,197,24,0.12);
+  }
+  .tt-icon{
+    width:30px;
+    height:30px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    border:1px solid;
+  }
+  .tt-icon.morning{background:var(--amber-soft);border-color:#FDE68A;color:var(--amber);}
+  .tt-icon.afternoon{background:var(--violet-soft);border-color:#DDD6FE;color:var(--violet);}
+  .tt-text{
+    flex:1;
+    line-height:1.15;
+  }
+  .tt-title{
+    font-size:12px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.015em;
+    margin-bottom:1px;
+  }
+  .tt-sub{
+    font-size:9.5px;
+    color:var(--slate-500);
+    font-weight:600;
+    letter-spacing:-0.005em;
+  }
+
+  /* Students preview card */
+  .students-card{
+    background:#fff;
+    border-radius:16px;
+    border:1px solid var(--slate-200);
+    box-shadow:var(--shadow-sm);
+    overflow:hidden;
+  }
+  .students-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:11px 14px;
+    border-bottom:1px solid var(--slate-100);
+    background:linear-gradient(135deg, var(--blue-soft) 0%, #fff 100%);
+  }
+  .students-head-info{
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .students-icon{
+    width:30px;
+    height:30px;
+    border-radius:9px;
+    background:var(--blue-soft);
+    border:1px solid #BFDBFE;
+    color:var(--blue);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .students-title{
+    font-size:12px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.015em;
+    line-height:1.15;
+    margin-bottom:1px;
+  }
+  .students-sub{
+    font-size:10px;
+    color:var(--slate-500);
+    font-weight:600;
+    letter-spacing:-0.005em;
+  }
+  .students-count{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 10px;
+    background:#fff;
+    border:1px solid var(--blue-soft);
+    border-radius:100px;
+    font-size:11px;
+    font-weight:800;
+    color:var(--blue);
+    letter-spacing:-0.005em;
+    font-variant-numeric:tabular-nums;
+  }
+  .students-list{
+    padding:6px 0;
+  }
+  .student-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:7px 14px;
+  }
+  .student-avatar{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:10px;
+    font-weight:800;
+    flex-shrink:0;
+    letter-spacing:-0.02em;
+    background:var(--slate-100);
+    color:var(--slate-600);
+    border:1.5px solid #fff;
+    box-shadow:0 0 0 1px var(--slate-200);
+  }
+  .student-info{flex:1;min-width:0;line-height:1.15;}
+  .student-name{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .student-grade{
+    font-size:10px;
+    color:var(--slate-400);
+    font-weight:500;
+    margin-top:1px;
+  }
+  .student-status{
+    flex-shrink:0;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:var(--slate-100);
+    color:var(--slate-300);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .students-foot{
+    padding:8px 14px 11px;
+    text-align:center;
+    border-top:1px dashed var(--slate-200);
+    font-size:11px;
+    color:var(--slate-500);
+    font-weight:600;
+    letter-spacing:-0.005em;
+  }
+  .students-foot b{color:var(--ink);font-weight:700;}
+
+  /* SHEET BAR (start trip button) */
+  .sheet-bar{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    padding:10px 14px 14px;
+    background:#fff;
+    border-top:1px solid var(--slate-100);
+    z-index:10;
+    box-shadow:0 -8px 24px -12px rgba(15,23,42,0.08);
+    display:flex;
+    gap:8px;
+  }
+  .sb-back{
+    background:#fff;
+    border:1.5px solid var(--slate-200);
+    border-radius:12px;
+    padding:11px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--slate-700);
+    cursor:pointer;
+    font-family:inherit;
+    letter-spacing:-0.01em;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    transition:all 0.15s;
+  }
+  .sb-back:hover{background:var(--slate-50);color:var(--ink);}
+  .sb-start{
+    flex:1;
+    background:linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    border:none;
+    border-radius:12px;
+    padding:11px 16px;
+    font-size:14px;
+    font-weight:800;
+    color:var(--ink);
+    cursor:pointer;
+    font-family:inherit;
+    letter-spacing:-0.015em;
+    box-shadow:var(--shadow-yellow), inset 0 1px 0 rgba(255,255,255,0.4);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    transition:transform 0.15s;
+  }
+  .sb-start:hover{transform:translateY(-1px);}
+
+  /* ============== SIMPLIFIED SETUP COMPONENTS ============== */
+  .simple-label{
+    font-size:10.5px;
+    font-weight:800;
+    color:var(--slate-700);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    padding:4px 4px 0;
+  }
+
+  /* Bus chip (after QR scan) */
+  .bus-chip{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:11px 13px;
+    background:linear-gradient(135deg, var(--yellow-tint) 0%, #fff 70%);
+    border:1.5px solid var(--yellow);
+    border-radius:14px;
+    box-shadow:0 4px 12px -4px rgba(245,197,24,0.3);
+  }
+  .bus-chip-icon{
+    width:38px;
+    height:38px;
+    border-radius:11px;
+    background:linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:
+      0 4px 8px -2px rgba(245,197,24,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .bus-chip-text{flex:1;min-width:0;line-height:1.15;}
+  .bus-chip-num{
+    font-size:14px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.02em;
+    margin-bottom:2px;
+  }
+  .bus-chip-route{
+    font-size:11px;
+    color:var(--slate-500);
+    font-weight:600;
+    letter-spacing:-0.005em;
+  }
+  .bus-chip-tag{
+    flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:4px 9px;
+    background:#fff;
+    border:1px solid #FDE68A;
+    border-radius:100px;
+    font-size:10px;
+    font-weight:700;
+    color:var(--yellow-deep);
+    letter-spacing:-0.005em;
+  }
+
+  /* Compact students strip */
+  .students-strip{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:11px 13px;
+    background:#fff;
+    border:1px solid var(--slate-200);
+    border-radius:14px;
+    box-shadow:var(--shadow-sm);
+    margin-top:4px;
+  }
+  .ss-avatars{
+    display:flex;
+    flex-shrink:0;
+  }
+  .ss-av, .ss-av-more{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9.5px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    border:2px solid #fff;
+    box-shadow:0 0 0 0.5px var(--slate-200);
+    margin-left:-7px;
+  }
+  .ss-av:first-child{margin-left:0;}
+  .ss-av-more{
+    background:var(--slate-100);
+    color:var(--slate-700);
+    font-size:9px;
+  }
+  .ss-text{flex:1;min-width:0;line-height:1.15;}
+  .ss-title{
+    font-size:13px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.015em;
+    margin-bottom:2px;
+  }
+  .ss-sub{
+    font-size:10.5px;
+    color:var(--slate-500);
+    font-weight:600;
+    letter-spacing:-0.005em;
+  }
+
+  /* Trip type opts when placed in body directly (not inside fg-card) */
+  .body > .trip-type-row .tt-opt{
+    background:#fff;
+    box-shadow:var(--shadow-sm);
+  }
+
+  /* Header for setup screens */
+  .setup-header{
+    background:#0a0a0a;
+    color:#fff;
+    padding:8px 18px 16px;
+    flex-shrink:0;
+    position:relative;
+  }
+  .sh-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .sh-eyebrow{
+    font-size:10px;
+    color:rgba(255,255,255,0.5);
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+  }
+  .sh-title{
+    font-size:22px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-0.025em;
+    line-height:1.1;
+  }
+  .sh-sub{
+    font-size:12px;
+    color:rgba(255,255,255,0.55);
+    font-weight:500;
+    margin-top:4px;
+  }
+
+  @media (max-width: 900px){
+    body{padding:32px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== STATE 1: HOME ==================== -->
+<div class="sw">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="background:#fff;color:var(--ink);">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO (white) -->
+      <div class="hero-light">
+        <div class="hero-row">
+          <div class="greet-block">
+            <div class="greet-avatar">LH</div>
+            <div class="greet-text">
+              <div class="greet-eyebrow">
+                <span class="wave">👋</span>
+                Good morning
+              </div>
+              <div class="greet-name">Layla Hassan</div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <a class="icon-btn" href="#" title="Notifications">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="icon-btn-badge"></span>
+            </a>
+            <a class="icon-btn" href="#" title="Settings">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="datetime-strip">
+          <span class="dt-pill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="dt-day">Wed</span>
+            May 06
+          </span>
+          <span class="dt-pill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            9:41 AM
+          </span>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body">
+
+        <!-- ONE START-TRIP CARD -->
+        <div class="start-card">
+
+          <!-- Big scan illustration with title inside -->
+          <a class="scan-frame" href="#">
+            <div class="scan-frame-corners">
+              <span class="sf-c sf-tl"></span>
+              <span class="sf-c sf-tr"></span>
+              <span class="sf-c sf-bl"></span>
+              <span class="sf-c sf-br"></span>
+            </div>
+            <div class="scan-icon-big">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7V5a2 2 0 0 0-2-2h-2"/><path d="M3 17v2a2 2 0 0 0 2 2h2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M5 3a2 2 0 0 0-2 2v2"/><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+            </div>
+            <div class="scan-frame-title">Scan Bus QR</div>
+            <div class="scan-frame-note">Scan to start a new trip</div>
+          </a>
+
+          <!-- Manual link -->
+          <a class="manual-link" href="#manual-setup">
+            <span>Or set up manually</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+
+        <!-- TODAY'S TRIPS -->
+        <div class="sect-head" style="margin-top:6px;">
+          <span class="dot"></span>
+          <span class="sect-title">Today's trips</span>
+        </div>
+        <div class="trips-list">
+
+          <!-- LIVE / IN-PROGRESS TRIP -->
+          <a class="trip-card live" href="#trip-details">
+            <div class="tc-icon morning">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            </div>
+            <div class="tc-info">
+              <div class="tc-title">Morning Pickup · Bus #38</div>
+              <div class="tc-meta">
+                Started 7:18 AM
+                <span class="tc-meta-dot"></span>
+                5 of 14 boarded
+              </div>
+            </div>
+            <span class="tc-status live">
+              <span class="pulse-dot"></span>
+              Live
+            </span>
+            <svg class="tc-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+          <!-- COMPLETED TRIP -->
+          <a class="trip-card" href="#trip-details">
+            <div class="tc-icon afternoon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <div class="tc-info">
+              <div class="tc-title">Afternoon Drop-off · Bus #38</div>
+              <div class="tc-meta">
+                2:00 PM — 2:38 PM
+                <span class="tc-meta-dot"></span>
+                14 students
+              </div>
+            </div>
+            <span class="tc-status completed">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Done
+            </span>
+            <svg class="tc-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">01 — Home</div>
+</div>
+
+<!-- ==================== STATE 2: TRIP SETUP (after QR scan) ==================== -->
+<div class="sw">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="background:#fff;color:var(--ink);">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO (white) -->
+      <div class="hero-light">
+        <div class="hero-row">
+          <a class="icon-btn" href="#" title="Back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </a>
+          <div class="hero-greet" style="text-align:center;flex:1;">
+            <div class="hero-name" style="font-size:16px;">New Trip</div>
+          </div>
+          <div style="width:36px;"></div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body" style="padding:14px 14px 90px;gap:10px;">
+
+        <!-- Identified bus chip — minimal -->
+        <div class="bus-chip">
+          <div class="bus-chip-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M16 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
+          </div>
+          <div class="bus-chip-text">
+            <div class="bus-chip-num">Bus #38</div>
+            <div class="bus-chip-route">Al-Manar School route</div>
+          </div>
+          <span class="bus-chip-tag">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            From QR
+          </span>
+        </div>
+
+        <!-- Trip type — large radio cards -->
+        <div class="simple-label">Trip type</div>
+        <div class="trip-type-row">
+          <div class="tt-opt active">
+            <div class="tt-icon morning">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            </div>
+            <div class="tt-text">
+              <div class="tt-title">Morning</div>
+              <div class="tt-sub">Home → School</div>
+            </div>
+          </div>
+          <div class="tt-opt">
+            <div class="tt-icon afternoon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <div class="tt-text">
+              <div class="tt-title">Afternoon</div>
+              <div class="tt-sub">School → Home</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Driver -->
+        <div class="simple-label">Driver</div>
+        <select class="select" style="background-color:#fff;border-color:var(--slate-200);box-shadow:var(--shadow-sm);">
+          <option selected>Khaled Sami · +962 79 123 4567</option>
+          <option>Ahmed Salah · +962 79 555 1122</option>
+          <option>Yousef Karim · +962 78 333 4455</option>
+        </select>
+
+        <!-- Students compact strip -->
+        <div class="students-strip">
+          <div class="ss-avatars">
+            <div class="ss-av" style="background:linear-gradient(135deg,#FECACA,#F87171);color:#7F1D1D;">AH</div>
+            <div class="ss-av" style="background:linear-gradient(135deg,#BFDBFE,#60A5FA);color:#1E40AF;">SK</div>
+            <div class="ss-av" style="background:linear-gradient(135deg,#FEF3C7,#FCD34D);color:#92400E;">YO</div>
+            <div class="ss-av" style="background:linear-gradient(135deg,#DDD6FE,#A78BFA);color:#5B21B6;">MR</div>
+            <div class="ss-av-more">+10</div>
+          </div>
+          <div class="ss-text">
+            <div class="ss-title">14 students</div>
+            <div class="ss-sub">Auto-loaded from last trip</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SHEET BAR with start trip -->
+      <div class="sheet-bar">
+        <button class="sb-start" style="flex:1;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          Start trip
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">02 — After QR Scan</div>
+</div>
+
+<!-- ==================== STATE 3: MANUAL SETUP (no QR) ==================== -->
+<div class="sw">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="background:#fff;color:var(--ink);">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="9" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C10.1 2.5 12.1 3.3 13.6 4.7L15 3.3C13.1 1.5 10.6 0.5 8 0.5C5.4 0.5 2.9 1.5 1 3.3L2.4 4.7C3.9 3.3 5.9 2.5 8 2.5ZM8 5.5C9.4 5.5 10.7 6 11.7 7L13.1 5.6C11.7 4.3 9.9 3.5 8 3.5C6.1 3.5 4.3 4.3 2.9 5.6L4.3 7C5.3 6 6.6 5.5 8 5.5ZM8 8.5C9 8.5 9.9 8.9 10.6 9.5L8 11L5.4 9.5C6.1 8.9 7 8.5 8 8.5Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" opacity="0.5"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.2" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.5"/></svg>
+      </span>
+    </div>
+    <div class="screen">
+
+      <!-- HERO (white) -->
+      <div class="hero-light">
+        <div class="hero-row">
+          <a class="icon-btn" href="#" title="Back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </a>
+          <div class="hero-greet" style="text-align:center;flex:1;">
+            <div class="hero-name" style="font-size:16px;">New Trip</div>
+          </div>
+          <div style="width:36px;"></div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body" style="padding:14px 14px 90px;gap:10px;">
+
+        <!-- Bus -->
+        <div class="simple-label">Bus</div>
+        <select class="select" style="background-color:#fff;border-color:var(--slate-200);box-shadow:var(--shadow-sm);">
+          <option selected>Bus #38 · Yellow · Al-Manar route</option>
+          <option>Bus #21 · Yellow · Rosary route</option>
+          <option>Bus #52 · Yellow · Modern Academy route</option>
+        </select>
+
+        <!-- Trip type -->
+        <div class="simple-label">Trip type</div>
+        <div class="trip-type-row">
+          <div class="tt-opt active">
+            <div class="tt-icon morning">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            </div>
+            <div class="tt-text">
+              <div class="tt-title">Morning</div>
+              <div class="tt-sub">Home → School</div>
+            </div>
+          </div>
+          <div class="tt-opt">
+            <div class="tt-icon afternoon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <div class="tt-text">
+              <div class="tt-title">Afternoon</div>
+              <div class="tt-sub">School → Home</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Driver -->
+        <div class="simple-label">Driver</div>
+        <select class="select" style="background-color:#fff;border-color:var(--slate-200);box-shadow:var(--shadow-sm);">
+          <option selected>Khaled Sami · +962 79 123 4567</option>
+          <option>Ahmed Salah · +962 79 555 1122</option>
+          <option>Yousef Karim · +962 78 333 4455</option>
+        </select>
+
+        <!-- Students compact strip -->
+        <div class="students-strip">
+          <div class="ss-avatars">
+            <div class="ss-av" style="background:linear-gradient(135deg,#FECACA,#F87171);color:#7F1D1D;">AH</div>
+            <div class="ss-av" style="background:linear-gradient(135deg,#BFDBFE,#60A5FA);color:#1E40AF;">SK</div>
+            <div class="ss-av" style="background:linear-gradient(135deg,#FEF3C7,#FCD34D);color:#92400E;">YO</div>
+            <div class="ss-av" style="background:linear-gradient(135deg,#DDD6FE,#A78BFA);color:#5B21B6;">MR</div>
+            <div class="ss-av-more">+10</div>
+          </div>
+          <div class="ss-text">
+            <div class="ss-title">14 students</div>
+            <div class="ss-sub">From last Bus #38 morning trip</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SHEET BAR -->
+      <div class="sheet-bar">
+        <button class="sb-start" style="flex:1;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          Start trip
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <div class="sl">03 — Manual Setup</div>
+</div>
+
+</body>
+</html>
