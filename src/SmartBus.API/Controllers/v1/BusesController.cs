@@ -8,6 +8,9 @@ using SmartBus.Application.Features.Buses.Commands.UpdateBus;
 using SmartBus.Application.Features.Buses.Commands.UpdateBusLocation;
 using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Buses.Queries.GetBusById;
+using SmartBus.Application.Features.Buses.Queries.GetBusByQrToken;
+using SmartBus.Application.Features.Buses.Queries.GetBusLastRoster;
+using SmartBus.Domain.Enums;
 
 namespace SmartBus.API.Controllers.v1;
 
@@ -34,6 +37,38 @@ public class BusesController : ControllerBase
     {
         var result = await _mediator.Send(new GetAllBusesQuery(pageNumber, pageSize, plateNumber, personName), cancellationToken);
         return Ok(result);
+    }
+
+    /// <summary>Resolve a bus from its QR token. Used by the assistant scan flow.</summary>
+    [HttpPost("by-qr")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> GetByQr(
+        [FromBody] BusByQrRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetBusByQrTokenQuery(request.QrToken), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Roster for the last trip on this bus + trip type, used by the
+    /// assistant trip-setup screen to preview students before starting.
+    /// </summary>
+    [HttpGet("{id:guid}/last-roster")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> LastRoster(
+        Guid id,
+        [FromQuery] TripType tripType,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetBusLastRosterQuery(id, tripType), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
     }
 
     /// <summary>Get a bus by ID.</summary>
@@ -96,6 +131,8 @@ public class BusesController : ControllerBase
 }
 
 public record UpdateLocationRequest(double Latitude, double Longitude, double? Speed, double? Heading);
+
+public record BusByQrRequest(string QrToken);
 
 public record BusRequest(
     string PlateNumber,

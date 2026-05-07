@@ -10,6 +10,7 @@ abstract class OtpRequestResponse with _$OtpRequestResponse {
   const factory OtpRequestResponse({
     required String message,
     required int expiresInSeconds,
+    required String role,
     String? otp,
   }) = _OtpRequestResponse;
 

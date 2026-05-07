@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
+import 'package:smart_bus/core/theme/app_theme.dart';
 import 'package:smart_bus/features/notifications/domain/entities/notification_item.dart';
 import 'package:smart_bus/features/notifications/presentation/providers/notifications_controller.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
@@ -48,27 +49,14 @@ class _Body extends ConsumerWidget {
               .markAllRead(),
         ),
         Expanded(
-          // The template tucks the body 12px under the hero with a 20-radius
-          // rounded top, so the dark hero peeks through the corners.
-          child: Transform.translate(
-            offset: const Offset(0, -12),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFFAFAFA),
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: items.isEmpty
-                  ? _EmptyState(l: l)
-                  : RefreshIndicator(
-                      onRefresh: () => ref
-                          .read(notificationsControllerProvider.notifier)
-                          .refresh(),
-                      child: _Groups(items: items, l: l),
-                    ),
-            ),
-          ),
+          child: items.isEmpty
+              ? _EmptyState(l: l)
+              : RefreshIndicator(
+                  onRefresh: () => ref
+                      .read(notificationsControllerProvider.notifier)
+                      .refresh(),
+                  child: _Groups(items: items, l: l),
+                ),
         ),
       ],
     );
@@ -92,95 +80,64 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isRtl = Directionality.of(context) == TextDirection.rtl;
-    return ClipRect(
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A0A0A), Color(0xFF1A1F2E), Color(0xFF0F172A)],
-            stops: [0, 0.6, 1],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Yellow radial glow tucked above the corner — matches the
-            // .hero::before pseudo from the template.
-            Positioned(
-              top: -150,
-              left: isRtl ? -60 : null,
-              right: isRtl ? null : -60,
-              child: IgnorePointer(
-                child: Container(
-                  width: 280,
-                  height: 280,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [Color(0x2EF5C518), Color(0x00F5C518)],
-                      stops: [0, 0.6],
-                    ),
-                  ),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: AppColors.slate100)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _IconChip(
+                icon: isRtl ? Icons.arrow_forward : Icons.arrow_back,
+                onTap: () => context.canPop() ? context.pop() : null,
+              ),
+              const Spacer(),
+              Text(
+                l.notificationsEyebrow.toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.slate500,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 8, 18, 22),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      _IconChip(
-                        icon: isRtl ? Icons.arrow_forward : Icons.arrow_back,
-                        onTap: () => context.canPop() ? context.pop() : null,
+              const Spacer(),
+              const SizedBox(width: 36),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l.notificationsTitle,
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
                       ),
-                      const Spacer(),
-                      Text(
-                        l.notificationsEyebrow.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.4,
-                        ),
-                      ),
-                      const Spacer(),
-                      const SizedBox(width: 36),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l.notificationsTitle,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            _Sub(newCount: newCount, total: total, l: l),
-                          ],
-                        ),
-                      ),
-                      _MarkAllPill(
-                          label: l.notificationsMarkAllRead,
-                          onTap: onMarkAllRead),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 4),
+                    _Sub(newCount: newCount, total: total, l: l),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+              _MarkAllPill(
+                label: l.notificationsMarkAllRead,
+                onTap: onMarkAllRead,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -204,15 +161,15 @@ class _Sub extends StatelessWidget {
     return Text.rich(
       TextSpan(
         style: const TextStyle(
-          color: Colors.white60,
+          color: AppColors.slate500,
           fontSize: 12,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
         children: [
           TextSpan(
             text: '$newCount',
             style: const TextStyle(
-              color: Color(0xFFF5C518),
+              color: AppColors.yellowDeep,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -232,7 +189,7 @@ class _IconChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.08),
+      color: AppColors.slate50,
       borderRadius: BorderRadius.circular(11),
       child: InkWell(
         borderRadius: BorderRadius.circular(11),
@@ -242,9 +199,9 @@ class _IconChip extends StatelessWidget {
           height: 36,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(11),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            border: Border.all(color: AppColors.slate100),
           ),
-          child: Icon(icon, size: 15, color: Colors.white),
+          child: Icon(icon, size: 16, color: AppColors.slate700),
         ),
       ),
     );
@@ -258,7 +215,7 @@ class _MarkAllPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0x26F5C518),
+      color: AppColors.yellowTint,
       borderRadius: BorderRadius.circular(100),
       child: InkWell(
         borderRadius: BorderRadius.circular(100),
@@ -267,19 +224,19 @@ class _MarkAllPill extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100),
-            border: Border.all(color: const Color(0x4DF5C518)),
+            border: Border.all(color: const Color(0x66F5C518)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check, size: 11, color: Color(0xFFFCD34D)),
+              const Icon(Icons.check, size: 11, color: AppColors.yellowDeep),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: const TextStyle(
-                  color: Color(0xFFFCD34D),
+                  color: AppColors.yellowDeep,
                   fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ],

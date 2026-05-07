@@ -38,32 +38,31 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
     public async Task<Result<OtpLoginResponse>> Handle(
         VerifyOtpCommand request, CancellationToken cancellationToken)
     {
-        var phone    = request.PhoneNumber.Trim();
-        var role     = request.Role.Trim();
-        var otp      = request.Otp.Trim();
-        var cacheKey = $"otp:{role.ToLower()}:{phone}";
+        var phone = request.PhoneNumber.Trim();
+        var otp   = request.Otp.Trim();
 
-        // ── Master OTP for development testing only ───────────────────────
+        // Resolve role from the phone — must match what RequestOtp resolved.
+        var resolvedRole = await ResolveRoleAsync(phone, cancellationToken);
+        if (resolvedRole is null)
+            return Result<OtpLoginResponse>.Failure(
+                T("لم يتم العثور على رقم الجوال في النظام.",
+                  "Phone number not found in the system."));
+
+        var cacheKey = $"otp:{resolvedRole.ToLower()}:{phone}";
+
+        // Master OTP for development testing only.
         if (IsDevEnvironment() && otp == MasterDevOtp)
         {
             await _cache.RemoveAsync(cacheKey, cancellationToken);
-            return role.ToLower() switch
-            {
-                "parent"    => await HandleParentAsync(phone, cancellationToken),
-                "driver"    => await HandleDriverAsync(phone, cancellationToken),
-                "assistant" => await HandleAssistantAsync(phone, cancellationToken),
-                _           => Result<OtpLoginResponse>.Failure(T("دور غير معروف.", "Unknown role."))
-            };
+            return await DispatchAsync(resolvedRole, phone, cancellationToken);
         }
 
-        // ── Load OTP record ────────────────────────────────────────────────
         var record = await _cache.GetAsync<OtpRecord>(cacheKey, cancellationToken);
         if (record is null)
             return Result<OtpLoginResponse>.Failure(
                 T("رمز التحقق منتهي الصلاحية أو غير موجود. يرجى طلب رمز جديد.",
                   "Verification code expired or not found. Please request a new code."));
 
-        // ── Check attempt limit ────────────────────────────────────────────
         if (record.Attempts >= MaxAttempts)
         {
             await _cache.RemoveAsync(cacheKey, cancellationToken);
@@ -72,10 +71,8 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
                   "Maximum attempts exceeded. Please request a new code."));
         }
 
-        // ── Validate OTP ───────────────────────────────────────────────────
         if (record.Code != otp)
         {
-            // Increment attempts
             var updated = record with { Attempts = record.Attempts + 1 };
             var remaining = (int)(record.CreatedAt.AddSeconds(300) - DateTime.UtcNow).TotalSeconds;
             if (remaining > 0)
@@ -87,18 +84,29 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
                   $"Invalid verification code. Remaining attempts: {attemptsLeft}"));
         }
 
-        // ── OTP valid → remove from cache ──────────────────────────────────
         await _cache.RemoveAsync(cacheKey, cancellationToken);
-
-        // ── Resolve entity and ensure Identity user exists ─────────────────
-        return role.ToLower() switch
-        {
-            "parent"    => await HandleParentAsync(phone, cancellationToken),
-            "driver"    => await HandleDriverAsync(phone, cancellationToken),
-            "assistant" => await HandleAssistantAsync(phone, cancellationToken),
-            _           => Result<OtpLoginResponse>.Failure(T("دور غير معروف.", "Unknown role."))
-        };
+        return await DispatchAsync(resolvedRole, phone, cancellationToken);
     }
+
+    private async Task<string?> ResolveRoleAsync(string phone, CancellationToken ct)
+    {
+        var parent = await _unitOfWork.Parents.GetByPhoneNumberAsync(phone, ct);
+        if (parent is not null) return "Parent";
+        var driver = await _unitOfWork.Drivers.GetByPhoneNumberAsync(phone, ct);
+        if (driver is null) return null;
+        return driver.DriverType == SmartBus.Domain.Enums.DriverType.Assistant
+            ? "Assistant" : "Driver";
+    }
+
+    private Task<Result<OtpLoginResponse>> DispatchAsync(
+        string role, string phone, CancellationToken ct) => role switch
+        {
+            "Parent"    => HandleParentAsync(phone, ct),
+            "Driver"    => HandleDriverAsync(phone, ct),
+            "Assistant" => HandleAssistantAsync(phone, ct),
+            _           => Task.FromResult(
+                Result<OtpLoginResponse>.Failure(T("دور غير معروف.", "Unknown role."))),
+        };
 
     // ── Per-role handlers ──────────────────────────────────────────────────
 
@@ -142,19 +150,21 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
     private async Task<Result<OtpLoginResponse>> HandleAssistantAsync(
         string phone, CancellationToken ct)
     {
-        var assistant = await _unitOfWork.Assistants.GetByPhoneNumberAsync(phone, ct);
-        if (assistant is null) return Result<OtpLoginResponse>.Failure(T("لم يتم العثور على المساعد.", "Assistant not found."));
+        // Assistants are stored in the Drivers table with DriverType=Assistant.
+        var driver = await _unitOfWork.Drivers.GetByPhoneNumberAsync(phone, ct);
+        if (driver is null || driver.DriverType != SmartBus.Domain.Enums.DriverType.Assistant)
+            return Result<OtpLoginResponse>.Failure(T("لم يتم العثور على المساعد.", "Assistant not found."));
 
-        var (userId, err) = await EnsureUserAsync(assistant.UserId, phone, assistant.FullName, "Assistant", ct);
+        var (userId, err) = await EnsureUserAsync(driver.UserId, phone, driver.FullName, "Assistant", ct);
         if (err is not null) return Result<OtpLoginResponse>.Failure(err);
 
-        if (assistant.UserId != userId)
+        if (driver.UserId != userId)
         {
-            assistant.UserId = userId;
+            driver.UserId = userId;
             await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        return BuildResponse(userId!, phone, assistant.FullName, "Assistant", assistant.Id);
+        return BuildResponse(userId!, phone, driver.FullName, "Assistant", driver.Id);
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────

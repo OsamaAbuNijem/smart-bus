@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OtpRequestRequest {
 
- String get phoneNumber; String get role;
+ String get phoneNumber;
 /// Create a copy of OtpRequestRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $OtpRequestRequestCopyWith<OtpRequestRequest> get copyWith => _$OtpRequestReques
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpRequestRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.role, role) || other.role == role));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpRequestRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,phoneNumber,role);
+int get hashCode => Object.hash(runtimeType,phoneNumber);
 
 @override
 String toString() {
-  return 'OtpRequestRequest(phoneNumber: $phoneNumber, role: $role)';
+  return 'OtpRequestRequest(phoneNumber: $phoneNumber)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $OtpRequestRequestCopyWith<$Res>  {
   factory $OtpRequestRequestCopyWith(OtpRequestRequest value, $Res Function(OtpRequestRequest) _then) = _$OtpRequestRequestCopyWithImpl;
 @useResult
 $Res call({
- String phoneNumber, String role
+ String phoneNumber
 });
 
 
@@ -65,10 +65,9 @@ class _$OtpRequestRequestCopyWithImpl<$Res>
 
 /// Create a copy of OtpRequestRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? phoneNumber = null,Object? role = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? phoneNumber = null,}) {
   return _then(_self.copyWith(
 phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -154,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String phoneNumber,  String role)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String phoneNumber)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OtpRequestRequest() when $default != null:
-return $default(_that.phoneNumber,_that.role);case _:
+return $default(_that.phoneNumber);case _:
   return orElse();
 
 }
@@ -175,10 +174,10 @@ return $default(_that.phoneNumber,_that.role);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String phoneNumber,  String role)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String phoneNumber)  $default,) {final _that = this;
 switch (_that) {
 case _OtpRequestRequest():
-return $default(_that.phoneNumber,_that.role);case _:
+return $default(_that.phoneNumber);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +194,10 @@ return $default(_that.phoneNumber,_that.role);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String phoneNumber,  String role)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String phoneNumber)?  $default,) {final _that = this;
 switch (_that) {
 case _OtpRequestRequest() when $default != null:
-return $default(_that.phoneNumber,_that.role);case _:
+return $default(_that.phoneNumber);case _:
   return null;
 
 }
@@ -210,11 +209,10 @@ return $default(_that.phoneNumber,_that.role);case _:
 @JsonSerializable()
 
 class _OtpRequestRequest implements OtpRequestRequest {
-  const _OtpRequestRequest({required this.phoneNumber, required this.role});
+  const _OtpRequestRequest({required this.phoneNumber});
   factory _OtpRequestRequest.fromJson(Map<String, dynamic> json) => _$OtpRequestRequestFromJson(json);
 
 @override final  String phoneNumber;
-@override final  String role;
 
 /// Create a copy of OtpRequestRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -229,16 +227,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpRequestRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.role, role) || other.role == role));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpRequestRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,phoneNumber,role);
+int get hashCode => Object.hash(runtimeType,phoneNumber);
 
 @override
 String toString() {
-  return 'OtpRequestRequest(phoneNumber: $phoneNumber, role: $role)';
+  return 'OtpRequestRequest(phoneNumber: $phoneNumber)';
 }
 
 
@@ -249,7 +247,7 @@ abstract mixin class _$OtpRequestRequestCopyWith<$Res> implements $OtpRequestReq
   factory _$OtpRequestRequestCopyWith(_OtpRequestRequest value, $Res Function(_OtpRequestRequest) _then) = __$OtpRequestRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String phoneNumber, String role
+ String phoneNumber
 });
 
 
@@ -266,10 +264,9 @@ class __$OtpRequestRequestCopyWithImpl<$Res>
 
 /// Create a copy of OtpRequestRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? phoneNumber = null,Object? role = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? phoneNumber = null,}) {
   return _then(_OtpRequestRequest(
 phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

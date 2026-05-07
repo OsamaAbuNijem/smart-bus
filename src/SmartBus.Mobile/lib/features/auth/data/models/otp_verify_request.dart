@@ -8,7 +8,6 @@ abstract class OtpVerifyRequest with _$OtpVerifyRequest {
   const factory OtpVerifyRequest({
     required String phoneNumber,
     required String otp,
-    required String role,
   }) = _OtpVerifyRequest;
 
   factory OtpVerifyRequest.fromJson(Map<String, dynamic> json) =>

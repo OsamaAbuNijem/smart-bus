@@ -7,7 +7,6 @@ part 'otp_request_request.g.dart';
 abstract class OtpRequestRequest with _$OtpRequestRequest {
   const factory OtpRequestRequest({
     required String phoneNumber,
-    required String role,
   }) = _OtpRequestRequest;
 
   factory OtpRequestRequest.fromJson(Map<String, dynamic> json) =>

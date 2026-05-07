@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 enum Flavor { dev, staging, prod }
 
 class Env {
@@ -31,7 +33,7 @@ class Env {
     return switch (flavor) {
       Flavor.prod => _prodBase,
       Flavor.staging => _stagingBase,
-      Flavor.dev => _devAndroidEmulatorBase,
+      Flavor.dev => Platform.isAndroid ? _devAndroidEmulatorBase : _devLocalhostBase,
     };
   }
 

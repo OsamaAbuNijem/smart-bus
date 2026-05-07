@@ -137,7 +137,7 @@ public class NotificationsController : ControllerBase
 
     /// <summary>Sends a push notification to the parent of a given student. Admin-only.</summary>
     [HttpPost("students/{studentId:guid}/push")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin,Driver,Assistant")]
     public async Task<IActionResult> SendToStudentParent(
         Guid studentId,
         [FromBody] SendPushRequest request,

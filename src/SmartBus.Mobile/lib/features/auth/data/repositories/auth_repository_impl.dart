@@ -46,14 +46,14 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<OtpRequestResult> requestOtp({
     required String phoneNumber,
-    required UserRole role,
   }) async {
     final dto = await _remote.requestOtp(
-      OtpRequestRequest(phoneNumber: phoneNumber, role: role.apiValue),
+      OtpRequestRequest(phoneNumber: phoneNumber),
     );
     return OtpRequestResult(
       message: dto.message,
       expiresInSeconds: dto.expiresInSeconds,
+      role: UserRole.fromApi(dto.role),
       devOtp: dto.otp,
     );
   }
@@ -62,10 +62,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<User> verifyOtp({
     required String phoneNumber,
     required String otp,
-    required UserRole role,
   }) async {
     final dto = await _remote.verifyOtp(
-      OtpVerifyRequest(phoneNumber: phoneNumber, otp: otp, role: role.apiValue),
+      OtpVerifyRequest(phoneNumber: phoneNumber, otp: otp),
     );
     await Future.wait([
       _storage.writeAccessToken(dto.token),

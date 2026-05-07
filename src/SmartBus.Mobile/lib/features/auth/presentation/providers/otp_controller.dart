@@ -27,17 +27,18 @@ class OtpController extends _$OtpController {
   @override
   AsyncValue<OtpFlow> build() => const AsyncValue.data(OtpIdle());
 
-  Future<bool> requestOtp({
-    required String phoneNumber,
-    required UserRole role,
-  }) async {
+  Future<bool> requestOtp({required String phoneNumber}) async {
+    // Capture the prior OtpPending so a resend failure (e.g. server-side
+    // cooldown) doesn't bounce the user back to login when the router sees
+    // the controller state flip to AsyncError.
+    final previous = state.valueOrNull;
     state = const AsyncValue.loading();
 
     if (Env.demoMode) {
       state = AsyncValue.data(
         OtpFlow.pending(
           phoneNumber: phoneNumber,
-          role: role,
+          role: UserRole.parent,
           expiresAt: DateTime.now().add(const Duration(minutes: 5)),
           devOtp: Env.demoOtp,
         ),
@@ -45,19 +46,30 @@ class OtpController extends _$OtpController {
       return true;
     }
 
-    final result = await AsyncValue.guard(() async {
+    try {
       final repo = ref.read(authRepositoryProvider);
-      final res = await repo.requestOtp(phoneNumber: phoneNumber, role: role);
-      return OtpFlow.pending(
-        phoneNumber: phoneNumber,
-        role: role,
-        expiresAt:
-            DateTime.now().add(Duration(seconds: res.expiresInSeconds)),
-        devOtp: res.devOtp,
+      final res = await repo.requestOtp(phoneNumber: phoneNumber);
+      state = AsyncValue.data(
+        OtpFlow.pending(
+          phoneNumber: phoneNumber,
+          role: res.role,
+          expiresAt:
+              DateTime.now().add(Duration(seconds: res.expiresInSeconds)),
+          devOtp: res.devOtp,
+        ),
       );
-    });
-    state = result;
-    return !result.hasError;
+      return true;
+    } catch (e, st) {
+      if (previous is OtpPending) {
+        // Resend failed — restore the existing pending session so the router
+        // keeps the user on the OTP screen. Rethrow so the caller can surface
+        // the server message.
+        state = AsyncValue.data(previous);
+        rethrow;
+      }
+      state = AsyncValue.error(e, st);
+      return false;
+    }
   }
 
   Future<bool> verifyOtp(String code) async {
@@ -100,7 +112,6 @@ class OtpController extends _$OtpController {
       return repo.verifyOtp(
         phoneNumber: pending.phoneNumber,
         otp: code,
-        role: pending.role,
       );
     });
 

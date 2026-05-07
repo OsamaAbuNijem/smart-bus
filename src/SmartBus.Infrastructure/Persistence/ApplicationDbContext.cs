@@ -63,7 +63,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<EmployeeQrToken>()
             .HasIndex(t => t.Token)
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         builder.Entity<EmployeeQrToken>()
             .HasIndex(t => new { t.SchoolId, t.Type, t.IsUsed });
@@ -79,7 +79,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<StudentQrToken>()
             .HasIndex(t => t.Token)
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         builder.Entity<StudentQrToken>()
             .HasIndex(t => new { t.SchoolId, t.IsRegistered });
@@ -198,19 +198,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<Driver>()
             .HasIndex(d => d.PhoneNumber)
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Unique national number per active student (blank rows excluded for backfill safety):
         builder.Entity<Student>()
             .HasIndex(s => s.NationalNumber)
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0 AND [NationalNumber] <> ''");
+            .HasFilter("\"IsDeleted\" = false AND \"NationalNumber\" <> ''");
 
         // Unique phone per active parent (so siblings resolve to one Parent row):
         builder.Entity<Parent>()
             .HasIndex(p => p.PhoneNumber)
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Latest-location lookup on BusLocation:
         builder.Entity<BusLocation>().HasIndex(l => new { l.BusId, l.Timestamp });
@@ -225,7 +225,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<UserDeviceToken>()
             .HasIndex(t => new { t.UserId, t.Token })
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
+            .HasFilter("\"IsDeleted\" = false");
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -56,7 +56,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     FocusScope.of(context).unfocus();
     final ok = await ref.read(otpControllerProvider.notifier).requestOtp(
           phoneNumber: _normalisedPhone(),
-          role: UserRole.parent,
         );
     if (!mounted) return;
     if (ok) {
@@ -105,7 +104,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 _SignInCard(
                                   title: l.loginCardTitle,
                                   description: l.loginCardDesc,
-                                  phoneLabel: l.loginPhoneLabel,
                                   phoneHint: l.loginPhonePlaceholder,
                                   phoneHelp: l.loginPhoneHelp,
                                   sendLabel: l.loginSendOtp,
@@ -214,7 +212,6 @@ class _SignInCard extends StatelessWidget {
   const _SignInCard({
     required this.title,
     required this.description,
-    required this.phoneLabel,
     required this.phoneHint,
     required this.phoneHelp,
     required this.sendLabel,
@@ -232,7 +229,6 @@ class _SignInCard extends StatelessWidget {
 
   final String title;
   final String description;
-  final String phoneLabel;
   final String phoneHint;
   final String phoneHelp;
   final String sendLabel;
@@ -283,19 +279,6 @@ class _SignInCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Text(
-              phoneLabel.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: AppColors.slate700,
-                letterSpacing: 1.0,
-              ),
-            ),
-          ),
-          const SizedBox(height: 7),
           _PhoneRow(
             controller: phoneCtrl,
             focusNode: phoneFocus,
@@ -376,12 +359,7 @@ class _PhoneRow extends StatelessWidget {
         curve: Curves.easeOut,
         decoration: BoxDecoration(
           color: focused ? Colors.white : AppColors.slate50,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.zero,
-            bottomLeft: Radius.zero,
-            topRight: Radius.circular(14),
-            bottomRight: Radius.circular(14),
-          ),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: focused
                 ? AppColors.yellowDeep
@@ -408,11 +386,6 @@ class _PhoneRow extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.fromLTRB(12, 13, 12, 13),
-                decoration: const BoxDecoration(
-                  border: Border(
-                    right: BorderSide(color: AppColors.slate200, width: 1),
-                  ),
-                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -462,7 +435,13 @@ class _PhoneRow extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.2,
                     ),
+                    filled: false,
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 14,
@@ -740,3 +719,4 @@ class LangSwitchButton extends ConsumerWidget {
     );
   }
 }
+

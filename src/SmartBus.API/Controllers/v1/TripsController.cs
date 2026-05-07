@@ -5,12 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Trips.Commands.CreateTrip;
 using SmartBus.Application.Features.Trips.Commands.DeleteTrip;
 using SmartBus.Application.Features.Trips.Commands.ScanBusQr;
+using SmartBus.Application.Features.Trips.Commands.ScanStudent;
 using SmartBus.Application.Features.Trips.Commands.SetBusSchedule;
+using SmartBus.Application.Features.Trips.Commands.StartTrip;
 using SmartBus.Application.Features.Trips.Commands.UpdateTrip;
 using SmartBus.Application.Features.Trips.Commands.UpdateTripStatus;
 using SmartBus.Application.Features.Trips.Queries.GetAllBusSchedules;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
+using SmartBus.Application.Features.Trips.Queries.GetMyTodayTrips;
+using SmartBus.Application.Features.Trips.Queries.GetTripDetails;
 using SmartBus.Application.Features.Trips.Queries.GetTripStudents;
 using SmartBus.Domain.Enums;
 
@@ -26,6 +30,64 @@ public class TripsController : ControllerBase
 
     public TripsController(IMediator mediator)
         => _mediator = mediator;
+
+    /// <summary>Scan a student QR on a live trip — marks them as Boarded.</summary>
+    [HttpPost("{id:guid}/scan-student")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> ScanStudent(
+        Guid id,
+        [FromBody] ScanStudentRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new ScanStudentCommand(id, request.QrToken, request.Latitude, request.Longitude),
+            cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Trip details for the assistant's live trip screen: header + students
+    /// enriched with parent contact + absence flag, sorted by home area.
+    /// </summary>
+    [HttpGet("{id:guid}/details")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> GetDetails(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetTripDetailsQuery(id), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Create and start a new trip with the given bus, driver, and trip type.
+    /// Roster is auto-loaded from the last trip on (bus, type), or — failing
+    /// that — from the bus schedule. Replaces /trips/scan for the assistant flow.
+    /// </summary>
+    [HttpPost("start")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> Start(
+        [FromBody] StartTripCommand command,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command, cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>Today's trips for the current driver/assistant (one row per leg).</summary>
+    [HttpGet("my-today")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> GetMyToday(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetMyTodayTripsQuery(), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAll(
@@ -132,7 +194,7 @@ public class TripsController : ControllerBase
 
     /// <summary>Mark a trip as In Progress (sets ActualDeparture to now).</summary>
     [HttpPost("{id:guid}/start")]
-    [Authorize(Roles = "Admin,Driver")]
+    [Authorize(Roles = "Admin,Driver,Assistant")]
     public async Task<IActionResult> Start(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
@@ -143,7 +205,7 @@ public class TripsController : ControllerBase
 
     /// <summary>Mark a trip as Completed (sets ActualArrival to now).</summary>
     [HttpPost("{id:guid}/complete")]
-    [Authorize(Roles = "Admin,Driver")]
+    [Authorize(Roles = "Admin,Driver,Assistant")]
     public async Task<IActionResult> Complete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
@@ -174,3 +236,5 @@ public record BusScheduleRequest(
     Guid? ReturnAssistantId,
     IReadOnlyList<Guid>? StudentIds
 );
+
+public record ScanStudentRequest(string QrToken, double? Latitude = null, double? Longitude = null);

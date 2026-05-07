@@ -1,13 +1,14 @@
 using MediatR;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
+using SmartBus.Domain.Enums;
 
 namespace SmartBus.Application.Features.Auth.Commands.RequestOtp;
 
 public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Result<RequestOtpResponse>>
 {
-    private const int OtpTtlSeconds    = 300; // 5 minutes
-    private const int MaxResendSeconds = 60;  // prevent spam: must wait 60 s before re-requesting
+    private const int OtpTtlSeconds    = 300;
+    private const int MaxResendSeconds = 60;
 
     private readonly IUnitOfWork   _unitOfWork;
     private readonly ICacheService _cache;
@@ -28,21 +29,27 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
         RequestOtpCommand request, CancellationToken cancellationToken)
     {
         var phone = request.PhoneNumber.Trim();
-        var role  = request.Role.Trim();
 
-        // ── Verify the phone belongs to the expected role ──────────────────
-        var exists = role.ToLower() switch
+        // Resolve the role from the phone. Parent first, then Driver/Assistant.
+        // Drivers and Assistants share the Drivers table — DriverType disambiguates.
+        string? role = null;
+
+        var parent = await _unitOfWork.Parents.GetByPhoneNumberAsync(phone, cancellationToken);
+        if (parent is not null) role = "Parent";
+
+        if (role is null)
         {
-            "parent"    => await _unitOfWork.Parents.GetByPhoneNumberAsync(phone, cancellationToken)    is not null,
-            "driver"    => await _unitOfWork.Drivers.GetByPhoneNumberAsync(phone, cancellationToken)    is not null,
-            "assistant" => await _unitOfWork.Assistants.GetByPhoneNumberAsync(phone, cancellationToken) is not null,
-            _           => false
-        };
+            var driver = await _unitOfWork.Drivers.GetByPhoneNumberAsync(phone, cancellationToken);
+            if (driver is not null)
+            {
+                role = driver.DriverType == DriverType.Assistant ? "Assistant" : "Driver";
+            }
+        }
 
-        if (!exists)
+        if (role is null)
             return Result<RequestOtpResponse>.Failure(
-                T($"لم يتم العثور على رقم الجوال في النظام للدور '{role}'.",
-                  $"Phone number not found in the system for role '{role}'."));
+                T("لم يتم العثور على رقم الجوال في النظام.",
+                  "Phone number not found in the system."));
 
         // ── Rate-limit: block re-request within 60 s ───────────────────────
         var cooldownKey = $"otp:cooldown:{role.ToLower()}:{phone}";
@@ -51,25 +58,19 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
                 T("يرجى الانتظار دقيقة قبل طلب رمز جديد.",
                   "Please wait a minute before requesting a new code."));
 
-        // ── Generate OTP ───────────────────────────────────────────────────
         var otp = GenerateOtp();
 
-        // Store verifiable record
         var cacheKey = $"otp:{role.ToLower()}:{phone}";
         var record   = new OtpRecord(otp, DateTime.UtcNow, 0);
         await _cache.SetAsync(cacheKey, record, TimeSpan.FromSeconds(OtpTtlSeconds), cancellationToken);
-
-        // Set cooldown
         await _cache.SetAsync(cooldownKey, true, TimeSpan.FromSeconds(MaxResendSeconds), cancellationToken);
 
-        // ── Send OTP ───────────────────────────────────────────────────────
         await _sender.SendAsync(phone, otp, cancellationToken);
 
-        // Always include OTP in result — the API controller strips it in Production
         return Result<RequestOtpResponse>.Success(
             new RequestOtpResponse(
                 T("تم إرسال رمز التحقق بنجاح.", "Verification code sent successfully."),
-                OtpTtlSeconds, otp));
+                OtpTtlSeconds, role, otp));
     }
 
     private static string GenerateOtp()

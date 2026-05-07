@@ -50,13 +50,14 @@ public class ScanBusQrCommandHandler : IRequestHandler<ScanBusQrCommand, Result<
         if (bus is null)
             return Result<ScanBusQrResponse>.Failure("Bus not found for the scanned QR.");
 
-        // 2. Scanner identity. JWT email is `<digits>@smartbus.local`; recover the phone.
-        var email = _currentUser.UserName;
-        if (string.IsNullOrEmpty(email))
+        // 2. Scanner identity from JWT. OTP login stores the Identity user-id
+        //    on the Drivers row, so we resolve via UserId (not phone).
+        var userId = _currentUser.UserId;
+        if (string.IsNullOrEmpty(userId))
             return Result<ScanBusQrResponse>.Failure("Unauthenticated.");
 
-        var phone = email.Split('@')[0];
-        var driver = await _unitOfWork.Drivers.GetByPhoneNumberAsync(phone, ct);
+        var driver = await _context.Drivers
+            .FirstOrDefaultAsync(d => d.UserId == userId, ct);
         if (driver is null)
             return Result<ScanBusQrResponse>.Failure("The scanning user is not registered as a driver/assistant.");
 

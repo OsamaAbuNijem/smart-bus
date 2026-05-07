@@ -64,81 +64,70 @@ class _QrScanScreenState extends State<QrScanScreen>
             ),
 
             // ── Centered scan frame + tip ───────────────────────────────────
-            Align(
-              alignment: const Alignment(0, -0.18),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 240,
-                    height: 240,
-                    child: Stack(
-                      children: [
-                        const _ScanCorner(alignment: Alignment.topLeft),
-                        const _ScanCorner(alignment: Alignment.topRight),
-                        const _ScanCorner(alignment: Alignment.bottomLeft),
-                        const _ScanCorner(alignment: Alignment.bottomRight),
-                        AnimatedBuilder(
-                          animation: _laser,
-                          builder: (_, _) {
-                            final t = Curves.easeInOut.transform(_laser.value);
-                            // 8% .. 92% of 240px frame
-                            final top = 240 * (0.08 + 0.84 * t);
-                            return Positioned(
-                              top: top,
-                              left: 0,
-                              right: 0,
-                              child: const _LaserLine(),
-                            );
-                          },
+            // Frame anchored to a Stack-layer overlay so its centre lines up
+            // exactly with the dim-mask cutout below it.
+            Positioned.fill(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final centerY = constraints.maxHeight *
+                      (0.5 + _frameAlignmentY * 0.5);
+                  final frameTop = centerY - _frameSide / 2;
+                  return Stack(
+                    children: [
+                      Positioned(
+                        top: frameTop,
+                        left: 0,
+                        right: 0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: _frameSide,
+                              height: _frameSide,
+                              child: Stack(
+                                children: [
+                                  const _ScanCorner(alignment: Alignment.topLeft),
+                                  const _ScanCorner(alignment: Alignment.topRight),
+                                  const _ScanCorner(alignment: Alignment.bottomLeft),
+                                  const _ScanCorner(alignment: Alignment.bottomRight),
+                                  AnimatedBuilder(
+                                    animation: _laser,
+                                    builder: (_, _) {
+                                      final t = Curves.easeInOut.transform(_laser.value);
+                                      // 8% .. 92% of frame.
+                                      final top = _frameSide * (0.08 + 0.84 * t);
+                                      return Positioned(
+                                        top: top,
+                                        left: 0,
+                                        right: 0,
+                                        child: const _LaserLine(),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            _ScanTip(label: l.scanTip),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  _ScanTip(label: l.scanTip),
-                ],
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
 
-            // ── Top scan-bar (close + title + flash) ────────────────────────
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 6, 16, 14),
-                child: Row(
-                  children: [
-                    _GlassButton(icon: Icons.close, onTap: _close),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            l.scanTitle,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: -0.2,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            l.scanSubtitle.toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white.withValues(alpha: 0.55),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _GlassButton(
-                      icon: Icons.flash_on,
-                      onTap: () {},
-                    ),
-                  ],
+            // ── Back arrow pinned to the top-left corner ────────────────────
+            Positioned(
+              top: 0,
+              left: 0,
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+                  child:
+                      _GlassButton(icon: Icons.arrow_back, onTap: _close),
                 ),
               ),
             ),
@@ -462,14 +451,21 @@ class _DarkButton extends StatelessWidget {
 }
 
 // Darkens the area outside the centered 240×240 scan frame.
+/// Vertical alignment used by both the visible bracket frame and this
+/// dim-overlay cutout. Keep them in sync — the visible brackets live in an
+/// `Align(alignment: Alignment(0, _frameAlignmentY))` above. Flutter's
+/// Alignment maps `y` over half the height: centerY = h * (0.5 + y * 0.5).
+const double _frameAlignmentY = -0.18;
+const double _frameSide       = 240.0;
+
 class _ScanMaskPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final dim = Paint()..color = const Color(0x66000000);
-    const frameSide = 240.0;
-    final frameTop = size.height * 0.5 - 0.18 * size.height - frameSide / 2;
-    final left = (size.width - frameSide) / 2;
-    final frame = Rect.fromLTWH(left, frameTop, frameSide, frameSide);
+    final centerY = size.height * (0.5 + _frameAlignmentY * 0.5);
+    final frameTop = centerY - _frameSide / 2;
+    final left = (size.width - _frameSide) / 2;
+    final frame = Rect.fromLTWH(left, frameTop, _frameSide, _frameSide);
     final whole = Rect.fromLTWH(0, 0, size.width, size.height);
     final path = Path.combine(
       PathOperation.difference,

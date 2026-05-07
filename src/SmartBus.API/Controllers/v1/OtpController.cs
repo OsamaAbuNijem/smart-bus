@@ -30,19 +30,16 @@ public class OtpController : ControllerBase
     }
 
     /// <summary>
-    /// Request an OTP for a phone number.
-    /// The OTP expires in 5 minutes. A new request cannot be made within 60 seconds.
+    /// Request an OTP for a phone number. The role is auto-detected from the
+    /// phone (Parent / Driver / Assistant) and returned in the response.
     /// </summary>
     /// <remarks>
     /// Sample request:
     ///
     ///     POST /api/v1/auth/otp/request
     ///     {
-    ///         "phoneNumber": "0501234567",
-    ///         "role": "Parent"
+    ///         "phoneNumber": "+962791234567"
     ///     }
-    ///
-    /// Valid roles: **Parent**, **Driver**, **Assistant**
     /// </remarks>
     [HttpPost("request")]
     [ProducesResponseType(typeof(RequestOtpResponse), StatusCodes.Status200OK)]
@@ -51,16 +48,12 @@ public class OtpController : ControllerBase
         [FromBody] OtpRequestDto dto,
         CancellationToken cancellationToken)
     {
-        if (!IsValidRole(dto.Role))
-            return BadRequest(new { error = _L["Otp_RoleInvalid"].Value });
-
         var result = await _mediator.Send(
-            new RequestOtpCommand(dto.PhoneNumber, dto.Role), cancellationToken);
+            new RequestOtpCommand(dto.PhoneNumber), cancellationToken);
 
         if (!result.IsSuccess)
             return BadRequest(new { error = result.Error });
 
-        // Strip OTP from response in non-development environments
         var data = _env.IsDevelopment()
             ? result.Data
             : result.Data! with { Otp = null };
@@ -68,21 +61,7 @@ public class OtpController : ControllerBase
         return Ok(data);
     }
 
-    /// <summary>
-    /// Verify an OTP and receive a JWT token.
-    /// </summary>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     POST /api/v1/auth/otp/verify
-    ///     {
-    ///         "phoneNumber": "0501234567",
-    ///         "otp": "123456",
-    ///         "role": "Parent"
-    ///     }
-    ///
-    /// On success returns a JWT token valid for 24 hours.
-    /// </remarks>
+    /// <summary>Verify an OTP and receive a JWT token.</summary>
     [HttpPost("verify")]
     [ProducesResponseType(typeof(OtpLoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -91,20 +70,14 @@ public class OtpController : ControllerBase
         [FromBody] OtpVerifyDto dto,
         CancellationToken cancellationToken)
     {
-        if (!IsValidRole(dto.Role))
-            return BadRequest(new { error = _L["Otp_RoleInvalid"].Value });
-
         var result = await _mediator.Send(
-            new VerifyOtpCommand(dto.PhoneNumber, dto.Otp, dto.Role), cancellationToken);
+            new VerifyOtpCommand(dto.PhoneNumber, dto.Otp), cancellationToken);
 
         return result.IsSuccess
             ? Ok(result.Data)
             : Unauthorized(new { error = result.Error });
     }
-
-    private static bool IsValidRole(string role)
-        => role?.ToLower() is "parent" or "driver" or "assistant";
 }
 
-public record OtpRequestDto(string PhoneNumber, string Role);
-public record OtpVerifyDto(string PhoneNumber, string Otp, string Role);
+public record OtpRequestDto(string PhoneNumber);
+public record OtpVerifyDto(string PhoneNumber, string Otp);

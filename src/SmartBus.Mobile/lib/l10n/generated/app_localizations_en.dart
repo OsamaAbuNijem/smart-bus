@@ -719,4 +719,234 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationsEmptySub =>
       'Updates about your child\'s trip will appear here.';
+
+  @override
+  String get assistantGreetMorning => 'Good morning';
+
+  @override
+  String get assistantGreetAfternoon => 'Good afternoon';
+
+  @override
+  String get assistantGreetEvening => 'Good evening';
+
+  @override
+  String get assistantTodaysTrips => 'Today\'s trips';
+
+  @override
+  String get assistantScanBusQr => 'Scan Bus QR';
+
+  @override
+  String get assistantScanBusQrSub => 'Scan to start a new trip';
+
+  @override
+  String get assistantManualSetupCta => 'Or set up manually';
+
+  @override
+  String get assistantMorningPickup => 'Morning Pickup';
+
+  @override
+  String get assistantAfternoonDropoff => 'Afternoon Drop-off';
+
+  @override
+  String get assistantStartedAt => 'Started';
+
+  @override
+  String get assistantBoarded => 'boarded';
+
+  @override
+  String get assistantStudents => 'students';
+
+  @override
+  String get assistantStatusLive => 'Live';
+
+  @override
+  String get assistantStatusDone => 'Done';
+
+  @override
+  String get assistantStatusScheduled => 'Scheduled';
+
+  @override
+  String get assistantNoTripsToday =>
+      'No trips assigned for today.\nScan a bus QR to get started.';
+
+  @override
+  String get assistantTripSetupTitle => 'New Trip';
+
+  @override
+  String get assistantBusFromQr => 'From QR';
+
+  @override
+  String get assistantTripTypeLabel => 'Trip type';
+
+  @override
+  String get assistantTripTypeMorning => 'Morning';
+
+  @override
+  String get assistantTripTypeMorningSub => 'Home → School';
+
+  @override
+  String get assistantTripTypeAfternoon => 'Afternoon';
+
+  @override
+  String get assistantTripTypeAfternoonSub => 'School → Home';
+
+  @override
+  String get assistantStudentsAuto => 'Auto-loaded from last trip';
+
+  @override
+  String get assistantStartTrip => 'Start trip';
+
+  @override
+  String get assistantBusLabel => 'Bus';
+
+  @override
+  String get assistantDriverLabel => 'Driver';
+
+  @override
+  String get assistantQrEntryHint => 'Paste or type QR token';
+
+  @override
+  String get assistantQrEntryConfirm => 'Use this token';
+
+  @override
+  String get assistantQrSimulatorTitle => 'QR scanner unavailable in simulator';
+
+  @override
+  String get assistantQrSimulatorBody =>
+      'Type or paste the bus QR token below to continue.';
+
+  @override
+  String get loginRoleParent => 'Parent';
+
+  @override
+  String get loginRoleDriver => 'Driver';
+
+  @override
+  String get loginRoleAssistant => 'Assistant';
+
+  @override
+  String get assistantSelectBus => 'Select a bus';
+
+  @override
+  String get assistantSelectDriver => 'Select a driver';
+
+  @override
+  String get assistantNoLastRoster =>
+      'No prior trip on this bus + type. Trip will start with an empty roster.';
+
+  @override
+  String get assistantScanStudentTitle => 'Scan student QR';
+
+  @override
+  String get assistantScanStudentOk => 'Student boarded.';
+
+  @override
+  String get assistantNfcUnavailable => 'NFC isn\'t available on this device.';
+
+  @override
+  String get assistantBoardedLabel => 'Boarded';
+
+  @override
+  String get assistantOf => 'of';
+
+  @override
+  String get assistantScanQrShort => 'Scan QR';
+
+  @override
+  String get assistantScanQrSubShort => 'Use camera';
+
+  @override
+  String get assistantTapNfc => 'Tap NFC';
+
+  @override
+  String get assistantTapNfcSub => 'Hold to phone';
+
+  @override
+  String get assistantStudentsByStop => 'Students · sorted by stop';
+
+  @override
+  String get assistantRouteOrder => 'Route order';
+
+  @override
+  String get assistantAbsenceReported => 'Parent reported absence';
+
+  @override
+  String get assistantBoardedAt => 'Boarded';
+
+  @override
+  String get assistantWaitingForPickup => 'Waiting for pickup';
+
+  @override
+  String get assistantAbsentBadge => 'Absent';
+
+  @override
+  String get assistantNotifyArrivedOk => 'Parent notified.';
+
+  @override
+  String get assistantNoParentPhone => 'No parent phone on file.';
+
+  @override
+  String get assistantOpenFailed => 'Could not open the app.';
+
+  @override
+  String get assistantEndTrip => 'End trip';
+
+  @override
+  String get assistantEndTripConfirmTitle => 'End this trip?';
+
+  @override
+  String get assistantEndTripConfirmBody =>
+      'All boarding actions will be saved and the trip will be marked as completed.';
+
+  @override
+  String get assistantEndTripConfirmYes => 'End trip';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsProfile => 'Profile';
+
+  @override
+  String get settingsFullName => 'Full name';
+
+  @override
+  String get settingsFullNameHint => 'Your full name';
+
+  @override
+  String get settingsPhoneNumber => 'Phone number';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsSave => 'Save changes';
+
+  @override
+  String get settingsSaved => 'Profile updated.';
+
+  @override
+  String get settingsCancel => 'Cancel';
+
+  @override
+  String get settingsLogout => 'Log out';
+
+  @override
+  String get settingsLogoutTitle => 'Log out?';
+
+  @override
+  String get settingsLogoutBody =>
+      'You\'ll need to sign in again with your phone number.';
+
+  @override
+  String get assistantEndedAt => 'Ended';
+
+  @override
+  String get assistantNotBoarded => 'Did not board';
+
+  @override
+  String get assistantNotBoardedShort => 'No-show';
+
+  @override
+  String get assistantTripCompletedTitle => 'Trip completed';
 }

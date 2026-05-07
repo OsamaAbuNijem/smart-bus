@@ -1459,6 +1459,456 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Updates about your child\'s trip will appear here.'**
   String get notificationsEmptySub;
+
+  /// No description provided for @assistantGreetMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get assistantGreetMorning;
+
+  /// No description provided for @assistantGreetAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get assistantGreetAfternoon;
+
+  /// No description provided for @assistantGreetEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get assistantGreetEvening;
+
+  /// No description provided for @assistantTodaysTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s trips'**
+  String get assistantTodaysTrips;
+
+  /// No description provided for @assistantScanBusQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Bus QR'**
+  String get assistantScanBusQr;
+
+  /// No description provided for @assistantScanBusQrSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to start a new trip'**
+  String get assistantScanBusQrSub;
+
+  /// No description provided for @assistantManualSetupCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Or set up manually'**
+  String get assistantManualSetupCta;
+
+  /// No description provided for @assistantMorningPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Pickup'**
+  String get assistantMorningPickup;
+
+  /// No description provided for @assistantAfternoonDropoff.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon Drop-off'**
+  String get assistantAfternoonDropoff;
+
+  /// No description provided for @assistantStartedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get assistantStartedAt;
+
+  /// No description provided for @assistantBoarded.
+  ///
+  /// In en, this message translates to:
+  /// **'boarded'**
+  String get assistantBoarded;
+
+  /// No description provided for @assistantStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'students'**
+  String get assistantStudents;
+
+  /// No description provided for @assistantStatusLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get assistantStatusLive;
+
+  /// No description provided for @assistantStatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get assistantStatusDone;
+
+  /// No description provided for @assistantStatusScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get assistantStatusScheduled;
+
+  /// No description provided for @assistantNoTripsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips assigned for today.\nScan a bus QR to get started.'**
+  String get assistantNoTripsToday;
+
+  /// No description provided for @assistantTripSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Trip'**
+  String get assistantTripSetupTitle;
+
+  /// No description provided for @assistantBusFromQr.
+  ///
+  /// In en, this message translates to:
+  /// **'From QR'**
+  String get assistantBusFromQr;
+
+  /// No description provided for @assistantTripTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip type'**
+  String get assistantTripTypeLabel;
+
+  /// No description provided for @assistantTripTypeMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get assistantTripTypeMorning;
+
+  /// No description provided for @assistantTripTypeMorningSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Home → School'**
+  String get assistantTripTypeMorningSub;
+
+  /// No description provided for @assistantTripTypeAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get assistantTripTypeAfternoon;
+
+  /// No description provided for @assistantTripTypeAfternoonSub.
+  ///
+  /// In en, this message translates to:
+  /// **'School → Home'**
+  String get assistantTripTypeAfternoonSub;
+
+  /// No description provided for @assistantStudentsAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-loaded from last trip'**
+  String get assistantStudentsAuto;
+
+  /// No description provided for @assistantStartTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Start trip'**
+  String get assistantStartTrip;
+
+  /// No description provided for @assistantBusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus'**
+  String get assistantBusLabel;
+
+  /// No description provided for @assistantDriverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get assistantDriverLabel;
+
+  /// No description provided for @assistantQrEntryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste or type QR token'**
+  String get assistantQrEntryHint;
+
+  /// No description provided for @assistantQrEntryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this token'**
+  String get assistantQrEntryConfirm;
+
+  /// No description provided for @assistantQrSimulatorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'QR scanner unavailable in simulator'**
+  String get assistantQrSimulatorTitle;
+
+  /// No description provided for @assistantQrSimulatorBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Type or paste the bus QR token below to continue.'**
+  String get assistantQrSimulatorBody;
+
+  /// No description provided for @loginRoleParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get loginRoleParent;
+
+  /// No description provided for @loginRoleDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get loginRoleDriver;
+
+  /// No description provided for @loginRoleAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant'**
+  String get loginRoleAssistant;
+
+  /// No description provided for @assistantSelectBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a bus'**
+  String get assistantSelectBus;
+
+  /// No description provided for @assistantSelectDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a driver'**
+  String get assistantSelectDriver;
+
+  /// No description provided for @assistantNoLastRoster.
+  ///
+  /// In en, this message translates to:
+  /// **'No prior trip on this bus + type. Trip will start with an empty roster.'**
+  String get assistantNoLastRoster;
+
+  /// No description provided for @assistantScanStudentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan student QR'**
+  String get assistantScanStudentTitle;
+
+  /// No description provided for @assistantScanStudentOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Student boarded.'**
+  String get assistantScanStudentOk;
+
+  /// No description provided for @assistantNfcUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'NFC isn\'t available on this device.'**
+  String get assistantNfcUnavailable;
+
+  /// No description provided for @assistantBoardedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Boarded'**
+  String get assistantBoardedLabel;
+
+  /// No description provided for @assistantOf.
+  ///
+  /// In en, this message translates to:
+  /// **'of'**
+  String get assistantOf;
+
+  /// No description provided for @assistantScanQrShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get assistantScanQrShort;
+
+  /// No description provided for @assistantScanQrSubShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Use camera'**
+  String get assistantScanQrSubShort;
+
+  /// No description provided for @assistantTapNfc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap NFC'**
+  String get assistantTapNfc;
+
+  /// No description provided for @assistantTapNfcSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to phone'**
+  String get assistantTapNfcSub;
+
+  /// No description provided for @assistantStudentsByStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Students · sorted by stop'**
+  String get assistantStudentsByStop;
+
+  /// No description provided for @assistantRouteOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Route order'**
+  String get assistantRouteOrder;
+
+  /// No description provided for @assistantAbsenceReported.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent reported absence'**
+  String get assistantAbsenceReported;
+
+  /// No description provided for @assistantBoardedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Boarded'**
+  String get assistantBoardedAt;
+
+  /// No description provided for @assistantWaitingForPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for pickup'**
+  String get assistantWaitingForPickup;
+
+  /// No description provided for @assistantAbsentBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Absent'**
+  String get assistantAbsentBadge;
+
+  /// No description provided for @assistantNotifyArrivedOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent notified.'**
+  String get assistantNotifyArrivedOk;
+
+  /// No description provided for @assistantNoParentPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'No parent phone on file.'**
+  String get assistantNoParentPhone;
+
+  /// No description provided for @assistantOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the app.'**
+  String get assistantOpenFailed;
+
+  /// No description provided for @assistantEndTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'End trip'**
+  String get assistantEndTrip;
+
+  /// No description provided for @assistantEndTripConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'End this trip?'**
+  String get assistantEndTripConfirmTitle;
+
+  /// No description provided for @assistantEndTripConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'All boarding actions will be saved and the trip will be marked as completed.'**
+  String get assistantEndTripConfirmBody;
+
+  /// No description provided for @assistantEndTripConfirmYes.
+  ///
+  /// In en, this message translates to:
+  /// **'End trip'**
+  String get assistantEndTripConfirmYes;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get settingsProfile;
+
+  /// No description provided for @settingsFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get settingsFullName;
+
+  /// No description provided for @settingsFullNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your full name'**
+  String get settingsFullNameHint;
+
+  /// No description provided for @settingsPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get settingsPhoneNumber;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get settingsSave;
+
+  /// No description provided for @settingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated.'**
+  String get settingsSaved;
+
+  /// No description provided for @settingsCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get settingsCancel;
+
+  /// No description provided for @settingsLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get settingsLogout;
+
+  /// No description provided for @settingsLogoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out?'**
+  String get settingsLogoutTitle;
+
+  /// No description provided for @settingsLogoutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll need to sign in again with your phone number.'**
+  String get settingsLogoutBody;
+
+  /// No description provided for @assistantEndedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get assistantEndedAt;
+
+  /// No description provided for @assistantNotBoarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Did not board'**
+  String get assistantNotBoarded;
+
+  /// No description provided for @assistantNotBoardedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'No-show'**
+  String get assistantNotBoardedShort;
+
+  /// No description provided for @assistantTripCompletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip completed'**
+  String get assistantTripCompletedTitle;
 }
 
 class _AppLocalizationsDelegate

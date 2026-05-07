@@ -1,0 +1,121 @@
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using SmartBus.Application.Common.Interfaces;
+using SmartBus.Application.Common.Models;
+using SmartBus.Domain.Enums;
+
+namespace SmartBus.Application.Features.Trips.Queries.GetTripDetails;
+
+public class GetTripDetailsQueryHandler
+    : IRequestHandler<GetTripDetailsQuery, Result<TripDetailsDto>>
+{
+    private readonly IApplicationDbContext _context;
+
+    public GetTripDetailsQueryHandler(IApplicationDbContext context)
+        => _context = context;
+
+    public async Task<Result<TripDetailsDto>> Handle(
+        GetTripDetailsQuery request, CancellationToken ct)
+    {
+        var trip = await _context.Trips
+            .Include(t => t.Bus)
+            .FirstOrDefaultAsync(t => t.Id == request.TripId, ct);
+
+        if (trip is null)
+            return Result<TripDetailsDto>.Failure("Trip not found.");
+
+        // Driver name resolved via the bus schedule slot matching this trip type.
+        var schedule = await _context.BusSchedules
+            .FirstOrDefaultAsync(s => s.BusId == trip.BusId, ct);
+
+        Guid? driverId = trip.Type == TripType.Morning
+            ? schedule?.MorningDriverId
+            : schedule?.ReturnDriverId;
+
+        string? driverName = null;
+        if (driverId is not null)
+        {
+            driverName = await _context.Drivers
+                .Where(d => d.Id == driverId)
+                .Select(d => d.FullName)
+                .FirstOrDefaultAsync(ct);
+        }
+
+        // Today's absence requests (Approved or Pending) for this trip's students.
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var absentStudentIds = await _context.AbsenceRequests
+            .Where(a => a.Date == today
+                        && a.Status != AbsenceRequestStatus.Rejected)
+            .Select(a => a.StudentId)
+            .ToListAsync(ct);
+        var absentSet = absentStudentIds.ToHashSet();
+
+        var rows = await _context.StudentTrips
+            .Where(st => st.TripId == request.TripId)
+            .Include(st => st.Student)
+            .ThenInclude(s => s.Parent)
+            .Select(st => new
+            {
+                st.StudentId,
+                st.Student.FullName,
+                st.Student.FullNameEn,
+                st.Student.Grade,
+                st.Student.Class,
+                st.Student.HomeArea,
+                st.Student.Latitude,
+                st.Student.Longitude,
+                st.BoardingStatus,
+                st.BoardingTime,
+                st.DropoffTime,
+                ParentName = st.Student.Parent != null ? st.Student.Parent.FullName : null,
+                ParentPhone = st.Student.Parent != null ? st.Student.Parent.PhoneNumber : null,
+            })
+            .ToListAsync(ct);
+
+        var students = rows
+            .Select(r =>
+            {
+                var isAbsent = absentSet.Contains(r.StudentId);
+                var status = isAbsent
+                    ? "Absent"
+                    : r.BoardingStatus.ToString();
+                return new TripStudentDetailDto(
+                    r.StudentId,
+                    r.FullName,
+                    r.FullNameEn,
+                    r.Grade,
+                    r.Class,
+                    r.HomeArea,
+                    r.Latitude,
+                    r.Longitude,
+                    status,
+                    r.BoardingTime,
+                    r.DropoffTime,
+                    isAbsent,
+                    r.ParentName,
+                    r.ParentPhone);
+            })
+            // Sort by HomeArea (groups in the UI), then by name within an area.
+            // Absent students fall to the bottom of each group (they get the
+            // empty-string sort key by-design only when HomeArea is null).
+            .OrderBy(s => s.HomeArea ?? string.Empty)
+            .ThenBy(s => s.IsAbsentToday ? 1 : 0)
+            .ThenBy(s => s.FullName)
+            .ToList();
+
+        var boarded = students.Count(s => s.BoardingStatus == "Boarded");
+
+        return Result<TripDetailsDto>.Success(new TripDetailsDto(
+            trip.Id,
+            trip.Type.ToString(),
+            trip.Status.ToString(),
+            trip.Bus!.PlateNumber,
+            driverName,
+            trip.ScheduledDeparture,
+            trip.ActualDeparture,
+            trip.ActualArrival,
+            students.Count,
+            boarded,
+            students));
+    }
+}

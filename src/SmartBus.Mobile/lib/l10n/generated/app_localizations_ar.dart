@@ -713,4 +713,234 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationsEmptySub => 'ستظهر هنا أي تحديثات عن رحلة طفلك.';
+
+  @override
+  String get assistantGreetMorning => 'صباح الخير';
+
+  @override
+  String get assistantGreetAfternoon => 'مساء الخير';
+
+  @override
+  String get assistantGreetEvening => 'مساء النور';
+
+  @override
+  String get assistantTodaysTrips => 'رحلات اليوم';
+
+  @override
+  String get assistantScanBusQr => 'مسح رمز الحافلة';
+
+  @override
+  String get assistantScanBusQrSub => 'امسح لبدء رحلة جديدة';
+
+  @override
+  String get assistantManualSetupCta => 'أو الإعداد يدويًا';
+
+  @override
+  String get assistantMorningPickup => 'نقلة الصباح';
+
+  @override
+  String get assistantAfternoonDropoff => 'نقلة العودة';
+
+  @override
+  String get assistantStartedAt => 'بدأت';
+
+  @override
+  String get assistantBoarded => 'صعدوا';
+
+  @override
+  String get assistantStudents => 'طلاب';
+
+  @override
+  String get assistantStatusLive => 'مباشر';
+
+  @override
+  String get assistantStatusDone => 'اكتملت';
+
+  @override
+  String get assistantStatusScheduled => 'مجدولة';
+
+  @override
+  String get assistantNoTripsToday =>
+      'لا توجد رحلات لهذا اليوم.\nامسح رمز الحافلة للبدء.';
+
+  @override
+  String get assistantTripSetupTitle => 'رحلة جديدة';
+
+  @override
+  String get assistantBusFromQr => 'من الرمز';
+
+  @override
+  String get assistantTripTypeLabel => 'نوع الرحلة';
+
+  @override
+  String get assistantTripTypeMorning => 'ذهاب';
+
+  @override
+  String get assistantTripTypeMorningSub => 'البيت → المدرسة';
+
+  @override
+  String get assistantTripTypeAfternoon => 'إياب';
+
+  @override
+  String get assistantTripTypeAfternoonSub => 'المدرسة → البيت';
+
+  @override
+  String get assistantStudentsAuto => 'تم تحميلهم تلقائيًا من آخر رحلة';
+
+  @override
+  String get assistantStartTrip => 'ابدأ الرحلة';
+
+  @override
+  String get assistantBusLabel => 'الحافلة';
+
+  @override
+  String get assistantDriverLabel => 'السائق';
+
+  @override
+  String get assistantQrEntryHint => 'ألصق أو اكتب رمز الحافلة';
+
+  @override
+  String get assistantQrEntryConfirm => 'استخدم هذا الرمز';
+
+  @override
+  String get assistantQrSimulatorTitle => 'الكاميرا غير متاحة في المحاكي';
+
+  @override
+  String get assistantQrSimulatorBody =>
+      'اكتب أو ألصق رمز الحافلة بالأسفل للمتابعة.';
+
+  @override
+  String get loginRoleParent => 'ولي أمر';
+
+  @override
+  String get loginRoleDriver => 'سائق';
+
+  @override
+  String get loginRoleAssistant => 'مرافق';
+
+  @override
+  String get assistantSelectBus => 'اختر الحافلة';
+
+  @override
+  String get assistantSelectDriver => 'اختر السائق';
+
+  @override
+  String get assistantNoLastRoster =>
+      'لا توجد رحلة سابقة لهذه الحافلة + النوع. ستبدأ الرحلة بقائمة فارغة.';
+
+  @override
+  String get assistantScanStudentTitle => 'مسح رمز الطالب';
+
+  @override
+  String get assistantScanStudentOk => 'تم تسجيل الطالب.';
+
+  @override
+  String get assistantNfcUnavailable => 'الـ NFC غير متاح على هذا الجهاز.';
+
+  @override
+  String get assistantBoardedLabel => 'صعدوا';
+
+  @override
+  String get assistantOf => 'من';
+
+  @override
+  String get assistantScanQrShort => 'مسح QR';
+
+  @override
+  String get assistantScanQrSubShort => 'بالكاميرا';
+
+  @override
+  String get assistantTapNfc => 'بطاقة NFC';
+
+  @override
+  String get assistantTapNfcSub => 'قرّب من الهاتف';
+
+  @override
+  String get assistantStudentsByStop => 'الطلاب · مرتبون حسب الموقع';
+
+  @override
+  String get assistantRouteOrder => 'ترتيب الموقع';
+
+  @override
+  String get assistantAbsenceReported => 'تم الإبلاغ عن الغياب';
+
+  @override
+  String get assistantBoardedAt => 'صعد الساعة';
+
+  @override
+  String get assistantWaitingForPickup => 'بانتظار الصعود';
+
+  @override
+  String get assistantAbsentBadge => 'غائب';
+
+  @override
+  String get assistantNotifyArrivedOk => 'تم تنبيه ولي الأمر.';
+
+  @override
+  String get assistantNoParentPhone => 'لا يوجد رقم لولي الأمر.';
+
+  @override
+  String get assistantOpenFailed => 'تعذّر فتح التطبيق.';
+
+  @override
+  String get assistantEndTrip => 'إنهاء الرحلة';
+
+  @override
+  String get assistantEndTripConfirmTitle => 'هل تريد إنهاء الرحلة؟';
+
+  @override
+  String get assistantEndTripConfirmBody =>
+      'سيتم حفظ جميع عمليات الصعود ووضع الرحلة كمكتملة.';
+
+  @override
+  String get assistantEndTripConfirmYes => 'إنهاء الرحلة';
+
+  @override
+  String get settingsTitle => 'الإعدادات';
+
+  @override
+  String get settingsProfile => 'الملف الشخصي';
+
+  @override
+  String get settingsFullName => 'الاسم الكامل';
+
+  @override
+  String get settingsFullNameHint => 'اكتب اسمك الكامل';
+
+  @override
+  String get settingsPhoneNumber => 'رقم الجوال';
+
+  @override
+  String get settingsLanguage => 'اللغة';
+
+  @override
+  String get settingsSave => 'حفظ التغييرات';
+
+  @override
+  String get settingsSaved => 'تم تحديث البيانات.';
+
+  @override
+  String get settingsCancel => 'إلغاء';
+
+  @override
+  String get settingsLogout => 'تسجيل الخروج';
+
+  @override
+  String get settingsLogoutTitle => 'تسجيل الخروج؟';
+
+  @override
+  String get settingsLogoutBody =>
+      'سيتعين عليك تسجيل الدخول مجددًا برقم جوالك.';
+
+  @override
+  String get assistantEndedAt => 'انتهت';
+
+  @override
+  String get assistantNotBoarded => 'لم يصعد';
+
+  @override
+  String get assistantNotBoardedShort => 'لم يصعد';
+
+  @override
+  String get assistantTripCompletedTitle => 'اكتملت الرحلة';
 }

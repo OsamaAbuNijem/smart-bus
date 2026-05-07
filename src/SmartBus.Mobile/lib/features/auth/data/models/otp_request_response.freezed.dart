@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OtpRequestResponse {
 
- String get message; int get expiresInSeconds; String? get otp;
+ String get message; int get expiresInSeconds; String get role; String? get otp;
 /// Create a copy of OtpRequestResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $OtpRequestResponseCopyWith<OtpRequestResponse> get copyWith => _$OtpRequestResp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpRequestResponse&&(identical(other.message, message) || other.message == message)&&(identical(other.expiresInSeconds, expiresInSeconds) || other.expiresInSeconds == expiresInSeconds)&&(identical(other.otp, otp) || other.otp == otp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpRequestResponse&&(identical(other.message, message) || other.message == message)&&(identical(other.expiresInSeconds, expiresInSeconds) || other.expiresInSeconds == expiresInSeconds)&&(identical(other.role, role) || other.role == role)&&(identical(other.otp, otp) || other.otp == otp));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,message,expiresInSeconds,otp);
+int get hashCode => Object.hash(runtimeType,message,expiresInSeconds,role,otp);
 
 @override
 String toString() {
-  return 'OtpRequestResponse(message: $message, expiresInSeconds: $expiresInSeconds, otp: $otp)';
+  return 'OtpRequestResponse(message: $message, expiresInSeconds: $expiresInSeconds, role: $role, otp: $otp)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $OtpRequestResponseCopyWith<$Res>  {
   factory $OtpRequestResponseCopyWith(OtpRequestResponse value, $Res Function(OtpRequestResponse) _then) = _$OtpRequestResponseCopyWithImpl;
 @useResult
 $Res call({
- String message, int expiresInSeconds, String? otp
+ String message, int expiresInSeconds, String role, String? otp
 });
 
 
@@ -65,11 +65,12 @@ class _$OtpRequestResponseCopyWithImpl<$Res>
 
 /// Create a copy of OtpRequestResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? expiresInSeconds = null,Object? otp = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? expiresInSeconds = null,Object? role = null,Object? otp = freezed,}) {
   return _then(_self.copyWith(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,expiresInSeconds: null == expiresInSeconds ? _self.expiresInSeconds : expiresInSeconds // ignore: cast_nullable_to_non_nullable
-as int,otp: freezed == otp ? _self.otp : otp // ignore: cast_nullable_to_non_nullable
+as int,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,otp: freezed == otp ? _self.otp : otp // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String message,  int expiresInSeconds,  String? otp)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String message,  int expiresInSeconds,  String role,  String? otp)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OtpRequestResponse() when $default != null:
-return $default(_that.message,_that.expiresInSeconds,_that.otp);case _:
+return $default(_that.message,_that.expiresInSeconds,_that.role,_that.otp);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.message,_that.expiresInSeconds,_that.otp);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String message,  int expiresInSeconds,  String? otp)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String message,  int expiresInSeconds,  String role,  String? otp)  $default,) {final _that = this;
 switch (_that) {
 case _OtpRequestResponse():
-return $default(_that.message,_that.expiresInSeconds,_that.otp);case _:
+return $default(_that.message,_that.expiresInSeconds,_that.role,_that.otp);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.message,_that.expiresInSeconds,_that.otp);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String message,  int expiresInSeconds,  String? otp)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String message,  int expiresInSeconds,  String role,  String? otp)?  $default,) {final _that = this;
 switch (_that) {
 case _OtpRequestResponse() when $default != null:
-return $default(_that.message,_that.expiresInSeconds,_that.otp);case _:
+return $default(_that.message,_that.expiresInSeconds,_that.role,_that.otp);case _:
   return null;
 
 }
@@ -211,11 +212,12 @@ return $default(_that.message,_that.expiresInSeconds,_that.otp);case _:
 @JsonSerializable()
 
 class _OtpRequestResponse implements OtpRequestResponse {
-  const _OtpRequestResponse({required this.message, required this.expiresInSeconds, this.otp});
+  const _OtpRequestResponse({required this.message, required this.expiresInSeconds, required this.role, this.otp});
   factory _OtpRequestResponse.fromJson(Map<String, dynamic> json) => _$OtpRequestResponseFromJson(json);
 
 @override final  String message;
 @override final  int expiresInSeconds;
+@override final  String role;
 @override final  String? otp;
 
 /// Create a copy of OtpRequestResponse
@@ -231,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpRequestResponse&&(identical(other.message, message) || other.message == message)&&(identical(other.expiresInSeconds, expiresInSeconds) || other.expiresInSeconds == expiresInSeconds)&&(identical(other.otp, otp) || other.otp == otp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpRequestResponse&&(identical(other.message, message) || other.message == message)&&(identical(other.expiresInSeconds, expiresInSeconds) || other.expiresInSeconds == expiresInSeconds)&&(identical(other.role, role) || other.role == role)&&(identical(other.otp, otp) || other.otp == otp));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,message,expiresInSeconds,otp);
+int get hashCode => Object.hash(runtimeType,message,expiresInSeconds,role,otp);
 
 @override
 String toString() {
-  return 'OtpRequestResponse(message: $message, expiresInSeconds: $expiresInSeconds, otp: $otp)';
+  return 'OtpRequestResponse(message: $message, expiresInSeconds: $expiresInSeconds, role: $role, otp: $otp)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$OtpRequestResponseCopyWith<$Res> implements $OtpRequestRe
   factory _$OtpRequestResponseCopyWith(_OtpRequestResponse value, $Res Function(_OtpRequestResponse) _then) = __$OtpRequestResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String message, int expiresInSeconds, String? otp
+ String message, int expiresInSeconds, String role, String? otp
 });
 
 
@@ -268,11 +270,12 @@ class __$OtpRequestResponseCopyWithImpl<$Res>
 
 /// Create a copy of OtpRequestResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? expiresInSeconds = null,Object? otp = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? expiresInSeconds = null,Object? role = null,Object? otp = freezed,}) {
   return _then(_OtpRequestResponse(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,expiresInSeconds: null == expiresInSeconds ? _self.expiresInSeconds : expiresInSeconds // ignore: cast_nullable_to_non_nullable
-as int,otp: freezed == otp ? _self.otp : otp // ignore: cast_nullable_to_non_nullable
+as int,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,otp: freezed == otp ? _self.otp : otp // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

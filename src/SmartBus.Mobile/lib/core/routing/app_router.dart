@@ -8,6 +8,10 @@ import 'package:smart_bus/features/auth/presentation/providers/auth_controller.d
 import 'package:smart_bus/features/auth/presentation/providers/otp_controller.dart';
 import 'package:smart_bus/features/auth/presentation/screens/login_screen.dart';
 import 'package:smart_bus/features/auth/presentation/screens/otp_screen.dart';
+import 'package:smart_bus/features/assistant/presentation/screens/assistant_qr_scan_screen.dart';
+import 'package:smart_bus/features/assistant/presentation/screens/assistant_settings_screen.dart';
+import 'package:smart_bus/features/assistant/presentation/screens/assistant_trip_details_screen.dart';
+import 'package:smart_bus/features/assistant/presentation/screens/assistant_trip_setup_screen.dart';
 import 'package:smart_bus/features/auth/presentation/screens/qr_scan_screen.dart';
 import 'package:smart_bus/features/auth/presentation/screens/splash_screen.dart';
 import 'package:smart_bus/features/home/presentation/screens/assistant_home_screen.dart';
@@ -33,6 +37,14 @@ abstract class AppRoute {
   static const homeParent = '/home/parent';
   static const homeDriver = '/home/driver';
   static const homeAssistant = '/home/assistant';
+  static const assistantQrScan = '/assistant/qr';
+  static const assistantTripSetup = '/assistant/trip-setup';
+  static const assistantManualSetup = '/assistant/manual-setup';
+  static const assistantTripDetails = '/assistant/trips/:tripId';
+  static const assistantSettings = '/assistant/settings';
+
+  static String assistantTripDetailsFor(String tripId) =>
+      '/assistant/trips/$tripId';
   static const studentInfo = '/students/:studentId';
   static const studentEdit = '/students/:studentId/edit';
   static const studentTrips = '/students/:studentId/trips';
@@ -146,6 +158,28 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoute.homeAssistant,
         builder: (_, _) => const AssistantHomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.assistantQrScan,
+        builder: (_, _) => const AssistantQrScanScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.assistantTripSetup,
+        builder: (_, _) => const AssistantTripSetupScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.assistantManualSetup,
+        builder: (_, _) => const AssistantTripSetupScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.assistantTripDetails,
+        builder: (context, state) => AssistantTripDetailsScreen(
+          tripId: state.pathParameters['tripId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.assistantSettings,
+        builder: (_, _) => const AssistantSettingsScreen(),
       ),
       GoRoute(
         path: AppRoute.studentInfo,

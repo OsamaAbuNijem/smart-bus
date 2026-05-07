@@ -10,12 +10,7 @@ _OtpVerifyRequest _$OtpVerifyRequestFromJson(Map<String, dynamic> json) =>
     _OtpVerifyRequest(
       phoneNumber: json['phoneNumber'] as String,
       otp: json['otp'] as String,
-      role: json['role'] as String,
     );
 
 Map<String, dynamic> _$OtpVerifyRequestToJson(_OtpVerifyRequest instance) =>
-    <String, dynamic>{
-      'phoneNumber': instance.phoneNumber,
-      'otp': instance.otp,
-      'role': instance.role,
-    };
+    <String, dynamic>{'phoneNumber': instance.phoneNumber, 'otp': instance.otp};

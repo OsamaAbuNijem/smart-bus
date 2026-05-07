@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Drivers.Commands.CreateDriver;
 using SmartBus.Application.Features.Drivers.Commands.DeleteDriver;
 using SmartBus.Application.Features.Drivers.Commands.UpdateDriver;
+using SmartBus.Application.Features.Drivers.Commands.UpdateMyProfile;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Drivers.Queries.GetDriverById;
 using SmartBus.Domain.Enums;
@@ -20,6 +21,22 @@ public class DriversController : ControllerBase
     private readonly IMediator _mediator;
 
     public DriversController(IMediator mediator) => _mediator = mediator;
+
+    /// <summary>
+    /// Self-update for the authenticated driver/assistant. Used by the
+    /// mobile settings screen.
+    /// </summary>
+    [HttpPut("me")]
+    [Authorize(Roles = "Driver,Assistant")]
+    public async Task<IActionResult> UpdateMe(
+        [FromBody] UpdateMyProfileCommand command,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command, cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAll(

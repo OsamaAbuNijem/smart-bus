@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OtpVerifyRequest {
 
- String get phoneNumber; String get otp; String get role;
+ String get phoneNumber; String get otp;
 /// Create a copy of OtpVerifyRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $OtpVerifyRequestCopyWith<OtpVerifyRequest> get copyWith => _$OtpVerifyRequestCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpVerifyRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.otp, otp) || other.otp == otp)&&(identical(other.role, role) || other.role == role));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpVerifyRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.otp, otp) || other.otp == otp));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,phoneNumber,otp,role);
+int get hashCode => Object.hash(runtimeType,phoneNumber,otp);
 
 @override
 String toString() {
-  return 'OtpVerifyRequest(phoneNumber: $phoneNumber, otp: $otp, role: $role)';
+  return 'OtpVerifyRequest(phoneNumber: $phoneNumber, otp: $otp)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $OtpVerifyRequestCopyWith<$Res>  {
   factory $OtpVerifyRequestCopyWith(OtpVerifyRequest value, $Res Function(OtpVerifyRequest) _then) = _$OtpVerifyRequestCopyWithImpl;
 @useResult
 $Res call({
- String phoneNumber, String otp, String role
+ String phoneNumber, String otp
 });
 
 
@@ -65,11 +65,10 @@ class _$OtpVerifyRequestCopyWithImpl<$Res>
 
 /// Create a copy of OtpVerifyRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? phoneNumber = null,Object? otp = null,Object? role = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? phoneNumber = null,Object? otp = null,}) {
   return _then(_self.copyWith(
 phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
 as String,otp: null == otp ? _self.otp : otp // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -155,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String phoneNumber,  String otp,  String role)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String phoneNumber,  String otp)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OtpVerifyRequest() when $default != null:
-return $default(_that.phoneNumber,_that.otp,_that.role);case _:
+return $default(_that.phoneNumber,_that.otp);case _:
   return orElse();
 
 }
@@ -176,10 +175,10 @@ return $default(_that.phoneNumber,_that.otp,_that.role);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String phoneNumber,  String otp,  String role)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String phoneNumber,  String otp)  $default,) {final _that = this;
 switch (_that) {
 case _OtpVerifyRequest():
-return $default(_that.phoneNumber,_that.otp,_that.role);case _:
+return $default(_that.phoneNumber,_that.otp);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +195,10 @@ return $default(_that.phoneNumber,_that.otp,_that.role);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String phoneNumber,  String otp,  String role)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String phoneNumber,  String otp)?  $default,) {final _that = this;
 switch (_that) {
 case _OtpVerifyRequest() when $default != null:
-return $default(_that.phoneNumber,_that.otp,_that.role);case _:
+return $default(_that.phoneNumber,_that.otp);case _:
   return null;
 
 }
@@ -211,12 +210,11 @@ return $default(_that.phoneNumber,_that.otp,_that.role);case _:
 @JsonSerializable()
 
 class _OtpVerifyRequest implements OtpVerifyRequest {
-  const _OtpVerifyRequest({required this.phoneNumber, required this.otp, required this.role});
+  const _OtpVerifyRequest({required this.phoneNumber, required this.otp});
   factory _OtpVerifyRequest.fromJson(Map<String, dynamic> json) => _$OtpVerifyRequestFromJson(json);
 
 @override final  String phoneNumber;
 @override final  String otp;
-@override final  String role;
 
 /// Create a copy of OtpVerifyRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +229,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpVerifyRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.otp, otp) || other.otp == otp)&&(identical(other.role, role) || other.role == role));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpVerifyRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.otp, otp) || other.otp == otp));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,phoneNumber,otp,role);
+int get hashCode => Object.hash(runtimeType,phoneNumber,otp);
 
 @override
 String toString() {
-  return 'OtpVerifyRequest(phoneNumber: $phoneNumber, otp: $otp, role: $role)';
+  return 'OtpVerifyRequest(phoneNumber: $phoneNumber, otp: $otp)';
 }
 
 
@@ -251,7 +249,7 @@ abstract mixin class _$OtpVerifyRequestCopyWith<$Res> implements $OtpVerifyReque
   factory _$OtpVerifyRequestCopyWith(_OtpVerifyRequest value, $Res Function(_OtpVerifyRequest) _then) = __$OtpVerifyRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String phoneNumber, String otp, String role
+ String phoneNumber, String otp
 });
 
 
@@ -268,11 +266,10 @@ class __$OtpVerifyRequestCopyWithImpl<$Res>
 
 /// Create a copy of OtpVerifyRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? phoneNumber = null,Object? otp = null,Object? role = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? phoneNumber = null,Object? otp = null,}) {
   return _then(_OtpVerifyRequest(
 phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
 as String,otp: null == otp ? _self.otp : otp // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

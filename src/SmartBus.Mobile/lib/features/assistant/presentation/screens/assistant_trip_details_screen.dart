@@ -1,0 +1,1345 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:smart_bus/core/errors/failures.dart';
+import 'package:smart_bus/core/routing/app_router.dart';
+import 'package:smart_bus/core/theme/app_theme.dart';
+import 'package:smart_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:smart_bus/features/assistant/data/models/trip_details_dto.dart';
+import 'package:smart_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
+import 'package:smart_bus/l10n/generated/app_localizations.dart';
+
+class AssistantTripDetailsScreen extends ConsumerWidget {
+  const AssistantTripDetailsScreen({super.key, required this.tripId});
+  final String tripId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final detailsAsync = ref.watch(tripDetailsProvider(tripId));
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F4F5),
+      body: detailsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => _ErrorView(
+          message: e is Failure ? e.message : '$e',
+          onRetry: () => ref.invalidate(tripDetailsProvider(tripId)),
+        ),
+        data: (details) => _TripBody(details: details, l: l),
+      ),
+    );
+  }
+}
+
+class _TripBody extends ConsumerWidget {
+  const _TripBody({required this.details, required this.l});
+  final TripDetailsDto details;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groups = _groupByArea(details.students);
+    final readOnly = details.status == 'Completed';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _Header(details: details, l: l),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () async =>
+                ref.invalidate(tripDetailsProvider(details.tripId)),
+            color: AppColors.yellowDeep,
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+              children: [
+                if (!readOnly) ...[
+                  _ScanActionRow(
+                    onQr: () => _onScanQr(context, ref),
+                    onNfc: () => _onNfcTap(context),
+                    l: l,
+                  ),
+                  const SizedBox(height: 14),
+                ],
+                _SectionHeader(l: l),
+                const SizedBox(height: 10),
+                for (final entry in groups.entries) ...[
+                  _StopGroup(
+                    stopNumber: groups.keys.toList().indexOf(entry.key) + 1,
+                    stopName: entry.key,
+                    students: entry.value,
+                    tripId: details.tripId,
+                    readOnly: readOnly,
+                    l: l,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ],
+            ),
+          ),
+        ),
+        if (readOnly)
+          _CompletedSummaryBar(details: details, l: l)
+        else
+          _EndTripBar(details: details, l: l),
+      ],
+    );
+  }
+
+  Map<String, List<TripStudentDetailDto>> _groupByArea(
+      List<TripStudentDetailDto> students) {
+    final map = <String, List<TripStudentDetailDto>>{};
+    for (final s in students) {
+      final key = (s.homeArea?.trim().isNotEmpty ?? false)
+          ? s.homeArea!.trim()
+          : 'Unassigned';
+      (map[key] ??= []).add(s);
+    }
+    return map;
+  }
+
+  Future<void> _onScanQr(BuildContext context, WidgetRef ref) async {
+    final token = await _promptToken(context, l.assistantScanStudentTitle);
+    if (token == null || token.isEmpty) return;
+    try {
+      await ref.read(tripActionsProvider(details.tripId)).scanStudent(token);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l.assistantScanStudentOk)),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    }
+  }
+
+  void _onNfcTap(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l.assistantNfcUnavailable)),
+    );
+  }
+}
+
+// ─── Header ─────────────────────────────────────────────────────────────
+
+class _Header extends StatelessWidget {
+  const _Header({required this.details, required this.l});
+  final TripDetailsDto details;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    final fmt = DateFormat('MMM d · h:mm a');
+    final fmtTime = DateFormat('h:mm a');
+    final start = details.actualDeparture ?? details.scheduledDeparture;
+    final completed = details.status == 'Completed';
+    final progress = details.studentCount == 0
+        ? 0.0
+        : details.boardedCount / details.studentCount;
+
+    final subtitle = StringBuffer();
+    if (completed && details.actualArrival != null) {
+      // Trip recap. Use the longer "MMM d · h:mm" format so the date is
+      // legible in case the user is reviewing a trip from a previous day.
+      subtitle
+        ..write('${l.assistantStartedAt} ${fmt.format(start.toLocal())}  ·  ')
+        ..write(
+            '${l.assistantEndedAt} ${fmtTime.format(details.actualArrival!.toLocal())}');
+    } else {
+      subtitle.write('${l.assistantStartedAt} ${fmtTime.format(start.toLocal())}');
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: AppColors.slate100)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                _BackBtn(),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${details.isMorning ? l.assistantMorningPickup : l.assistantAfternoonDropoff} · ${details.busPlateNumber}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.ink,
+                          letterSpacing: -0.2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle.toString(),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate500,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (details.driverName != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          '${l.assistantDriverLabel}: ${details.driverName}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.slate500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (details.status == 'InProgress') _LivePill(l: l),
+                if (completed) _CompletedPill(l: l),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _ProgressRow(
+              boarded: details.boardedCount,
+              total: details.studentCount,
+              progress: progress,
+              l: l,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BackBtn extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.pop(),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: AppColors.slate50,
+          border: Border.all(color: AppColors.slate100),
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: const Icon(
+          Icons.arrow_back_rounded,
+          size: 18,
+          color: AppColors.slate700,
+        ),
+      ),
+    );
+  }
+}
+
+class _LivePill extends StatelessWidget {
+  const _LivePill({required this.l});
+  final AppLocalizations l;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.yellow, AppColors.yellowDeep],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(100),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x8CF5C518),
+            blurRadius: 8,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: const BoxDecoration(
+              color: AppColors.ink,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            l.assistantStatusLive,
+            style: const TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              color: AppColors.ink,
+              letterSpacing: -0.05,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProgressRow extends StatelessWidget {
+  const _ProgressRow({
+    required this.boarded,
+    required this.total,
+    required this.progress,
+    required this.l,
+  });
+  final int boarded, total;
+  final double progress;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 120,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l.assistantBoardedLabel.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.slate500,
+                  letterSpacing: 0.6,
+                ),
+              ),
+              const SizedBox(height: 2),
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.slate600,
+                    fontWeight: FontWeight.w600,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '$boarded',
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                      ),
+                    ),
+                    TextSpan(text: ' ${l.assistantOf} $total'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: LinearProgressIndicator(
+              value: progress.clamp(0.0, 1.0),
+              minHeight: 8,
+              backgroundColor: AppColors.slate100,
+              valueColor: const AlwaysStoppedAnimation(AppColors.yellowDeep),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Scan action row ────────────────────────────────────────────────────
+
+class _ScanActionRow extends StatelessWidget {
+  const _ScanActionRow({
+    required this.onQr,
+    required this.onNfc,
+    required this.l,
+  });
+  final VoidCallback onQr;
+  final VoidCallback onNfc;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _ScanBtn(
+            icon: Icons.qr_code_scanner_rounded,
+            title: l.assistantScanQrShort,
+            subtitle: l.assistantScanQrSubShort,
+            onTap: onQr,
+            isQr: true,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _ScanBtn(
+            icon: Icons.nfc_rounded,
+            title: l.assistantTapNfc,
+            subtitle: l.assistantTapNfcSub,
+            onTap: onNfc,
+            isQr: false,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ScanBtn extends StatelessWidget {
+  const _ScanBtn({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    required this.isQr,
+  });
+  final IconData icon;
+  final String title, subtitle;
+  final VoidCallback onTap;
+  final bool isQr;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: isQr
+              ? const LinearGradient(
+                  colors: [AppColors.yellow, AppColors.yellowDeep],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: isQr ? null : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isQr ? Colors.transparent : AppColors.slate200,
+          ),
+          boxShadow: isQr ? AppShadows.yellow : AppShadows.sm,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: isQr ? const Color(0x33FFFFFF) : AppColors.slate50,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                size: 18,
+                color: isQr ? AppColors.ink : AppColors.slate700,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: isQr ? AppColors.ink : AppColors.ink,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                      color: isQr
+                          ? const Color(0x99000000)
+                          : AppColors.slate500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Section header ─────────────────────────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.l});
+  final AppLocalizations l;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 4,
+              decoration: const BoxDecoration(
+                color: AppColors.slate400,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 7),
+            Text(
+              l.assistantStudentsByStop,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: AppColors.slate600,
+                letterSpacing: 0.6,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            const Icon(Icons.place_outlined,
+                size: 12, color: AppColors.slate500),
+            const SizedBox(width: 4),
+            Text(
+              l.assistantRouteOrder,
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.slate500,
+                letterSpacing: 0.4,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Stop group ─────────────────────────────────────────────────────────
+
+class _StopGroup extends StatelessWidget {
+  const _StopGroup({
+    required this.stopNumber,
+    required this.stopName,
+    required this.students,
+    required this.tripId,
+    required this.readOnly,
+    required this.l,
+  });
+  final int stopNumber;
+  final String stopName;
+  final List<TripStudentDetailDto> students;
+  final String tripId;
+  final bool readOnly;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 22,
+              height: 22,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.ink,
+                borderRadius: BorderRadius.circular(7),
+              ),
+              child: Text(
+                '$stopNumber',
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.yellow,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                stopName,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                  letterSpacing: -0.2,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              '${students.length} ${l.assistantStudents}',
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.slate500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        for (var i = 0; i < students.length; i++) ...[
+          _StudentRow(
+            student: students[i],
+            paletteIndex: i,
+            tripId: tripId,
+            readOnly: readOnly,
+            l: l,
+          ),
+          if (i < students.length - 1) const SizedBox(height: 6),
+        ],
+      ],
+    );
+  }
+}
+
+// ─── Student row ────────────────────────────────────────────────────────
+
+class _StudentRow extends ConsumerStatefulWidget {
+  const _StudentRow({
+    required this.student,
+    required this.paletteIndex,
+    required this.tripId,
+    required this.readOnly,
+    required this.l,
+  });
+  final TripStudentDetailDto student;
+  final int paletteIndex;
+  final String tripId;
+  final bool readOnly;
+  final AppLocalizations l;
+
+  @override
+  ConsumerState<_StudentRow> createState() => _StudentRowState();
+}
+
+class _StudentRowState extends ConsumerState<_StudentRow> {
+  static const _palette = [
+    [Color(0xFFFECACA), Color(0xFFF87171), Color(0xFF7F1D1D)],
+    [Color(0xFFBFDBFE), Color(0xFF60A5FA), Color(0xFF1E40AF)],
+    [Color(0xFFFEF3C7), Color(0xFFFCD34D), Color(0xFF92400E)],
+    [Color(0xFFDDD6FE), Color(0xFFA78BFA), Color(0xFF5B21B6)],
+    [Color(0xFFA7F3D0), Color(0xFF34D399), Color(0xFF065F46)],
+    [Color(0xFFFED7AA), Color(0xFFFB923C), Color(0xFF9A3412)],
+    [Color(0xFFE0E7FF), Color(0xFF818CF8), Color(0xFF3730A3)],
+    [Color(0xFFFBCFE8), Color(0xFFF472B6), Color(0xFF831843)],
+  ];
+
+  bool _busy = false;
+
+  Future<void> _toggleBoarded() async {
+    final s = widget.student;
+    if (s.isAbsent) return;
+    setState(() => _busy = true);
+    try {
+      final action = ref.read(tripActionsProvider(widget.tripId));
+      await action.setBoarding(
+        studentId: s.studentId,
+        status: s.isBoarded ? 'Waiting' : 'Boarded',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _notifyArrived() async {
+    final s = widget.student;
+    try {
+      await ref
+          .read(tripActionsProvider(widget.tripId))
+          .notifyArrived(s.studentId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(widget.l.assistantNotifyArrivedOk)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    }
+  }
+
+  Future<void> _whatsapp() async {
+    final phone = widget.student.parentPhone;
+    if (phone == null || phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(widget.l.assistantNoParentPhone)),
+      );
+      return;
+    }
+    final cleaned = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    final url = Uri.parse('https://wa.me/$cleaned');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(widget.l.assistantOpenFailed)),
+      );
+    }
+  }
+
+  Future<void> _call() async {
+    final phone = widget.student.parentPhone;
+    if (phone == null || phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(widget.l.assistantNoParentPhone)),
+      );
+      return;
+    }
+    final url = Uri.parse('tel:$phone');
+    if (!await launchUrl(url)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(widget.l.assistantOpenFailed)),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = widget.student;
+    final l = widget.l;
+    final palette = _palette[widget.paletteIndex % _palette.length];
+    final boarded = s.isBoarded;
+    final absent = s.isAbsent;
+
+    return Opacity(
+      opacity: absent ? 0.65 : 1,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        decoration: BoxDecoration(
+          color: absent ? AppColors.slate50 : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: boarded ? const Color(0xFFA7F3D0) : AppColors.slate200,
+          ),
+          boxShadow: AppShadows.sm,
+        ),
+        child: Row(
+          children: [
+            _Avatar(
+              text: _initials(s.fullName),
+              bg1: palette[0],
+              bg2: palette[1],
+              fg: palette[2],
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    s.fullName,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.15,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _meta(s, l),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate500,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            if (widget.readOnly)
+              _OutcomeBadge(student: s, l: l)
+            else if (absent)
+              _AbsentBadge(l: l)
+            else ...[
+              _PickupToggle(
+                checked: boarded,
+                busy: _busy,
+                onTap: _toggleBoarded,
+              ),
+              const SizedBox(width: 6),
+              _CommBtn(
+                icon: Icons.notifications_active_outlined,
+                color: AppColors.red,
+                onTap: _notifyArrived,
+              ),
+              const SizedBox(width: 4),
+              _CommBtn(
+                icon: Icons.chat_bubble_outline_rounded,
+                color: const Color(0xFF25D366),
+                onTap: _whatsapp,
+              ),
+              const SizedBox(width: 4),
+              _CommBtn(
+                icon: Icons.phone_rounded,
+                color: AppColors.blue,
+                onTap: _call,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _meta(TripStudentDetailDto s, AppLocalizations l) {
+    final parts = <String>[];
+    final grade = s.className == null
+        ? s.grade
+        : '${s.grade}-${s.className}';
+    parts.add(grade);
+    if (s.isAbsent) {
+      parts.add(l.assistantAbsenceReported);
+    } else if (s.isBoarded && s.boardingTime != null) {
+      parts.add(
+          '${l.assistantBoardedAt} ${DateFormat('h:mm a').format(s.boardingTime!.toLocal())}');
+    } else if (widget.readOnly) {
+      // Trip is over — anyone still "Waiting" never boarded.
+      parts.add(l.assistantNotBoarded);
+    } else {
+      parts.add(l.assistantWaitingForPickup);
+    }
+    return parts.join(' · ');
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '·';
+    if (parts.length == 1) return parts.first.characters.first.toUpperCase();
+    return (parts.first.characters.first + parts.last.characters.first)
+        .toUpperCase();
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  const _Avatar({
+    required this.text,
+    required this.bg1,
+    required this.bg2,
+    required this.fg,
+  });
+  final String text;
+  final Color bg1, bg2, fg;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [bg1, bg2],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          color: fg,
+        ),
+      ),
+    );
+  }
+}
+
+class _AbsentBadge extends StatelessWidget {
+  const _AbsentBadge({required this.l});
+  final AppLocalizations l;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.slate100,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: AppColors.slate200),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.do_not_disturb_alt_rounded,
+              size: 10, color: AppColors.slate500),
+          const SizedBox(width: 4),
+          Text(
+            l.assistantAbsentBadge,
+            style: const TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              color: AppColors.slate600,
+              letterSpacing: -0.05,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Read-only outcome pill rendered on completed-trip rows. Reflects what
+/// actually happened: Boarded (green) / Absent (grey) / Not boarded (slate).
+class _OutcomeBadge extends StatelessWidget {
+  const _OutcomeBadge({required this.student, required this.l});
+  final TripStudentDetailDto student;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    if (student.isAbsent) return _AbsentBadge(l: l);
+    if (student.isBoarded) {
+      return _Pill(
+        bg: AppColors.emeraldSoft,
+        border: const Color(0xFFA7F3D0),
+        fg: AppColors.emerald,
+        icon: Icons.check_rounded,
+        label: l.assistantStatusDone,
+      );
+    }
+    return _Pill(
+      bg: AppColors.slate100,
+      border: AppColors.slate200,
+      fg: AppColors.slate600,
+      icon: Icons.remove_rounded,
+      label: l.assistantNotBoardedShort,
+    );
+  }
+}
+
+class _Pill extends StatelessWidget {
+  const _Pill({
+    required this.bg,
+    required this.border,
+    required this.fg,
+    required this.icon,
+    required this.label,
+  });
+  final Color bg, border, fg;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 10, color: fg),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              color: fg,
+              letterSpacing: -0.05,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CompletedPill extends StatelessWidget {
+  const _CompletedPill({required this.l});
+  final AppLocalizations l;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.emeraldSoft,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: const Color(0xFFA7F3D0)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check_rounded, size: 10, color: AppColors.emerald),
+          const SizedBox(width: 5),
+          Text(
+            l.assistantStatusDone,
+            style: const TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              color: AppColors.emerald,
+              letterSpacing: -0.05,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Read-only summary bar shown in place of the End-trip button when the
+/// trip is already Completed.
+class _CompletedSummaryBar extends StatelessWidget {
+  const _CompletedSummaryBar({required this.details, required this.l});
+  final TripDetailsDto details;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.slate100)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.emeraldSoft,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFA7F3D0)),
+              ),
+              child: const Icon(
+                Icons.check_circle_outline_rounded,
+                color: AppColors.emerald,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l.assistantTripCompletedTitle,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${details.boardedCount}/${details.studentCount} ${l.assistantBoardedLabel.toLowerCase()}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate500,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PickupToggle extends StatelessWidget {
+  const _PickupToggle({
+    required this.checked,
+    required this.busy,
+    required this.onTap,
+  });
+  final bool checked;
+  final bool busy;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: busy ? null : onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        width: 32,
+        height: 32,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: checked ? AppColors.emerald : AppColors.slate100,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: checked
+              ? const [
+                  BoxShadow(
+                    color: Color(0x4D059669),
+                    blurRadius: 6,
+                    offset: Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: busy
+            ? const SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Icon(
+                Icons.check_rounded,
+                size: 16,
+                color: checked ? Colors.white : AppColors.slate400,
+              ),
+      ),
+    );
+  }
+}
+
+class _CommBtn extends StatelessWidget {
+  const _CommBtn({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 28,
+        height: 28,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: Icon(icon, size: 14, color: color),
+      ),
+    );
+  }
+}
+
+// ─── End trip bar ───────────────────────────────────────────────────────
+
+class _EndTripBar extends ConsumerStatefulWidget {
+  const _EndTripBar({required this.details, required this.l});
+  final TripDetailsDto details;
+  final AppLocalizations l;
+  @override
+  ConsumerState<_EndTripBar> createState() => _EndTripBarState();
+}
+
+class _EndTripBarState extends ConsumerState<_EndTripBar> {
+  bool _busy = false;
+
+  Future<void> _end() async {
+    final l = widget.l;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.assistantEndTripConfirmTitle),
+        content: Text(l.assistantEndTripConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l.settingsCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l.assistantEndTripConfirmYes),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    setState(() => _busy = true);
+    try {
+      final ds = ref.read(assistantRemoteDataSourceProvider);
+      await ds.completeTrip(widget.details.tripId);
+      if (!mounted) return;
+      context.go(AppRoute.homeAssistant);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.slate100)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: FilledButton(
+          onPressed:
+              _busy || widget.details.status == 'Completed' ? null : _end,
+          child: _busy
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.ink,
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(widget.l.assistantEndTrip),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.ink.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Text(
+                        '${widget.details.boardedCount}/${widget.details.studentCount} ${widget.l.assistantBoardedLabel}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.ink,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Error view ─────────────────────────────────────────────────────────
+
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.message, required this.onRetry});
+  final String message;
+  final VoidCallback onRetry;
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline_rounded,
+                color: AppColors.red, size: 36),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.slate600,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 14),
+            FilledButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Token-prompt dialog (used by Scan QR until camera lands) ───────────
+
+Future<String?> _promptToken(BuildContext context, String title) async {
+  final ctrl = TextEditingController();
+  return showDialog<String>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title, style: const TextStyle(fontSize: 15)),
+      content: TextField(
+        controller: ctrl,
+        autofocus: true,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9\-_]')),
+        ],
+        decoration: const InputDecoration(hintText: 'Token'),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(ctrl.text.trim()),
+          child: const Text('Use'),
+        ),
+      ],
+    ),
+  );
+}
+

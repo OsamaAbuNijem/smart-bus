@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:smart_bus/core/errors/failures.dart';
 import 'package:smart_bus/core/routing/app_router.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
 import 'package:smart_bus/features/auth/presentation/providers/otp_controller.dart';
@@ -89,14 +90,20 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   Future<void> _resend() async {
     final pending = ref.read(otpControllerProvider).valueOrNull;
     if (pending is! OtpPending) return;
-    final ok = await ref.read(otpControllerProvider.notifier).requestOtp(
-          phoneNumber: pending.phoneNumber,
-          role: pending.role,
-        );
-    if (!mounted) return;
-    if (ok) {
-      final fresh = ref.read(otpControllerProvider).valueOrNull;
-      if (fresh is OtpPending) _restartTimer(fresh.expiresAt);
+    try {
+      final ok = await ref.read(otpControllerProvider.notifier).requestOtp(
+            phoneNumber: pending.phoneNumber,
+          );
+      if (!mounted) return;
+      if (ok) {
+        final fresh = ref.read(otpControllerProvider).valueOrNull;
+        if (fresh is OtpPending) _restartTimer(fresh.expiresAt);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
     }
   }
 
