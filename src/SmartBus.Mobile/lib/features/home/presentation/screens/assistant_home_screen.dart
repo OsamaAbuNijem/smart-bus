@@ -20,14 +20,18 @@ class AssistantHomeScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F5),
+      // White paints the status-bar / notch area above the hero. The trip
+      // list below uses its own slate panel for visual separation.
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _Hero(name: user?.fullName ?? '', l: l),
             Expanded(
-              child: RefreshIndicator(
+              child: ColoredBox(
+                color: const Color(0xFFF4F4F5),
+                child: RefreshIndicator(
                 onRefresh: () async => ref.invalidate(myTodayTripsProvider),
                 color: AppColors.yellowDeep,
                 child: ListView(
@@ -62,6 +66,7 @@ class AssistantHomeScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              ),
             ),
           ],
         ),
@@ -80,86 +85,120 @@ class _Hero extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
-    final dayShort = DateFormat('E').format(now);
-    final dateStr = DateFormat('MMM dd').format(now);
-    final timeStr = DateFormat('h:mm a').format(now);
+    final dayShort = DateFormat('EEEE').format(now);
+    final dateStr = DateFormat('MMM d, yyyy').format(now);
     final greeting = _greetingFor(now.hour, l);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 6, 18, 16),
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppColors.slate100)),
+        border: Border(
+          bottom: BorderSide(color: AppColors.slate100),
+        ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _GreetAvatar(name: name),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              Row(
+                children: [
+                  _GreetAvatar(name: name),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('👋', style: TextStyle(fontSize: 12)),
-                        const SizedBox(width: 5),
                         Text(
                           greeting,
                           style: const TextStyle(
-                            fontSize: 10,
+                            fontSize: 11,
                             color: AppColors.slate500,
                             fontWeight: FontWeight.w700,
-                            letterSpacing: 0.6,
+                            letterSpacing: 0.4,
                           ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          name.isEmpty ? l.homeAssistantTitle : name,
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.ink,
+                            letterSpacing: -0.5,
+                            height: 1.1,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 1),
+                  ),
+                  _GlassIconBtn(
+                    icon: Icons.notifications_none_rounded,
+                    badge: true,
+                    onTap: () => context.push(AppRoute.notifications),
+                  ),
+                  const SizedBox(width: 8),
+                  _GlassIconBtn(
+                    icon: Icons.settings_outlined,
+                    onTap: () =>
+                        context.push(AppRoute.assistantSettings),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(11),
+                  border: Border.all(color: AppColors.slate100),
+                  boxShadow: AppShadows.sm,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: AppColors.yellowDeep,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Text(
-                      name.isEmpty ? l.homeAssistantTitle : name,
+                      dayShort,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 12,
                         fontWeight: FontWeight.w800,
                         color: AppColors.ink,
-                        letterSpacing: -0.4,
+                        letterSpacing: -0.1,
                       ),
-                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '·',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.slate400,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      dateStr,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.slate600,
+                        letterSpacing: 0.1,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ],
                 ),
               ),
-              _IconBtn(
-                icon: Icons.notifications_none_rounded,
-                badge: true,
-                onTap: () => context.push(AppRoute.notifications),
-              ),
-              const SizedBox(width: 8),
-              _IconBtn(
-                icon: Icons.settings_outlined,
-                onTap: () => context.push(AppRoute.assistantSettings),
-              ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _DtPill(
-                icon: Icons.calendar_today_outlined,
-                label: '$dayShort  $dateStr',
-                emphasis: dayShort,
-              ),
-              const SizedBox(width: 6),
-              _DtPill(
-                icon: Icons.access_time_rounded,
-                label: timeStr,
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
@@ -216,8 +255,8 @@ class _GreetAvatar extends StatelessWidget {
   }
 }
 
-class _IconBtn extends StatelessWidget {
-  const _IconBtn({
+class _GlassIconBtn extends StatelessWidget {
+  const _GlassIconBtn({
     required this.icon,
     required this.onTap,
     this.badge = false,
@@ -235,14 +274,15 @@ class _IconBtn extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: AppColors.slate50,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(13),
               border: Border.all(color: AppColors.slate100),
-              borderRadius: BorderRadius.circular(11),
+              boxShadow: AppShadows.sm,
             ),
-            child: Icon(icon, size: 18, color: AppColors.slate700),
+            child: Icon(icon, size: 19, color: AppColors.ink),
           ),
           if (badge)
             Positioned(
@@ -264,42 +304,6 @@ class _IconBtn extends StatelessWidget {
   }
 }
 
-class _DtPill extends StatelessWidget {
-  const _DtPill({required this.icon, required this.label, this.emphasis});
-  final IconData icon;
-  final String label;
-  final String? emphasis;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-      decoration: BoxDecoration(
-        color: AppColors.slate50,
-        border: Border.all(color: AppColors.slate100),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 11, color: AppColors.slate500),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: AppColors.slate600,
-              letterSpacing: 0.1,
-              fontFeatures: [FontFeature.tabularFigures()],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ─── Start card (Scan Bus QR + manual link) ─────────────────────────────
 
 class _StartCard extends StatelessWidget {
@@ -314,86 +318,152 @@ class _StartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onScan,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.slate200),
-          boxShadow: AppShadows.sm,
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.yellow, AppColors.yellowDeep],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Primary CTA — yellow gradient hero with a single icon, headline,
+        // and supporting line. Tap anywhere on the card to scan.
+        GestureDetector(
+          onTap: onScan,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 22),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              gradient: const LinearGradient(
+                colors: [AppColors.yellow, AppColors.yellowDeep],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x66F5C518),
+                  blurRadius: 24,
+                  offset: Offset(0, 10),
                 ),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: const Icon(
-                Icons.qr_code_scanner_rounded,
-                color: AppColors.ink,
-                size: 32,
-              ),
+              ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              l.assistantScanBusQr,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppColors.ink,
-                letterSpacing: -0.3,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l.assistantScanBusQrSub,
-              style: const TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w500,
-                color: AppColors.slate500,
-              ),
-            ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: onManual,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      l.assistantManualSetupCta,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.slate600,
-                        letterSpacing: -0.1,
+            child: Row(
+              children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.ink,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x330F172A),
+                            blurRadius: 14,
+                            offset: Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.qr_code_scanner_rounded,
+                        color: AppColors.yellow,
+                        size: 28,
                       ),
                     ),
-                    const SizedBox(width: 5),
-                    const Icon(
-                      Icons.chevron_right_rounded,
-                      size: 16,
-                      color: AppColors.slate400,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l.assistantScanBusQr,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.ink,
+                              letterSpacing: -0.4,
+                              height: 1.1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l.assistantScanBusQrSub,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.ink.withValues(alpha: 0.6),
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 28,
+                      height: 28,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.ink.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.chevron_right_rounded,
+                        size: 18,
+                        color: AppColors.ink,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        const SizedBox(height: 10),
+        // Secondary action — quiet ghost button for the manual path.
+        GestureDetector(
+          onTap: onManual,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.slate200),
+              boxShadow: AppShadows.sm,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 22,
+                  height: 22,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.slate100,
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  child: const Icon(
+                    Icons.tune_rounded,
+                    size: 12,
+                    color: AppColors.slate700,
+                  ),
+                ),
+                const SizedBox(width: 9),
+                Text(
+                  l.assistantManualSetupCta,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: -0.1,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  size: 16,
+                  color: AppColors.slate400,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
