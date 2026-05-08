@@ -949,4 +949,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistantTripCompletedTitle => 'Trip completed';
+
+  @override
+  String get assistantAbsenceSheetTitle => 'Absence details';
+
+  @override
+  String get assistantAbsenceReasonLabel => 'Reason';
+
+  @override
+  String get assistantAbsencePickupBy => 'Picked up by';
+
+  @override
+  String get assistantAbsenceNoteLabel => 'Parent\'s note';
+
+  @override
+  String get assistantAbsenceReasonIllness => 'Illness';
+
+  @override
+  String get assistantAbsenceReasonMedical => 'Medical appointment';
+
+  @override
+  String get assistantAbsenceReasonFamily => 'Family matter';
+
+  @override
+  String get assistantAbsenceReasonOther => 'Other';
 }

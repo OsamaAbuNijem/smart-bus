@@ -153,6 +153,15 @@ class _AssistantSettingsScreenState
               roleLabel: l.loginRoleAssistant,
             ),
             const SizedBox(height: 22),
+            _SectionLabel(text: l.settingsLanguage),
+            const SizedBox(height: 10),
+            _LanguageSegmented(
+              current: currentLang,
+              onChanged: (code) => ref
+                  .read(localeControllerProvider.notifier)
+                  .setLocale(code),
+            ),
+            const SizedBox(height: 22),
             _SectionLabel(text: l.settingsProfile),
             const SizedBox(height: 10),
             _InputCard(
@@ -215,36 +224,6 @@ class _AssistantSettingsScreenState
                 ),
                 onChanged: (_) => setState(() {}),
               ),
-            ),
-            const SizedBox(height: 22),
-            _SectionLabel(text: l.settingsLanguage),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _LanguageTile(
-                    flag: '🇺🇸',
-                    label: 'English',
-                    sub: 'EN',
-                    selected: currentLang == 'en',
-                    onTap: () => ref
-                        .read(localeControllerProvider.notifier)
-                        .setLocale('en'),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _LanguageTile(
-                    flag: '🇯🇴',
-                    label: 'العربية',
-                    sub: 'AR',
-                    selected: currentLang == 'ar',
-                    onTap: () => ref
-                        .read(localeControllerProvider.notifier)
-                        .setLocale('ar'),
-                  ),
-                ),
-              ],
             ),
             const SizedBox(height: 28),
             _PrimarySaveButton(
@@ -561,17 +540,51 @@ class _CountryChip extends StatelessWidget {
   }
 }
 
-// ── Language tile ─────────────────────────────────────────────────────────
+// ── Language segmented control (plain text, no icons) ────────────────────
 
-class _LanguageTile extends StatelessWidget {
-  const _LanguageTile({
-    required this.flag,
+class _LanguageSegmented extends StatelessWidget {
+  const _LanguageSegmented({required this.current, required this.onChanged});
+  final String current;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.slate50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.slate200),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _LanguageSegment(
+              label: 'English',
+              selected: current == 'en',
+              onTap: () => onChanged('en'),
+            ),
+          ),
+          Expanded(
+            child: _LanguageSegment(
+              label: 'العربية',
+              selected: current == 'ar',
+              onTap: () => onChanged('ar'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LanguageSegment extends StatelessWidget {
+  const _LanguageSegment({
     required this.label,
-    required this.sub,
     required this.selected,
     required this.onTap,
   });
-  final String flag, label, sub;
+  final String label;
   final bool selected;
   final VoidCallback onTap;
 
@@ -579,63 +592,24 @@ class _LanguageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+        height: 38,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? AppColors.yellowTint : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected ? AppColors.yellow : AppColors.slate200,
-            width: selected ? 1.6 : 1,
-          ),
-          boxShadow: selected ? AppShadows.yellow : AppShadows.sm,
+          color: selected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(9),
+          boxShadow: selected ? AppShadows.sm : null,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(flag, style: const TextStyle(fontSize: 24)),
-                AnimatedScale(
-                  scale: selected ? 1 : 0,
-                  duration: const Duration(milliseconds: 160),
-                  child: Container(
-                    width: 22,
-                    height: 22,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: AppColors.yellowDeep,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.check_rounded,
-                        size: 14, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                color: AppColors.ink,
-                letterSpacing: -0.2,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              sub,
-              style: const TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w800,
-                color: AppColors.slate500,
-                letterSpacing: 0.6,
-              ),
-            ),
-          ],
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.1,
+            color: selected ? AppColors.ink : AppColors.slate500,
+          ),
         ),
       ),
     );

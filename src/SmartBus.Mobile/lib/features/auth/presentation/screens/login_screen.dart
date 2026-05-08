@@ -64,11 +64,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
     final l = AppLocalizations.of(context);
     final err = ref.read(otpControllerProvider).error;
+    // Pass through the server's own message when it gave us one — that lets
+    // the cooldown / role-mismatch / etc. text reach the user verbatim.
+    // Fall back to the generic "phone not registered" copy only when we
+    // truly don't have a better string.
     final msg = switch (err) {
-      ValidationFailure() => l.loginPhoneNotRegistered,
       NotFoundFailure() => l.loginPhoneNotRegistered,
       NetworkFailure() => l.loginNetworkError,
       TimeoutFailure() => l.loginNetworkError,
+      ValidationFailure(:final message) when message.isNotEmpty => message,
+      ServerFailure(:final message) when message.isNotEmpty => message,
+      Failure(:final message) when message.isNotEmpty => message,
       _ => l.loginUnknownError,
     };
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));

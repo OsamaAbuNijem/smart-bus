@@ -943,4 +943,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get assistantTripCompletedTitle => 'اكتملت الرحلة';
+
+  @override
+  String get assistantAbsenceSheetTitle => 'تفاصيل الغياب';
+
+  @override
+  String get assistantAbsenceReasonLabel => 'السبب';
+
+  @override
+  String get assistantAbsencePickupBy => 'تم الاستلام بواسطة';
+
+  @override
+  String get assistantAbsenceNoteLabel => 'ملاحظة ولي الأمر';
+
+  @override
+  String get assistantAbsenceReasonIllness => 'مرض';
+
+  @override
+  String get assistantAbsenceReasonMedical => 'موعد طبي';
+
+  @override
+  String get assistantAbsenceReasonFamily => 'أمر عائلي';
+
+  @override
+  String get assistantAbsenceReasonOther => 'أخرى';
 }

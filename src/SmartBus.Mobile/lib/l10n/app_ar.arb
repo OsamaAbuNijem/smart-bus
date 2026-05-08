@@ -338,5 +338,13 @@
   "assistantEndedAt": "انتهت",
   "assistantNotBoarded": "لم يصعد",
   "assistantNotBoardedShort": "لم يصعد",
-  "assistantTripCompletedTitle": "اكتملت الرحلة"
+  "assistantTripCompletedTitle": "اكتملت الرحلة",
+  "assistantAbsenceSheetTitle": "تفاصيل الغياب",
+  "assistantAbsenceReasonLabel": "السبب",
+  "assistantAbsencePickupBy": "تم الاستلام بواسطة",
+  "assistantAbsenceNoteLabel": "ملاحظة ولي الأمر",
+  "assistantAbsenceReasonIllness": "مرض",
+  "assistantAbsenceReasonMedical": "موعد طبي",
+  "assistantAbsenceReasonFamily": "أمر عائلي",
+  "assistantAbsenceReasonOther": "أخرى"
 }

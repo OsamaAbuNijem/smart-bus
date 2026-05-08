@@ -48,12 +48,14 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
                 T("لم يتم العثور على رقم الجوال في النظام.",
                   "Phone number not found in the system."));
 
-        var cacheKey = $"otp:{resolvedRole.ToLower()}:{phone}";
+        var cacheKey    = $"otp:{resolvedRole.ToLower()}:{phone}";
+        var cooldownKey = $"otp:cooldown:{resolvedRole.ToLower()}:{phone}";
 
         // Master OTP for development testing only.
         if (IsDevEnvironment() && otp == MasterDevOtp)
         {
             await _cache.RemoveAsync(cacheKey, cancellationToken);
+            await _cache.RemoveAsync(cooldownKey, cancellationToken);
             return await DispatchAsync(resolvedRole, phone, cancellationToken);
         }
 
@@ -84,7 +86,10 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
                   $"Invalid verification code. Remaining attempts: {attemptsLeft}"));
         }
 
+        // OTP consumed → drop both the code and the resend cooldown so a
+        // post-logout re-login can request a fresh code immediately.
         await _cache.RemoveAsync(cacheKey, cancellationToken);
+        await _cache.RemoveAsync(cooldownKey, cancellationToken);
         return await DispatchAsync(resolvedRole, phone, cancellationToken);
     }
 

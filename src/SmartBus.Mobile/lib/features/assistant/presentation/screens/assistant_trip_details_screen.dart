@@ -10,6 +10,7 @@ import 'package:smart_bus/core/routing/app_router.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
 import 'package:smart_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
 import 'package:smart_bus/features/assistant/data/models/trip_details_dto.dart';
+import 'package:smart_bus/features/assistant/presentation/providers/assistant_controllers.dart';
 import 'package:smart_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
 
@@ -140,9 +141,13 @@ class _Header extends StatelessWidget {
     final fmtTime = DateFormat('h:mm a');
     final start = details.actualDeparture ?? details.scheduledDeparture;
     final completed = details.status == 'Completed';
-    final progress = details.studentCount == 0
-        ? 0.0
-        : details.boardedCount / details.studentCount;
+    // Absent students don't count toward the "boarded out of N" total —
+    // they were never expected to ride.
+    final absentCount =
+        details.students.where((s) => s.isAbsent).length;
+    final expected = details.studentCount - absentCount;
+    final progress =
+        expected <= 0 ? 0.0 : details.boardedCount / expected;
 
     final subtitle = StringBuffer();
     if (completed && details.actualArrival != null) {
@@ -218,7 +223,7 @@ class _Header extends StatelessWidget {
             const SizedBox(height: 12),
             _ProgressRow(
               boarded: details.boardedCount,
-              total: details.studentCount,
+              total: expected,
               progress: progress,
               l: l,
             ),
@@ -795,11 +800,23 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
               ),
             ),
             const SizedBox(width: 8),
-            if (widget.readOnly)
-              _OutcomeBadge(student: s, l: l)
-            else if (absent)
-              _AbsentBadge(l: l)
-            else ...[
+            if (widget.readOnly) ...[
+              _OutcomeBadge(student: s, l: l),
+              if (absent && _hasAbsenceDetail(s)) ...[
+                const SizedBox(width: 6),
+                _AbsenceInfoBtn(
+                  onTap: () => _showAbsenceSheet(s),
+                ),
+              ],
+            ] else if (absent) ...[
+              _AbsentBadge(l: l),
+              if (_hasAbsenceDetail(s)) ...[
+                const SizedBox(width: 6),
+                _AbsenceInfoBtn(
+                  onTap: () => _showAbsenceSheet(s),
+                ),
+              ],
+            ] else ...[
               _PickupToggle(
                 checked: boarded,
                 busy: _busy,
@@ -827,6 +844,24 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
           ],
         ),
       ),
+    );
+  }
+
+  bool _hasAbsenceDetail(TripStudentDetailDto s) =>
+      (s.absenceReason?.isNotEmpty ?? false) ||
+      (s.absencePickupPersonName?.isNotEmpty ?? false) ||
+      (s.absencePickupPersonRelation?.isNotEmpty ?? false) ||
+      (s.absenceDriverNote?.isNotEmpty ?? false);
+
+  Future<void> _showAbsenceSheet(TripStudentDetailDto s) {
+    return showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _AbsenceDetailSheet(student: s, l: widget.l),
     );
   }
 
@@ -1031,6 +1066,186 @@ class _CompletedPill extends StatelessWidget {
 
 /// Read-only summary bar shown in place of the End-trip button when the
 /// trip is already Completed.
+// ── Absence info button + bottom sheet ────────────────────────────────────
+
+class _AbsenceInfoBtn extends StatelessWidget {
+  const _AbsenceInfoBtn({required this.onTap});
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 28,
+        height: 28,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: AppColors.slate100,
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: const Icon(
+          Icons.info_outline_rounded,
+          size: 14,
+          color: AppColors.slate600,
+        ),
+      ),
+    );
+  }
+}
+
+class _AbsenceDetailSheet extends StatelessWidget {
+  const _AbsenceDetailSheet({required this.student, required this.l});
+  final TripStudentDetailDto student;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 22),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.slate200,
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.slate100,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.do_not_disturb_alt_rounded,
+                    size: 18,
+                    color: AppColors.slate600,
+                  ),
+                ),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.assistantAbsenceSheetTitle,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.ink,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        student.fullName,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.slate500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (student.absenceReason != null)
+              _AbsenceRow(
+                label: l.assistantAbsenceReasonLabel,
+                value: _localiseReason(student.absenceReason!, l),
+              ),
+            if (student.absencePickupPersonName != null &&
+                student.absencePickupPersonName!.isNotEmpty)
+              _AbsenceRow(
+                label: l.assistantAbsencePickupBy,
+                value: [
+                  student.absencePickupPersonName!,
+                  if (student.absencePickupPersonRelation?.isNotEmpty ??
+                      false)
+                    '(${student.absencePickupPersonRelation})',
+                ].join(' '),
+              ),
+            if (student.absenceDriverNote != null &&
+                student.absenceDriverNote!.isNotEmpty)
+              _AbsenceRow(
+                label: l.assistantAbsenceNoteLabel,
+                value: student.absenceDriverNote!,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _localiseReason(String code, AppLocalizations l) {
+    switch (code) {
+      case 'Illness':
+        return l.assistantAbsenceReasonIllness;
+      case 'MedicalAppointment':
+        return l.assistantAbsenceReasonMedical;
+      case 'FamilyMatter':
+        return l.assistantAbsenceReasonFamily;
+      case 'Other':
+        return l.assistantAbsenceReasonOther;
+      default:
+        return code;
+    }
+  }
+}
+
+class _AbsenceRow extends StatelessWidget {
+  const _AbsenceRow({required this.label, required this.value});
+  final String label, value;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: AppColors.slate500,
+              letterSpacing: 0.6,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppColors.ink,
+              letterSpacing: -0.1,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CompletedSummaryBar extends StatelessWidget {
   const _CompletedSummaryBar({required this.details, required this.l});
   final TripDetailsDto details;
@@ -1038,6 +1253,9 @@ class _CompletedSummaryBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final absentCount =
+        details.students.where((s) => s.isAbsent).length;
+    final expected = details.studentCount - absentCount;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
       decoration: const BoxDecoration(
@@ -1079,7 +1297,7 @@ class _CompletedSummaryBar extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${details.boardedCount}/${details.studentCount} ${l.assistantBoardedLabel.toLowerCase()}',
+                    '${details.boardedCount}/$expected ${l.assistantBoardedLabel.toLowerCase()}',
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -1214,6 +1432,11 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
     try {
       final ds = ref.read(assistantRemoteDataSourceProvider);
       await ds.completeTrip(widget.details.tripId);
+      // Invalidate before navigating so the home rebuild picks up the
+      // refreshed list (the autoDispose provider was kept alive by the
+      // previous home subscription, so a re-mount alone wouldn't refetch).
+      ref.invalidate(myTodayTripsProvider);
+      ref.invalidate(tripDetailsProvider(widget.details.tripId));
       if (!mounted) return;
       context.go(AppRoute.homeAssistant);
     } catch (e) {
@@ -1228,6 +1451,9 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
 
   @override
   Widget build(BuildContext context) {
+    final absentCount =
+        widget.details.students.where((s) => s.isAbsent).length;
+    final expected = widget.details.studentCount - absentCount;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
       decoration: const BoxDecoration(
@@ -1261,7 +1487,7 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Text(
-                        '${widget.details.boardedCount}/${widget.details.studentCount} ${widget.l.assistantBoardedLabel}',
+                        '${widget.details.boardedCount}/$expected ${widget.l.assistantBoardedLabel}',
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,

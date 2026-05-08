@@ -65,6 +65,10 @@ class TripStudentDetailDto {
     required this.boardingTime,
     required this.dropoffTime,
     required this.isAbsentToday,
+    required this.absenceReason,
+    required this.absencePickupPersonName,
+    required this.absencePickupPersonRelation,
+    required this.absenceDriverNote,
     required this.parentName,
     required this.parentPhone,
   });
@@ -87,6 +91,11 @@ class TripStudentDetailDto {
             ? null
             : DateTime.parse(json['dropoffTime'] as String),
         isAbsentToday: json['isAbsentToday'] as bool? ?? false,
+        absenceReason: json['absenceReason'] as String?,
+        absencePickupPersonName: json['absencePickupPersonName'] as String?,
+        absencePickupPersonRelation:
+            json['absencePickupPersonRelation'] as String?,
+        absenceDriverNote: json['absenceDriverNote'] as String?,
         parentName: json['parentName'] as String?,
         parentPhone: json['parentPhone'] as String?,
       );
@@ -103,6 +112,10 @@ class TripStudentDetailDto {
   final DateTime? boardingTime;
   final DateTime? dropoffTime;
   final bool isAbsentToday;
+  final String? absenceReason;
+  final String? absencePickupPersonName;
+  final String? absencePickupPersonRelation;
+  final String? absenceDriverNote;
   final String? parentName;
   final String? parentPhone;
 

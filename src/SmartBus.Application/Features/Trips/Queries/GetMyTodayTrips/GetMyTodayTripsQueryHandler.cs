@@ -82,65 +82,31 @@ public class GetMyTodayTripsQueryHandler
                 t.StudentTrips.Count(st => st.BoardingStatus == BoardingStatus.Boarded)))
             .ToListAsync(ct);
 
-        var result = new List<MyTodayTripDto>();
+        // Show only trips the assistant actually started. No schedule-based
+        // placeholders — the home should reflect real activity.
         var schedulesByBus = schedules.ToDictionary(s => s.BusId);
-
-        // Surface every real trip in the window — assistant sees live ones
-        // alongside completed history.
-        foreach (var t in tripsRaw)
-        {
-            var sched = schedulesByBus.GetValueOrDefault(t.BusId);
-            var plate = sched?.BusPlate ?? string.Empty;
-            result.Add(new MyTodayTripDto(
-                t.Id, t.BusId, plate,
-                t.Type.ToString(),
-                t.Status.ToString(),
-                t.ScheduledDeparture,
-                t.ActualDeparture,
-                t.ActualArrival,
-                t.StudentCount,
-                t.BoardedCount));
-        }
-
-        // For TODAY only, synthesize "Scheduled" placeholder rows for legs
-        // that don't yet have a Trip row — so the assistant always sees
-        // their next leg even before the bus departs.
-        // Multiple trips can share (bus, type) within the same day (e.g. an
-        // earlier completed Return + a fresh one); we just need to know
-        // *whether any* exists, so collect into a HashSet rather than a Dict.
-        var todayLegsCovered = tripsRaw
-            .Where(t => t.ScheduledDeparture >= today)
-            .Select(t => (t.BusId, t.Type))
-            .ToHashSet();
-
-        foreach (var sched in schedules)
-        {
-            var inMorning = sched.MorningDriverId == driver.Id || sched.MorningAssistantId == driver.Id;
-            var inReturn  = sched.ReturnDriverId  == driver.Id || sched.ReturnAssistantId  == driver.Id;
-
-            if (inMorning && !todayLegsCovered.Contains((sched.BusId, TripType.Morning)))
+        var result = tripsRaw
+            .Select(t =>
             {
-                result.Add(Placeholder(sched.BusId, sched.BusPlate, TripType.Morning,
-                    today.Add(sched.MorningTime.ToTimeSpan())));
-            }
-            if (inReturn && !todayLegsCovered.Contains((sched.BusId, TripType.Return)))
-            {
-                result.Add(Placeholder(sched.BusId, sched.BusPlate, TripType.Return,
-                    today.Add(sched.ReturnTime.ToTimeSpan())));
-            }
-        }
-
-        // Live first, then scheduled (today), then completed/recent — newest first.
-        return Result<List<MyTodayTripDto>>.Success(result
-            .OrderBy(r => r.Status == "InProgress" ? 0 : r.Status == "Scheduled" ? 1 : 2)
+                var sched = schedulesByBus.GetValueOrDefault(t.BusId);
+                var plate = sched?.BusPlate ?? string.Empty;
+                return new MyTodayTripDto(
+                    t.Id, t.BusId, plate,
+                    t.Type.ToString(),
+                    t.Status.ToString(),
+                    t.ScheduledDeparture,
+                    t.ActualDeparture,
+                    t.ActualArrival,
+                    t.StudentCount,
+                    t.BoardedCount);
+            })
+            // Live first, then completed/recent — newest first.
+            .OrderBy(r => r.Status == "InProgress" ? 0 : 1)
             .ThenByDescending(r => r.ScheduledDeparture)
-            .ToList());
-    }
+            .ToList();
 
-    private static MyTodayTripDto Placeholder(
-        Guid busId, string plate, TripType type, DateTime scheduled) =>
-        new(null, busId, plate, type.ToString(), "Scheduled",
-            scheduled, null, null, 0, 0);
+        return Result<List<MyTodayTripDto>>.Success(result);
+    }
 
     private record TripFacts(
         Guid Id,

@@ -41,14 +41,34 @@ public class GetTripDetailsQueryHandler
                 .FirstOrDefaultAsync(ct);
         }
 
-        // Today's absence requests (Approved or Pending) for this trip's students.
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var absentStudentIds = await _context.AbsenceRequests
-            .Where(a => a.Date == today
-                        && a.Status != AbsenceRequestStatus.Rejected)
-            .Select(a => a.StudentId)
+        // Absences are scoped to THIS trip — same calendar date and matching
+        // leg (FullDay always counts; MorningOnly only matches a Morning trip;
+        // ReturnOnly only matches a Return trip). Old trips no longer pick up
+        // absences filed for a different day or different leg.
+        var tripDate = DateOnly.FromDateTime(trip.ScheduledDeparture);
+        var legFilter = trip.Type == TripType.Morning
+            ? AbsenceTripType.MorningOnly
+            : AbsenceTripType.ReturnOnly;
+
+        var absenceRows = await _context.AbsenceRequests
+            .Where(a => a.Date == tripDate
+                        && a.Status != AbsenceRequestStatus.Rejected
+                        && (a.TripType == AbsenceTripType.FullDay
+                            || a.TripType == legFilter))
+            .Select(a => new
+            {
+                a.StudentId,
+                a.Reason,
+                a.PickupPersonName,
+                a.PickupPersonRelation,
+                a.DriverNote,
+            })
             .ToListAsync(ct);
-        var absentSet = absentStudentIds.ToHashSet();
+        // Multiple rows per student (e.g. FullDay + leg-specific) collapse
+        // to the first.
+        var absenceByStudent = absenceRows
+            .GroupBy(a => a.StudentId)
+            .ToDictionary(g => g.Key, g => g.First());
 
         var rows = await _context.StudentTrips
             .Where(st => st.TripId == request.TripId)
@@ -75,7 +95,8 @@ public class GetTripDetailsQueryHandler
         var students = rows
             .Select(r =>
             {
-                var isAbsent = absentSet.Contains(r.StudentId);
+                var absence = absenceByStudent.GetValueOrDefault(r.StudentId);
+                var isAbsent = absence is not null;
                 var status = isAbsent
                     ? "Absent"
                     : r.BoardingStatus.ToString();
@@ -92,6 +113,10 @@ public class GetTripDetailsQueryHandler
                     r.BoardingTime,
                     r.DropoffTime,
                     isAbsent,
+                    absence?.Reason.ToString(),
+                    absence?.PickupPersonName,
+                    absence?.PickupPersonRelation,
+                    absence?.DriverNote,
                     r.ParentName,
                     r.ParentPhone);
             })

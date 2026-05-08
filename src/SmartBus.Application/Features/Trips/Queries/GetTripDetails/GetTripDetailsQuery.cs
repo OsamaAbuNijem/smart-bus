@@ -37,5 +37,9 @@ public record TripStudentDetailDto(
     DateTime? BoardingTime,
     DateTime? DropoffTime,
     bool IsAbsentToday,
+    string? AbsenceReason,        // "Illness" | "MedicalAppointment" | "FamilyMatter" | "Other"
+    string? AbsencePickupPersonName,
+    string? AbsencePickupPersonRelation,
+    string? AbsenceDriverNote,
     string? ParentName,
     string? ParentPhone);

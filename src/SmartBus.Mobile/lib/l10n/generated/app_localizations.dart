@@ -1909,6 +1909,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Trip completed'**
   String get assistantTripCompletedTitle;
+
+  /// No description provided for @assistantAbsenceSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Absence details'**
+  String get assistantAbsenceSheetTitle;
+
+  /// No description provided for @assistantAbsenceReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get assistantAbsenceReasonLabel;
+
+  /// No description provided for @assistantAbsencePickupBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Picked up by'**
+  String get assistantAbsencePickupBy;
+
+  /// No description provided for @assistantAbsenceNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent\'s note'**
+  String get assistantAbsenceNoteLabel;
+
+  /// No description provided for @assistantAbsenceReasonIllness.
+  ///
+  /// In en, this message translates to:
+  /// **'Illness'**
+  String get assistantAbsenceReasonIllness;
+
+  /// No description provided for @assistantAbsenceReasonMedical.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical appointment'**
+  String get assistantAbsenceReasonMedical;
+
+  /// No description provided for @assistantAbsenceReasonFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family matter'**
+  String get assistantAbsenceReasonFamily;
+
+  /// No description provided for @assistantAbsenceReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get assistantAbsenceReasonOther;
 }
 
 class _AppLocalizationsDelegate

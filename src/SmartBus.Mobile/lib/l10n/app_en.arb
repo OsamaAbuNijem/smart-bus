@@ -350,5 +350,13 @@
   "assistantEndedAt": "Ended",
   "assistantNotBoarded": "Did not board",
   "assistantNotBoardedShort": "No-show",
-  "assistantTripCompletedTitle": "Trip completed"
+  "assistantTripCompletedTitle": "Trip completed",
+  "assistantAbsenceSheetTitle": "Absence details",
+  "assistantAbsenceReasonLabel": "Reason",
+  "assistantAbsencePickupBy": "Picked up by",
+  "assistantAbsenceNoteLabel": "Parent's note",
+  "assistantAbsenceReasonIllness": "Illness",
+  "assistantAbsenceReasonMedical": "Medical appointment",
+  "assistantAbsenceReasonFamily": "Family matter",
+  "assistantAbsenceReasonOther": "Other"
 }
