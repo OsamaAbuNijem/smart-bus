@@ -48,7 +48,9 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
             MaxDrivers    = request.MaxDrivers,
             MaxAssistants = request.MaxAssistants,
             MaxStudents   = request.MaxStudents,
-            Notes         = request.Notes
+            Notes         = request.Notes,
+            Latitude      = request.Latitude,
+            Longitude     = request.Longitude
         };
 
         await _unitOfWork.Schools.AddAsync(school, cancellationToken);

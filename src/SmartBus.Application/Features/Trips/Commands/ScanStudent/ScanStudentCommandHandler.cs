@@ -65,11 +65,13 @@ public class ScanStudentCommandHandler
             st.BoardingTime   = now;
         }
 
-        // Refine the student's home pickup point from the assistant's GPS at
-        // boarding time — Morning trips only.
+        // Capture home GPS the first time we have it — subsequent scans
+        // don't overwrite to keep the canonical home location stable.
         if (trip.Type == TripType.Morning
             && request.Latitude is double lat
-            && request.Longitude is double lng)
+            && request.Longitude is double lng
+            && student.Latitude is null
+            && student.Longitude is null)
         {
             student.Latitude  = lat;
             student.Longitude = lng;

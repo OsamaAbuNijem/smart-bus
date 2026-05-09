@@ -358,5 +358,37 @@
   "assistantAbsenceReasonIllness": "Illness",
   "assistantAbsenceReasonMedical": "Medical appointment",
   "assistantAbsenceReasonFamily": "Family matter",
-  "assistantAbsenceReasonOther": "Other"
+  "assistantAbsenceReasonOther": "Other",
+  "driverActiveTrips": "Active trips",
+  "driverNoActiveTrip": "No active trip",
+  "driverNoActiveTripBody": "Once the assistant starts a trip, it'll show up here so you can open the route map.",
+  "driverOpenRouteMap": "Open route map",
+  "driverRouteOrderTitle": "Route order",
+  "driverSchoolPin": "School",
+  "driverNoBoardedStopsTitle": "No stops to route yet",
+  "driverNeedMoreStopsTitle": "Not enough stops to route",
+  "driverNoBoardedStopsBody": "The route appears once at least one student has been boarded with a known location.",
+  "driverRouteFallback": "Couldn't fetch driving route — showing direct lines.",
+  "driverStopsCount": "{count, plural, =1{1 stop} other{{count} stops}}",
+  "@driverStopsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "assistantDroppedAt": "Dropped",
+  "assistantStatusDropped": "Dropped",
+  "assistantArrivedSchool": "Arrived at school",
+  "assistantArrivedHome": "Arrived home",
+  "assistantOnBus": "On bus",
+  "assistantMarkAbsentTitle": "Mark as absent?",
+  "assistantMarkAbsentBody": "Mark {name} as absent for this trip. The student will be removed from the route and counts.",
+  "@assistantMarkAbsentBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "assistantMarkAbsentConfirm": "Mark absent",
+  "assistantContactParent": "Contact parent",
+  "assistantNotifyArrivedMenu": "Notify arrived",
+  "assistantCallMenu": "Call",
+  "driverProgressLabel": "Drop-offs",
+  "driverProgressLabelReturn": "At home",
+  "driverPinArrived": "Arrived",
+  "driverPinAtHome": "At home"
 }

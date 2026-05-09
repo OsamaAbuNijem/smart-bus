@@ -35,7 +35,10 @@ public class UpdateBoardingStatusCommandHandler
                 TripId         = request.TripId,
                 BoardingStatus = request.Status,
                 BoardingTime   = request.BoardingTime
-                    ?? (request.Status == BoardingStatus.Boarded ? DateTime.UtcNow : null)
+                    ?? (request.Status == BoardingStatus.Boarded ? DateTime.UtcNow : null),
+                DropoffTime    = request.Status == BoardingStatus.DroppedOff
+                    ? DateTime.UtcNow
+                    : null,
             };
             await _unitOfWork.StudentTrips.AddAsync(studentTrip, ct);
         }
@@ -43,11 +46,26 @@ public class UpdateBoardingStatusCommandHandler
         {
             studentTrip.BoardingStatus = request.Status;
             if (request.BoardingTime.HasValue) studentTrip.BoardingTime = request.BoardingTime;
+            // Stamp the drop-off moment the first time the student goes
+            // DroppedOff. Reverting back to Boarded clears it so the
+            // history reflects the current truth.
+            if (request.Status == BoardingStatus.DroppedOff)
+            {
+                studentTrip.DropoffTime ??= DateTime.UtcNow;
+            }
+            else if (studentTrip.DropoffTime is not null
+                     && request.Status != BoardingStatus.DroppedOff)
+            {
+                studentTrip.DropoffTime = null;
+            }
             await _unitOfWork.StudentTrips.UpdateAsync(studentTrip);
         }
 
-        // On Morning pickups we treat the boarding GPS as the student's home
-        // pickup point. Skip Return trips — that GPS is the school, not home.
+        // On Morning pickups capture the boarding GPS as the student's home
+        // pickup point — but ONLY when we don't already have one on file.
+        // Subsequent pickups don't overwrite, otherwise a noisy simulator
+        // GPS or a parent dropping the kid off in a different spot would
+        // permanently destroy the canonical home address.
         if (request.Status == BoardingStatus.Boarded
             && request.Latitude is double lat
             && request.Longitude is double lng)
@@ -61,7 +79,9 @@ public class UpdateBoardingStatusCommandHandler
             {
                 var student = await _context.Students
                     .FirstOrDefaultAsync(s => s.Id == request.StudentId, ct);
-                if (student is not null)
+                if (student is not null
+                    && student.Latitude is null
+                    && student.Longitude is null)
                 {
                     student.Latitude  = lat;
                     student.Longitude = lng;

@@ -128,7 +128,20 @@ public class GetTripDetailsQueryHandler
             .ThenBy(s => s.FullName)
             .ToList();
 
-        var boarded = students.Count(s => s.BoardingStatus == "Boarded");
+        var boarded   = students.Count(s => s.BoardingStatus == "Boarded");
+        var droppedOff = students.Count(s => s.BoardingStatus == "DroppedOff");
+
+        // Single-tenant for now — there's only ever one School row, so just
+        // grab it for the route map's school marker. (When multi-tenant
+        // lands, scope this through the trip's bus / school relationship.)
+        var school = await _context.Schools
+            .Select(s => new
+            {
+                s.Name,
+                s.Latitude,
+                s.Longitude,
+            })
+            .FirstOrDefaultAsync(ct);
 
         return Result<TripDetailsDto>.Success(new TripDetailsDto(
             trip.Id,
@@ -141,6 +154,10 @@ public class GetTripDetailsQueryHandler
             trip.ActualArrival,
             students.Count,
             boarded,
+            droppedOff,
+            school?.Name,
+            school?.Latitude,
+            school?.Longitude,
             students));
     }
 }

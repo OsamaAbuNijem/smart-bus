@@ -967,4 +967,98 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get assistantAbsenceReasonOther => 'أخرى';
+
+  @override
+  String get driverActiveTrips => 'الرحلات النشطة';
+
+  @override
+  String get driverNoActiveTrip => 'لا توجد رحلة نشطة';
+
+  @override
+  String get driverNoActiveTripBody =>
+      'بمجرد أن يبدأ المرافق الرحلة، ستظهر هنا لتتمكن من فتح خريطة المسار.';
+
+  @override
+  String get driverOpenRouteMap => 'افتح خريطة المسار';
+
+  @override
+  String get driverRouteOrderTitle => 'ترتيب المسار';
+
+  @override
+  String get driverSchoolPin => 'المدرسة';
+
+  @override
+  String get driverNoBoardedStopsTitle => 'لا توجد محطات للتوجيه بعد';
+
+  @override
+  String get driverNeedMoreStopsTitle => 'لا توجد محطات كافية للتوجيه';
+
+  @override
+  String get driverNoBoardedStopsBody =>
+      'سيظهر المسار بمجرد إركاب طالب واحد على الأقل بموقع معروف.';
+
+  @override
+  String get driverRouteFallback =>
+      'تعذّر جلب مسار القيادة — يتم عرض خطوط مباشرة.';
+
+  @override
+  String driverStopsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count محطة',
+      many: '$count محطة',
+      few: '$count محطات',
+      two: 'محطتان',
+      one: 'محطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get assistantDroppedAt => 'تم التوصيل';
+
+  @override
+  String get assistantStatusDropped => 'تم التوصيل';
+
+  @override
+  String get assistantArrivedSchool => 'وصل إلى المدرسة';
+
+  @override
+  String get assistantArrivedHome => 'وصل إلى المنزل';
+
+  @override
+  String get assistantOnBus => 'على متن الحافلة';
+
+  @override
+  String get assistantMarkAbsentTitle => 'تسجيل غياب الطالب؟';
+
+  @override
+  String assistantMarkAbsentBody(String name) {
+    return 'تسجيل $name غائبًا في هذه الرحلة. سيتم إزالته من المسار والإحصاءات.';
+  }
+
+  @override
+  String get assistantMarkAbsentConfirm => 'تسجيل غياب';
+
+  @override
+  String get assistantContactParent => 'تواصل مع ولي الأمر';
+
+  @override
+  String get assistantNotifyArrivedMenu => 'تنبيه الوصول';
+
+  @override
+  String get assistantCallMenu => 'اتصال';
+
+  @override
+  String get driverProgressLabel => 'التوصيل';
+
+  @override
+  String get driverProgressLabelReturn => 'في المنزل';
+
+  @override
+  String get driverPinArrived => 'وصل';
+
+  @override
+  String get driverPinAtHome => 'في المنزل';
 }

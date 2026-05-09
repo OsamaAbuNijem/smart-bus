@@ -973,4 +973,95 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistantAbsenceReasonOther => 'Other';
+
+  @override
+  String get driverActiveTrips => 'Active trips';
+
+  @override
+  String get driverNoActiveTrip => 'No active trip';
+
+  @override
+  String get driverNoActiveTripBody =>
+      'Once the assistant starts a trip, it\'ll show up here so you can open the route map.';
+
+  @override
+  String get driverOpenRouteMap => 'Open route map';
+
+  @override
+  String get driverRouteOrderTitle => 'Route order';
+
+  @override
+  String get driverSchoolPin => 'School';
+
+  @override
+  String get driverNoBoardedStopsTitle => 'No stops to route yet';
+
+  @override
+  String get driverNeedMoreStopsTitle => 'Not enough stops to route';
+
+  @override
+  String get driverNoBoardedStopsBody =>
+      'The route appears once at least one student has been boarded with a known location.';
+
+  @override
+  String get driverRouteFallback =>
+      'Couldn\'t fetch driving route — showing direct lines.';
+
+  @override
+  String driverStopsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops',
+      one: '1 stop',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get assistantDroppedAt => 'Dropped';
+
+  @override
+  String get assistantStatusDropped => 'Dropped';
+
+  @override
+  String get assistantArrivedSchool => 'Arrived at school';
+
+  @override
+  String get assistantArrivedHome => 'Arrived home';
+
+  @override
+  String get assistantOnBus => 'On bus';
+
+  @override
+  String get assistantMarkAbsentTitle => 'Mark as absent?';
+
+  @override
+  String assistantMarkAbsentBody(String name) {
+    return 'Mark $name as absent for this trip. The student will be removed from the route and counts.';
+  }
+
+  @override
+  String get assistantMarkAbsentConfirm => 'Mark absent';
+
+  @override
+  String get assistantContactParent => 'Contact parent';
+
+  @override
+  String get assistantNotifyArrivedMenu => 'Notify arrived';
+
+  @override
+  String get assistantCallMenu => 'Call';
+
+  @override
+  String get driverProgressLabel => 'Drop-offs';
+
+  @override
+  String get driverProgressLabelReturn => 'At home';
+
+  @override
+  String get driverPinArrived => 'Arrived';
+
+  @override
+  String get driverPinAtHome => 'At home';
 }

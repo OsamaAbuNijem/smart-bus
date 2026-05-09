@@ -75,6 +75,7 @@ class _TripBody extends ConsumerWidget {
                     stopName: entry.key,
                     students: entry.value,
                     tripId: details.tripId,
+                    isMorning: details.isMorning,
                     readOnly: readOnly,
                     l: l,
                   ),
@@ -141,13 +142,18 @@ class _Header extends StatelessWidget {
     final fmtTime = DateFormat('h:mm a');
     final start = details.actualDeparture ?? details.scheduledDeparture;
     final completed = details.status == 'Completed';
-    // Absent students don't count toward the "boarded out of N" total —
-    // they were never expected to ride.
+    // Absent students don't count toward the totals — they were never
+    // expected to ride. Progress means different things per trip type:
+    //  • Morning → boarding (students picked up out of expected)
+    //  • Return  → drop-offs (students delivered home out of expected)
     final absentCount =
         details.students.where((s) => s.isAbsent).length;
     final expected = details.studentCount - absentCount;
+    final progressNumerator = details.isMorning
+        ? details.boardedCount
+        : details.droppedOffCount;
     final progress =
-        expected <= 0 ? 0.0 : details.boardedCount / expected;
+        expected <= 0 ? 0.0 : progressNumerator / expected;
 
     final subtitle = StringBuffer();
     if (completed && details.actualArrival != null) {
@@ -222,9 +228,10 @@ class _Header extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             _ProgressRow(
-              boarded: details.boardedCount,
+              boarded: progressNumerator,
               total: expected,
               progress: progress,
+              isMorning: details.isMorning,
               l: l,
             ),
           ],
@@ -312,14 +319,18 @@ class _ProgressRow extends StatelessWidget {
     required this.boarded,
     required this.total,
     required this.progress,
+    required this.isMorning,
     required this.l,
   });
   final int boarded, total;
   final double progress;
+  final bool isMorning;
   final AppLocalizations l;
 
   @override
   Widget build(BuildContext context) {
+    final label =
+        isMorning ? l.assistantBoardedLabel : l.driverProgressLabel;
     return Row(
       children: [
         SizedBox(
@@ -328,7 +339,7 @@ class _ProgressRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                l.assistantBoardedLabel.toUpperCase(),
+                label.toUpperCase(),
                 style: const TextStyle(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
@@ -562,6 +573,7 @@ class _StopGroup extends StatelessWidget {
     required this.stopName,
     required this.students,
     required this.tripId,
+    required this.isMorning,
     required this.readOnly,
     required this.l,
   });
@@ -569,6 +581,7 @@ class _StopGroup extends StatelessWidget {
   final String stopName;
   final List<TripStudentDetailDto> students;
   final String tripId;
+  final bool isMorning;
   final bool readOnly;
   final AppLocalizations l;
 
@@ -625,6 +638,7 @@ class _StopGroup extends StatelessWidget {
             student: students[i],
             paletteIndex: i,
             tripId: tripId,
+            isMorning: isMorning,
             readOnly: readOnly,
             l: l,
           ),
@@ -642,12 +656,14 @@ class _StudentRow extends ConsumerStatefulWidget {
     required this.student,
     required this.paletteIndex,
     required this.tripId,
+    required this.isMorning,
     required this.readOnly,
     required this.l,
   });
   final TripStudentDetailDto student;
   final int paletteIndex;
   final String tripId;
+  final bool isMorning;
   final bool readOnly;
   final AppLocalizations l;
 
@@ -672,12 +688,22 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
   Future<void> _toggleBoarded() async {
     final s = widget.student;
     if (s.isAbsent) return;
+    // Behaviour depends on trip type:
+    //  • Morning trip — Waiting ↔ Boarded. The end-trip flow flips boarded
+    //    students to "arrived at school" server-side, so the assistant only
+    //    needs to confirm pickups during the trip.
+    //  • Return trip — Boarded ↔ DroppedOff. Students start the trip on the
+    //    bus from school; marking is what flags "arrived home".
+    final isMorning = widget.isMorning;
+    final next = isMorning
+        ? (s.isBoarded ? 'Waiting' : 'Boarded')
+        : (s.isDroppedOff ? 'Boarded' : 'DroppedOff');
     setState(() => _busy = true);
     try {
       final action = ref.read(tripActionsProvider(widget.tripId));
       await action.setBoarding(
         studentId: s.studentId,
-        status: s.isBoarded ? 'Waiting' : 'Boarded',
+        status: next,
       );
     } catch (e) {
       if (!mounted) return;
@@ -742,6 +768,71 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
     }
   }
 
+  /// Confirm-and-flip the student's status for this trip to Absent. The
+  /// parent-side `AbsenceRequest` is unaffected; this only marks them
+  /// absent on the live roster so they drop out of routing + counts.
+  Future<void> _markAbsent() async {
+    final l = widget.l;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.assistantMarkAbsentTitle),
+        content: Text(
+          l.assistantMarkAbsentBody(widget.student.fullName),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l.settingsCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l.assistantMarkAbsentConfirm),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      await ref
+          .read(tripActionsProvider(widget.tripId))
+          .setBoarding(studentId: widget.student.studentId, status: 'Absent');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Reverse an assistant-marked absence — flips the student back to
+  /// Waiting (Morning) or Boarded (Return). Parent-reported absences
+  /// can't be undone here; the badge stays read-only in that case.
+  Future<void> _unmarkAbsent() async {
+    final fallback = widget.isMorning ? 'Waiting' : 'Boarded';
+    setState(() => _busy = true);
+    try {
+      await ref.read(tripActionsProvider(widget.tripId)).setBoarding(
+            studentId: widget.student.studentId,
+            status: fallback,
+          );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = widget.student;
@@ -749,6 +840,9 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
     final palette = _palette[widget.paletteIndex % _palette.length];
     final boarded = s.isBoarded;
     final absent = s.isAbsent;
+    // The row border highlights the same milestone the mark icon does:
+    // boarded for Morning, arrived-home for Return.
+    final highlight = widget.isMorning ? boarded : s.isDroppedOff;
 
     return Opacity(
       opacity: absent ? 0.65 : 1,
@@ -758,7 +852,7 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
           color: absent ? AppColors.slate50 : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: boarded ? const Color(0xFFA7F3D0) : AppColors.slate200,
+            color: highlight ? const Color(0xFFA7F3D0) : AppColors.slate200,
           ),
           boxShadow: AppShadows.sm,
         ),
@@ -815,30 +909,43 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
                 _AbsenceInfoBtn(
                   onTap: () => _showAbsenceSheet(s),
                 ),
+              ] else ...[
+                // Assistant-flipped absences (no parent record) are
+                // reversible — tap × to put the student back on the trip.
+                const SizedBox(width: 6),
+                _CommBtn(
+                  icon: Icons.refresh_rounded,
+                  color: AppColors.slate600,
+                  onTap: _busy ? () {} : _unmarkAbsent,
+                ),
               ],
             ] else ...[
               _PickupToggle(
-                checked: boarded,
+                // What "checked" means depends on the leg:
+                //   • Morning — student picked up (Boarded)
+                //   • Return  — student arrived home (DroppedOff)
+                // Boarded students on a Return trip are still "on the bus"
+                // and the toggle stays empty so the assistant can clearly
+                // tell who hasn't been delivered yet.
+                checked: widget.isMorning ? boarded : s.isDroppedOff,
                 busy: _busy,
                 onTap: _toggleBoarded,
               ),
               const SizedBox(width: 6),
               _CommBtn(
-                icon: Icons.notifications_active_outlined,
+                icon: Icons.person_off_outlined,
                 color: AppColors.red,
-                onTap: _notifyArrived,
+                onTap: _markAbsent,
               ),
               const SizedBox(width: 4),
-              _CommBtn(
-                icon: Icons.chat_bubble_outline_rounded,
-                color: const Color(0xFF25D366),
-                onTap: _whatsapp,
-              ),
-              const SizedBox(width: 4),
-              _CommBtn(
-                icon: Icons.phone_rounded,
-                color: AppColors.blue,
-                onTap: _call,
+              // Single contact-the-parent button. Tap opens a dropdown
+              // menu with Notify (bus-arrived push), WhatsApp, and Call so
+              // the row stays compact.
+              _ContactMenuBtn(
+                onNotify: _notifyArrived,
+                onWhatsapp: _whatsapp,
+                onCall: _call,
+                l: l,
               ),
             ],
           ],
@@ -871,16 +978,31 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
         ? s.grade
         : '${s.grade}-${s.className}';
     parts.add(grade);
+    final fmt = DateFormat('h:mm a');
     if (s.isAbsent) {
       parts.add(l.assistantAbsenceReported);
+    } else if (s.isDroppedOff && s.dropoffTime != null) {
+      // The "drop" event means different things per leg:
+      //  • Morning trip → student arrived at school
+      //  • Return trip  → student arrived home
+      final label = widget.isMorning
+          ? l.assistantArrivedSchool
+          : l.assistantArrivedHome;
+      parts.add('$label ${fmt.format(s.dropoffTime!.toLocal())}');
     } else if (s.isBoarded && s.boardingTime != null) {
-      parts.add(
-          '${l.assistantBoardedAt} ${DateFormat('h:mm a').format(s.boardingTime!.toLocal())}');
+      // Both legs use "On bus" once the student is on board. Morning trips
+      // append the pickup time so the assistant can see exactly when each
+      // student boarded; Return trips skip the timestamp since every row
+      // shares the trip-start moment.
+      parts.add(widget.isMorning
+          ? '${l.assistantOnBus} · ${fmt.format(s.boardingTime!.toLocal())}'
+          : l.assistantOnBus);
     } else if (widget.readOnly) {
-      // Trip is over — anyone still "Waiting" never boarded.
       parts.add(l.assistantNotBoarded);
     } else {
-      parts.add(l.assistantWaitingForPickup);
+      parts.add(widget.isMorning
+          ? l.assistantWaitingForPickup
+          : l.assistantOnBus);
     }
     return parts.join(' · ');
   }
@@ -972,6 +1094,15 @@ class _OutcomeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (student.isAbsent) return _AbsentBadge(l: l);
+    if (student.isDroppedOff) {
+      return _Pill(
+        bg: AppColors.blueSoft,
+        border: AppColors.blue.withValues(alpha: 0.3),
+        fg: AppColors.blueDark,
+        icon: Icons.flag_rounded,
+        label: l.assistantStatusDropped,
+      );
+    }
     if (student.isBoarded) {
       return _Pill(
         bg: AppColors.emeraldSoft,
@@ -1256,6 +1387,10 @@ class _CompletedSummaryBar extends StatelessWidget {
     final absentCount =
         details.students.where((s) => s.isAbsent).length;
     final expected = details.studentCount - absentCount;
+    // Recap counts arrivals — students who actually finished their leg —
+    // which is exactly the DroppedOff count for both Morning (flipped on
+    // end-trip) and Return (flipped per-student by the assistant).
+    final arrived = details.droppedOffCount;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
       decoration: const BoxDecoration(
@@ -1297,7 +1432,7 @@ class _CompletedSummaryBar extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${details.boardedCount}/$expected ${l.assistantBoardedLabel.toLowerCase()}',
+                    '$arrived/$expected ${l.driverProgressLabel.toLowerCase()}',
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -1315,6 +1450,11 @@ class _CompletedSummaryBar extends StatelessWidget {
   }
 }
 
+/// Binary "done?" mark used by both legs:
+///   • Morning — green check once the student has boarded the bus.
+///   • Return  — green check once the student has arrived home.
+/// The unchecked state is always a quiet grey square, so a Return trip
+/// starts visually empty even though every row is technically Boarded.
 class _PickupToggle extends StatelessWidget {
   const _PickupToggle({
     required this.checked,
@@ -1394,6 +1534,128 @@ class _CommBtn extends StatelessWidget {
   }
 }
 
+/// Contact-the-parent dropdown — collapses the WhatsApp + Call buttons into
+/// a single icon that opens a small menu, keeping the row compact even when
+/// other actions (mark-absent, pickup toggle) need horizontal space.
+enum _ContactAction { notify, whatsapp, call }
+
+class _ContactMenuBtn extends StatelessWidget {
+  const _ContactMenuBtn({
+    required this.onNotify,
+    required this.onWhatsapp,
+    required this.onCall,
+    required this.l,
+  });
+  final VoidCallback onNotify;
+  final VoidCallback onWhatsapp;
+  final VoidCallback onCall;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    const accent = AppColors.blue;
+    return PopupMenuButton<_ContactAction>(
+      tooltip: l.assistantContactParent,
+      position: PopupMenuPosition.under,
+      offset: const Offset(0, 4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: Colors.white,
+      padding: EdgeInsets.zero,
+      onSelected: (action) {
+        switch (action) {
+          case _ContactAction.notify:   onNotify();   break;
+          case _ContactAction.whatsapp: onWhatsapp(); break;
+          case _ContactAction.call:     onCall();     break;
+        }
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: _ContactAction.notify,
+          height: 40,
+          child: _ContactMenuRow(
+            icon: Icons.notifications_active_outlined,
+            iconColor: AppColors.red,
+            label: l.assistantNotifyArrivedMenu,
+          ),
+        ),
+        PopupMenuItem(
+          value: _ContactAction.whatsapp,
+          height: 40,
+          child: const _ContactMenuRow(
+            icon: Icons.chat_bubble_outline_rounded,
+            iconColor: Color(0xFF25D366),
+            label: 'WhatsApp',
+          ),
+        ),
+        PopupMenuItem(
+          value: _ContactAction.call,
+          height: 40,
+          child: _ContactMenuRow(
+            icon: Icons.phone_rounded,
+            iconColor: AppColors.blue,
+            label: l.assistantCallMenu,
+          ),
+        ),
+      ],
+      child: Container(
+        width: 28,
+        height: 28,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: const Icon(
+          Icons.contact_phone_outlined,
+          size: 14,
+          color: accent,
+        ),
+      ),
+    );
+  }
+}
+
+class _ContactMenuRow extends StatelessWidget {
+  const _ContactMenuRow({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+  });
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 26,
+          height: 26,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 14, color: iconColor),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+            letterSpacing: -0.1,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 // ─── End trip bar ───────────────────────────────────────────────────────
 
 class _EndTripBar extends ConsumerStatefulWidget {
@@ -1454,6 +1716,14 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
     final absentCount =
         widget.details.students.where((s) => s.isAbsent).length;
     final expected = widget.details.studentCount - absentCount;
+    // Same numerator the header progress uses — boarding for Morning,
+    // drop-offs for Return — so the bottom pill stays in lock-step.
+    final progressNumerator = widget.details.isMorning
+        ? widget.details.boardedCount
+        : widget.details.droppedOffCount;
+    final progressLabel = widget.details.isMorning
+        ? widget.l.assistantBoardedLabel
+        : widget.l.driverProgressLabel;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
       decoration: const BoxDecoration(
@@ -1487,7 +1757,7 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Text(
-                        '${widget.details.boardedCount}/$expected ${widget.l.assistantBoardedLabel}',
+                        '$progressNumerator/$expected $progressLabel',
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,

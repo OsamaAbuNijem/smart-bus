@@ -17,5 +17,7 @@ public record UpdateSchoolCommand(
     int MaxAssistants,
     int MaxStudents,
     bool IsActive,
-    string? Notes
+    string? Notes,
+    double? Latitude = null,
+    double? Longitude = null
 ) : IRequest<Result>;

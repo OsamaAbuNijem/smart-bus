@@ -22,6 +22,10 @@ public record TripDetailsDto(
     DateTime? ActualArrival,
     int StudentCount,
     int BoardedCount,
+    int DroppedOffCount,
+    string? SchoolName,
+    double? SchoolLatitude,
+    double? SchoolLongitude,
     List<TripStudentDetailDto> Students);
 
 public record TripStudentDetailDto(

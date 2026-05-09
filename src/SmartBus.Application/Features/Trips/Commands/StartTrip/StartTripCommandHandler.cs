@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
+using SmartBus.Application.Features.Notifications.Commands.SendNotification;
 using SmartBus.Domain.Entities;
 using SmartBus.Domain.Enums;
 
@@ -13,16 +14,22 @@ public class StartTripCommandHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
+    private readonly IMediator _mediator;
     private readonly ILogger<StartTripCommandHandler> _logger;
 
     public StartTripCommandHandler(
         IUnitOfWork unitOfWork,
         IApplicationDbContext context,
+        ICurrentUserService currentUser,
+        IMediator mediator,
         ILogger<StartTripCommandHandler> logger)
     {
-        _unitOfWork = unitOfWork;
-        _context    = context;
-        _logger     = logger;
+        _unitOfWork  = unitOfWork;
+        _context     = context;
+        _currentUser = currentUser;
+        _mediator    = mediator;
+        _logger      = logger;
     }
 
     public async Task<Result<StartTripResponse>> Handle(
@@ -36,6 +43,39 @@ public class StartTripCommandHandler
             .FirstOrDefaultAsync(d => d.Id == request.DriverId, ct);
         if (driver is null || driver.DriverType != DriverType.Driver)
             return Result<StartTripResponse>.Failure("Driver not found.");
+
+        // Block opening a second trip while the assistant is mid-trip on
+        // any bus / leg — finishing or completing the active one is the
+        // only way out. Resolves the assistant by the JWT user id; admins
+        // and drivers using this endpoint directly aren't affected.
+        var callerUserId = _currentUser.UserId;
+        if (!string.IsNullOrEmpty(callerUserId))
+        {
+            var caller = await _context.Drivers
+                .FirstOrDefaultAsync(d => d.UserId == callerUserId, ct);
+            if (caller is not null && caller.DriverType == DriverType.Assistant)
+            {
+                var liveBusIds = await _context.BusSchedules
+                    .Where(s => s.MorningAssistantId == caller.Id ||
+                                s.ReturnAssistantId  == caller.Id)
+                    .Select(s => s.BusId)
+                    .ToListAsync(ct);
+
+                if (liveBusIds.Count > 0)
+                {
+                    var hasLive = await _context.Trips.AnyAsync(t =>
+                        !t.IsTemplate &&
+                        t.Status == TripStatus.InProgress &&
+                        liveBusIds.Contains(t.BusId), ct);
+
+                    if (hasLive)
+                    {
+                        return Result<StartTripResponse>.Failure(
+                            "You already have an active trip. End it before starting a new one.");
+                    }
+                }
+            }
+        }
 
         // Idempotency: if a non-completed trip exists today for (bus, type),
         // reuse it instead of creating a duplicate.
@@ -102,13 +142,21 @@ public class StartTripCommandHandler
                 .ToListAsync(ct);
         }
 
+        // Return trips start with everyone already on the bus (the assistant
+        // collected them at school), so seed Boarded with a boarding time
+        // stamped at trip start. Morning trips begin with everyone Waiting
+        // and the assistant marks each pickup as it happens.
+        var initial = request.TripType == TripType.Return
+            ? BoardingStatus.Boarded
+            : BoardingStatus.Waiting;
         foreach (var sid in studentIds)
         {
             _context.StudentTrips.Add(new StudentTrip
             {
                 TripId         = trip.Id,
                 StudentId      = sid,
-                BoardingStatus = BoardingStatus.Waiting
+                BoardingStatus = initial,
+                BoardingTime   = initial == BoardingStatus.Boarded ? now : null,
             });
         }
         if (studentIds.Count > 0)
@@ -117,6 +165,33 @@ public class StartTripCommandHandler
         _logger.LogInformation(
             "[StartTrip] Bus={BusId} Driver={DriverId} Type={Type} Students={N} → Trip {TripId}",
             bus.Id, driver.Id, request.TripType, studentIds.Count, trip.Id);
+
+        // Tell the driver the trip is live — shows up in their notifications
+        // list and triggers a SignalR push so a logged-in driver app reacts
+        // immediately. Best-effort: a notification failure shouldn't fail
+        // the trip creation itself.
+        if (!string.IsNullOrEmpty(driver.UserId))
+        {
+            try
+            {
+                var legLabel = request.TripType == TripType.Morning
+                    ? "Morning pickup"
+                    : "Return drop-off";
+                await _mediator.Send(new SendNotificationCommand(
+                    Title: $"{legLabel} started",
+                    Message:
+                        $"Bus {bus.PlateNumber} is now live — open the route map to begin driving.",
+                    Type: NotificationType.TripStarted,
+                    RecipientId: driver.UserId,
+                    RelatedTripId: trip.Id,
+                    RelatedBusId: bus.Id), ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "[StartTrip] Failed to notify driver {DriverId}", driver.Id);
+            }
+        }
 
         return Result<StartTripResponse>.Success(new StartTripResponse(
             trip.Id, bus.Id, bus.PlateNumber,

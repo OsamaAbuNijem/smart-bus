@@ -16,5 +16,7 @@ public record CreateSchoolCommand(
     int MaxAssistants,
     int MaxStudents,
     string? Notes,
+    double? Latitude = null,
+    double? Longitude = null,
     string AdminPassword = "Admin@123456"
 ) : IRequest<Result<Guid>>;

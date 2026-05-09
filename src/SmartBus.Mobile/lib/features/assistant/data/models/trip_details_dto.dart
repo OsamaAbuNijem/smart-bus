@@ -11,6 +11,10 @@ class TripDetailsDto {
     required this.actualArrival,
     required this.studentCount,
     required this.boardedCount,
+    required this.droppedOffCount,
+    required this.schoolName,
+    required this.schoolLatitude,
+    required this.schoolLongitude,
     required this.students,
   });
 
@@ -30,6 +34,10 @@ class TripDetailsDto {
             : DateTime.parse(json['actualArrival'] as String),
         studentCount: json['studentCount'] as int,
         boardedCount: json['boardedCount'] as int,
+        droppedOffCount: json['droppedOffCount'] as int? ?? 0,
+        schoolName: json['schoolName'] as String?,
+        schoolLatitude: (json['schoolLatitude'] as num?)?.toDouble(),
+        schoolLongitude: (json['schoolLongitude'] as num?)?.toDouble(),
         students: ((json['students'] as List<dynamic>?) ?? const [])
             .map((e) =>
                 TripStudentDetailDto.fromJson(e as Map<String, dynamic>))
@@ -46,6 +54,10 @@ class TripDetailsDto {
   final DateTime? actualArrival;
   final int studentCount;
   final int boardedCount;
+  final int droppedOffCount;
+  final String? schoolName;
+  final double? schoolLatitude;
+  final double? schoolLongitude;
   final List<TripStudentDetailDto> students;
 
   bool get isMorning => tripType == 'Morning';
@@ -120,7 +132,8 @@ class TripStudentDetailDto {
   final String? parentPhone;
 
   bool get isBoarded => boardingStatus == 'Boarded';
+  bool get isDroppedOff => boardingStatus == 'DroppedOff';
   bool get isAbsent => boardingStatus == 'Absent' || isAbsentToday;
   bool get isWaiting =>
-      boardingStatus == 'Waiting' && !isAbsent;
+      boardingStatus == 'Waiting' && !isAbsent && !isDroppedOff;
 }

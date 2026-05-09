@@ -39,6 +39,8 @@ public class UpdateSchoolCommandHandler : IRequestHandler<UpdateSchoolCommand, R
         school.MaxStudents   = request.MaxStudents;
         school.IsActive      = request.IsActive;
         school.Notes         = request.Notes;
+        if (request.Latitude  is not null) school.Latitude  = request.Latitude;
+        if (request.Longitude is not null) school.Longitude = request.Longitude;
 
         await _unitOfWork.Schools.UpdateAsync(school);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

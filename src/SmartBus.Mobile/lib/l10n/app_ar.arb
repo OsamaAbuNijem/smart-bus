@@ -346,5 +346,37 @@
   "assistantAbsenceReasonIllness": "مرض",
   "assistantAbsenceReasonMedical": "موعد طبي",
   "assistantAbsenceReasonFamily": "أمر عائلي",
-  "assistantAbsenceReasonOther": "أخرى"
+  "assistantAbsenceReasonOther": "أخرى",
+  "driverActiveTrips": "الرحلات النشطة",
+  "driverNoActiveTrip": "لا توجد رحلة نشطة",
+  "driverNoActiveTripBody": "بمجرد أن يبدأ المرافق الرحلة، ستظهر هنا لتتمكن من فتح خريطة المسار.",
+  "driverOpenRouteMap": "افتح خريطة المسار",
+  "driverRouteOrderTitle": "ترتيب المسار",
+  "driverSchoolPin": "المدرسة",
+  "driverNoBoardedStopsTitle": "لا توجد محطات للتوجيه بعد",
+  "driverNeedMoreStopsTitle": "لا توجد محطات كافية للتوجيه",
+  "driverNoBoardedStopsBody": "سيظهر المسار بمجرد إركاب طالب واحد على الأقل بموقع معروف.",
+  "driverRouteFallback": "تعذّر جلب مسار القيادة — يتم عرض خطوط مباشرة.",
+  "driverStopsCount": "{count, plural, =1{محطة واحدة} =2{محطتان} few{{count} محطات} many{{count} محطة} other{{count} محطة}}",
+  "@driverStopsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "assistantDroppedAt": "تم التوصيل",
+  "assistantStatusDropped": "تم التوصيل",
+  "assistantArrivedSchool": "وصل إلى المدرسة",
+  "assistantArrivedHome": "وصل إلى المنزل",
+  "assistantOnBus": "على متن الحافلة",
+  "assistantMarkAbsentTitle": "تسجيل غياب الطالب؟",
+  "assistantMarkAbsentBody": "تسجيل {name} غائبًا في هذه الرحلة. سيتم إزالته من المسار والإحصاءات.",
+  "@assistantMarkAbsentBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "assistantMarkAbsentConfirm": "تسجيل غياب",
+  "assistantContactParent": "تواصل مع ولي الأمر",
+  "assistantNotifyArrivedMenu": "تنبيه الوصول",
+  "assistantCallMenu": "اتصال",
+  "driverProgressLabel": "التوصيل",
+  "driverProgressLabelReturn": "في المنزل",
+  "driverPinArrived": "وصل",
+  "driverPinAtHome": "في المنزل"
 }

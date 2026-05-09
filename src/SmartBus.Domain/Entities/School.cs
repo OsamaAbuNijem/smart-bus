@@ -18,4 +18,11 @@ public class School : BaseEntity
     public bool IsActive { get; set; } = true;
     public string? LogoUrl { get; set; }
     public string? Notes { get; set; }
+
+    /// <summary>
+    /// School map location supplied by the SuperAdmin. Used by the driver
+    /// route map as the start (Return trips) or end (Morning trips).
+    /// </summary>
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
 }

@@ -8,6 +8,7 @@ import 'package:smart_bus/core/locale/locale_controller.dart';
 import 'package:smart_bus/core/storage/secure_storage.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
 import 'package:smart_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:smart_bus/features/auth/domain/entities/user.dart';
 import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
 
@@ -150,7 +151,12 @@ class _AssistantSettingsScreenState
                   ? (user?.fullName ?? '')
                   : _nameCtrl.text.trim(),
               phone: user?.phoneNumber ?? '',
-              roleLabel: l.loginRoleAssistant,
+              role: user?.role ?? UserRole.assistant,
+              roleLabel: switch (user?.role) {
+                UserRole.driver => l.loginRoleDriver,
+                UserRole.parent => l.loginRoleParent,
+                _ => l.loginRoleAssistant,
+              },
             ),
             const SizedBox(height: 22),
             _SectionLabel(text: l.settingsLanguage),
@@ -267,15 +273,52 @@ class _ProfileHero extends StatelessWidget {
   const _ProfileHero({
     required this.name,
     required this.phone,
+    required this.role,
     required this.roleLabel,
   });
   final String name;
   final String phone;
+  final UserRole role;
   final String roleLabel;
 
   @override
   Widget build(BuildContext context) {
     final displayName = name.isEmpty ? '—' : name;
+    // Per-role palette so the hero matches the home brand mark for that
+    // role: yellow for assistant, blue for driver, violet otherwise.
+    final (avatarA, avatarB, avatarFg, glow) = switch (role) {
+      UserRole.driver => (
+          AppColors.blue,
+          const Color(0xFF1E40AF),
+          Colors.white,
+          const Color(0x802563EB),
+        ),
+      UserRole.parent => (
+          AppColors.violet,
+          const Color(0xFF5B21B6),
+          Colors.white,
+          const Color(0x807C3AED),
+        ),
+      _ => (
+          AppColors.yellow,
+          AppColors.yellowDeep,
+          AppColors.ink,
+          const Color(0x80F5C518),
+        ),
+    };
+    final (pillBg, pillBorder, pillFg) = switch (role) {
+      UserRole.driver => (
+          AppColors.blueSoft,
+          AppColors.blue.withValues(alpha: 0.3),
+          AppColors.blueDark,
+        ),
+      _ => (
+          AppColors.violetSoft,
+          const Color(0xFFDDD6FE),
+          AppColors.violet,
+        ),
+    };
+
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 22, 18, 22),
       decoration: BoxDecoration(
@@ -290,27 +333,27 @@ class _ProfileHero extends StatelessWidget {
             width: 76,
             height: 76,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.yellow, AppColors.yellowDeep],
+              gradient: LinearGradient(
+                colors: [avatarA, avatarB],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(22),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x80F5C518),
+                  color: glow,
                   blurRadius: 18,
-                  offset: Offset(0, 8),
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
             alignment: Alignment.center,
             child: Text(
               _initials(displayName),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: AppColors.ink,
+                color: avatarFg,
                 letterSpacing: -0.5,
               ),
             ),
@@ -332,22 +375,21 @@ class _ProfileHero extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.violetSoft,
+              color: pillBg,
               borderRadius: BorderRadius.circular(100),
-              border: Border.all(color: const Color(0xFFDDD6FE)),
+              border: Border.all(color: pillBorder),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.shield_outlined,
-                    size: 11, color: AppColors.violet),
+                Icon(Icons.shield_outlined, size: 11, color: pillFg),
                 const SizedBox(width: 5),
                 Text(
                   roleLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.violet,
+                    color: pillFg,
                     letterSpacing: 0.2,
                   ),
                 ),

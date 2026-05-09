@@ -12,6 +12,7 @@ import 'package:smart_bus/features/assistant/presentation/screens/assistant_qr_s
 import 'package:smart_bus/features/assistant/presentation/screens/assistant_settings_screen.dart';
 import 'package:smart_bus/features/assistant/presentation/screens/assistant_trip_details_screen.dart';
 import 'package:smart_bus/features/assistant/presentation/screens/assistant_trip_setup_screen.dart';
+import 'package:smart_bus/features/assistant/presentation/screens/driver_trip_map_screen.dart';
 import 'package:smart_bus/features/auth/presentation/screens/qr_scan_screen.dart';
 import 'package:smart_bus/features/auth/presentation/screens/splash_screen.dart';
 import 'package:smart_bus/features/home/presentation/screens/assistant_home_screen.dart';
@@ -42,6 +43,11 @@ abstract class AppRoute {
   static const assistantManualSetup = '/assistant/manual-setup';
   static const assistantTripDetails = '/assistant/trips/:tripId';
   static const assistantSettings = '/assistant/settings';
+  static const driverTripMap = '/driver/trips/:tripId/map';
+  static const driverSettings = '/driver/settings';
+
+  static String driverTripMapFor(String tripId) =>
+      '/driver/trips/$tripId/map';
 
   static String assistantTripDetailsFor(String tripId) =>
       '/assistant/trips/$tripId';
@@ -179,6 +185,16 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: AppRoute.assistantSettings,
+        builder: (_, _) => const AssistantSettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.driverTripMap,
+        builder: (context, state) => DriverTripMapScreen(
+          tripId: state.pathParameters['tripId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.driverSettings,
         builder: (_, _) => const AssistantSettingsScreen(),
       ),
       GoRoute(

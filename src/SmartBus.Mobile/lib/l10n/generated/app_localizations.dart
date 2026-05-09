@@ -1957,6 +1957,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get assistantAbsenceReasonOther;
+
+  /// No description provided for @driverActiveTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Active trips'**
+  String get driverActiveTrips;
+
+  /// No description provided for @driverNoActiveTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'No active trip'**
+  String get driverNoActiveTrip;
+
+  /// No description provided for @driverNoActiveTripBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Once the assistant starts a trip, it\'ll show up here so you can open the route map.'**
+  String get driverNoActiveTripBody;
+
+  /// No description provided for @driverOpenRouteMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Open route map'**
+  String get driverOpenRouteMap;
+
+  /// No description provided for @driverRouteOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Route order'**
+  String get driverRouteOrderTitle;
+
+  /// No description provided for @driverSchoolPin.
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get driverSchoolPin;
+
+  /// No description provided for @driverNoBoardedStopsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No stops to route yet'**
+  String get driverNoBoardedStopsTitle;
+
+  /// No description provided for @driverNeedMoreStopsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough stops to route'**
+  String get driverNeedMoreStopsTitle;
+
+  /// No description provided for @driverNoBoardedStopsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The route appears once at least one student has been boarded with a known location.'**
+  String get driverNoBoardedStopsBody;
+
+  /// No description provided for @driverRouteFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t fetch driving route — showing direct lines.'**
+  String get driverRouteFallback;
+
+  /// No description provided for @driverStopsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 stop} other{{count} stops}}'**
+  String driverStopsCount(int count);
+
+  /// No description provided for @assistantDroppedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Dropped'**
+  String get assistantDroppedAt;
+
+  /// No description provided for @assistantStatusDropped.
+  ///
+  /// In en, this message translates to:
+  /// **'Dropped'**
+  String get assistantStatusDropped;
+
+  /// No description provided for @assistantArrivedSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrived at school'**
+  String get assistantArrivedSchool;
+
+  /// No description provided for @assistantArrivedHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrived home'**
+  String get assistantArrivedHome;
+
+  /// No description provided for @assistantOnBus.
+  ///
+  /// In en, this message translates to:
+  /// **'On bus'**
+  String get assistantOnBus;
+
+  /// No description provided for @assistantMarkAbsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as absent?'**
+  String get assistantMarkAbsentTitle;
+
+  /// No description provided for @assistantMarkAbsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {name} as absent for this trip. The student will be removed from the route and counts.'**
+  String assistantMarkAbsentBody(String name);
+
+  /// No description provided for @assistantMarkAbsentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark absent'**
+  String get assistantMarkAbsentConfirm;
+
+  /// No description provided for @assistantContactParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact parent'**
+  String get assistantContactParent;
+
+  /// No description provided for @assistantNotifyArrivedMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify arrived'**
+  String get assistantNotifyArrivedMenu;
+
+  /// No description provided for @assistantCallMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get assistantCallMenu;
+
+  /// No description provided for @driverProgressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop-offs'**
+  String get driverProgressLabel;
+
+  /// No description provided for @driverProgressLabelReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'At home'**
+  String get driverProgressLabelReturn;
+
+  /// No description provided for @driverPinArrived.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrived'**
+  String get driverPinArrived;
+
+  /// No description provided for @driverPinAtHome.
+  ///
+  /// In en, this message translates to:
+  /// **'At home'**
+  String get driverPinAtHome;
 }
 
 class _AppLocalizationsDelegate
