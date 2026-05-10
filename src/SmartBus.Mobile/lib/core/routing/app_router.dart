@@ -45,6 +45,7 @@ abstract class AppRoute {
   static const assistantSettings = '/assistant/settings';
   static const driverTripMap = '/driver/trips/:tripId/map';
   static const driverSettings = '/driver/settings';
+  static const parentSettings = '/parent/settings';
 
   static String driverTripMapFor(String tripId) =>
       '/driver/trips/$tripId/map';
@@ -195,6 +196,10 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: AppRoute.driverSettings,
+        builder: (_, _) => const AssistantSettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.parentSettings,
         builder: (_, _) => const AssistantSettingsScreen(),
       ),
       GoRoute(

@@ -65,6 +65,8 @@ class ParentRepository {
       homeLongitude: dto.homeLongitude,
       homeAddress: dto.homeAddress,
       schoolName: dto.schoolName,
+      schoolLatitude: dto.schoolLatitude,
+      schoolLongitude: dto.schoolLongitude,
     );
   }
 

@@ -26,6 +26,8 @@ abstract class LiveTrackingDto with _$LiveTrackingDto {
     double? homeLongitude,
     String? homeAddress,
     String? schoolName,
+    double? schoolLatitude,
+    double? schoolLongitude,
   }) = _LiveTrackingDto;
 
   factory LiveTrackingDto.fromJson(Map<String, dynamic> json) =>

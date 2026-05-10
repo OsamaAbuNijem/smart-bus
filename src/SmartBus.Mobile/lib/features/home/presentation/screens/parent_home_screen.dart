@@ -1,14 +1,15 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:smart_bus/core/routing/app_router.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
-import 'dart:math' as math;
 
 import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
 import 'package:smart_bus/features/notifications/presentation/providers/notifications_controller.dart';
+import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
 import 'package:smart_bus/features/parent/domain/entities/live_tracking.dart';
 import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
 import 'package:smart_bus/features/parent/presentation/providers/live_tracking_controller.dart';
@@ -131,7 +132,7 @@ class _Header extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  l.parentGreetingEyebrow,
+                  _greetingForNow(l),
                   style: const TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w600,
@@ -160,7 +161,7 @@ class _Header extends ConsumerWidget {
           const SizedBox(width: 8),
           _HeaderIcon(
             icon: Icons.settings_outlined,
-            onTap: () => ref.read(authControllerProvider.notifier).logout(),
+            onTap: () => context.push(AppRoute.parentSettings),
           ),
         ],
       ),
@@ -227,26 +228,20 @@ class _ChildTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppColors.slate100)),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-        child: Row(
-          children: [
-            for (var i = 0; i < children.length; i++) ...[
-              _ChildTab(
-                child: children[i],
-                active: i == activeIndex,
-                onTap: () => onTap(i),
-              ),
-              if (i != children.length - 1) const SizedBox(width: 8),
-            ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Row(
+        children: [
+          for (var i = 0; i < children.length; i++) ...[
+            _ChildTab(
+              child: children[i],
+              active: i == activeIndex,
+              onTap: () => onTap(i),
+            ),
+            if (i != children.length - 1) const SizedBox(width: 8),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -270,16 +265,16 @@ class _ChildTab extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.fromLTRB(7, 7, 13, 7),
         decoration: BoxDecoration(
-          color: active ? AppColors.ink : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(100),
           border: Border.all(
-            color: active ? AppColors.ink : AppColors.slate200,
-            width: 1.5,
+            color: active ? AppColors.yellow : AppColors.slate200,
+            width: active ? 1.8 : 1.5,
           ),
           boxShadow: active
               ? [
                   BoxShadow(
-                    color: AppColors.ink.withValues(alpha: 0.30),
+                    color: AppColors.yellow.withValues(alpha: 0.28),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -313,7 +308,7 @@ class _ChildTab extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: active ? Colors.white : AppColors.slate700,
+                color: active ? AppColors.ink : AppColors.slate700,
                 letterSpacing: -0.1,
               ),
             ),
@@ -339,7 +334,7 @@ class _ChildPanel extends ConsumerWidget {
       color: AppColors.yellowDeep,
       onRefresh: () async => ref.invalidate(childTripsProvider(child.id)),
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
         children: [
           tripsAsync.when(
             loading: () => const Center(
@@ -350,15 +345,21 @@ class _ChildPanel extends ConsumerWidget {
             ),
             error: (e, _) => _ErrorBox(message: e.toString()),
             data: (trips) {
-              final last = trips.isNotEmpty ? trips.first : null;
+              // Live card only when there's a trip currently rolling. Empty-
+              // state placeholder is reserved for parents with no trips at all.
+              final liveTrip = trips
+                  .where((t) => t.tripPhase == TripPhase.inProgress)
+                  .firstOrNull;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (last != null)
-                    _TripHero(trip: last, l: l, studentId: child.id)
-                  else
+                  if (liveTrip != null) ...[
+                    _TripHero(trip: liveTrip, l: l, studentId: child.id),
+                    const SizedBox(height: 14),
+                  ] else if (trips.isEmpty) ...[
                     _NoTripsHero(l: l),
-                  const SizedBox(height: 14),
+                    const SizedBox(height: 14),
+                  ],
                   _SectionHead(title: l.parentSectionQuickActions),
                   const SizedBox(height: 8),
                   _Actions(l: l, studentId: child.id),
@@ -373,7 +374,7 @@ class _ChildPanel extends ConsumerWidget {
                   if (trips.isEmpty)
                     _EmptyHistory(l: l)
                   else
-                    _HistoryCard(trips: trips, l: l),
+                    _HistoryCard(trips: trips.take(4).toList(), l: l),
                 ],
               );
             },
@@ -406,33 +407,34 @@ class _TripHero extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // While the trip is active, swap the "Duration" cell for live ETA so the
-    // home card stays useful as the bus moves.
-    final liveEtaMin = _showTrackButton
-        ? _liveEtaMinutes(
-            ref.watch(liveTrackingControllerProvider(studentId)).valueOrNull,
-          )
+    // Status palette on the white surface: amber for in-flight, emerald
+    // for done — saturated tokens since the background is no longer dark.
+    final statusBgLight =
+        _pending ? const Color(0xFFFEF3C7) : AppColors.emeraldSoft;
+    final statusBorderLight = _pending
+        ? const Color(0xFFFDE68A)
+        : const Color(0xFFA7F3D0);
+    final statusFgLight =
+        _pending ? const Color(0xFFB45309) : AppColors.emerald;
+    final statusDotLight =
+        _pending ? const Color(0xFFD97706) : AppColors.emerald;
+
+    final isInProgress = trip.tripPhase == TripPhase.inProgress;
+    final isCompleted = trip.tripPhase == TripPhase.completed;
+    // Pull live position only when there's something to track. For completed /
+    // scheduled trips we still want the progress line filled / empty without
+    // hitting the controller.
+    final live = isInProgress
+        ? ref.watch(liveTrackingControllerProvider(studentId)).valueOrNull
         : null;
-    final statusColor = _pending ? const Color(0xFFFCD34D) : const Color(0xFF6EE7B7);
-    final statusBg =
-        _pending ? const Color(0x2EF59E0B) : const Color(0x2E10B981);
-    final dotColor = _pending ? const Color(0xFFF59E0B) : const Color(0xFF34D399);
+    final progress = _computeRouteProgress(trip, live, isCompleted);
 
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF1A1F2E), Color(0xFF0F172A)],
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.50),
-            blurRadius: 30,
-            offset: const Offset(0, 12),
-          ),
-        ],
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: AppShadows.md,
       ),
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
       child: Column(
@@ -443,16 +445,26 @@ class _TripHero extends ConsumerWidget {
               Expanded(
                 child: Row(
                   children: [
-                    const Icon(Icons.shield_outlined,
-                        size: 11, color: AppColors.yellow),
+                    Icon(
+                      trip.tripType == 'Morning'
+                          ? Icons.wb_sunny_outlined
+                          : Icons.nightlight_outlined,
+                      size: 12,
+                      color: trip.tripType == 'Morning'
+                          ? const Color(0xFFD97706)
+                          : AppColors.violet,
+                    ),
                     const SizedBox(width: 6),
                     Text(
-                      '${l.parentTripEyebrow} · ${_relativeDay(trip.tripDate, l)}',
-                      style: TextStyle(
+                      (trip.tripType == 'Morning'
+                              ? l.assistantMorningPickup
+                              : l.assistantAfternoonDropoff)
+                          .toUpperCase(),
+                      style: const TextStyle(
                         fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white.withValues(alpha: 0.5),
-                        letterSpacing: 1.4,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.slate500,
+                        letterSpacing: 1.0,
                       ),
                     ),
                   ],
@@ -461,9 +473,9 @@ class _TripHero extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
                 decoration: BoxDecoration(
-                  color: statusBg,
+                  color: statusBgLight,
                   borderRadius: BorderRadius.circular(100),
-                  border: Border.all(color: statusColor.withValues(alpha: 0.5)),
+                  border: Border.all(color: statusBorderLight),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -473,10 +485,7 @@ class _TripHero extends ConsumerWidget {
                       height: 6,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: dotColor,
-                        boxShadow: [
-                          BoxShadow(color: dotColor, blurRadius: 8),
-                        ],
+                        color: statusDotLight,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -484,8 +493,8 @@ class _TripHero extends ConsumerWidget {
                       _statusText(trip, l),
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: statusColor,
+                        fontWeight: FontWeight.w800,
+                        color: statusFgLight,
                       ),
                     ),
                   ],
@@ -494,67 +503,34 @@ class _TripHero extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 14),
-          // Route stops + bus icon
+          // Route stops + animated progress line
           Row(
             children: [
+              // Whichever side of the route is the school we render as a
+              // generic "School" instead of the verbose admin name (e.g.
+              // "SmartBus Demo School") so it never gets truncated.
               _Stop(
                 label: l.parentTripPickup,
-                name: trip.pickupStopName,
-                time: _hhmm(trip.boardingTime ?? trip.actualDeparture ?? trip.scheduledDeparture),
+                name: trip.tripType == 'Return'
+                    ? l.driverSchoolPin
+                    : l.liveTrackingHome,
                 rightAlign: false,
               ),
               const SizedBox(width: 10),
-              _RouteLine(),
+              _RouteProgress(
+                fraction: progress.fraction,
+                remainingMinutes: progress.remainingMinutes,
+                liveLabel: l.liveTrackingArrives,
+              ),
               const SizedBox(width: 10),
               _Stop(
                 label: l.parentTripDropoff,
-                name: trip.dropoffStopName,
-                time: _hhmm(trip.dropoffTime ?? trip.actualArrival),
+                name: trip.tripType == 'Morning'
+                    ? l.driverSchoolPin
+                    : l.liveTrackingHome,
                 rightAlign: true,
               ),
             ],
-          ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.only(top: 14),
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
-              ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _MetaItem(
-                    icon: Icons.directions_bus,
-                    label: l.parentMetaBus,
-                    value: '#${trip.busPlateNumber}',
-                  ),
-                ),
-                _MetaDivider(),
-                Expanded(
-                  child: _MetaItem(
-                    icon: Icons.person_outline,
-                    label: l.parentMetaDriver,
-                    value: trip.driverName ?? '—',
-                  ),
-                ),
-                _MetaDivider(),
-                Expanded(
-                  child: _MetaItem(
-                    icon: Icons.access_time,
-                    label: liveEtaMin != null
-                        ? l.liveTrackingArrives
-                        : l.parentMetaDuration,
-                    value: liveEtaMin != null
-                        ? '$liveEtaMin min'
-                        : (trip.durationMinutes != null
-                            ? '${trip.durationMinutes} min'
-                            : '—'),
-                  ),
-                ),
-              ],
-            ),
           ),
           if (_showTrackButton) ...[
             const SizedBox(height: 14),
@@ -651,23 +627,34 @@ class _NoTripsHero extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: AppShadows.sm,
       ),
       child: Column(
         children: [
-          const Icon(Icons.directions_bus,
-              color: AppColors.yellow, size: 32),
-          const SizedBox(height: 10),
+          Container(
+            width: 52,
+            height: 52,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.yellowTint,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: const Color(0x66F5C518)),
+            ),
+            child: const Icon(Icons.directions_bus,
+                color: AppColors.yellowDeep, size: 26),
+          ),
+          const SizedBox(height: 12),
           Text(
             l.parentNoTrips,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.ink,
               fontSize: 14,
               fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
             ),
           ),
         ],
@@ -680,28 +667,27 @@ class _Stop extends StatelessWidget {
   const _Stop({
     required this.label,
     required this.name,
-    required this.time,
     required this.rightAlign,
   });
   final String label;
   final String name;
-  final String time;
   final bool rightAlign;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return SizedBox(
+      width: 84,
       child: Column(
         crossAxisAlignment:
             rightAlign ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
             label.toUpperCase(),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Colors.white.withValues(alpha: 0.5),
-              letterSpacing: 1.2,
+              fontWeight: FontWeight.w800,
+              color: AppColors.slate500,
+              letterSpacing: 1.0,
             ),
           ),
           const SizedBox(height: 3),
@@ -712,64 +698,165 @@ class _Stop extends StatelessWidget {
             textAlign: rightAlign ? TextAlign.end : TextAlign.start,
             style: const TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              color: AppColors.ink,
               letterSpacing: -0.1,
             ),
           ),
-          const SizedBox(height: 1),
-          Text(
-            time,
-            style: const TextStyle(
-              fontSize: 14.5,
-              fontWeight: FontWeight.w800,
-              color: AppColors.yellow,
-              letterSpacing: -0.4,
-            ),
-          ),
         ],
       ),
     );
   }
 }
 
-class _RouteLine extends StatelessWidget {
+/// Bus-on-rail progress indicator. The rail spans the available width with
+/// dots at each end; the bus slides along it based on [fraction] (0..1).
+/// When [remainingMinutes] is set, a centered "live" caption with a small
+/// arrival range (e.g. "7-10 min") sits below the rail.
+class _RouteProgress extends StatelessWidget {
+  const _RouteProgress({
+    required this.fraction,
+    required this.remainingMinutes,
+    required this.liveLabel,
+  });
+  final double fraction;
+  final int? remainingMinutes;
+  final String liveLabel;
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _Dot(),
-          const _DashedLine(),
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.yellow,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.yellow.withValues(alpha: 0.4),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            LayoutBuilder(
+              builder: (context, c) {
+                const railHeight = 4.0;
+                const busSize = 28.0;
+                const railCenterY = 20.0;
+                const totalHeight = 40.0;
+                final f = fraction.clamp(0.0, 1.0);
+                final width = c.maxWidth;
+                // Center the bus on the rail; subtract endpoint dot diameters
+                // so it visually halts at the dots, not past them.
+                const endInset = 8.0;
+                final travel = (width - busSize).clamp(0.0, width);
+                final busLeft = endInset + (travel - endInset * 2) * f;
+                return SizedBox(
+                  height: totalHeight,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: railCenterY - railHeight / 2,
+                        child: Container(
+                          height: railHeight,
+                          decoration: BoxDecoration(
+                            color: AppColors.slate100,
+                            borderRadius: BorderRadius.circular(railHeight),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        top: railCenterY - railHeight / 2,
+                        child: Container(
+                          width: (busLeft + busSize / 2).clamp(0.0, width),
+                          height: railHeight,
+                          decoration: BoxDecoration(
+                            color: AppColors.yellow,
+                            borderRadius: BorderRadius.circular(railHeight),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        top: railCenterY - 4,
+                        child: _EndDot(),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: railCenterY - 4,
+                        child: _EndDot(),
+                      ),
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.easeOutCubic,
+                        left: busLeft,
+                        top: railCenterY - busSize / 2,
+                        child: Container(
+                          width: busSize,
+                          height: busSize,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.yellow,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.yellow.withValues(alpha: 0.4),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.directions_bus,
+                              size: 14, color: AppColors.ink),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-            alignment: Alignment.center,
-            child: const Icon(Icons.directions_bus,
-                size: 14, color: AppColors.ink),
-          ),
-          const _DashedLine(),
-          _Dot(),
-        ],
+            if (remainingMinutes != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.emerald,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    _formatRemainingRange(remainingMinutes!),
+                    maxLines: 1,
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.1,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _Dot extends StatelessWidget {
+/// Spreads a single ETA estimate into a short range that reflects normal
+/// urban variability — roughly ±15-20%, snapped to whole minutes, with a
+/// minimum spread of 2 min so it always reads as a range.
+String _formatRemainingRange(int mins) {
+  final low = math.max(1, (mins * 0.85).round());
+  var high = (mins * 1.20).round() + 1;
+  if (high - low < 2) high = low + 2;
+  return '$low-$high min';
+}
+
+class _EndDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -783,111 +870,6 @@ class _Dot extends StatelessWidget {
           width: 3,
         ),
       ),
-    );
-  }
-}
-
-class _DashedLine extends StatelessWidget {
-  const _DashedLine();
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 24,
-      height: 2,
-      child: CustomPaint(painter: _DashPainter()),
-    );
-  }
-}
-
-class _DashPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.yellow
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.square;
-    const dash = 4.0;
-    const gap = 4.0;
-    var x = 0.0;
-    while (x < size.width) {
-      canvas.drawLine(Offset(x, size.height / 2),
-          Offset((x + dash).clamp(0, size.width), size.height / 2), paint);
-      x += dash + gap;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _MetaItem extends StatelessWidget {
-  const _MetaItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-          ),
-          alignment: Alignment.center,
-          child: Icon(icon, size: 14, color: Colors.white.withValues(alpha: 0.7)),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white.withValues(alpha: 0.45),
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 1),
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  letterSpacing: -0.1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MetaDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 24,
-      color: Colors.white.withValues(alpha: 0.08),
-      margin: const EdgeInsets.symmetric(horizontal: 6),
     );
   }
 }
@@ -963,17 +945,6 @@ class _Actions extends StatelessWidget {
             title: l.parentActionStudentInfo,
             sub: l.parentActionStudentInfoSub,
             onTap: () => context.push(AppRoute.studentInfoFor(studentId)),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _ActionTile(
-            icon: Icons.show_chart,
-            iconColor: const Color(0xFFD97706),
-            iconBg: const Color(0xFFFEF3C7),
-            title: l.parentActionTripHistory,
-            sub: l.parentActionTripHistorySub,
-            onTap: () => context.push(AppRoute.studentTripsFor(studentId)),
           ),
         ),
         const SizedBox(width: 10),
@@ -1168,7 +1139,9 @@ class _HistoryRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '${trip.pickupStopName} → ${trip.dropoffStopName}',
+                  trip.tripType == 'Morning'
+                      ? l.tripHistoryMorningPickup
+                      : l.tripHistoryAfternoonDropoff,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -1202,46 +1175,51 @@ class _HistoryRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          _ResultTag(trip: trip, l: l),
+          _StatusTag(trip: trip, l: l),
         ],
       ),
     );
   }
 }
 
-class _ResultTag extends StatelessWidget {
-  const _ResultTag({required this.trip, required this.l});
+class _StatusTag extends StatelessWidget {
+  const _StatusTag({required this.trip, required this.l});
   final ChildTrip trip;
   final AppLocalizations l;
 
   @override
   Widget build(BuildContext context) {
-    final (icon, bg, fg, text) = switch (trip.resultTag) {
-      TripResultTag.onTime => (
-          Icons.check,
-          AppColors.emeraldSoft,
-          AppColors.emerald,
-          l.parentTagOnTime,
-        ),
-      TripResultTag.late => (
-          Icons.access_time,
-          const Color(0xFFFEF3C7),
-          const Color(0xFFD97706),
-          '+${trip.delayMinutes ?? 0} min',
-        ),
-      TripResultTag.absent => (
-          Icons.close,
-          const Color(0xFFFFE4E6),
-          const Color(0xFFE11D48),
-          l.parentTagAbsent,
-        ),
-      TripResultTag.pending => (
-          Icons.schedule,
-          AppColors.slate100,
-          AppColors.slate500,
-          l.parentTagPending,
-        ),
-    };
+    // Tag now reflects the current trip phase (or absence) instead of the
+    // on-time/late computed result, so parents see "On the bus" / "Arrived
+    // safely" / "Awaiting today" / "Absent" alongside the trip-type row.
+    final (IconData icon, Color bg, Color fg, String text) =
+        trip.boardingStatus == BoardingStatus.absent
+            ? (
+                Icons.close,
+                const Color(0xFFFFE4E6),
+                const Color(0xFFE11D48),
+                l.parentTagAbsent,
+              )
+            : switch (trip.tripPhase) {
+                TripPhase.completed => (
+                    Icons.check,
+                    AppColors.emeraldSoft,
+                    AppColors.emerald,
+                    l.parentStatusArrived,
+                  ),
+                TripPhase.inProgress => (
+                    Icons.directions_bus,
+                    const Color(0xFFFEF3C7),
+                    const Color(0xFFD97706),
+                    l.parentStatusOnBus,
+                  ),
+                TripPhase.scheduled => (
+                    Icons.schedule,
+                    AppColors.slate100,
+                    AppColors.slate500,
+                    l.parentStatusAwaiting,
+                  ),
+              };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1334,6 +1312,13 @@ String _firstName(String full) {
   return parts.isNotEmpty ? parts.first : full;
 }
 
+String _greetingForNow(AppLocalizations l) {
+  final hour = DateTime.now().hour;
+  if (hour < 12) return l.assistantGreetMorning;
+  if (hour < 18) return l.assistantGreetAfternoon;
+  return l.assistantGreetEvening;
+}
+
 String _hhmm(DateTime? dt) {
   if (dt == null) return '—';
   final local = dt.toLocal();
@@ -1389,21 +1374,54 @@ String _monthAbbrev(int month) {
   return months[month.clamp(1, 12)];
 }
 
-int? _liveEtaMinutes(LiveTracking? data) {
-  if (data == null) return null;
-  final bus = data.busLocation;
-  if (bus == null) return null;
-  if (data.homeLatitude == null || data.homeLongitude == null) return null;
-  final meters = _haversineMeters(
-    bus.latitude,
-    bus.longitude,
-    data.homeLatitude!,
-    data.homeLongitude!,
-  );
-  // Use reported speed when the bus is actually moving; otherwise assume an
-  // urban average of 30 km/h so the value still reflects something meaningful.
+class _RouteProgressData {
+  const _RouteProgressData({required this.fraction, required this.remainingMinutes});
+  final double fraction;
+  final int? remainingMinutes;
+}
+
+/// Resolves how far along the route the bus is plus how many minutes are left
+/// to the dropoff. Prefers the live GPS distance/speed; falls back to schedule
+/// timing when coords or pings are missing so the parent always sees a live
+/// readout while the trip is in progress.
+_RouteProgressData _computeRouteProgress(
+  ChildTrip trip,
+  LiveTracking? live,
+  bool isCompleted,
+) {
+  if (isCompleted) return const _RouteProgressData(fraction: 1.0, remainingMinutes: null);
+  // Schedule-based fallback used whenever live coords are unavailable.
+  _RouteProgressData scheduleFallback() {
+    final start = trip.actualDeparture ?? trip.scheduledDeparture;
+    final duration = trip.durationMinutes ?? 30;
+    final elapsedMin = DateTime.now().difference(start).inMinutes;
+    final fraction = (elapsedMin / duration).clamp(0.0, 1.0);
+    final remaining = (duration - elapsedMin).clamp(1, 999);
+    return _RouteProgressData(
+      fraction: fraction.toDouble(),
+      remainingMinutes: remaining,
+    );
+  }
+
+  if (live == null) return scheduleFallback();
+  final bus = live.busLocation;
+  // Pickup / dropoff coordinate pair flips with trip type.
+  final morning = trip.tripType == 'Morning';
+  final pickupLat = morning ? live.homeLatitude : live.schoolLatitude;
+  final pickupLng = morning ? live.homeLongitude : live.schoolLongitude;
+  final dropLat = morning ? live.schoolLatitude : live.homeLatitude;
+  final dropLng = morning ? live.schoolLongitude : live.homeLongitude;
+  if (bus == null ||
+      pickupLat == null || pickupLng == null ||
+      dropLat == null || dropLng == null) {
+    return scheduleFallback();
+  }
+  final total = _haversineMeters(pickupLat, pickupLng, dropLat, dropLng);
+  final remaining = _haversineMeters(bus.latitude, bus.longitude, dropLat, dropLng);
+  final fraction = total <= 1 ? 0.0 : (1 - remaining / total).clamp(0.0, 1.0);
   final mps = (bus.speed != null && bus.speed! > 1.0) ? bus.speed! : 30 * 1000 / 3600;
-  return (meters / mps / 60).round().clamp(0, 999);
+  final mins = (remaining / mps / 60).round().clamp(1, 999);
+  return _RouteProgressData(fraction: fraction.toDouble(), remainingMinutes: mins);
 }
 
 double _haversineMeters(double lat1, double lng1, double lat2, double lng2) {

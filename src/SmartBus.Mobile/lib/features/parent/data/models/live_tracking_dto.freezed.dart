@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LiveTrackingDto {
 
- String? get tripId; String? get tripStatus; String? get tripType; DateTime? get scheduledDeparture; DateTime? get actualDeparture; DateTime? get actualArrival; DateTime? get boardingTime; String? get boardingStatus; String? get busId; String? get busPlateNumber; BusLocationDto? get busLocation; String? get driverName; String? get driverPhone; String? get assistantName; String? get assistantPhone; String get studentFullName; double? get homeLatitude; double? get homeLongitude; String? get homeAddress; String? get schoolName;
+ String? get tripId; String? get tripStatus; String? get tripType; DateTime? get scheduledDeparture; DateTime? get actualDeparture; DateTime? get actualArrival; DateTime? get boardingTime; String? get boardingStatus; String? get busId; String? get busPlateNumber; BusLocationDto? get busLocation; String? get driverName; String? get driverPhone; String? get assistantName; String? get assistantPhone; String get studentFullName; double? get homeLatitude; double? get homeLongitude; String? get homeAddress; String? get schoolName; double? get schoolLatitude; double? get schoolLongitude;
 /// Create a copy of LiveTrackingDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $LiveTrackingDtoCopyWith<LiveTrackingDto> get copyWith => _$LiveTrackingDtoCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LiveTrackingDto&&(identical(other.tripId, tripId) || other.tripId == tripId)&&(identical(other.tripStatus, tripStatus) || other.tripStatus == tripStatus)&&(identical(other.tripType, tripType) || other.tripType == tripType)&&(identical(other.scheduledDeparture, scheduledDeparture) || other.scheduledDeparture == scheduledDeparture)&&(identical(other.actualDeparture, actualDeparture) || other.actualDeparture == actualDeparture)&&(identical(other.actualArrival, actualArrival) || other.actualArrival == actualArrival)&&(identical(other.boardingTime, boardingTime) || other.boardingTime == boardingTime)&&(identical(other.boardingStatus, boardingStatus) || other.boardingStatus == boardingStatus)&&(identical(other.busId, busId) || other.busId == busId)&&(identical(other.busPlateNumber, busPlateNumber) || other.busPlateNumber == busPlateNumber)&&(identical(other.busLocation, busLocation) || other.busLocation == busLocation)&&(identical(other.driverName, driverName) || other.driverName == driverName)&&(identical(other.driverPhone, driverPhone) || other.driverPhone == driverPhone)&&(identical(other.assistantName, assistantName) || other.assistantName == assistantName)&&(identical(other.assistantPhone, assistantPhone) || other.assistantPhone == assistantPhone)&&(identical(other.studentFullName, studentFullName) || other.studentFullName == studentFullName)&&(identical(other.homeLatitude, homeLatitude) || other.homeLatitude == homeLatitude)&&(identical(other.homeLongitude, homeLongitude) || other.homeLongitude == homeLongitude)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LiveTrackingDto&&(identical(other.tripId, tripId) || other.tripId == tripId)&&(identical(other.tripStatus, tripStatus) || other.tripStatus == tripStatus)&&(identical(other.tripType, tripType) || other.tripType == tripType)&&(identical(other.scheduledDeparture, scheduledDeparture) || other.scheduledDeparture == scheduledDeparture)&&(identical(other.actualDeparture, actualDeparture) || other.actualDeparture == actualDeparture)&&(identical(other.actualArrival, actualArrival) || other.actualArrival == actualArrival)&&(identical(other.boardingTime, boardingTime) || other.boardingTime == boardingTime)&&(identical(other.boardingStatus, boardingStatus) || other.boardingStatus == boardingStatus)&&(identical(other.busId, busId) || other.busId == busId)&&(identical(other.busPlateNumber, busPlateNumber) || other.busPlateNumber == busPlateNumber)&&(identical(other.busLocation, busLocation) || other.busLocation == busLocation)&&(identical(other.driverName, driverName) || other.driverName == driverName)&&(identical(other.driverPhone, driverPhone) || other.driverPhone == driverPhone)&&(identical(other.assistantName, assistantName) || other.assistantName == assistantName)&&(identical(other.assistantPhone, assistantPhone) || other.assistantPhone == assistantPhone)&&(identical(other.studentFullName, studentFullName) || other.studentFullName == studentFullName)&&(identical(other.homeLatitude, homeLatitude) || other.homeLatitude == homeLatitude)&&(identical(other.homeLongitude, homeLongitude) || other.homeLongitude == homeLongitude)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.schoolLatitude, schoolLatitude) || other.schoolLatitude == schoolLatitude)&&(identical(other.schoolLongitude, schoolLongitude) || other.schoolLongitude == schoolLongitude));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,tripId,tripStatus,tripType,scheduledDeparture,actualDeparture,actualArrival,boardingTime,boardingStatus,busId,busPlateNumber,busLocation,driverName,driverPhone,assistantName,assistantPhone,studentFullName,homeLatitude,homeLongitude,homeAddress,schoolName]);
+int get hashCode => Object.hashAll([runtimeType,tripId,tripStatus,tripType,scheduledDeparture,actualDeparture,actualArrival,boardingTime,boardingStatus,busId,busPlateNumber,busLocation,driverName,driverPhone,assistantName,assistantPhone,studentFullName,homeLatitude,homeLongitude,homeAddress,schoolName,schoolLatitude,schoolLongitude]);
 
 @override
 String toString() {
-  return 'LiveTrackingDto(tripId: $tripId, tripStatus: $tripStatus, tripType: $tripType, scheduledDeparture: $scheduledDeparture, actualDeparture: $actualDeparture, actualArrival: $actualArrival, boardingTime: $boardingTime, boardingStatus: $boardingStatus, busId: $busId, busPlateNumber: $busPlateNumber, busLocation: $busLocation, driverName: $driverName, driverPhone: $driverPhone, assistantName: $assistantName, assistantPhone: $assistantPhone, studentFullName: $studentFullName, homeLatitude: $homeLatitude, homeLongitude: $homeLongitude, homeAddress: $homeAddress, schoolName: $schoolName)';
+  return 'LiveTrackingDto(tripId: $tripId, tripStatus: $tripStatus, tripType: $tripType, scheduledDeparture: $scheduledDeparture, actualDeparture: $actualDeparture, actualArrival: $actualArrival, boardingTime: $boardingTime, boardingStatus: $boardingStatus, busId: $busId, busPlateNumber: $busPlateNumber, busLocation: $busLocation, driverName: $driverName, driverPhone: $driverPhone, assistantName: $assistantName, assistantPhone: $assistantPhone, studentFullName: $studentFullName, homeLatitude: $homeLatitude, homeLongitude: $homeLongitude, homeAddress: $homeAddress, schoolName: $schoolName, schoolLatitude: $schoolLatitude, schoolLongitude: $schoolLongitude)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $LiveTrackingDtoCopyWith<$Res>  {
   factory $LiveTrackingDtoCopyWith(LiveTrackingDto value, $Res Function(LiveTrackingDto) _then) = _$LiveTrackingDtoCopyWithImpl;
 @useResult
 $Res call({
- String? tripId, String? tripStatus, String? tripType, DateTime? scheduledDeparture, DateTime? actualDeparture, DateTime? actualArrival, DateTime? boardingTime, String? boardingStatus, String? busId, String? busPlateNumber, BusLocationDto? busLocation, String? driverName, String? driverPhone, String? assistantName, String? assistantPhone, String studentFullName, double? homeLatitude, double? homeLongitude, String? homeAddress, String? schoolName
+ String? tripId, String? tripStatus, String? tripType, DateTime? scheduledDeparture, DateTime? actualDeparture, DateTime? actualArrival, DateTime? boardingTime, String? boardingStatus, String? busId, String? busPlateNumber, BusLocationDto? busLocation, String? driverName, String? driverPhone, String? assistantName, String? assistantPhone, String studentFullName, double? homeLatitude, double? homeLongitude, String? homeAddress, String? schoolName, double? schoolLatitude, double? schoolLongitude
 });
 
 
@@ -65,7 +65,7 @@ class _$LiveTrackingDtoCopyWithImpl<$Res>
 
 /// Create a copy of LiveTrackingDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? tripId = freezed,Object? tripStatus = freezed,Object? tripType = freezed,Object? scheduledDeparture = freezed,Object? actualDeparture = freezed,Object? actualArrival = freezed,Object? boardingTime = freezed,Object? boardingStatus = freezed,Object? busId = freezed,Object? busPlateNumber = freezed,Object? busLocation = freezed,Object? driverName = freezed,Object? driverPhone = freezed,Object? assistantName = freezed,Object? assistantPhone = freezed,Object? studentFullName = null,Object? homeLatitude = freezed,Object? homeLongitude = freezed,Object? homeAddress = freezed,Object? schoolName = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? tripId = freezed,Object? tripStatus = freezed,Object? tripType = freezed,Object? scheduledDeparture = freezed,Object? actualDeparture = freezed,Object? actualArrival = freezed,Object? boardingTime = freezed,Object? boardingStatus = freezed,Object? busId = freezed,Object? busPlateNumber = freezed,Object? busLocation = freezed,Object? driverName = freezed,Object? driverPhone = freezed,Object? assistantName = freezed,Object? assistantPhone = freezed,Object? studentFullName = null,Object? homeLatitude = freezed,Object? homeLongitude = freezed,Object? homeAddress = freezed,Object? schoolName = freezed,Object? schoolLatitude = freezed,Object? schoolLongitude = freezed,}) {
   return _then(_self.copyWith(
 tripId: freezed == tripId ? _self.tripId : tripId // ignore: cast_nullable_to_non_nullable
 as String?,tripStatus: freezed == tripStatus ? _self.tripStatus : tripStatus // ignore: cast_nullable_to_non_nullable
@@ -87,7 +87,9 @@ as String,homeLatitude: freezed == homeLatitude ? _self.homeLatitude : homeLatit
 as double?,homeLongitude: freezed == homeLongitude ? _self.homeLongitude : homeLongitude // ignore: cast_nullable_to_non_nullable
 as double?,homeAddress: freezed == homeAddress ? _self.homeAddress : homeAddress // ignore: cast_nullable_to_non_nullable
 as String?,schoolName: freezed == schoolName ? _self.schoolName : schoolName // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,schoolLatitude: freezed == schoolLatitude ? _self.schoolLatitude : schoolLatitude // ignore: cast_nullable_to_non_nullable
+as double?,schoolLongitude: freezed == schoolLongitude ? _self.schoolLongitude : schoolLongitude // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 /// Create a copy of LiveTrackingDto
@@ -184,10 +186,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? tripId,  String? tripStatus,  String? tripType,  DateTime? scheduledDeparture,  DateTime? actualDeparture,  DateTime? actualArrival,  DateTime? boardingTime,  String? boardingStatus,  String? busId,  String? busPlateNumber,  BusLocationDto? busLocation,  String? driverName,  String? driverPhone,  String? assistantName,  String? assistantPhone,  String studentFullName,  double? homeLatitude,  double? homeLongitude,  String? homeAddress,  String? schoolName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? tripId,  String? tripStatus,  String? tripType,  DateTime? scheduledDeparture,  DateTime? actualDeparture,  DateTime? actualArrival,  DateTime? boardingTime,  String? boardingStatus,  String? busId,  String? busPlateNumber,  BusLocationDto? busLocation,  String? driverName,  String? driverPhone,  String? assistantName,  String? assistantPhone,  String studentFullName,  double? homeLatitude,  double? homeLongitude,  String? homeAddress,  String? schoolName,  double? schoolLatitude,  double? schoolLongitude)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LiveTrackingDto() when $default != null:
-return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDeparture,_that.actualDeparture,_that.actualArrival,_that.boardingTime,_that.boardingStatus,_that.busId,_that.busPlateNumber,_that.busLocation,_that.driverName,_that.driverPhone,_that.assistantName,_that.assistantPhone,_that.studentFullName,_that.homeLatitude,_that.homeLongitude,_that.homeAddress,_that.schoolName);case _:
+return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDeparture,_that.actualDeparture,_that.actualArrival,_that.boardingTime,_that.boardingStatus,_that.busId,_that.busPlateNumber,_that.busLocation,_that.driverName,_that.driverPhone,_that.assistantName,_that.assistantPhone,_that.studentFullName,_that.homeLatitude,_that.homeLongitude,_that.homeAddress,_that.schoolName,_that.schoolLatitude,_that.schoolLongitude);case _:
   return orElse();
 
 }
@@ -205,10 +207,10 @@ return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDepa
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? tripId,  String? tripStatus,  String? tripType,  DateTime? scheduledDeparture,  DateTime? actualDeparture,  DateTime? actualArrival,  DateTime? boardingTime,  String? boardingStatus,  String? busId,  String? busPlateNumber,  BusLocationDto? busLocation,  String? driverName,  String? driverPhone,  String? assistantName,  String? assistantPhone,  String studentFullName,  double? homeLatitude,  double? homeLongitude,  String? homeAddress,  String? schoolName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? tripId,  String? tripStatus,  String? tripType,  DateTime? scheduledDeparture,  DateTime? actualDeparture,  DateTime? actualArrival,  DateTime? boardingTime,  String? boardingStatus,  String? busId,  String? busPlateNumber,  BusLocationDto? busLocation,  String? driverName,  String? driverPhone,  String? assistantName,  String? assistantPhone,  String studentFullName,  double? homeLatitude,  double? homeLongitude,  String? homeAddress,  String? schoolName,  double? schoolLatitude,  double? schoolLongitude)  $default,) {final _that = this;
 switch (_that) {
 case _LiveTrackingDto():
-return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDeparture,_that.actualDeparture,_that.actualArrival,_that.boardingTime,_that.boardingStatus,_that.busId,_that.busPlateNumber,_that.busLocation,_that.driverName,_that.driverPhone,_that.assistantName,_that.assistantPhone,_that.studentFullName,_that.homeLatitude,_that.homeLongitude,_that.homeAddress,_that.schoolName);case _:
+return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDeparture,_that.actualDeparture,_that.actualArrival,_that.boardingTime,_that.boardingStatus,_that.busId,_that.busPlateNumber,_that.busLocation,_that.driverName,_that.driverPhone,_that.assistantName,_that.assistantPhone,_that.studentFullName,_that.homeLatitude,_that.homeLongitude,_that.homeAddress,_that.schoolName,_that.schoolLatitude,_that.schoolLongitude);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -225,10 +227,10 @@ return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDepa
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? tripId,  String? tripStatus,  String? tripType,  DateTime? scheduledDeparture,  DateTime? actualDeparture,  DateTime? actualArrival,  DateTime? boardingTime,  String? boardingStatus,  String? busId,  String? busPlateNumber,  BusLocationDto? busLocation,  String? driverName,  String? driverPhone,  String? assistantName,  String? assistantPhone,  String studentFullName,  double? homeLatitude,  double? homeLongitude,  String? homeAddress,  String? schoolName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? tripId,  String? tripStatus,  String? tripType,  DateTime? scheduledDeparture,  DateTime? actualDeparture,  DateTime? actualArrival,  DateTime? boardingTime,  String? boardingStatus,  String? busId,  String? busPlateNumber,  BusLocationDto? busLocation,  String? driverName,  String? driverPhone,  String? assistantName,  String? assistantPhone,  String studentFullName,  double? homeLatitude,  double? homeLongitude,  String? homeAddress,  String? schoolName,  double? schoolLatitude,  double? schoolLongitude)?  $default,) {final _that = this;
 switch (_that) {
 case _LiveTrackingDto() when $default != null:
-return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDeparture,_that.actualDeparture,_that.actualArrival,_that.boardingTime,_that.boardingStatus,_that.busId,_that.busPlateNumber,_that.busLocation,_that.driverName,_that.driverPhone,_that.assistantName,_that.assistantPhone,_that.studentFullName,_that.homeLatitude,_that.homeLongitude,_that.homeAddress,_that.schoolName);case _:
+return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDeparture,_that.actualDeparture,_that.actualArrival,_that.boardingTime,_that.boardingStatus,_that.busId,_that.busPlateNumber,_that.busLocation,_that.driverName,_that.driverPhone,_that.assistantName,_that.assistantPhone,_that.studentFullName,_that.homeLatitude,_that.homeLongitude,_that.homeAddress,_that.schoolName,_that.schoolLatitude,_that.schoolLongitude);case _:
   return null;
 
 }
@@ -240,7 +242,7 @@ return $default(_that.tripId,_that.tripStatus,_that.tripType,_that.scheduledDepa
 @JsonSerializable()
 
 class _LiveTrackingDto implements LiveTrackingDto {
-  const _LiveTrackingDto({this.tripId, this.tripStatus, this.tripType, this.scheduledDeparture, this.actualDeparture, this.actualArrival, this.boardingTime, this.boardingStatus, this.busId, this.busPlateNumber, this.busLocation, this.driverName, this.driverPhone, this.assistantName, this.assistantPhone, required this.studentFullName, this.homeLatitude, this.homeLongitude, this.homeAddress, this.schoolName});
+  const _LiveTrackingDto({this.tripId, this.tripStatus, this.tripType, this.scheduledDeparture, this.actualDeparture, this.actualArrival, this.boardingTime, this.boardingStatus, this.busId, this.busPlateNumber, this.busLocation, this.driverName, this.driverPhone, this.assistantName, this.assistantPhone, required this.studentFullName, this.homeLatitude, this.homeLongitude, this.homeAddress, this.schoolName, this.schoolLatitude, this.schoolLongitude});
   factory _LiveTrackingDto.fromJson(Map<String, dynamic> json) => _$LiveTrackingDtoFromJson(json);
 
 @override final  String? tripId;
@@ -263,6 +265,8 @@ class _LiveTrackingDto implements LiveTrackingDto {
 @override final  double? homeLongitude;
 @override final  String? homeAddress;
 @override final  String? schoolName;
+@override final  double? schoolLatitude;
+@override final  double? schoolLongitude;
 
 /// Create a copy of LiveTrackingDto
 /// with the given fields replaced by the non-null parameter values.
@@ -277,16 +281,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LiveTrackingDto&&(identical(other.tripId, tripId) || other.tripId == tripId)&&(identical(other.tripStatus, tripStatus) || other.tripStatus == tripStatus)&&(identical(other.tripType, tripType) || other.tripType == tripType)&&(identical(other.scheduledDeparture, scheduledDeparture) || other.scheduledDeparture == scheduledDeparture)&&(identical(other.actualDeparture, actualDeparture) || other.actualDeparture == actualDeparture)&&(identical(other.actualArrival, actualArrival) || other.actualArrival == actualArrival)&&(identical(other.boardingTime, boardingTime) || other.boardingTime == boardingTime)&&(identical(other.boardingStatus, boardingStatus) || other.boardingStatus == boardingStatus)&&(identical(other.busId, busId) || other.busId == busId)&&(identical(other.busPlateNumber, busPlateNumber) || other.busPlateNumber == busPlateNumber)&&(identical(other.busLocation, busLocation) || other.busLocation == busLocation)&&(identical(other.driverName, driverName) || other.driverName == driverName)&&(identical(other.driverPhone, driverPhone) || other.driverPhone == driverPhone)&&(identical(other.assistantName, assistantName) || other.assistantName == assistantName)&&(identical(other.assistantPhone, assistantPhone) || other.assistantPhone == assistantPhone)&&(identical(other.studentFullName, studentFullName) || other.studentFullName == studentFullName)&&(identical(other.homeLatitude, homeLatitude) || other.homeLatitude == homeLatitude)&&(identical(other.homeLongitude, homeLongitude) || other.homeLongitude == homeLongitude)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LiveTrackingDto&&(identical(other.tripId, tripId) || other.tripId == tripId)&&(identical(other.tripStatus, tripStatus) || other.tripStatus == tripStatus)&&(identical(other.tripType, tripType) || other.tripType == tripType)&&(identical(other.scheduledDeparture, scheduledDeparture) || other.scheduledDeparture == scheduledDeparture)&&(identical(other.actualDeparture, actualDeparture) || other.actualDeparture == actualDeparture)&&(identical(other.actualArrival, actualArrival) || other.actualArrival == actualArrival)&&(identical(other.boardingTime, boardingTime) || other.boardingTime == boardingTime)&&(identical(other.boardingStatus, boardingStatus) || other.boardingStatus == boardingStatus)&&(identical(other.busId, busId) || other.busId == busId)&&(identical(other.busPlateNumber, busPlateNumber) || other.busPlateNumber == busPlateNumber)&&(identical(other.busLocation, busLocation) || other.busLocation == busLocation)&&(identical(other.driverName, driverName) || other.driverName == driverName)&&(identical(other.driverPhone, driverPhone) || other.driverPhone == driverPhone)&&(identical(other.assistantName, assistantName) || other.assistantName == assistantName)&&(identical(other.assistantPhone, assistantPhone) || other.assistantPhone == assistantPhone)&&(identical(other.studentFullName, studentFullName) || other.studentFullName == studentFullName)&&(identical(other.homeLatitude, homeLatitude) || other.homeLatitude == homeLatitude)&&(identical(other.homeLongitude, homeLongitude) || other.homeLongitude == homeLongitude)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.schoolLatitude, schoolLatitude) || other.schoolLatitude == schoolLatitude)&&(identical(other.schoolLongitude, schoolLongitude) || other.schoolLongitude == schoolLongitude));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,tripId,tripStatus,tripType,scheduledDeparture,actualDeparture,actualArrival,boardingTime,boardingStatus,busId,busPlateNumber,busLocation,driverName,driverPhone,assistantName,assistantPhone,studentFullName,homeLatitude,homeLongitude,homeAddress,schoolName]);
+int get hashCode => Object.hashAll([runtimeType,tripId,tripStatus,tripType,scheduledDeparture,actualDeparture,actualArrival,boardingTime,boardingStatus,busId,busPlateNumber,busLocation,driverName,driverPhone,assistantName,assistantPhone,studentFullName,homeLatitude,homeLongitude,homeAddress,schoolName,schoolLatitude,schoolLongitude]);
 
 @override
 String toString() {
-  return 'LiveTrackingDto(tripId: $tripId, tripStatus: $tripStatus, tripType: $tripType, scheduledDeparture: $scheduledDeparture, actualDeparture: $actualDeparture, actualArrival: $actualArrival, boardingTime: $boardingTime, boardingStatus: $boardingStatus, busId: $busId, busPlateNumber: $busPlateNumber, busLocation: $busLocation, driverName: $driverName, driverPhone: $driverPhone, assistantName: $assistantName, assistantPhone: $assistantPhone, studentFullName: $studentFullName, homeLatitude: $homeLatitude, homeLongitude: $homeLongitude, homeAddress: $homeAddress, schoolName: $schoolName)';
+  return 'LiveTrackingDto(tripId: $tripId, tripStatus: $tripStatus, tripType: $tripType, scheduledDeparture: $scheduledDeparture, actualDeparture: $actualDeparture, actualArrival: $actualArrival, boardingTime: $boardingTime, boardingStatus: $boardingStatus, busId: $busId, busPlateNumber: $busPlateNumber, busLocation: $busLocation, driverName: $driverName, driverPhone: $driverPhone, assistantName: $assistantName, assistantPhone: $assistantPhone, studentFullName: $studentFullName, homeLatitude: $homeLatitude, homeLongitude: $homeLongitude, homeAddress: $homeAddress, schoolName: $schoolName, schoolLatitude: $schoolLatitude, schoolLongitude: $schoolLongitude)';
 }
 
 
@@ -297,7 +301,7 @@ abstract mixin class _$LiveTrackingDtoCopyWith<$Res> implements $LiveTrackingDto
   factory _$LiveTrackingDtoCopyWith(_LiveTrackingDto value, $Res Function(_LiveTrackingDto) _then) = __$LiveTrackingDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String? tripId, String? tripStatus, String? tripType, DateTime? scheduledDeparture, DateTime? actualDeparture, DateTime? actualArrival, DateTime? boardingTime, String? boardingStatus, String? busId, String? busPlateNumber, BusLocationDto? busLocation, String? driverName, String? driverPhone, String? assistantName, String? assistantPhone, String studentFullName, double? homeLatitude, double? homeLongitude, String? homeAddress, String? schoolName
+ String? tripId, String? tripStatus, String? tripType, DateTime? scheduledDeparture, DateTime? actualDeparture, DateTime? actualArrival, DateTime? boardingTime, String? boardingStatus, String? busId, String? busPlateNumber, BusLocationDto? busLocation, String? driverName, String? driverPhone, String? assistantName, String? assistantPhone, String studentFullName, double? homeLatitude, double? homeLongitude, String? homeAddress, String? schoolName, double? schoolLatitude, double? schoolLongitude
 });
 
 
@@ -314,7 +318,7 @@ class __$LiveTrackingDtoCopyWithImpl<$Res>
 
 /// Create a copy of LiveTrackingDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? tripId = freezed,Object? tripStatus = freezed,Object? tripType = freezed,Object? scheduledDeparture = freezed,Object? actualDeparture = freezed,Object? actualArrival = freezed,Object? boardingTime = freezed,Object? boardingStatus = freezed,Object? busId = freezed,Object? busPlateNumber = freezed,Object? busLocation = freezed,Object? driverName = freezed,Object? driverPhone = freezed,Object? assistantName = freezed,Object? assistantPhone = freezed,Object? studentFullName = null,Object? homeLatitude = freezed,Object? homeLongitude = freezed,Object? homeAddress = freezed,Object? schoolName = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? tripId = freezed,Object? tripStatus = freezed,Object? tripType = freezed,Object? scheduledDeparture = freezed,Object? actualDeparture = freezed,Object? actualArrival = freezed,Object? boardingTime = freezed,Object? boardingStatus = freezed,Object? busId = freezed,Object? busPlateNumber = freezed,Object? busLocation = freezed,Object? driverName = freezed,Object? driverPhone = freezed,Object? assistantName = freezed,Object? assistantPhone = freezed,Object? studentFullName = null,Object? homeLatitude = freezed,Object? homeLongitude = freezed,Object? homeAddress = freezed,Object? schoolName = freezed,Object? schoolLatitude = freezed,Object? schoolLongitude = freezed,}) {
   return _then(_LiveTrackingDto(
 tripId: freezed == tripId ? _self.tripId : tripId // ignore: cast_nullable_to_non_nullable
 as String?,tripStatus: freezed == tripStatus ? _self.tripStatus : tripStatus // ignore: cast_nullable_to_non_nullable
@@ -336,7 +340,9 @@ as String,homeLatitude: freezed == homeLatitude ? _self.homeLatitude : homeLatit
 as double?,homeLongitude: freezed == homeLongitude ? _self.homeLongitude : homeLongitude // ignore: cast_nullable_to_non_nullable
 as double?,homeAddress: freezed == homeAddress ? _self.homeAddress : homeAddress // ignore: cast_nullable_to_non_nullable
 as String?,schoolName: freezed == schoolName ? _self.schoolName : schoolName // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,schoolLatitude: freezed == schoolLatitude ? _self.schoolLatitude : schoolLatitude // ignore: cast_nullable_to_non_nullable
+as double?,schoolLongitude: freezed == schoolLongitude ? _self.schoolLongitude : schoolLongitude // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 

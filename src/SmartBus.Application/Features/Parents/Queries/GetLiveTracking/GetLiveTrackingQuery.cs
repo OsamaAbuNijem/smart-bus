@@ -31,7 +31,9 @@ public record LiveTrackingDto(
     double? HomeLatitude,
     double? HomeLongitude,
     string? HomeAddress,
-    string? SchoolName);
+    string? SchoolName,
+    double? SchoolLatitude,
+    double? SchoolLongitude);
 
 public record BusLocationDto(
     double Latitude,

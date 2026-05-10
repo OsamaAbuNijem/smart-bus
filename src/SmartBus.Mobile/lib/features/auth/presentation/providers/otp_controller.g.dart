@@ -6,7 +6,7 @@ part of 'otp_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$otpControllerHash() => r'ed934e1212275a0ad71e4ccd42259cc612474104';
+String _$otpControllerHash() => r'66e9889d45ccad01023c88e835f1b78edaa4e479';
 
 /// See also [OtpController].
 @ProviderFor(OtpController)

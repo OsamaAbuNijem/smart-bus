@@ -24,28 +24,28 @@ class TripHistoryScreen extends ConsumerWidget {
         children: [
           _Hero(childName: childName, l: l),
           Expanded(
-            child: Container(
-              transform: Matrix4.translationValues(0, -12, 0),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFAFAFA),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: tripsAsync.when(
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: _ErrorBox(message: e.toString())),
-                data: (trips) {
-                  if (trips.isEmpty) {
-                    return _Empty(l: l);
-                  }
-                  return RefreshIndicator(
-                    color: AppColors.yellowDeep,
-                    onRefresh: () async =>
-                        ref.invalidate(tripHistoryProvider(studentId)),
-                    child: _GroupedList(trips: trips, l: l),
-                  );
-                },
-              ),
+            child: tripsAsync.when(
+              loading: () =>
+                  const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: _ErrorBox(message: e.toString())),
+              data: (trips) {
+                // Show only the trailing 7-day window so the page matches its
+                // "This Week" header and the last-7 hero subtitle.
+                final cutoff = DateTime.now()
+                    .subtract(const Duration(days: 7));
+                final recent = trips
+                    .where((t) => t.tripDate.toLocal().isAfter(cutoff))
+                    .toList();
+                if (recent.isEmpty) {
+                  return _Empty(l: l);
+                }
+                return RefreshIndicator(
+                  color: AppColors.yellowDeep,
+                  onRefresh: () async =>
+                      ref.invalidate(tripHistoryProvider(studentId)),
+                  child: _GroupedList(trips: recent, l: l),
+                );
+              },
             ),
           ),
         ],
@@ -63,132 +63,83 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final today = DateTime.now();
-    final start = today.subtract(const Duration(days: 6));
-    final range = '${_monShort(start.month)} ${start.day} — ${_monShort(today.month)} ${today.day}';
-
     return SafeArea(
       bottom: false,
       child: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A0A0A), Color(0xFF1A1F2E), Color(0xFF0F172A)],
-          ),
+          color: Colors.white,
+          border: Border(bottom: BorderSide(color: AppColors.slate100)),
         ),
-        padding: const EdgeInsets.fromLTRB(18, 6, 18, 28),
-        child: Column(
+        padding: const EdgeInsets.fromLTRB(14, 6, 14, 12),
+        child: Row(
           children: [
-            Row(
-              children: [
-                _DarkIconBtn(
-                  icon: Directionality.of(context) == TextDirection.rtl
-                      ? Icons.arrow_forward
-                      : Icons.arrow_back,
-                  onTap: () => context.pop(),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      childName.isEmpty ? '' : childName,
+            _LightIconBtn(
+              icon: Directionality.of(context) == TextDirection.rtl
+                  ? Icons.arrow_forward
+                  : Icons.arrow_back,
+              onTap: () => context.pop(),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    l.tripHistoryTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.4,
+                      height: 1.15,
+                    ),
+                  ),
+                  if (childName.isNotEmpty) ...[
+                    const SizedBox(height: 1),
+                    Text(
+                      childName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white.withValues(alpha: 0.5),
-                        letterSpacing: 1.4,
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.slate500,
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 36),
-              ],
+                  ],
+                ],
+              ),
             ),
-            const SizedBox(height: 14),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        l.tripHistoryTitle,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: -0.7,
-                          height: 1.1,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: [
-                          Text(
-                            l.tripHistoryLast7,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white.withValues(alpha: 0.6),
-                            ),
-                          ),
-                          Container(
-                            width: 3,
-                            height: 3,
-                            margin: const EdgeInsets.symmetric(horizontal: 6),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.35),
-                            ),
-                          ),
-                          Text(
-                            range,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white.withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.yellowTint,
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(color: const Color(0x66F5C518)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    size: 11,
+                    color: AppColors.yellowDeep,
                   ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.yellow.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(
-                      color: AppColors.yellow.withValues(alpha: 0.30),
+                  const SizedBox(width: 5),
+                  Text(
+                    l.tripHistoryThisWeek,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.yellowDeep,
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.calendar_today_outlined,
-                        size: 11,
-                        color: Color(0xFFFCD34D),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        l.tripHistoryThisWeek,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFFFCD34D),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -197,26 +148,27 @@ class _Hero extends StatelessWidget {
   }
 }
 
-class _DarkIconBtn extends StatelessWidget {
-  const _DarkIconBtn({required this.icon, this.onTap});
+class _LightIconBtn extends StatelessWidget {
+  const _LightIconBtn({required this.icon, this.onTap});
   final IconData icon;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.08),
+      color: AppColors.slate50,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(11),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+        side: const BorderSide(color: AppColors.slate100),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(11),
         onTap: onTap,
         child: SizedBox(
-          width: 36,
-          height: 36,
-          child: Center(child: Icon(icon, size: 15, color: Colors.white)),
+          width: 38,
+          height: 38,
+          child:
+              Center(child: Icon(icon, size: 17, color: AppColors.slate700)),
         ),
       ),
     );
@@ -294,38 +246,24 @@ class _DayHeader extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
             padding: const EdgeInsets.symmetric(horizontal: 9),
             decoration: BoxDecoration(
-              gradient: isToday
-                  ? const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppColors.yellow, AppColors.yellowDeep],
-                    )
-                  : null,
-              color: isToday ? null : Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: isToday
-                  ? null
-                  : Border.all(color: AppColors.slate200),
-              boxShadow: isToday
-                  ? [
-                      BoxShadow(
-                        color: AppColors.yellow.withValues(alpha: 0.5),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : AppShadows.sm,
+              color: isToday ? AppColors.yellowTint : Colors.white,
+              borderRadius: BorderRadius.circular(9),
+              border: Border.all(
+                color: isToday
+                    ? const Color(0x66F5C518)
+                    : AppColors.slate200,
+              ),
             ),
             alignment: Alignment.center,
             child: Text(
               '$dayNumber',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
-                color: AppColors.ink,
+                color: isToday ? AppColors.yellowDeep : AppColors.ink,
                 letterSpacing: -0.4,
               ),
             ),
@@ -482,32 +420,36 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (bg, fg, border, text) = switch (trip.resultTag) {
-      TripResultTag.onTime => (
-          AppColors.emeraldSoft,
-          AppColors.emerald,
-          const Color(0xFFA7F3D0),
-          l.tripHistoryOnTime,
-        ),
-      TripResultTag.late => (
-          const Color(0xFFFEF3C7),
-          const Color(0xFFD97706),
-          const Color(0xFFFDE68A),
-          l.tripHistoryLateMinutes(trip.delayMinutes ?? 0),
-        ),
-      TripResultTag.absent => (
-          const Color(0xFFFFE4E6),
-          const Color(0xFFE11D48),
-          const Color(0xFFFECDD3),
-          l.tripHistoryAbsent,
-        ),
-      TripResultTag.pending => (
-          AppColors.slate100,
-          AppColors.slate500,
-          AppColors.slate200,
-          l.tripHistoryPending,
-        ),
-    };
+    // Reflect the trip's current phase (or absence) so this matches the
+    // recent-trips rows on the parent home page.
+    final (Color bg, Color fg, Color border, String text) =
+        trip.boardingStatus == BoardingStatus.absent
+            ? (
+                const Color(0xFFFFE4E6),
+                const Color(0xFFE11D48),
+                const Color(0xFFFECDD3),
+                l.parentTagAbsent,
+              )
+            : switch (trip.tripPhase) {
+                TripPhase.completed => (
+                    AppColors.emeraldSoft,
+                    AppColors.emerald,
+                    const Color(0xFFA7F3D0),
+                    l.parentStatusArrived,
+                  ),
+                TripPhase.inProgress => (
+                    const Color(0xFFFEF3C7),
+                    const Color(0xFFD97706),
+                    const Color(0xFFFDE68A),
+                    l.parentStatusOnBus,
+                  ),
+                TripPhase.scheduled => (
+                    AppColors.slate100,
+                    AppColors.slate500,
+                    AppColors.slate200,
+                    l.parentStatusAwaiting,
+                  ),
+              };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -600,35 +542,17 @@ class _CrewPerson extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = isDriver
-        ? (
-            const LinearGradient(
-              colors: [Color(0xFFDBEAFE), Color(0xFF93C5FD)],
-            ),
-            const Color(0xFF1E40AF),
-          )
-        : (
-            const LinearGradient(
-              colors: [Color(0xFFFEF3C7), Color(0xFFFCD34D)],
-            ),
-            const Color(0xFF92400E),
-          );
+        ? (AppColors.blueSoft, AppColors.blue)
+        : (const Color(0xFFFEF3C7), const Color(0xFFD97706));
 
     return Row(
       children: [
         Container(
-          width: 28,
-          height: 28,
+          width: 26,
+          height: 26,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: bg,
-            border: Border.all(color: Colors.white, width: 1.5),
-            boxShadow: const [
-              BoxShadow(
-                color: AppColors.slate200,
-                blurRadius: 0,
-                spreadRadius: 1.5,
-              ),
-            ],
+            color: bg,
           ),
           alignment: Alignment.center,
           child: Text(

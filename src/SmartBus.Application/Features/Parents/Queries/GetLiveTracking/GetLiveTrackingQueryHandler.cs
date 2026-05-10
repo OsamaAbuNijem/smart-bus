@@ -35,12 +35,16 @@ public class GetLiveTrackingQueryHandler
             return Result<LiveTrackingDto>.Failure("الطالب غير موجود لهذا الولي.");
 
         string? schoolName = null;
+        double? schoolLat = null, schoolLng = null;
         if (Guid.TryParse(student.SchoolId, out var schoolGuid))
         {
-            schoolName = await _db.Schools
+            var school = await _db.Schools
                 .Where(sc => sc.Id == schoolGuid)
-                .Select(sc => sc.Name)
+                .Select(sc => new { sc.Name, sc.Latitude, sc.Longitude })
                 .FirstOrDefaultAsync(ct);
+            schoolName = school?.Name;
+            schoolLat = school?.Latitude;
+            schoolLng = school?.Longitude;
         }
 
         var addressParts = new[]
@@ -79,7 +83,9 @@ public class GetLiveTrackingQueryHandler
                 HomeLatitude: student.Latitude,
                 HomeLongitude: student.Longitude,
                 HomeAddress: homeAddress,
-                SchoolName: schoolName));
+                SchoolName: schoolName,
+                SchoolLatitude: schoolLat,
+                SchoolLongitude: schoolLng));
         }
 
         var trip = st.Trip;
@@ -148,6 +154,8 @@ public class GetLiveTrackingQueryHandler
             HomeLatitude: student.Latitude,
             HomeLongitude: student.Longitude,
             HomeAddress: homeAddress,
-            SchoolName: schoolName));
+            SchoolName: schoolName,
+            SchoolLatitude: schoolLat,
+            SchoolLongitude: schoolLng));
     }
 }

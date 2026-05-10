@@ -25,6 +25,8 @@ abstract class LiveTracking with _$LiveTracking {
     double? homeLongitude,
     String? homeAddress,
     String? schoolName,
+    double? schoolLatitude,
+    double? schoolLongitude,
   }) = _LiveTracking;
 }
 

@@ -23,7 +23,7 @@ class LiveTrackingScreen extends ConsumerWidget {
     final tracking = ref.watch(liveTrackingControllerProvider(studentId));
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: const Color(0xFFFAFAFA),
       body: tracking.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => _ErrorScreen(message: e.toString(), l: l),
@@ -68,23 +68,26 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
     super.dispose();
   }
 
-  LatLng? get _busLatLng {
-    final l = widget.data.busLocation;
-    if (l == null) return null;
-    return LatLng(l.latitude, l.longitude);
-  }
-
   LatLng? get _homeLatLng {
     final d = widget.data;
     if (d.homeLatitude == null || d.homeLongitude == null) return null;
     return LatLng(d.homeLatitude!, d.homeLongitude!);
   }
 
+  LatLng? get _schoolLatLng {
+    final d = widget.data;
+    if (d.schoolLatitude == null || d.schoolLongitude == null) return null;
+    return LatLng(d.schoolLatitude!, d.schoolLongitude!);
+  }
+
+  LatLng? get _destinationLatLng => _destination(widget.data);
+  LatLng? get _displayBusLatLng => _displayBus(widget.data);
+
   void _recenter() {
-    final bus = _busLatLng;
-    final home = _homeLatLng;
-    if (bus != null && home != null) {
-      final bounds = LatLngBounds.fromPoints([bus, home]);
+    final bus = _displayBusLatLng;
+    final dest = _destinationLatLng;
+    if (bus != null && dest != null) {
+      final bounds = LatLngBounds.fromPoints([bus, dest]);
       _mapController.fitCamera(
         CameraFit.bounds(
           bounds: bounds,
@@ -93,8 +96,8 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
       );
     } else if (bus != null) {
       _mapController.move(bus, 15);
-    } else if (home != null) {
-      _mapController.move(home, 14);
+    } else if (dest != null) {
+      _mapController.move(dest, 14);
     }
   }
 
@@ -117,12 +120,15 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
             children: [
               _Map(
                 controller: _mapController,
-                bus: _busLatLng,
+                bus: _displayBusLatLng,
                 home: _homeLatLng,
+                school: _schoolLatLng,
+                destination: _destinationLatLng,
                 busLabel: data.busPlateNumber == null
                     ? null
                     : 'Bus #${data.busPlateNumber}',
                 homeLabel: l.liveTrackingHome,
+                schoolLabel: l.driverSchoolPin,
               ),
               Positioned(
                 top: 14,
@@ -163,181 +169,61 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final etaMinutes = _etaMinutes(data);
-    final isInProgress = (data.tripStatus ?? '').toLowerCase() == 'inprogress';
-
     return SafeArea(
       bottom: false,
       child: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A0A0A), Color(0xFF1A1F2E), Color(0xFF0F172A)],
-          ),
+          color: Colors.white,
+          border: Border(bottom: BorderSide(color: AppColors.slate100)),
         ),
-        padding: const EdgeInsets.fromLTRB(18, 6, 18, 14),
-        child: Column(
+        padding: const EdgeInsets.fromLTRB(14, 6, 14, 12),
+        child: Row(
           children: [
-            Row(
-              children: [
-                _DarkIconBtn(
-                  icon: Directionality.of(context) == TextDirection.rtl
-                      ? Icons.arrow_forward
-                      : Icons.arrow_back,
-                  onTap: () => context.pop(),
-                ),
-                Expanded(
-                  child: Column(
+            _LightIconBtn(
+              icon: Directionality.of(context) == TextDirection.rtl
+                  ? Icons.arrow_forward
+                  : Icons.arrow_back,
+              onTap: () => context.pop(),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const _LivePulse(),
-                          const SizedBox(width: 5),
-                          Text(
-                            l.liveTrackingLive.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF6EE7B7),
-                              letterSpacing: 1.6,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 1),
+                      const _LivePulse(color: AppColors.emerald),
+                      const SizedBox(width: 5),
                       Text(
-                        data.studentFullName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        l.liveTrackingLive.toUpperCase(),
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: -0.3,
-                          height: 1.1,
+                          color: AppColors.emerald,
+                          letterSpacing: 1.4,
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 36),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // ETA bar
-            Container(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(11),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [AppColors.yellow, AppColors.yellowDeep],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.yellow.withValues(alpha: 0.55),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.directions_bus,
-                      size: 18,
+                  const SizedBox(height: 2),
+                  Text(
+                    data.studentFullName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.ink,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _onTheWayLabel(data, l),
-                          style: TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white.withValues(alpha: 0.55),
-                            letterSpacing: 0.7,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              etaMinutes == null ? '—' : '$etaMinutes',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: -0.4,
-                                height: 1,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              data.busPlateNumber == null
-                                  ? l.liveTrackingMin
-                                  : '${l.liveTrackingMin} · #${data.busPlateNumber}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withValues(alpha: 0.55),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.18),
-                      border: Border.all(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.30),
-                      ),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const _LivePulse(),
-                        const SizedBox(width: 5),
-                        Text(
-                          isInProgress
-                              ? l.liveTrackingOnTime
-                              : (data.tripStatus ?? '—'),
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF6EE7B7),
-                          ),
-                        ),
-                      ],
+                      letterSpacing: -0.3,
+                      height: 1.1,
                     ),
                   ),
                 ],
               ),
             ),
+            if (etaMinutes != null) _EtaPill(minutes: etaMinutes),
           ],
         ),
       ),
@@ -345,8 +231,69 @@ class _Hero extends StatelessWidget {
   }
 }
 
+class _EtaPill extends StatelessWidget {
+  const _EtaPill({required this.minutes});
+  final int minutes;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppColors.yellowTint,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: const Color(0x66F5C518)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.directions_bus,
+              size: 13, color: AppColors.yellowDeep),
+          const SizedBox(width: 5),
+          Text(
+            '$minutes min',
+            style: const TextStyle(
+              color: AppColors.yellowDeep,
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LightIconBtn extends StatelessWidget {
+  const _LightIconBtn({required this.icon, required this.onTap});
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.slate50,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(11),
+        side: const BorderSide(color: AppColors.slate100),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(11),
+        onTap: onTap,
+        child: SizedBox(
+          width: 38,
+          height: 38,
+          child: Center(
+              child: Icon(icon, size: 17, color: AppColors.slate700)),
+        ),
+      ),
+    );
+  }
+}
+
 class _LivePulse extends StatefulWidget {
-  const _LivePulse();
+  const _LivePulse({this.color = AppColors.emerald});
+  final Color color;
   @override
   State<_LivePulse> createState() => _LivePulseState();
 }
@@ -376,10 +323,10 @@ class _LivePulseState extends State<_LivePulse>
           height: 6,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: const Color(0xFF34D399),
+            color: widget.color,
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF34D399).withValues(alpha: 0.55 * opacity),
+                color: widget.color.withValues(alpha: 0.55 * opacity),
                 blurRadius: 0,
                 spreadRadius: spread,
               ),
@@ -391,32 +338,6 @@ class _LivePulseState extends State<_LivePulse>
   }
 }
 
-class _DarkIconBtn extends StatelessWidget {
-  const _DarkIconBtn({required this.icon, required this.onTap});
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.08),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(11),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(11),
-        onTap: onTap,
-        child: SizedBox(
-          width: 36,
-          height: 36,
-          child: Center(child: Icon(icon, size: 15, color: Colors.white)),
-        ),
-      ),
-    );
-  }
-}
-
 // ─── Map ───────────────────────────────────────────────────────────
 
 class _Map extends ConsumerWidget {
@@ -424,29 +345,39 @@ class _Map extends ConsumerWidget {
     required this.controller,
     required this.bus,
     required this.home,
+    required this.school,
+    required this.destination,
     required this.busLabel,
     required this.homeLabel,
+    required this.schoolLabel,
   });
   final MapController controller;
   final LatLng? bus;
   final LatLng? home;
+  final LatLng? school;
+  // Active destination — school in morning trips, home in return trips.
+  final LatLng? destination;
   final String? busLabel;
   final String homeLabel;
+  final String schoolLabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final initialCenter = bus ?? home ?? const LatLng(31.95, 35.93); // Amman fallback
-    final initialZoom = bus != null && home != null ? 13.0 : 14.0;
+    final initialCenter =
+        bus ?? destination ?? home ?? school ?? const LatLng(31.95, 35.93);
+    final initialZoom = bus != null && destination != null ? 13.0 : 14.0;
 
-    // Fetch a street-following route between bus and home. Snap to ~111m
-    // grid so small bus movements reuse the cached path.
-    List<LatLng> linePoints = (bus != null && home != null) ? [bus!, home!] : const [];
-    if (bus != null && home != null) {
+    // Fetch a street-following route between bus and the active destination
+    // (school for morning, home for return). Snap to ~111m grid so small bus
+    // movements reuse the cached path.
+    List<LatLng> linePoints =
+        (bus != null && destination != null) ? [bus!, destination!] : const [];
+    if (bus != null && destination != null) {
       final routed = ref.watch(routedPathProvider(
         fromLat: bus!.latitude.roundForRoute,
         fromLng: bus!.longitude.roundForRoute,
-        toLat: home!.latitude.roundForRoute,
-        toLng: home!.longitude.roundForRoute,
+        toLat: destination!.latitude.roundForRoute,
+        toLng: destination!.longitude.roundForRoute,
       ));
       final routedList = routed.valueOrNull;
       if (routedList != null && routedList.length >= 2) {
@@ -493,6 +424,18 @@ class _Map extends ConsumerWidget {
                   label: homeLabel,
                   color: const Color(0xFFE11D48),
                   icon: Icons.home_filled,
+                ),
+              ),
+            if (school != null)
+              Marker(
+                point: school!,
+                width: 80,
+                height: 70,
+                alignment: Alignment.bottomCenter,
+                child: _PinWithLabel(
+                  label: schoolLabel,
+                  color: AppColors.blue,
+                  icon: Icons.school,
                 ),
               ),
             if (bus != null)
@@ -768,51 +711,25 @@ class _Sheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final lastUpdated = data.busLocation?.timestamp;
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 30,
-            offset: const Offset(0, -10),
-          ),
-        ],
+        border: Border(top: BorderSide(color: AppColors.slate100)),
       ),
-      padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
       child: SafeArea(
         top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 38,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: AppColors.slate200,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
             _Stats(data: data, l: l),
             const SizedBox(height: 12),
             _CrewCard(data: data, l: l),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xFF34D399),
-                    boxShadow: [
-                      BoxShadow(color: Color(0xFF34D399), blurRadius: 6),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 5),
+                const _LivePulse(color: AppColors.emerald),
+                const SizedBox(width: 6),
                 Text(
                   l.liveTrackingLastUpdated(_relativeTime(lastUpdated, l)),
                   style: const TextStyle(
@@ -842,7 +759,7 @@ class _Stats extends StatelessWidget {
         : (data.busLocation!.speed! * 3.6).round();
     final distance = _kmDistance(data);
     final boardingTime = data.boardingTime;
-    final arrival = data.actualArrival;
+    final etaMin = _etaMinutes(data);
 
     return Column(
       children: [
@@ -878,7 +795,7 @@ class _Stats extends StatelessWidget {
           children: [
             Expanded(
               child: _StatTile(
-                icon: Icons.access_time,
+                icon: Icons.speed,
                 bg: AppColors.violetSoft,
                 fg: AppColors.violet,
                 border: const Color(0xFFDDD6FE),
@@ -895,8 +812,8 @@ class _Stats extends StatelessWidget {
                 fg: AppColors.emerald,
                 border: const Color(0xFFA7F3D0),
                 label: l.liveTrackingArrives,
-                value: _hhmm(arrival),
-                unit: _ampm(arrival),
+                value: etaMin == null ? '—' : _etaRange(etaMin),
+                unit: etaMin == null ? '' : 'min',
               ),
             ),
           ],
@@ -1292,32 +1209,89 @@ String _ampm(DateTime? dt) {
   return dt.toLocal().hour >= 12 ? 'PM' : 'AM';
 }
 
-String _onTheWayLabel(LiveTracking data, AppLocalizations l) {
-  return data.tripType?.toLowerCase() == 'morning'
-      ? l.liveTrackingOnTheWaySchool
-      : l.liveTrackingOnTheWayHome;
-}
-
 int? _etaMinutes(LiveTracking data) {
-  // Rough ETA: distance / 30km/h average if no other signal.
+  // Rough ETA: distance to the active destination / GPS speed when known,
+  // otherwise a 30 km/h urban average.
   final speed = data.busLocation?.speed; // m/s
   final dist = _meters(data); // meters
   if (dist == null) return null;
   final mps = (speed != null && speed > 1.0) ? speed : 30 * 1000 / 3600;
   final secs = dist / mps;
-  return (secs / 60).round().clamp(0, 999);
+  return (secs / 60).round().clamp(1, 999);
+}
+
+/// Spreads a single ETA estimate into a short range that reflects normal
+/// urban variability — roughly ±15-20%, snapped to whole minutes, with a
+/// minimum spread of 2 min so it always reads as a range.
+String _etaRange(int mins) {
+  final low = math.max(1, (mins * 0.85).round());
+  var high = (mins * 1.20).round() + 1;
+  if (high - low < 2) high = low + 2;
+  return '$low-$high';
+}
+
+LatLng? _pickup(LiveTracking data) {
+  final morning = data.tripType?.toLowerCase() == 'morning';
+  if (morning) {
+    if (data.homeLatitude != null && data.homeLongitude != null) {
+      return LatLng(data.homeLatitude!, data.homeLongitude!);
+    }
+  } else {
+    if (data.schoolLatitude != null && data.schoolLongitude != null) {
+      return LatLng(data.schoolLatitude!, data.schoolLongitude!);
+    }
+  }
+  return null;
+}
+
+LatLng? _destination(LiveTracking data) {
+  final morning = data.tripType?.toLowerCase() == 'morning';
+  if (morning) {
+    if (data.schoolLatitude != null && data.schoolLongitude != null) {
+      return LatLng(data.schoolLatitude!, data.schoolLongitude!);
+    }
+    if (data.homeLatitude != null && data.homeLongitude != null) {
+      return LatLng(data.homeLatitude!, data.homeLongitude!);
+    }
+  } else {
+    if (data.homeLatitude != null && data.homeLongitude != null) {
+      return LatLng(data.homeLatitude!, data.homeLongitude!);
+    }
+    if (data.schoolLatitude != null && data.schoolLongitude != null) {
+      return LatLng(data.schoolLatitude!, data.schoolLongitude!);
+    }
+  }
+  return null;
+}
+
+/// Best-effort bus position: real GPS when available, otherwise interpolate
+/// along the pickup → destination line using the trip's elapsed time.
+LatLng? _displayBus(LiveTracking data) {
+  final bus = data.busLocation;
+  if (bus != null) return LatLng(bus.latitude, bus.longitude);
+  final pickup = _pickup(data);
+  final dest = _destination(data);
+  if (pickup == null || dest == null) return null;
+  final status = data.tripStatus?.toLowerCase();
+  if (status == 'completed') return dest;
+  if (status == 'scheduled') return pickup;
+  final start = data.actualDeparture ?? data.scheduledDeparture;
+  if (start == null) return pickup;
+  final end = data.actualArrival ?? start.add(const Duration(minutes: 30));
+  final totalSec = end.difference(start).inSeconds;
+  final elapsedSec = DateTime.now().difference(start).inSeconds;
+  final f = totalSec <= 0 ? 0.5 : (elapsedSec / totalSec).clamp(0.0, 1.0);
+  return LatLng(
+    pickup.latitude + (dest.latitude - pickup.latitude) * f,
+    pickup.longitude + (dest.longitude - pickup.longitude) * f,
+  );
 }
 
 double? _meters(LiveTracking data) {
-  final bus = data.busLocation;
-  if (bus == null) return null;
-  if (data.homeLatitude == null || data.homeLongitude == null) return null;
-  return _haversine(
-    bus.latitude,
-    bus.longitude,
-    data.homeLatitude!,
-    data.homeLongitude!,
-  );
+  final bus = _displayBus(data);
+  final dest = _destination(data);
+  if (bus == null || dest == null) return null;
+  return _haversine(bus.latitude, bus.longitude, dest.latitude, dest.longitude);
 }
 
 double? _kmDistance(LiveTracking data) {

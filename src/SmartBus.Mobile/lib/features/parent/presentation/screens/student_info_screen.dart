@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_bus/core/routing/app_router.dart';
+import 'package:smart_bus/core/errors/failures.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
 import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
 import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
+import 'package:smart_bus/features/parent/presentation/providers/student_edit_controller.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
+
+const _gradeOptions = <String>[
+  'KG-A',
+  'KG-B',
+  'Grade 1',
+  'Grade 2',
+  'Grade 3',
+  'Grade 4',
+  'Grade 5',
+  'Grade 6',
+];
 
 class StudentInfoScreen extends ConsumerWidget {
   const StudentInfoScreen({super.key, required this.studentId});
@@ -20,50 +32,230 @@ class StudentInfoScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFFAFAFA),
       body: infoAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => _ErrorBox(message: e.toString()),
-        data: (info) => Column(
-          children: [
-            _Hero(
-              info: info,
-              l: l,
-              onEdit: () =>
-                  context.push(AppRoute.studentEditFor(studentId)),
-            ),
-            Expanded(
-              child: Container(
-                transform: Matrix4.translationValues(0, -12, 0),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFAFAFA),
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                child: RefreshIndicator(
-                  color: AppColors.yellowDeep,
-                  onRefresh: () async =>
-                      ref.invalidate(studentInfoProvider(studentId)),
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(14, 18, 14, 24),
-                    children: [
-                      _SectionHead(title: l.studentInfoGeneral),
-                      const SizedBox(height: 8),
-                      _GeneralInfoSection(info: info, l: l),
-                      if (_hasNotes(info)) ...[
-                        const SizedBox(height: 12),
-                        _NotesCard(notes: info.notes!, l: l),
-                      ],
-                      const SizedBox(height: 12),
-                      _SectionHead(title: l.studentInfoParentContact),
-                      const SizedBox(height: 8),
-                      if (info.parent == null)
-                        _EmptyContacts(l: l)
-                      else
-                        _ContactsCard(
-                          contacts: [info.parent!],
-                          fallbackAddress: info.homeAddress,
-                          l: l,
-                        ),
-                    ],
+        error: (e, _) => Center(child: Text(e.toString())),
+        data: (info) => _Form(info: info, studentId: studentId, l: l),
+      ),
+    );
+  }
+}
+
+class _Form extends ConsumerStatefulWidget {
+  const _Form({
+    required this.info,
+    required this.studentId,
+    required this.l,
+  });
+  final StudentInfo info;
+  final String studentId;
+  final AppLocalizations l;
+
+  @override
+  ConsumerState<_Form> createState() => _FormState();
+}
+
+class _FormState extends ConsumerState<_Form> {
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _classCtrl;
+  late final TextEditingController _notesCtrl;
+  late String _grade;
+
+  @override
+  void initState() {
+    super.initState();
+    final info = widget.info;
+    _nameCtrl = TextEditingController(text: info.fullName);
+    _classCtrl = TextEditingController(text: info.className ?? '');
+    _notesCtrl = TextEditingController(text: info.notes ?? '');
+    _grade = info.grade;
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _classCtrl.dispose();
+    _notesCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final l = widget.l;
+    if (_nameCtrl.text.trim().isEmpty || _grade.trim().isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l.studentEditMissingFields)));
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    final ok = await ref
+        .read(studentEditControllerProvider(widget.studentId).notifier)
+        .save(
+          fullName: _nameCtrl.text.trim(),
+          grade: _grade.trim(),
+          className: _classCtrl.text.trim().isEmpty
+              ? null
+              : _classCtrl.text.trim(),
+          notes: _notesCtrl.text.trim().isEmpty
+              ? null
+              : _notesCtrl.text.trim(),
+          // The API still requires parent contact — pass through whatever's
+          // already on file so the parent details aren't surfaced or modified
+          // from this screen.
+          parentName: widget.info.parent?.name ?? '',
+          parentPhone: widget.info.parent?.phoneNumber ?? '',
+        );
+    if (!mounted) return;
+    if (ok) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l.studentEditSaved)));
+      return;
+    }
+    final err =
+        ref.read(studentEditControllerProvider(widget.studentId)).error;
+    final msg = switch (err) {
+      ValidationFailure(:final message) when message.isNotEmpty => message,
+      Failure() => l.studentEditFailed,
+      _ => l.studentEditFailed,
+    };
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = widget.l;
+    final info = widget.info;
+    final saving =
+        ref.watch(studentEditControllerProvider(widget.studentId)).isLoading;
+
+    return Column(
+      children: [
+        _Hero(l: l, onBack: () => context.pop()),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+            children: [
+              _AvatarBanner(name: _nameCtrl.text.isEmpty
+                  ? info.fullName
+                  : _nameCtrl.text),
+              const SizedBox(height: 14),
+              _SectionTitle(text: l.studentEditBasicInfo),
+              const SizedBox(height: 8),
+              _Card(
+                children: [
+                  _TextField(
+                    icon: Icons.person_outline,
+                    label: l.studentEditFullName,
+                    controller: _nameCtrl,
+                    enabled: !saving,
+                    hint: l.studentEditFullNameHint,
+                    onChanged: (_) => setState(() {}),
                   ),
+                  _ReadOnlyField(
+                    icon: Icons.badge_outlined,
+                    label: l.studentEditStudentId,
+                    labelTag: l.studentEditAuto,
+                    value: info.nationalNumber,
+                  ),
+                  _Row2(
+                    left: _DropdownField(
+                      icon: Icons.school,
+                      label: l.studentEditGrade,
+                      value: _grade,
+                      options: _gradeOptions,
+                      enabled: !saving,
+                      onChanged: (v) => setState(() => _grade = v ?? _grade),
+                    ),
+                    right: _TextField(
+                      icon: Icons.grid_view,
+                      label: l.studentEditClass,
+                      controller: _classCtrl,
+                      enabled: !saving,
+                      hint: l.studentEditClassHint,
+                    ),
+                  ),
+                ],
+              ),
+              if (info.schoolName != null && info.schoolName!.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                _SectionTitle(text: l.studentInfoSchool),
+                const SizedBox(height: 8),
+                _Card(
+                  children: [
+                    _ReadOnlyField(
+                      icon: Icons.account_balance_outlined,
+                      label: l.studentInfoSchool,
+                      value: info.schoolName!,
+                    ),
+                    if (info.homeAddress.isNotEmpty)
+                      _ReadOnlyField(
+                        icon: Icons.location_on_outlined,
+                        label: l.studentInfoHomeAddress,
+                        value: info.homeAddress,
+                      ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: 14),
+              _SectionTitle(text: l.studentEditNotes),
+              const SizedBox(height: 8),
+              _Card(
+                children: [
+                  _TextAreaField(
+                    icon: Icons.description_outlined,
+                    label: l.studentEditDriverNote,
+                    controller: _notesCtrl,
+                    enabled: !saving,
+                    hint: l.studentEditNotesHint,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        _SaveBar(
+          saveText: l.studentEditSave,
+          saving: saving,
+          onSave: saving ? null : _save,
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Header ─────────────────────────────────────────────────────────
+
+class _Hero extends StatelessWidget {
+  const _Hero({required this.l, required this.onBack});
+  final AppLocalizations l;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(bottom: BorderSide(color: AppColors.slate100)),
+        ),
+        padding: const EdgeInsets.fromLTRB(14, 6, 14, 12),
+        child: Row(
+          children: [
+            _LightIconBtn(
+              icon: Directionality.of(context) == TextDirection.rtl
+                  ? Icons.arrow_forward
+                  : Icons.arrow_back,
+              onTap: onBack,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l.studentInfoTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                  letterSpacing: -0.4,
                 ),
               ),
             ),
@@ -72,624 +264,228 @@ class StudentInfoScreen extends ConsumerWidget {
       ),
     );
   }
-
-  bool _hasNotes(StudentInfo info) =>
-      info.notes != null && info.notes!.trim().isNotEmpty;
 }
 
-// ─── Hero (matches absence/edit/trip-history dark hero pattern) ────
-
-class _Hero extends StatelessWidget {
-  const _Hero({
-    required this.info,
-    required this.l,
-    required this.onEdit,
-  });
-  final StudentInfo info;
-  final AppLocalizations l;
-  final VoidCallback onEdit;
-
-  @override
-  Widget build(BuildContext context) {
-    final classText = info.className == null || info.className!.isEmpty
-        ? ''
-        : ' · ${l.studentInfoClassPrefix} ${info.className}';
-    final subtitle = '${info.nationalNumber} · ${info.grade}$classText';
-
-    return SafeArea(
-      bottom: false,
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A0A0A), Color(0xFF1A1F2E), Color(0xFF0F172A)],
-          ),
-        ),
-        padding: const EdgeInsets.fromLTRB(18, 6, 18, 28),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                _DarkIconBtn(
-                  icon: Directionality.of(context) == TextDirection.rtl
-                      ? Icons.arrow_forward
-                      : Icons.arrow_back,
-                  onTap: () => Navigator.of(context).maybePop(),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      l.studentInfoTitle.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white.withValues(alpha: 0.5),
-                        letterSpacing: 1.4,
-                      ),
-                    ),
-                  ),
-                ),
-                _EditPill(onTap: onEdit),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        info.fullName,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: -0.7,
-                          height: 1.1,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DarkIconBtn extends StatelessWidget {
-  const _DarkIconBtn({required this.icon, this.onTap});
+class _LightIconBtn extends StatelessWidget {
+  const _LightIconBtn({required this.icon, required this.onTap});
   final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.08),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(11),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(11),
-        onTap: onTap,
-        child: SizedBox(
-          width: 36,
-          height: 36,
-          child: Center(child: Icon(icon, size: 15, color: Colors.white)),
-        ),
-      ),
-    );
-  }
-}
-
-class _EditPill extends StatelessWidget {
-  const _EditPill({required this.onTap});
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.yellow.withValues(alpha: 0.18),
+      color: AppColors.slate50,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(100),
-        side: BorderSide(color: AppColors.yellow.withValues(alpha: 0.45)),
+        borderRadius: BorderRadius.circular(11),
+        side: const BorderSide(color: AppColors.slate100),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: BorderRadius.circular(11),
         onTap: onTap,
-        child: const Padding(
-          padding: EdgeInsets.fromLTRB(10, 7, 12, 7),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.edit, size: 12, color: Color(0xFFFCD34D)),
-              SizedBox(width: 5),
-              Text(
-                'Edit',
-                style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFFFCD34D),
-                  letterSpacing: -0.1,
-                ),
-              ),
-            ],
-          ),
+        child: SizedBox(
+          width: 38,
+          height: 38,
+          child:
+              Center(child: Icon(icon, size: 17, color: AppColors.slate700)),
         ),
       ),
     );
   }
 }
 
-// ─── Section heading ────────────────────────────────────────────────
+// ─── Avatar banner ──────────────────────────────────────────────────
 
-class _SectionHead extends StatelessWidget {
-  const _SectionHead({required this.title});
-  final String title;
+class _AvatarBanner extends StatelessWidget {
+  const _AvatarBanner({required this.name});
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.yellowTint,
+              border: Border.all(color: const Color(0x66F5C518)),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              _initials(name),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: AppColors.yellowDeep,
+                letterSpacing: -0.6,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            name.isEmpty ? '—' : name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: AppColors.ink,
+              letterSpacing: -0.3,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Section title ─────────────────────────────────────────────────
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.text});
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(
-        title.toUpperCase(),
+        text.toUpperCase(),
         style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
+          fontSize: 10.5,
+          fontWeight: FontWeight.w800,
           color: AppColors.slate500,
-          letterSpacing: 1.4,
+          letterSpacing: 1.0,
         ),
       ),
     );
   }
 }
 
-// ─── General info ──────────────────────────────────────────────────
+// ─── Card + fields (mirrors edit screen but flatter) ───────────────
 
-class _GeneralInfoSection extends StatelessWidget {
-  const _GeneralInfoSection({required this.info, required this.l});
-  final StudentInfo info;
-  final AppLocalizations l;
+class _Card extends StatelessWidget {
+  const _Card({required this.children});
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    final rows = <_InfoRowData>[
-      if (info.dateOfBirth != null)
-        _InfoRowData(
-          icon: Icons.calendar_today,
-          color: AppColors.violet,
-          bg: AppColors.violetSoft,
-          border: const Color(0xFFDDD6FE),
-          label: l.studentInfoDob,
-          value: _formatDate(info.dateOfBirth!),
-        ),
-      if (info.schoolName != null && info.schoolName!.isNotEmpty)
-        _InfoRowData(
-          icon: Icons.school,
-          color: AppColors.blue,
-          bg: AppColors.blueSoft,
-          border: const Color(0xFFBFDBFE),
-          label: l.studentInfoSchool,
-          value: info.schoolName!,
-        ),
-      _InfoRowData(
-        icon: Icons.location_on_outlined,
-        color: AppColors.emerald,
-        bg: AppColors.emeraldSoft,
-        border: const Color(0xFFA7F3D0),
-        label: l.studentInfoHomeAddress,
-        value: info.homeAddress.isEmpty ? '—' : info.homeAddress,
-      ),
-      if (info.routeName != null && info.routeName!.isNotEmpty)
-        _InfoRowData(
-          icon: Icons.alt_route,
-          color: const Color(0xFFD97706),
-          bg: const Color(0xFFFEF3C7),
-          border: const Color(0xFFFDE68A),
-          label: l.studentInfoRoute,
-          value: info.routeName!,
-        ),
-    ];
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.slate200),
-        boxShadow: AppShadows.sm,
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          for (var i = 0; i < rows.length; i++)
-            _InfoRow(data: rows[i], isLast: i == rows.length - 1),
+          for (var i = 0; i < children.length; i++) ...[
+            if (i != 0)
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: AppColors.slate100,
+              ),
+            children[i],
+          ],
         ],
       ),
     );
   }
 }
 
-class _InfoRowData {
-  const _InfoRowData({
+class _FieldShell extends StatelessWidget {
+  const _FieldShell({
     required this.icon,
-    required this.color,
-    required this.bg,
-    required this.border,
     required this.label,
-    required this.value,
+    required this.child,
+    this.labelTag,
+    this.borderRight = false,
   });
   final IconData icon;
-  final Color color;
-  final Color bg;
-  final Color border;
   final String label;
-  final String value;
-}
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.data, required this.isLast});
-  final _InfoRowData data;
-  final bool isLast;
+  final Widget child;
+  final String? labelTag;
+  final bool borderRight;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : const Border(
-                bottom: BorderSide(color: AppColors.slate100),
-              ),
-      ),
-      padding: const EdgeInsets.fromLTRB(16, 13, 16, 13),
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    return IntrinsicHeight(
       child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: data.bg,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: data.border),
-            ),
-            alignment: Alignment.center,
-            child: Icon(data.icon, size: 16, color: data.color),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  data.label.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.slate400,
-                    letterSpacing: 0.6,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  data.value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.ink,
-                    letterSpacing: -0.1,
-                    height: 1.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Notes ──────────────────────────────────────────────────────────
-
-class _NotesCard extends StatelessWidget {
-  const _NotesCard({required this.notes, required this.l});
-  final String notes;
-  final AppLocalizations l;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.yellowTint, Colors.white],
-        ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.yellow),
-        boxShadow: AppShadows.sm,
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: -4,
-            right: 4,
-            child: Text(
-              '"',
-              style: TextStyle(
-                fontSize: 56,
-                color: AppColors.yellow.withValues(alpha: 0.4),
-                fontFamily: 'serif',
-                height: 1,
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.yellow,
-                      borderRadius: BorderRadius.circular(9),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.description,
-                        size: 14, color: AppColors.ink),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    l.studentInfoNotes,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.ink,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                notes,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.slate700,
-                  height: 1.6,
-                  letterSpacing: -0.05,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Emergency contacts ─────────────────────────────────────────────
-
-class _ContactsCard extends StatelessWidget {
-  const _ContactsCard({
-    required this.contacts,
-    required this.fallbackAddress,
-    required this.l,
-  });
-  final List<StudentContact> contacts;
-  final String fallbackAddress;
-  final AppLocalizations l;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.slate200),
-        boxShadow: AppShadows.sm,
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          for (var i = 0; i < contacts.length; i++)
-            _ContactRow(
-              contact: contacts[i],
-              isLast: i == contacts.length - 1,
-              fallbackAddress: fallbackAddress,
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ContactRow extends StatelessWidget {
-  const _ContactRow({
-    required this.contact,
-    required this.isLast,
-    required this.fallbackAddress,
-  });
-  final StudentContact contact;
-  final bool isLast;
-  final String fallbackAddress;
-
-  bool get _isMother =>
-      contact.relation?.toLowerCase().contains('mother') == true ||
-      contact.relation?.contains('أم') == true;
-  bool get _isFather =>
-      contact.relation?.toLowerCase().contains('father') == true ||
-      contact.relation?.contains('أب') == true;
-
-  @override
-  Widget build(BuildContext context) {
-    final address = (contact.address?.isNotEmpty ?? false)
-        ? contact.address!
-        : fallbackAddress;
-
-    final (avatarBg, avatarFg) = _isMother
-        ? (
-            const LinearGradient(
-              colors: [Color(0xFFFECDD3), Color(0xFFFDA4AF)],
-            ),
-            const Color(0xFF9F1239),
-          )
-        : _isFather
-            ? (
-                const LinearGradient(
-                  colors: [Color(0xFFDBEAFE), Color(0xFF93C5FD)],
-                ),
-                const Color(0xFF1E40AF),
-              )
-            : (
-                const LinearGradient(
-                  colors: [AppColors.slate100, AppColors.slate200],
-                ),
-                AppColors.slate700,
-              );
-
-    return Container(
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : const Border(
-                bottom: BorderSide(color: AppColors.slate100),
-              ),
-      ),
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 42,
-            height: 42,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: avatarBg,
-              border: Border.all(color: Colors.white, width: 2),
-              boxShadow: const [
-                BoxShadow(
-                  color: AppColors.slate200,
-                  blurRadius: 0,
-                  spreadRadius: 1.5,
-                ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              _initials(contact.name),
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: avatarFg,
-                letterSpacing: -0.4,
+              border: Border(
+                right: isRtl
+                    ? BorderSide.none
+                    : const BorderSide(color: AppColors.slate100),
+                left: isRtl
+                    ? const BorderSide(color: AppColors.slate100)
+                    : BorderSide.none,
               ),
             ),
+            alignment: Alignment.center,
+            child: Icon(icon, size: 16, color: AppColors.slate400),
           ),
-          const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  contact.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.ink,
-                    letterSpacing: -0.1,
-                  ),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(14, 7, 14, 8),
+              decoration: BoxDecoration(
+                border: Border(
+                  right: borderRight && !isRtl
+                      ? const BorderSide(color: AppColors.slate100)
+                      : BorderSide.none,
+                  left: borderRight && isRtl
+                      ? const BorderSide(color: AppColors.slate100)
+                      : BorderSide.none,
                 ),
-                const SizedBox(height: 2),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    if (contact.relation != null && contact.relation!.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 7, vertical: 1.5),
-                        decoration: BoxDecoration(
-                          color: AppColors.slate100,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Text(
-                          contact.relation!,
-                          style: const TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.slate700,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                    Text(
-                      contact.phoneNumber,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.slate500,
-                      ),
-                    ),
-                  ],
-                ),
-                if (address.isNotEmpty) ...[
-                  const SizedBox(height: 5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.location_on_outlined,
-                          size: 11, color: AppColors.slate400),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Text(
-                          address,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.slate500,
-                            height: 1.4,
-                            letterSpacing: -0.05,
-                          ),
+                      Text(
+                        label.toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.slate500,
+                          letterSpacing: 0.7,
                         ),
                       ),
+                      if (labelTag != null) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: AppColors.slate100,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Text(
+                            labelTag!,
+                            style: const TextStyle(
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.slate500,
+                              letterSpacing: 0.4,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
+                  const SizedBox(height: 1),
+                  child,
                 ],
-              ],
+              ),
             ),
           ),
         ],
@@ -698,43 +494,263 @@ class _ContactRow extends StatelessWidget {
   }
 }
 
-class _EmptyContacts extends StatelessWidget {
-  const _EmptyContacts({required this.l});
-  final AppLocalizations l;
+class _TextField extends StatelessWidget {
+  const _TextField({
+    required this.icon,
+    required this.label,
+    required this.controller,
+    required this.enabled,
+    this.hint,
+    this.onChanged,
+  });
+  final IconData icon;
+  final String label;
+  final TextEditingController controller;
+  final bool enabled;
+  final String? hint;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.slate200),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        l.studentInfoNoContacts,
+    return _FieldShell(
+      icon: icon,
+      label: label,
+      child: TextField(
+        controller: controller,
+        enabled: enabled,
+        onChanged: onChanged,
         style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: AppColors.slate500,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w700,
+          color: AppColors.ink,
+          letterSpacing: -0.2,
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(
+            color: AppColors.slate400,
+            fontWeight: FontWeight.w500,
+          ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          isDense: true,
+          filled: false,
         ),
       ),
     );
   }
 }
 
-class _ErrorBox extends StatelessWidget {
-  const _ErrorBox({required this.message});
-  final String message;
+class _ReadOnlyField extends StatelessWidget {
+  const _ReadOnlyField({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.labelTag,
+  });
+  final IconData icon;
+  final String label;
+  final String value;
+  final String? labelTag;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
+    return _FieldShell(
+      icon: icon,
+      label: label,
+      labelTag: labelTag,
       child: Text(
-        message,
-        style: const TextStyle(fontSize: 12, color: AppColors.slate500),
+        value,
+        style: const TextStyle(
+          fontSize: 13.5,
+          fontWeight: FontWeight.w700,
+          color: AppColors.slate500,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+}
+
+class _DropdownField extends StatelessWidget {
+  const _DropdownField({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.options,
+    required this.enabled,
+    required this.onChanged,
+  });
+  final IconData icon;
+  final String label;
+  final String value;
+  final List<String> options;
+  final bool enabled;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = {value, ...options}.toList();
+    return _FieldShell(
+      icon: icon,
+      label: label,
+      borderRight: true,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isDense: true,
+          isExpanded: true,
+          icon: const Icon(Icons.expand_more,
+              size: 16, color: AppColors.slate500),
+          style: const TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+            letterSpacing: -0.2,
+          ),
+          onChanged: enabled ? onChanged : null,
+          items: [
+            for (final o in items)
+              DropdownMenuItem<String>(value: o, child: Text(o)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Row2 extends StatelessWidget {
+  const _Row2({required this.left, required this.right});
+  final Widget left;
+  final Widget right;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: left),
+          const VerticalDivider(
+              width: 1, thickness: 1, color: AppColors.slate100),
+          Expanded(child: right),
+        ],
+      ),
+    );
+  }
+}
+
+class _TextAreaField extends StatelessWidget {
+  const _TextAreaField({
+    required this.icon,
+    required this.label,
+    required this.controller,
+    required this.enabled,
+    this.hint,
+  });
+  final IconData icon;
+  final String label;
+  final TextEditingController controller;
+  final bool enabled;
+  final String? hint;
+
+  @override
+  Widget build(BuildContext context) {
+    return _FieldShell(
+      icon: icon,
+      label: label,
+      child: TextField(
+        controller: controller,
+        enabled: enabled,
+        maxLines: 3,
+        minLines: 2,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppColors.ink,
+          height: 1.45,
+          letterSpacing: -0.1,
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(
+            color: AppColors.slate400,
+            fontWeight: FontWeight.w500,
+          ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          isDense: true,
+          filled: false,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Save bar ──────────────────────────────────────────────────────
+
+class _SaveBar extends StatelessWidget {
+  const _SaveBar({
+    required this.saveText,
+    required this.saving,
+    required this.onSave,
+  });
+  final String saveText;
+  final bool saving;
+  final VoidCallback? onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.slate100)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: FilledButton(
+            onPressed: onSave,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.yellow,
+              foregroundColor: AppColors.ink,
+              disabledBackgroundColor:
+                  AppColors.yellow.withValues(alpha: 0.45),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(13),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.2,
+              ),
+            ),
+            child: saving
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.4,
+                      color: AppColors.ink,
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.check, size: 14, color: AppColors.ink),
+                      const SizedBox(width: 7),
+                      Text(saveText),
+                    ],
+                  ),
+          ),
+        ),
       ),
     );
   }
@@ -749,24 +765,6 @@ String _initials(String name) {
   if (parts.length == 1) {
     return parts.first.characters.take(2).toString().toUpperCase();
   }
-  return (parts.first.characters.first + parts.last.characters.first).toUpperCase();
-}
-
-String _formatDate(DateTime dt) {
-  const months = [
-    '',
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-  return '${months[dt.month.clamp(1, 12)]} ${dt.day}, ${dt.year}';
+  return (parts.first.characters.first + parts.last.characters.first)
+      .toUpperCase();
 }

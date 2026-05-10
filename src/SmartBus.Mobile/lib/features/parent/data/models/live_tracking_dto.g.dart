@@ -40,6 +40,8 @@ _LiveTrackingDto _$LiveTrackingDtoFromJson(Map<String, dynamic> json) =>
       homeLongitude: (json['homeLongitude'] as num?)?.toDouble(),
       homeAddress: json['homeAddress'] as String?,
       schoolName: json['schoolName'] as String?,
+      schoolLatitude: (json['schoolLatitude'] as num?)?.toDouble(),
+      schoolLongitude: (json['schoolLongitude'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$LiveTrackingDtoToJson(
@@ -69,6 +71,8 @@ Map<String, dynamic> _$LiveTrackingDtoToJson(
   if (instance.homeLongitude case final value?) 'homeLongitude': value,
   if (instance.homeAddress case final value?) 'homeAddress': value,
   if (instance.schoolName case final value?) 'schoolName': value,
+  if (instance.schoolLatitude case final value?) 'schoolLatitude': value,
+  if (instance.schoolLongitude case final value?) 'schoolLongitude': value,
 };
 
 _BusLocationDto _$BusLocationDtoFromJson(Map<String, dynamic> json) =>

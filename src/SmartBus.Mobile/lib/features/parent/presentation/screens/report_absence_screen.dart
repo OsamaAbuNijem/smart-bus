@@ -52,7 +52,12 @@ class _FormState extends ConsumerState<_Form> {
   void initState() {
     super.initState();
     final now = DateTime.now();
-    _selectedDate = DateTime(now.year, now.month, now.day);
+    var d = DateTime(now.year, now.month, now.day);
+    // Skip Fri/Sat — there's no school bus on weekends.
+    while (d.weekday == DateTime.friday || d.weekday == DateTime.saturday) {
+      d = d.add(const Duration(days: 1));
+    }
+    _selectedDate = d;
   }
 
   @override
@@ -97,81 +102,57 @@ class _FormState extends ConsumerState<_Form> {
     final saving =
         ref.watch(absenceControllerProvider(widget.studentId)).isLoading;
 
-    return Stack(
+    return Column(
       children: [
-        Column(
-          children: [
-            _Hero(l: l),
-            Expanded(
-              child: Container(
-                transform: Matrix4.translationValues(0, -12, 0),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFAFAFA),
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(14, 18, 14, 90),
-                  children: [
-                    _SectionTitle(text: l.absenceSectionStudent),
-                    const SizedBox(height: 8),
-                    _StudentCard(info: info, l: l),
-                    const SizedBox(height: 14),
-                    _SectionTitle(text: l.absenceSectionDate),
-                    const SizedBox(height: 8),
-                    _DateRow(
-                      selected: _selectedDate,
-                      onSelect: (d) => setState(() => _selectedDate = d),
-                    ),
-                    const SizedBox(height: 14),
-                    _SectionTitle(text: l.absenceSectionService),
-                    const SizedBox(height: 8),
-                    _OptionsList(
-                      tripType: _tripType,
-                      onChange: (t) => setState(() => _tripType = t),
-                      l: l,
-                    ),
-                    const SizedBox(height: 14),
-                    _SectionTitle(text: l.absenceSectionReason),
-                    const SizedBox(height: 8),
-                    _ReasonGrid(
-                      selected: _reason,
-                      onChange: (r) => setState(() => _reason = r),
-                      l: l,
-                    ),
-                    const SizedBox(height: 14),
-                    _SectionTitle(
-                      text: l.absenceSectionNote,
-                      subtitle: l.absenceOptional,
-                    ),
-                    const SizedBox(height: 8),
-                    _NoteCard(
-                      controller: _noteCtrl,
-                      enabled: !saving,
-                      hint: l.absenceNoteHint,
-                    ),
-                    const SizedBox(height: 14),
-                    _InfoBox(text: l.absenceInfoBox),
-                  ],
-                ),
+        _Hero(l: l, onBack: () => context.pop()),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
+            children: [
+              _SectionTitle(text: l.absenceSectionStudent),
+              const SizedBox(height: 8),
+              _StudentCard(info: info, l: l),
+              const SizedBox(height: 14),
+              _SectionTitle(text: l.absenceSectionDate),
+              const SizedBox(height: 8),
+              _DateRow(
+                selected: _selectedDate,
+                onSelect: (d) => setState(() => _selectedDate = d),
               ),
-            ),
-          ],
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: _SubmitBar(
-            label: l.absenceSubmit,
-            saving: saving,
-            onTap: saving ? null : _submit,
+              const SizedBox(height: 14),
+              _SectionTitle(text: l.absenceSectionService),
+              const SizedBox(height: 8),
+              _OptionsList(
+                tripType: _tripType,
+                onChange: (t) => setState(() => _tripType = t),
+                l: l,
+              ),
+              const SizedBox(height: 14),
+              _SectionTitle(text: l.absenceSectionReason),
+              const SizedBox(height: 8),
+              _ReasonGrid(
+                selected: _reason,
+                onChange: (r) => setState(() => _reason = r),
+                l: l,
+              ),
+              const SizedBox(height: 14),
+              _SectionTitle(
+                text: l.absenceSectionNote,
+                subtitle: l.absenceOptional,
+              ),
+              const SizedBox(height: 8),
+              _NoteCard(
+                controller: _noteCtrl,
+                enabled: !saving,
+                hint: l.absenceNoteHint,
+              ),
+            ],
           ),
         ),
-        Positioned(
-          top: 0,
-          left: 0,
-          child: SafeArea(child: _BackBtn(onTap: () => context.pop())),
+        _SubmitBar(
+          label: l.absenceSubmit,
+          saving: saving,
+          onTap: saving ? null : _submit,
         ),
       ],
     );
@@ -181,8 +162,9 @@ class _FormState extends ConsumerState<_Form> {
 // ─── Hero ───────────────────────────────────────────────────────────
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.l});
+  const _Hero({required this.l, required this.onBack});
   final AppLocalizations l;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -190,66 +172,49 @@ class _Hero extends StatelessWidget {
       bottom: false,
       child: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A0A0A), Color(0xFF1A1F2E), Color(0xFF0F172A)],
-          ),
+          color: Colors.white,
+          border: Border(bottom: BorderSide(color: AppColors.slate100)),
         ),
-        padding: const EdgeInsets.fromLTRB(18, 6, 18, 28),
-        child: Column(
+        padding: const EdgeInsets.fromLTRB(14, 6, 14, 12),
+        child: Row(
           children: [
-            // Top eyebrow row — back button is positioned absolutely above us.
-            Row(
-              children: [
-                const SizedBox(width: 36),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      l.absenceEyebrow.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white.withValues(alpha: 0.5),
-                        letterSpacing: 1.4,
-                      ),
+            _LightIconBtn(
+              icon: Directionality.of(context) == TextDirection.rtl
+                  ? Icons.arrow_forward
+                  : Icons.arrow_back,
+              onTap: onBack,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    l.absenceTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.4,
+                      height: 1.15,
                     ),
                   ),
-                ),
-                const SizedBox(width: 36),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        l.absenceTitle,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: -0.7,
-                          height: 1.1,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        l.absenceSubtitle,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 1),
+                  Text(
+                    l.absenceSubtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate500,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -258,36 +223,27 @@ class _Hero extends StatelessWidget {
   }
 }
 
-class _BackBtn extends StatelessWidget {
-  const _BackBtn({required this.onTap});
+class _LightIconBtn extends StatelessWidget {
+  const _LightIconBtn({required this.icon, required this.onTap});
+  final IconData icon;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 6, 0, 0),
-      child: Material(
-        color: Colors.white.withValues(alpha: 0.08),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
-        ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(11),
-          onTap: onTap,
-          child: SizedBox(
-            width: 36,
-            height: 36,
-            child: Center(
-              child: Icon(
-                Directionality.of(context) == TextDirection.rtl
-                    ? Icons.arrow_forward
-                    : Icons.arrow_back,
-                size: 15,
-                color: Colors.white,
-              ),
-            ),
-          ),
+    return Material(
+      color: AppColors.slate50,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(11),
+        side: const BorderSide(color: AppColors.slate100),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(11),
+        onTap: onTap,
+        child: SizedBox(
+          width: 38,
+          height: 38,
+          child:
+              Center(child: Icon(icon, size: 17, color: AppColors.slate700)),
         ),
       ),
     );
@@ -307,33 +263,17 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
-          Container(
-            width: 5,
-            height: 5,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.yellow,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.yellow.withValues(alpha: 0.20),
-                  blurRadius: 0,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
           Text(
             text.toUpperCase(),
             style: const TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w800,
-              color: AppColors.slate700,
+              color: AppColors.slate500,
               letterSpacing: 1.0,
             ),
           ),
           if (subtitle != null) ...[
-            const SizedBox(width: 4),
+            const SizedBox(width: 6),
             Text(
               subtitle!,
               style: const TextStyle(
@@ -364,38 +304,27 @@ class _StudentCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.slate200),
-        boxShadow: AppShadows.sm,
       ),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
       child: Row(
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(13),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.yellow, AppColors.yellowDeep],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.yellow.withValues(alpha: 0.4),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.yellowTint,
+              border: Border.all(color: const Color(0x66F5C518)),
             ),
             alignment: Alignment.center,
             child: Text(
               _initials(info.fullName),
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w800,
-                color: AppColors.ink,
+                color: AppColors.yellowDeep,
                 letterSpacing: -0.4,
               ),
             ),
@@ -449,23 +378,31 @@ class _DateRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final today = DateTime.now();
     final t = DateTime(today.year, today.month, today.day);
-    // 3 past, today, 3 future
-    final days = List.generate(7, (i) => t.add(Duration(days: i - 3)));
+    // Show the next 7 school days, skipping Fridays and Saturdays
+    // (weekend in Jordan / no bus running).
+    final days = <DateTime>[];
+    var cursor = t;
+    while (days.length < 7) {
+      if (cursor.weekday != DateTime.friday &&
+          cursor.weekday != DateTime.saturday) {
+        days.add(cursor);
+      }
+      cursor = cursor.add(const Duration(days: 1));
+    }
 
-    return Row(
-      children: [
-        for (var i = 0; i < days.length; i++) ...[
-          Expanded(
-            child: _DateChip(
-              date: days[i],
-              isPast: days[i].isBefore(t),
-              isActive: _sameDay(days[i], selected),
-              onTap: days[i].isBefore(t) ? null : () => onSelect(days[i]),
-            ),
-          ),
-          if (i != days.length - 1) const SizedBox(width: 5),
-        ],
-      ],
+    return SizedBox(
+      height: 64,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        itemCount: days.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 6),
+        itemBuilder: (context, i) => _DateChip(
+          date: days[i],
+          isActive: _sameDay(days[i], selected),
+          onTap: () => onSelect(days[i]),
+        ),
+      ),
     );
   }
 }
@@ -473,80 +410,70 @@ class _DateRow extends StatelessWidget {
 class _DateChip extends StatelessWidget {
   const _DateChip({
     required this.date,
-    required this.isPast,
     required this.isActive,
     required this.onTap,
   });
   final DateTime date;
-  final bool isPast;
   final bool isActive;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final dayNumColor = isActive ? AppColors.ink : AppColors.ink;
-    final dayNameColor = isActive
-        ? AppColors.ink.withValues(alpha: 0.7)
-        : AppColors.slate500;
-    return Opacity(
-      opacity: isPast ? 0.5 : 1,
-      child: Material(
-        color: Colors.transparent,
+    final isArabic =
+        Localizations.localeOf(context).languageCode == 'ar';
+    final label = _dayName(context, date.weekday);
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: isActive ? null : (isPast ? AppColors.slate50 : Colors.white),
-              gradient: isActive
-                  ? const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [AppColors.yellow, AppColors.yellowDeep],
-                    )
-                  : null,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isActive ? Colors.transparent : AppColors.slate200,
-                width: 1.5,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          // Arabic full names need extra horizontal room.
+          width: isArabic ? 86 : 64,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+          decoration: BoxDecoration(
+            color: isActive ? AppColors.yellowTint : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isActive
+                  ? const Color(0x99F5C518)
+                  : AppColors.slate200,
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: isArabic ? 11 : 10,
+                  fontWeight: FontWeight.w700,
+                  color: isActive
+                      ? AppColors.yellowDeep
+                      : AppColors.slate500,
+                  letterSpacing: isArabic ? 0 : 0.6,
+                  height: 1.1,
+                ),
               ),
-              boxShadow: isActive
-                  ? [
-                      BoxShadow(
-                        color: AppColors.yellow.withValues(alpha: 0.55),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _dayName3(date.weekday),
-                  style: TextStyle(
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                    color: dayNameColor,
-                    letterSpacing: 0.6,
-                  ),
+              const SizedBox(height: 4),
+              Text(
+                date.day.toString().padLeft(2, '0'),
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: isActive ? AppColors.yellowDeep : AppColors.ink,
+                  letterSpacing: -0.4,
+                  height: 1,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  date.day.toString().padLeft(2, '0'),
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: dayNumColor,
-                    letterSpacing: -0.4,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -642,29 +569,14 @@ class _OptionRow extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
           decoration: BoxDecoration(
-            color: Colors.white,
-            gradient: active
-                ? const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppColors.yellowTint, Colors.white],
-                  )
-                : null,
-            borderRadius: BorderRadius.circular(16),
+            color: active ? AppColors.yellowTint : Colors.white,
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: active ? AppColors.yellowDeep : AppColors.slate200,
+              color: active
+                  ? const Color(0x99F5C518)
+                  : AppColors.slate200,
               width: 1.5,
             ),
-            boxShadow: [
-              if (active)
-                BoxShadow(
-                  color: AppColors.yellow.withValues(alpha: 0.12),
-                  blurRadius: 0,
-                  spreadRadius: 3,
-                )
-              else
-                ...AppShadows.sm,
-            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -846,6 +758,7 @@ class _ReasonGrid extends StatelessWidget {
       mainAxisSpacing: 8,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
       childAspectRatio: 4.3,
       children: [
         for (final r in reasons)
@@ -899,21 +812,13 @@ class _ReasonTile extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
           decoration: BoxDecoration(
             color: active ? AppColors.yellowTint : Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: active ? AppColors.yellowDeep : AppColors.slate200,
+              color: active
+                  ? const Color(0x99F5C518)
+                  : AppColors.slate200,
               width: 1.5,
             ),
-            boxShadow: [
-              if (active)
-                BoxShadow(
-                  color: AppColors.yellow.withValues(alpha: 0.15),
-                  blurRadius: 0,
-                  spreadRadius: 2,
-                )
-              else
-                ...AppShadows.sm,
-            ],
           ),
           child: Row(
             children: [
@@ -967,11 +872,10 @@ class _NoteCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.slate200),
-        boxShadow: AppShadows.sm,
       ),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
       child: TextField(
         controller: controller,
         enabled: enabled,
@@ -1001,42 +905,6 @@ class _NoteCard extends StatelessWidget {
           ),
           filled: false,
         ),
-      ),
-    );
-  }
-}
-
-class _InfoBox extends StatelessWidget {
-  const _InfoBox({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(13, 11, 13, 11),
-      decoration: BoxDecoration(
-        color: AppColors.blueSoft,
-        borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: const Color(0xFFBFDBFE)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.info_outline, size: 15, color: AppColors.blue),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1E40AF),
-                height: 1.5,
-                letterSpacing: -0.05,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1134,7 +1002,21 @@ String _initials(String name) {
 bool _sameDay(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;
 
-String _dayName3(int weekday) {
-  const days = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  return days[weekday.clamp(1, 7)];
+String _dayName(BuildContext context, int weekday) {
+  final code = Localizations.localeOf(context).languageCode;
+  if (code == 'ar') {
+    const arabic = [
+      '',
+      'الإثنين',
+      'الثلاثاء',
+      'الأربعاء',
+      'الخميس',
+      'الجمعة',
+      'السبت',
+      'الأحد',
+    ];
+    return arabic[weekday.clamp(1, 7)];
+  }
+  const en = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  return en[weekday.clamp(1, 7)];
 }

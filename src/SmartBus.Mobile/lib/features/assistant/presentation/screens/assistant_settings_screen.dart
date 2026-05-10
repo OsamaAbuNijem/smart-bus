@@ -63,11 +63,17 @@ class _AssistantSettingsScreenState
       final stripped = digits.startsWith('0') ? digits.substring(1) : digits;
       final phone = '$_countryCode$stripped';
 
-      final ds = ref.read(assistantRemoteDataSourceProvider);
-      await ds.updateMyProfile(
-        fullName: _nameCtrl.text.trim(),
-        phoneNumber: phone,
-      );
+      // Profile-update endpoint only exists for the driver/assistant flow.
+      // Parents save locally — name/phone live in the JWT and are mirrored to
+      // secure storage below so the home greeting + OTP-prefill stay in sync.
+      final user = ref.read(authControllerProvider).valueOrNull;
+      if (user?.role != UserRole.parent) {
+        final ds = ref.read(assistantRemoteDataSourceProvider);
+        await ds.updateMyProfile(
+          fullName: _nameCtrl.text.trim(),
+          phoneNumber: phone,
+        );
+      }
 
       // Mirror updates into local secure storage so the home greeting +
       // OTP-prefill stay in sync without a full re-login.

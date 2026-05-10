@@ -81,62 +81,45 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
+      padding: const EdgeInsets.fromLTRB(14, 6, 14, 12),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: AppColors.slate100)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              _IconChip(
-                icon: isRtl ? Icons.arrow_forward : Icons.arrow_back,
-                onTap: () => context.canPop() ? context.pop() : null,
-              ),
-              const Spacer(),
-              Text(
-                l.notificationsEyebrow.toUpperCase(),
-                style: const TextStyle(
-                  color: AppColors.slate500,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.4,
-                ),
-              ),
-              const Spacer(),
-              const SizedBox(width: 36),
-            ],
+          _IconChip(
+            icon: isRtl ? Icons.arrow_forward : Icons.arrow_back,
+            onTap: () => context.canPop() ? context.pop() : null,
           ),
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l.notificationsTitle,
-                      style: const TextStyle(
-                        color: AppColors.ink,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    _Sub(newCount: newCount, total: total, l: l),
-                  ],
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l.notificationsTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.ink,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.4,
+                    height: 1.15,
+                  ),
                 ),
-              ),
-              _MarkAllPill(
-                label: l.notificationsMarkAllRead,
-                onTap: onMarkAllRead,
-              ),
-            ],
+                const SizedBox(height: 1),
+                _Sub(newCount: newCount, total: total, l: l),
+              ],
+            ),
           ),
+          if (newCount > 0)
+            _MarkAllPill(
+              label: l.notificationsMarkAllRead,
+              onTap: onMarkAllRead,
+            ),
         ],
       ),
     );
@@ -159,10 +142,12 @@ class _Sub extends StatelessWidget {
     final leftSuffix = left.replaceFirst('$newCount', '').trim();
 
     return Text.rich(
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       TextSpan(
         style: const TextStyle(
           color: AppColors.slate500,
-          fontSize: 12,
+          fontSize: 11.5,
           fontWeight: FontWeight.w600,
         ),
         children: [
@@ -174,7 +159,7 @@ class _Sub extends StatelessWidget {
             ),
           ),
           TextSpan(text: leftSuffix.isEmpty ? '' : ' $leftSuffix'),
-          const TextSpan(text: '  ·  '),
+          const TextSpan(text: ' · '),
           TextSpan(text: right),
         ],
       ),
@@ -318,28 +303,12 @@ class _DayGroup extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Row(
             children: [
-              Container(
-                width: 5,
-                height: 5,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF5C518),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x33F5C518),
-                      blurRadius: 0,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 7),
               Text(
                 label.toUpperCase(),
                 style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 10.5,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF334155),
+                  color: AppColors.slate500,
                   letterSpacing: 1.0,
                 ),
               ),
@@ -347,9 +316,9 @@ class _DayGroup extends StatelessWidget {
               Text(
                 countLabel,
                 style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 10.5,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF94A3B8),
+                  color: AppColors.slate400,
                 ),
               ),
             ],
