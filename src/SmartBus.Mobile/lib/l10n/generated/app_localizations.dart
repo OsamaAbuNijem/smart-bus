@@ -155,7 +155,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginCardDesc.
   ///
   /// In en, this message translates to:
-  /// **'Enter your phone number to continue'**
+  /// **'Enter your phone, we\'ll send a 4-digit code.'**
   String get loginCardDesc;
 
   /// No description provided for @loginTabPhone.
@@ -182,29 +182,11 @@ abstract class AppLocalizations {
   /// **'7X XXX XXXX'**
   String get loginPhonePlaceholder;
 
-  /// No description provided for @loginPhoneHelp.
-  ///
-  /// In en, this message translates to:
-  /// **'We\'ll send a 4-digit verification code'**
-  String get loginPhoneHelp;
-
   /// No description provided for @loginSendOtp.
   ///
   /// In en, this message translates to:
   /// **'Send code'**
   String get loginSendOtp;
-
-  /// No description provided for @loginRegisterPrompt.
-  ///
-  /// In en, this message translates to:
-  /// **'New to SmartBus?'**
-  String get loginRegisterPrompt;
-
-  /// No description provided for @loginRegisterCta.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan card to register'**
-  String get loginRegisterCta;
 
   /// No description provided for @loginTerms.
   ///
@@ -289,6 +271,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resend'**
   String get otpResend;
+
+  /// No description provided for @otpResendWait.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait {time} before resending'**
+  String otpResendWait(String time);
 
   /// No description provided for @otpInvalid.
   ///
@@ -1016,6 +1004,54 @@ abstract class AppLocalizations {
   /// **'Student'**
   String get absenceSectionStudent;
 
+  /// No description provided for @absenceSectionRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested absences'**
+  String get absenceSectionRequested;
+
+  /// No description provided for @absenceStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get absenceStatusPending;
+
+  /// No description provided for @absenceStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get absenceStatusApproved;
+
+  /// No description provided for @absenceStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get absenceStatusRejected;
+
+  /// No description provided for @absenceCancelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel absence?'**
+  String get absenceCancelTitle;
+
+  /// No description provided for @absenceCancelBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The driver and school will be notified that the absence was cancelled.'**
+  String get absenceCancelBody;
+
+  /// No description provided for @absenceCancelYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel absence'**
+  String get absenceCancelYes;
+
+  /// No description provided for @absenceCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Absence cancelled.'**
+  String get absenceCancelled;
+
   /// No description provided for @absenceSectionDate.
   ///
   /// In en, this message translates to:
@@ -1604,6 +1640,24 @@ abstract class AppLocalizations {
   /// **'Auto-loaded from last trip'**
   String get assistantStudentsAuto;
 
+  /// No description provided for @assistantSkipRoster.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip auto-roster'**
+  String get assistantSkipRoster;
+
+  /// No description provided for @assistantSkipRosterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start empty — students join when their QR/NFC is scanned.'**
+  String get assistantSkipRosterHint;
+
+  /// No description provided for @assistantRosterSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-loaded students'**
+  String get assistantRosterSheetTitle;
+
   /// No description provided for @assistantStartTrip.
   ///
   /// In en, this message translates to:
@@ -1814,6 +1868,30 @@ abstract class AppLocalizations {
   /// **'End trip'**
   String get assistantEndTripConfirmYes;
 
+  /// No description provided for @assistantDeleteTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete trip'**
+  String get assistantDeleteTrip;
+
+  /// No description provided for @assistantDeleteTripConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this trip?'**
+  String get assistantDeleteTripConfirmTitle;
+
+  /// No description provided for @assistantDeleteTripConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No students are on this trip yet. Deleting cancels it without leaving a history entry.'**
+  String get assistantDeleteTripConfirmBody;
+
+  /// No description provided for @assistantDeleteTripConfirmYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get assistantDeleteTripConfirmYes;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
@@ -1915,6 +1993,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Absence details'**
   String get assistantAbsenceSheetTitle;
+
+  /// No description provided for @assistantAbsenceCancelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this absence?'**
+  String get assistantAbsenceCancelTitle;
+
+  /// No description provided for @assistantAbsenceCancelBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The student will rejoin the trip and the parent will be notified that the absence was cancelled.'**
+  String get assistantAbsenceCancelBody;
+
+  /// No description provided for @assistantAbsenceCancelYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel absence'**
+  String get assistantAbsenceCancelYes;
+
+  /// No description provided for @assistantAbsenceCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Absence cancelled.'**
+  String get assistantAbsenceCancelled;
 
   /// No description provided for @assistantAbsenceReasonLabel.
   ///

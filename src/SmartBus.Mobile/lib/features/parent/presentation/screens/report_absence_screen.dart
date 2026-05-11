@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_bus/core/errors/failures.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
+import 'package:smart_bus/features/parent/data/repositories/parent_repository.dart';
+import 'package:smart_bus/features/parent/domain/entities/absence_request_item.dart';
 import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
 import 'package:smart_bus/features/parent/presentation/providers/absence_controller.dart';
 import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
@@ -79,6 +81,9 @@ class _FormState extends ConsumerState<_Form> {
         );
     if (!mounted) return;
     if (ok) {
+      // Refresh the requested-absences list so the new row appears
+      // immediately above the form.
+      ref.invalidate(studentAbsencesProvider(widget.studentId));
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(widget.l.absenceSubmitted)));
       context.pop();
@@ -113,6 +118,7 @@ class _FormState extends ConsumerState<_Form> {
               const SizedBox(height: 8),
               _StudentCard(info: info, l: l),
               const SizedBox(height: 14),
+              _RequestedAbsencesSection(studentId: widget.studentId, l: l),
               _SectionTitle(text: l.absenceSectionDate),
               const SizedBox(height: 8),
               _DateRow(
@@ -365,6 +371,261 @@ class _StudentCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─── Requested absences (list + cancel) ─────────────────────────────
+
+class _RequestedAbsencesSection extends ConsumerWidget {
+  const _RequestedAbsencesSection({required this.studentId, required this.l});
+  final String studentId;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(studentAbsencesProvider(studentId));
+    // Skip entirely while loading the first time so the form isn't pushed
+    // around by an empty placeholder.
+    final all = async.valueOrNull;
+    if (all == null || all.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    // Limit to the current week (Mon → Sun, anchored on today) — past or
+    // future absences are filed but not surfaced here.
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final weekStart = today.subtract(Duration(days: today.weekday - 1));
+    final weekEnd = weekStart.add(const Duration(days: 7));
+    final items = all
+        .where((a) =>
+            !a.date.isBefore(weekStart) && a.date.isBefore(weekEnd))
+        .toList();
+    if (items.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SectionTitle(text: l.absenceSectionRequested),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.slate200),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              for (var i = 0; i < items.length; i++) ...[
+                if (i != 0)
+                  const Divider(
+                      height: 1, thickness: 1, color: AppColors.slate100),
+                _RequestedAbsenceRow(
+                  item: items[i],
+                  l: l,
+                  onCancel: () async {
+                    final ok = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(l.absenceCancelTitle),
+                        content: Text(l.absenceCancelBody),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text(l.commonCancel),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.red,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: Text(l.absenceCancelYes),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (ok != true) return;
+                    try {
+                      await ref
+                          .read(parentRepositoryProvider)
+                          .cancelAbsenceRequest(items[i].id);
+                      ref.invalidate(studentAbsencesProvider(studentId));
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l.absenceCancelled)),
+                        );
+                      }
+                    } catch (e) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(e is Failure ? e.message : '$e'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+      ],
+    );
+  }
+}
+
+class _RequestedAbsenceRow extends StatelessWidget {
+  const _RequestedAbsenceRow({
+    required this.item,
+    required this.l,
+    required this.onCancel,
+  });
+  final AbsenceRequestItem item;
+  final AppLocalizations l;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final dayName = _absenceDayName(context, item.date.weekday);
+    final shortDate =
+        '$dayName ${item.date.day}/${item.date.month}/${item.date.year}';
+    final legLabel = _absenceLegLabel(item.tripType, l);
+    final (pillBg, pillFg) = _statusPalette(item.status);
+    final statusLabel = _statusLabel(item.status, l);
+    final cancellable = item.status != 'Rejected';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.yellowTint,
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: const Color(0x66F5C518)),
+            ),
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.event_busy,
+              size: 17,
+              color: AppColors.yellowDeep,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  shortDate,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: isArabic ? 12.5 : 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: -0.2,
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  legLabel,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.slate500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: pillBg,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Text(
+              statusLabel,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                color: pillFg,
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: l.absenceCancelTitle,
+            onPressed: cancellable ? onCancel : null,
+            icon: Icon(
+              Icons.delete_outline,
+              size: 18,
+              color: cancellable ? AppColors.red : AppColors.slate300,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+(Color, Color) _statusPalette(String status) {
+  switch (status) {
+    case 'Approved':
+      return (AppColors.emeraldSoft, AppColors.emerald);
+    case 'Rejected':
+      return (const Color(0xFFFFE4E6), const Color(0xFFE11D48));
+    default:
+      return (AppColors.slate100, AppColors.slate600);
+  }
+}
+
+String _statusLabel(String status, AppLocalizations l) {
+  switch (status) {
+    case 'Approved':
+      return l.absenceStatusApproved;
+    case 'Rejected':
+      return l.absenceStatusRejected;
+    default:
+      return l.absenceStatusPending;
+  }
+}
+
+String _absenceLegLabel(String tripType, AppLocalizations l) {
+  switch (tripType) {
+    case 'MorningOnly':
+      return l.absenceOptionMorningTitle;
+    case 'ReturnOnly':
+      return l.absenceOptionReturnTitle;
+    default:
+      return l.absenceOptionFullTitle;
+  }
+}
+
+String _absenceDayName(BuildContext context, int weekday) {
+  final code = Localizations.localeOf(context).languageCode;
+  if (code == 'ar') {
+    const arabic = [
+      '',
+      'الإثنين',
+      'الثلاثاء',
+      'الأربعاء',
+      'الخميس',
+      'الجمعة',
+      'السبت',
+      'الأحد',
+    ];
+    return arabic[weekday.clamp(1, 7)];
+  }
+  const en = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  return en[weekday.clamp(1, 7)];
 }
 
 // ─── Date row ──────────────────────────────────────────────────────

@@ -315,6 +315,142 @@ class _ChildTripsProviderElement
   String get studentId => (origin as ChildTripsProvider).studentId;
 }
 
+String _$studentAbsencesHash() => r'd33eee0cf183c2db49c3c6169cfbbb0ca3a079fc';
+
+/// All non-deleted absence requests for the given student, newest first.
+///
+/// Copied from [studentAbsences].
+@ProviderFor(studentAbsences)
+const studentAbsencesProvider = StudentAbsencesFamily();
+
+/// All non-deleted absence requests for the given student, newest first.
+///
+/// Copied from [studentAbsences].
+class StudentAbsencesFamily
+    extends Family<AsyncValue<List<AbsenceRequestItem>>> {
+  /// All non-deleted absence requests for the given student, newest first.
+  ///
+  /// Copied from [studentAbsences].
+  const StudentAbsencesFamily();
+
+  /// All non-deleted absence requests for the given student, newest first.
+  ///
+  /// Copied from [studentAbsences].
+  StudentAbsencesProvider call(String studentId) {
+    return StudentAbsencesProvider(studentId);
+  }
+
+  @override
+  StudentAbsencesProvider getProviderOverride(
+    covariant StudentAbsencesProvider provider,
+  ) {
+    return call(provider.studentId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'studentAbsencesProvider';
+}
+
+/// All non-deleted absence requests for the given student, newest first.
+///
+/// Copied from [studentAbsences].
+class StudentAbsencesProvider
+    extends AutoDisposeFutureProvider<List<AbsenceRequestItem>> {
+  /// All non-deleted absence requests for the given student, newest first.
+  ///
+  /// Copied from [studentAbsences].
+  StudentAbsencesProvider(String studentId)
+    : this._internal(
+        (ref) => studentAbsences(ref as StudentAbsencesRef, studentId),
+        from: studentAbsencesProvider,
+        name: r'studentAbsencesProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$studentAbsencesHash,
+        dependencies: StudentAbsencesFamily._dependencies,
+        allTransitiveDependencies:
+            StudentAbsencesFamily._allTransitiveDependencies,
+        studentId: studentId,
+      );
+
+  StudentAbsencesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+  }) : super.internal();
+
+  final String studentId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<AbsenceRequestItem>> Function(StudentAbsencesRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: StudentAbsencesProvider._internal(
+        (ref) => create(ref as StudentAbsencesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<AbsenceRequestItem>> createElement() {
+    return _StudentAbsencesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is StudentAbsencesProvider && other.studentId == studentId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin StudentAbsencesRef
+    on AutoDisposeFutureProviderRef<List<AbsenceRequestItem>> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+}
+
+class _StudentAbsencesProviderElement
+    extends AutoDisposeFutureProviderElement<List<AbsenceRequestItem>>
+    with StudentAbsencesRef {
+  _StudentAbsencesProviderElement(super.provider);
+
+  @override
+  String get studentId => (origin as StudentAbsencesProvider).studentId;
+}
+
 String _$tripHistoryHash() => r'bbd53f6c29e16b822ceab88be233acc6bb29121e';
 
 /// Larger trip window for the dedicated history screen (last ~30 entries).

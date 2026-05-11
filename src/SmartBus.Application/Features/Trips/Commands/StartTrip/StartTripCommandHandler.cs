@@ -116,30 +116,39 @@ public class StartTripCommandHandler
         await _unitOfWork.SaveChangesAsync(ct);
 
         // Roster: prefer most recent prior trip on (bus, type); fall back to
-        // the BusSchedule's assigned students.
-        var lastTripId = await _context.Trips
-            .Where(t => !t.IsTemplate
-                        && t.Id    != trip.Id
-                        && t.BusId == bus.Id
-                        && t.Type  == request.TripType)
-            .OrderByDescending(t => t.ScheduledDeparture)
-            .Select(t => (Guid?)t.Id)
-            .FirstOrDefaultAsync(ct);
-
+        // the BusSchedule's assigned students. When the assistant explicitly
+        // chose to skip the auto-roster the trip is created empty and
+        // students are attached as their QR/NFC is scanned.
         List<Guid> studentIds;
-        if (lastTripId is not null)
+        if (request.SkipRoster)
         {
-            studentIds = await _context.StudentTrips
-                .Where(st => st.TripId == lastTripId)
-                .Select(st => st.StudentId)
-                .ToListAsync(ct);
+            studentIds = new List<Guid>();
         }
         else
         {
-            studentIds = await _context.BusScheduleStudents
-                .Where(x => x.BusSchedule.BusId == bus.Id)
-                .Select(x => x.StudentId)
-                .ToListAsync(ct);
+            var lastTripId = await _context.Trips
+                .Where(t => !t.IsTemplate
+                            && t.Id    != trip.Id
+                            && t.BusId == bus.Id
+                            && t.Type  == request.TripType)
+                .OrderByDescending(t => t.ScheduledDeparture)
+                .Select(t => (Guid?)t.Id)
+                .FirstOrDefaultAsync(ct);
+
+            if (lastTripId is not null)
+            {
+                studentIds = await _context.StudentTrips
+                    .Where(st => st.TripId == lastTripId)
+                    .Select(st => st.StudentId)
+                    .ToListAsync(ct);
+            }
+            else
+            {
+                studentIds = await _context.BusScheduleStudents
+                    .Where(x => x.BusSchedule.BusId == bus.Id)
+                    .Select(x => x.StudentId)
+                    .ToListAsync(ct);
+            }
         }
 
         // Return trips start with everyone already on the bus (the assistant

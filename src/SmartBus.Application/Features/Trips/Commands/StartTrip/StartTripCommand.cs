@@ -14,7 +14,8 @@ namespace SmartBus.Application.Features.Trips.Commands.StartTrip;
 public record StartTripCommand(
     Guid BusId,
     Guid DriverId,
-    TripType TripType
+    TripType TripType,
+    bool SkipRoster = false
 ) : IRequest<Result<StartTripResponse>>;
 
 public record StartTripResponse(

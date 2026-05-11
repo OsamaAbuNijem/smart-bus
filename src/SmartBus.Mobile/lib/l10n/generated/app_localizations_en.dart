@@ -36,7 +36,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginCardTitle => 'Sign in';
 
   @override
-  String get loginCardDesc => 'Enter your phone number to continue';
+  String get loginCardDesc => 'Enter your phone, we\'ll send a 4-digit code.';
 
   @override
   String get loginTabPhone => 'Phone';
@@ -51,16 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginPhonePlaceholder => '7X XXX XXXX';
 
   @override
-  String get loginPhoneHelp => 'We\'ll send a 4-digit verification code';
-
-  @override
   String get loginSendOtp => 'Send code';
-
-  @override
-  String get loginRegisterPrompt => 'New to SmartBus?';
-
-  @override
-  String get loginRegisterCta => 'Scan card to register';
 
   @override
   String get loginTerms => 'By continuing you agree to our Terms and Privacy';
@@ -105,6 +96,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get otpResend => 'Resend';
+
+  @override
+  String otpResendWait(String time) {
+    return 'Please wait $time before resending';
+  }
 
   @override
   String get otpInvalid => 'Invalid or expired code';
@@ -478,6 +474,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get absenceSectionStudent => 'Student';
 
   @override
+  String get absenceSectionRequested => 'Requested absences';
+
+  @override
+  String get absenceStatusPending => 'Pending';
+
+  @override
+  String get absenceStatusApproved => 'Approved';
+
+  @override
+  String get absenceStatusRejected => 'Rejected';
+
+  @override
+  String get absenceCancelTitle => 'Cancel absence?';
+
+  @override
+  String get absenceCancelBody =>
+      'The driver and school will be notified that the absence was cancelled.';
+
+  @override
+  String get absenceCancelYes => 'Cancel absence';
+
+  @override
+  String get absenceCancelled => 'Absence cancelled.';
+
+  @override
   String get absenceSectionDate => 'Absence Date';
 
   @override
@@ -794,6 +815,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantStudentsAuto => 'Auto-loaded from last trip';
 
   @override
+  String get assistantSkipRoster => 'Skip auto-roster';
+
+  @override
+  String get assistantSkipRosterHint =>
+      'Start empty — students join when their QR/NFC is scanned.';
+
+  @override
+  String get assistantRosterSheetTitle => 'Auto-loaded students';
+
+  @override
   String get assistantStartTrip => 'Start trip';
 
   @override
@@ -902,6 +933,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantEndTripConfirmYes => 'End trip';
 
   @override
+  String get assistantDeleteTrip => 'Delete trip';
+
+  @override
+  String get assistantDeleteTripConfirmTitle => 'Delete this trip?';
+
+  @override
+  String get assistantDeleteTripConfirmBody =>
+      'No students are on this trip yet. Deleting cancels it without leaving a history entry.';
+
+  @override
+  String get assistantDeleteTripConfirmYes => 'Delete';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override
@@ -952,6 +996,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistantAbsenceSheetTitle => 'Absence details';
+
+  @override
+  String get assistantAbsenceCancelTitle => 'Cancel this absence?';
+
+  @override
+  String get assistantAbsenceCancelBody =>
+      'The student will rejoin the trip and the parent will be notified that the absence was cancelled.';
+
+  @override
+  String get assistantAbsenceCancelYes => 'Cancel absence';
+
+  @override
+  String get assistantAbsenceCancelled => 'Absence cancelled.';
 
   @override
   String get assistantAbsenceReasonLabel => 'Reason';

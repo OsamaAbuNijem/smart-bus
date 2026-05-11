@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
+using SmartBus.Application.Features.Notifications.Commands.SendNotification;
 using SmartBus.Domain.Entities;
 using SmartBus.Domain.Enums;
 
@@ -13,13 +14,16 @@ public class ScanStudentQrCommandHandler
 {
     private readonly IApplicationDbContext _context;
     private readonly ILogger<ScanStudentQrCommandHandler> _logger;
+    private readonly IMediator _mediator;
 
     public ScanStudentQrCommandHandler(
         IApplicationDbContext context,
-        ILogger<ScanStudentQrCommandHandler> logger)
+        ILogger<ScanStudentQrCommandHandler> logger,
+        IMediator mediator)
     {
-        _context = context;
-        _logger  = logger;
+        _context  = context;
+        _logger   = logger;
+        _mediator = mediator;
     }
 
     public async Task<Result<ScanStudentQrResponse>> Handle(ScanStudentQrCommand request, CancellationToken ct)
@@ -91,11 +95,40 @@ public class ScanStudentQrCommandHandler
 
         await _context.SaveChangesAsync(ct);
 
-        // 5. Pull the student name for the response
-        var studentName = await _context.Students
+        // 5. Pull the student name + parent for the response and any
+        //    pickup / drop-off push that needs to fire.
+        var studentInfo = await _context.Students
             .Where(s => s.Id == qr.StudentId.Value)
-            .Select(s => s.FullName)
-            .FirstOrDefaultAsync(ct) ?? string.Empty;
+            .Select(s => new
+            {
+                s.FullName,
+                ParentUserId = s.Parent != null ? s.Parent.UserId : null,
+            })
+            .FirstOrDefaultAsync(ct);
+        var studentName = studentInfo?.FullName ?? string.Empty;
+
+        // Parent push — Morning trips trigger on first board, Return trips
+        // on first drop-off. The state machine above only flips action to
+        // those values on the meaningful transition, so we won't double-fire.
+        var notify =
+            (trip.Type == TripType.Morning && action == "Boarded") ||
+            (trip.Type == TripType.Return  && action == "Dropoff");
+        if (notify && studentInfo?.ParentUserId is not null)
+        {
+            var (title, message, type) = action == "Boarded"
+                ? ("Bus pickup",
+                   $"{studentName} has been picked up by the bus.",
+                   NotificationType.StudentBoarded)
+                : ("Arrived home",
+                   $"{studentName} has been dropped off by the bus.",
+                   NotificationType.StudentArrived);
+
+            await _mediator.Send(
+                new SendNotificationCommand(
+                    title, message, type,
+                    studentInfo.ParentUserId, trip.Id, null),
+                ct);
+        }
 
         _logger.LogInformation(
             "[StudentQrScan] Trip={TripId} Student={StudentId} → {Action}",

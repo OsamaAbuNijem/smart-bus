@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
+using SmartBus.Application.Features.Notifications.Commands.SendNotification;
 using SmartBus.Domain.Entities;
 using SmartBus.Domain.Enums;
 
@@ -12,13 +13,16 @@ public class UpdateBoardingStatusCommandHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IApplicationDbContext _context;
+    private readonly IMediator _mediator;
 
     public UpdateBoardingStatusCommandHandler(
         IUnitOfWork unitOfWork,
-        IApplicationDbContext context)
+        IApplicationDbContext context,
+        IMediator mediator)
     {
         _unitOfWork = unitOfWork;
         _context    = context;
+        _mediator   = mediator;
     }
 
     public async Task<Result> Handle(
@@ -26,6 +30,11 @@ public class UpdateBoardingStatusCommandHandler
     {
         var studentTrip = await _unitOfWork.StudentTrips
             .GetByStudentAndTripAsync(request.StudentId, request.TripId, ct);
+
+        // Snapshot the previous status so we can detect a "first time" flip
+        // (Waiting → Boarded for Morning, Boarded → DroppedOff for Return)
+        // and avoid firing duplicate notifications on repeated taps.
+        var previousStatus = studentTrip?.BoardingStatus;
 
         if (studentTrip is null)
         {
@@ -90,6 +99,55 @@ public class UpdateBoardingStatusCommandHandler
         }
 
         await _unitOfWork.SaveChangesAsync(ct);
+
+        // Parent push: notify on the first meaningful transition only.
+        // Morning trips → pickup confirmation when the student boards.
+        // Return trips → drop-off confirmation when the student gets off.
+        var isMorningPickup =
+            request.Status == BoardingStatus.Boarded
+            && previousStatus != BoardingStatus.Boarded;
+        var isReturnDropoff =
+            request.Status == BoardingStatus.DroppedOff
+            && previousStatus != BoardingStatus.DroppedOff;
+        if (isMorningPickup || isReturnDropoff)
+        {
+            var trip = await _context.Trips
+                .Where(t => t.Id == request.TripId)
+                .Select(t => new { t.Id, t.Type })
+                .FirstOrDefaultAsync(ct);
+
+            if (trip is not null &&
+                ((trip.Type == TripType.Morning && isMorningPickup) ||
+                 (trip.Type == TripType.Return  && isReturnDropoff)))
+            {
+                var info = await _context.Students
+                    .Where(s => s.Id == request.StudentId)
+                    .Select(s => new
+                    {
+                        s.FullName,
+                        ParentUserId = s.Parent != null ? s.Parent.UserId : null,
+                    })
+                    .FirstOrDefaultAsync(ct);
+
+                if (info?.ParentUserId is not null)
+                {
+                    var (title, message, type) = isMorningPickup
+                        ? ("Bus pickup",
+                           $"{info.FullName} has been picked up by the bus.",
+                           NotificationType.StudentBoarded)
+                        : ("Arrived home",
+                           $"{info.FullName} has been dropped off by the bus.",
+                           NotificationType.StudentArrived);
+
+                    await _mediator.Send(
+                        new SendNotificationCommand(
+                            title, message, type,
+                            info.ParentUserId, trip.Id, null),
+                        ct);
+                }
+            }
+        }
+
         return Result.Success();
     }
 }

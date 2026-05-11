@@ -90,6 +90,16 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   Future<void> _resend() async {
     final pending = ref.read(otpControllerProvider).valueOrNull;
     if (pending is! OtpPending) return;
+    // Honor the visible countdown — a request before it elapses would just
+    // come back as a server cooldown error anyway. Show a localized message
+    // tied to the 2-minute timer so the user knows how long to wait.
+    if (_remaining > Duration.zero) {
+      final l = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l.otpResendWait(_formatRemaining()))),
+      );
+      return;
+    }
     try {
       final ok = await ref.read(otpControllerProvider.notifier).requestOtp(
             phoneNumber: pending.phoneNumber,

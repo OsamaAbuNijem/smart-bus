@@ -36,7 +36,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginCardTitle => 'تسجيل الدخول';
 
   @override
-  String get loginCardDesc => 'أدخل رقم هاتفك للمتابعة';
+  String get loginCardDesc => 'أدخل رقم هاتفك، سنرسل رمز تحقق من 4 أرقام.';
 
   @override
   String get loginTabPhone => 'الهاتف';
@@ -51,16 +51,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginPhonePlaceholder => '7X XXX XXXX';
 
   @override
-  String get loginPhoneHelp => 'سنرسل لك رمز تحقق من 4 أرقام';
-
-  @override
   String get loginSendOtp => 'إرسال الرمز';
-
-  @override
-  String get loginRegisterPrompt => 'جديد على سمارت باص؟';
-
-  @override
-  String get loginRegisterCta => 'امسح البطاقة للتسجيل';
 
   @override
   String get loginTerms => 'بمتابعتك فإنك توافق على الشروط وسياسة الخصوصية';
@@ -105,6 +96,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get otpResend => 'إعادة الإرسال';
+
+  @override
+  String otpResendWait(String time) {
+    return 'الرجاء الانتظار $time قبل إعادة الإرسال';
+  }
 
   @override
   String get otpInvalid => 'الرمز غير صحيح أو منتهي الصلاحية';
@@ -476,6 +472,31 @@ class AppLocalizationsAr extends AppLocalizations {
   String get absenceSectionStudent => 'الطالب';
 
   @override
+  String get absenceSectionRequested => 'طلبات الغياب';
+
+  @override
+  String get absenceStatusPending => 'قيد المراجعة';
+
+  @override
+  String get absenceStatusApproved => 'مقبول';
+
+  @override
+  String get absenceStatusRejected => 'مرفوض';
+
+  @override
+  String get absenceCancelTitle => 'إلغاء الغياب؟';
+
+  @override
+  String get absenceCancelBody =>
+      'سيتم إبلاغ السائق والمدرسة بإلغاء طلب الغياب.';
+
+  @override
+  String get absenceCancelYes => 'إلغاء الغياب';
+
+  @override
+  String get absenceCancelled => 'تم إلغاء طلب الغياب.';
+
+  @override
   String get absenceSectionDate => 'تاريخ الغياب';
 
   @override
@@ -788,6 +809,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantStudentsAuto => 'تم تحميلهم تلقائيًا من آخر رحلة';
 
   @override
+  String get assistantSkipRoster => 'تخطّي القائمة التلقائية';
+
+  @override
+  String get assistantSkipRosterHint =>
+      'ابدأ بقائمة فارغة، يُضاف الطلاب عند مسح QR/NFC.';
+
+  @override
+  String get assistantRosterSheetTitle => 'الطلاب المُحمَّلون تلقائيًا';
+
+  @override
   String get assistantStartTrip => 'ابدأ الرحلة';
 
   @override
@@ -896,6 +927,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantEndTripConfirmYes => 'إنهاء الرحلة';
 
   @override
+  String get assistantDeleteTrip => 'حذف الرحلة';
+
+  @override
+  String get assistantDeleteTripConfirmTitle => 'حذف هذه الرحلة؟';
+
+  @override
+  String get assistantDeleteTripConfirmBody =>
+      'لا يوجد طلاب في هذه الرحلة بعد. الحذف يلغيها دون تسجيل في السجل.';
+
+  @override
+  String get assistantDeleteTripConfirmYes => 'حذف';
+
+  @override
   String get settingsTitle => 'الإعدادات';
 
   @override
@@ -946,6 +990,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get assistantAbsenceSheetTitle => 'تفاصيل الغياب';
+
+  @override
+  String get assistantAbsenceCancelTitle => 'إلغاء طلب الغياب؟';
+
+  @override
+  String get assistantAbsenceCancelBody =>
+      'سيعود الطالب إلى الرحلة وسيتم إبلاغ ولي الأمر بإلغاء الغياب.';
+
+  @override
+  String get assistantAbsenceCancelYes => 'إلغاء الغياب';
+
+  @override
+  String get assistantAbsenceCancelled => 'تم إلغاء طلب الغياب.';
 
   @override
   String get assistantAbsenceReasonLabel => 'السبب';

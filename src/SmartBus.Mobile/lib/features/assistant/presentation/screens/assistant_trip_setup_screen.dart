@@ -30,6 +30,7 @@ class _AssistantTripSetupScreenState
   DriverSummaryDto? _selectedDriver;
   String _tripType = 'Morning';
   bool _starting = false;
+  bool _skipRoster = false;
 
   @override
   void initState() {
@@ -55,6 +56,7 @@ class _AssistantTripSetupScreenState
         busId: _selectedBus!.id,
         driverId: _selectedDriver!.id,
         tripType: _tripType,
+        skipRoster: _skipRoster,
       );
       if (!mounted) return;
       ref.read(scannedBusControllerProvider.notifier).clear();
@@ -113,16 +115,30 @@ class _AssistantTripSetupScreenState
                   const SizedBox(height: 14),
                   _SimpleLabel(text: l.assistantDriverLabel),
                   const SizedBox(height: 8),
-                  _DriverPicker(
-                    selected: _selectedDriver,
-                    onChanged: (d) => setState(() => _selectedDriver = d),
-                    l: l,
-                  ),
+                  if (_selectedBus != null)
+                    _DriverAutoPicker(
+                      busId: _selectedBus!.id,
+                      tripType: _tripType,
+                      selected: _selectedDriver,
+                      onChanged: (d) =>
+                          setState(() => _selectedDriver = d),
+                      l: l,
+                    )
+                  else
+                    _DriverPicker(
+                      selected: _selectedDriver,
+                      onChanged: (d) =>
+                          setState(() => _selectedDriver = d),
+                      l: l,
+                    ),
                   const SizedBox(height: 14),
                   if (_selectedBus != null)
                     _StudentsStrip(
                       busId: _selectedBus!.id,
                       tripType: _tripType,
+                      skip: _skipRoster,
+                      onSkipChanged: (v) =>
+                          setState(() => _skipRoster = v),
                       l: l,
                     ),
                 ],
@@ -435,6 +451,59 @@ class _TripTypeOpt extends StatelessWidget {
   }
 }
 
+// ─── Driver auto-picker (pre-fills from the bus schedule) ───────────────
+
+class _DriverAutoPicker extends ConsumerStatefulWidget {
+  const _DriverAutoPicker({
+    required this.busId,
+    required this.tripType,
+    required this.selected,
+    required this.onChanged,
+    required this.l,
+  });
+  final String busId;
+  final String tripType;
+  final DriverSummaryDto? selected;
+  final ValueChanged<DriverSummaryDto?> onChanged;
+  final AppLocalizations l;
+
+  @override
+  ConsumerState<_DriverAutoPicker> createState() => _DriverAutoPickerState();
+}
+
+class _DriverAutoPickerState extends ConsumerState<_DriverAutoPicker> {
+  // Track the (bus, type) we already auto-applied so the user's manual
+  // override isn't clobbered if the schedule's default fetch resolves late.
+  String? _appliedKey;
+
+  String get _key => '${widget.busId}|${widget.tripType}';
+
+  @override
+  Widget build(BuildContext context) {
+    final defaultAsync = ref.watch(busDefaultDriverProvider(
+      (busId: widget.busId, tripType: widget.tripType),
+    ));
+
+    defaultAsync.whenData((driver) {
+      if (driver != null && _appliedKey != _key && widget.selected == null) {
+        _appliedKey = _key;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          widget.onChanged(driver);
+        });
+      }
+    });
+
+    // Reuse the manual dropdown so the user can still override the
+    // schedule's default driver if needed.
+    return _DriverPicker(
+      selected: widget.selected,
+      onChanged: widget.onChanged,
+      l: widget.l,
+    );
+  }
+}
+
 // ─── Driver picker ──────────────────────────────────────────────────────
 
 class _DriverPicker extends ConsumerWidget {
@@ -570,10 +639,14 @@ class _StudentsStrip extends ConsumerWidget {
   const _StudentsStrip({
     required this.busId,
     required this.tripType,
+    required this.skip,
+    required this.onSkipChanged,
     required this.l,
   });
   final String busId;
   final String tripType;
+  final bool skip;
+  final ValueChanged<bool> onSkipChanged;
   final AppLocalizations l;
 
   @override
@@ -619,11 +692,209 @@ class _StudentsStrip extends ConsumerWidget {
               ),
             );
           }
-          return _StudentsStripContent(students: students, l: l);
+          // Dim the auto-roster preview while skipped so the toggle's
+          // effect is immediately obvious without re-fetching. Tap the
+          // preview to open a sheet showing the whole list.
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => _showRosterSheet(context, students, l),
+                child: Opacity(
+                  opacity: skip ? 0.45 : 1,
+                  child:
+                      _StudentsStripContent(students: students, l: l),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Divider(
+                  height: 1, thickness: 1, color: AppColors.slate100),
+              const SizedBox(height: 6),
+              _SkipRosterRow(
+                value: skip,
+                onChanged: onSkipChanged,
+                l: l,
+              ),
+            ],
+          );
         },
       ),
     );
   }
+}
+
+class _SkipRosterRow extends StatelessWidget {
+  const _SkipRosterRow({
+    required this.value,
+    required this.onChanged,
+    required this.l,
+  });
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l.assistantSkipRoster,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                  letterSpacing: -0.1,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                l.assistantSkipRosterHint,
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.slate500,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        Switch.adaptive(
+          value: value,
+          onChanged: onChanged,
+          activeThumbColor: AppColors.yellowDeep,
+        ),
+      ],
+    );
+  }
+}
+
+Future<void> _showRosterSheet(
+  BuildContext context,
+  List<RosterStudentDto> students,
+  AppLocalizations l,
+) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+    ),
+    builder: (_) => DraggableScrollableSheet(
+      initialChildSize: 0.55,
+      minChildSize: 0.35,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, controller) => Column(
+        children: [
+          const SizedBox(height: 8),
+          Container(
+            width: 38,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.slate200,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l.assistantRosterSheetTitle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 9, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.yellowTint,
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(color: const Color(0x66F5C518)),
+                  ),
+                  child: Text(
+                    '${students.length}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.yellowDeep,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, thickness: 1, color: AppColors.slate100),
+          Expanded(
+            child: ListView.separated(
+              controller: controller,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              itemCount: students.length,
+              separatorBuilder: (_, _) => const Divider(
+                  height: 1, thickness: 1, color: AppColors.slate100),
+              itemBuilder: (context, i) {
+                final s = students[i];
+                final initials = _rosterInitials(s.fullName);
+                return ListTile(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  leading: Container(
+                    width: 34,
+                    height: 34,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.slate100,
+                    ),
+                    child: Text(
+                      initials,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.slate600,
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    s.fullName,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+String _rosterInitials(String name) {
+  final parts = name.trim().split(RegExp(r'\s+'));
+  if (parts.isEmpty || parts.first.isEmpty) return '·';
+  if (parts.length == 1) return parts.first.characters.first.toUpperCase();
+  return (parts.first.characters.first + parts.last.characters.first)
+      .toUpperCase();
 }
 
 class _StudentsStripContent extends StatelessWidget {

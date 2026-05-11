@@ -968,7 +968,11 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _AbsenceDetailSheet(student: s, l: widget.l),
+      builder: (_) => _AbsenceDetailSheet(
+        student: s,
+        tripId: widget.tripId,
+        l: widget.l,
+      ),
     );
   }
 
@@ -1225,13 +1229,76 @@ class _AbsenceInfoBtn extends StatelessWidget {
   }
 }
 
-class _AbsenceDetailSheet extends StatelessWidget {
-  const _AbsenceDetailSheet({required this.student, required this.l});
+class _AbsenceDetailSheet extends ConsumerStatefulWidget {
+  const _AbsenceDetailSheet({
+    required this.student,
+    required this.tripId,
+    required this.l,
+  });
   final TripStudentDetailDto student;
+  final String tripId;
   final AppLocalizations l;
 
   @override
+  ConsumerState<_AbsenceDetailSheet> createState() =>
+      _AbsenceDetailSheetState();
+}
+
+class _AbsenceDetailSheetState extends ConsumerState<_AbsenceDetailSheet> {
+  bool _busy = false;
+
+  Future<void> _cancel() async {
+    final l = widget.l;
+    final id = widget.student.absenceRequestId;
+    if (id == null) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.assistantAbsenceCancelTitle),
+        content: Text(l.assistantAbsenceCancelBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l.assistantAbsenceCancelYes),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      final ds = ref.read(assistantRemoteDataSourceProvider);
+      await ds.cancelAbsenceRequest(id);
+      // Force the trip-details refetch so the student switches back to its
+      // pre-absent boarding state immediately.
+      ref.invalidate(tripDetailsProvider(widget.tripId));
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l.assistantAbsenceCancelled)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final student = widget.student;
+    final l = widget.l;
     return SafeArea(
       top: false,
       child: Padding(
@@ -1319,6 +1386,36 @@ class _AbsenceDetailSheet extends StatelessWidget {
                 label: l.assistantAbsenceNoteLabel,
                 value: student.absenceDriverNote!,
               ),
+            if (student.absenceRequestId != null) ...[
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: FilledButton.icon(
+                  onPressed: _busy ? null : _cancel,
+                  icon: _busy
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.delete_outline, size: 16),
+                  label: Text(l.assistantAbsenceCancelYes),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.red,
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -1669,13 +1766,21 @@ class _EndTripBar extends ConsumerStatefulWidget {
 class _EndTripBarState extends ConsumerState<_EndTripBar> {
   bool _busy = false;
 
+  bool get _isEmpty => widget.details.studentCount == 0;
+
   Future<void> _end() async {
     final l = widget.l;
+    final deleting = _isEmpty;
+    // Empty trips have nothing to complete — confirm a hard delete instead.
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l.assistantEndTripConfirmTitle),
-        content: Text(l.assistantEndTripConfirmBody),
+        title: Text(deleting
+            ? l.assistantDeleteTripConfirmTitle
+            : l.assistantEndTripConfirmTitle),
+        content: Text(deleting
+            ? l.assistantDeleteTripConfirmBody
+            : l.assistantEndTripConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -1683,7 +1788,15 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l.assistantEndTripConfirmYes),
+            style: deleting
+                ? FilledButton.styleFrom(
+                    backgroundColor: AppColors.red,
+                    foregroundColor: Colors.white,
+                  )
+                : null,
+            child: Text(deleting
+                ? l.assistantDeleteTripConfirmYes
+                : l.assistantEndTripConfirmYes),
           ),
         ],
       ),
@@ -1693,7 +1806,11 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
     setState(() => _busy = true);
     try {
       final ds = ref.read(assistantRemoteDataSourceProvider);
-      await ds.completeTrip(widget.details.tripId);
+      if (deleting) {
+        await ds.cancelEmptyTrip(widget.details.tripId);
+      } else {
+        await ds.completeTrip(widget.details.tripId);
+      }
       // Invalidate before navigating so the home rebuild picks up the
       // refreshed list (the autoDispose provider was kept alive by the
       // previous home subscription, so a re-mount alone wouldn't refetch).
@@ -1735,6 +1852,12 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
         child: FilledButton(
           onPressed:
               _busy || widget.details.status == 'Completed' ? null : _end,
+          style: _isEmpty
+              ? FilledButton.styleFrom(
+                  backgroundColor: AppColors.red,
+                  foregroundColor: Colors.white,
+                )
+              : null,
           child: _busy
               ? const SizedBox(
                   width: 16,
@@ -1747,21 +1870,25 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(widget.l.assistantEndTrip),
+                    Text(_isEmpty
+                        ? widget.l.assistantDeleteTrip
+                        : widget.l.assistantEndTrip),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.ink.withValues(alpha: 0.1),
+                        color: _isEmpty
+                            ? Colors.white.withValues(alpha: 0.18)
+                            : AppColors.ink.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Text(
                         '$progressNumerator/$expected $progressLabel',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.ink,
+                          color: _isEmpty ? Colors.white : AppColors.ink,
                           fontFeatures: [FontFeature.tabularFigures()],
                         ),
                       ),

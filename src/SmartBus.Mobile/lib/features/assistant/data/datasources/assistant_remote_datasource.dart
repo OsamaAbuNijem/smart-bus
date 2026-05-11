@@ -74,6 +74,25 @@ class AssistantRemoteDataSource {
     }
   }
 
+  /// Default driver assigned to this bus + trip type via the bus schedule.
+  /// Returns null when no schedule entry exists for the requested leg.
+  Future<DriverSummaryDto?> getDefaultDriver({
+    required String busId,
+    required String tripType,
+  }) async {
+    try {
+      final response = await _dio.get<dynamic>(
+        '/buses/$busId/default-driver',
+        queryParameters: {'tripType': tripType},
+      );
+      final data = response.data;
+      if (data is! Map<String, dynamic>) return null;
+      return DriverSummaryDto.fromJson(data);
+    } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
   /// Students from the most recent trip on this bus + trip type.
   Future<List<RosterStudentDto>> getLastRoster({
     required String busId,
@@ -93,16 +112,23 @@ class AssistantRemoteDataSource {
     }
   }
 
-  /// Create + start a new trip.
+  /// Create + start a new trip. Pass [skipRoster] = true to materialise an
+  /// empty trip; students get attached as their QR/NFC is scanned.
   Future<StartTripResponseDto> startTrip({
     required String busId,
     required String driverId,
     required String tripType,
+    bool skipRoster = false,
   }) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         '/trips/start',
-        data: {'busId': busId, 'driverId': driverId, 'tripType': tripType},
+        data: {
+          'busId': busId,
+          'driverId': driverId,
+          'tripType': tripType,
+          'skipRoster': skipRoster,
+        },
       );
       final data = response.data;
       if (data == null) throw const FormatException('empty body');
@@ -180,6 +206,27 @@ class AssistantRemoteDataSource {
   Future<void> completeTrip(String tripId) async {
     try {
       await _dio.post<void>('/trips/$tripId/complete');
+    } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
+  /// Cancel a trip that still has zero students. Server enforces the
+  /// empty-roster guard, so this is rejected as soon as anyone is on board.
+  Future<void> cancelEmptyTrip(String tripId) async {
+    try {
+      await _dio.delete<void>('/trips/$tripId/empty');
+    } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
+  /// Cancel an absence the parent submitted earlier. Used by the assistant
+  /// trip-details sheet to undo an absent flag mid-trip when the student
+  /// shows up after all. Server rejects once the matching trip is completed.
+  Future<void> cancelAbsenceRequest(String absenceRequestId) async {
+    try {
+      await _dio.delete<void>('/absence-requests/$absenceRequestId');
     } on DioException catch (e) {
       throw mapDioErrorToFailure(e);
     }

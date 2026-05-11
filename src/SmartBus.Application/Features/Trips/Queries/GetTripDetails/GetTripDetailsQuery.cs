@@ -45,5 +45,7 @@ public record TripStudentDetailDto(
     string? AbsencePickupPersonName,
     string? AbsencePickupPersonRelation,
     string? AbsenceDriverNote,
+    Guid? AbsenceRequestId,       // null when not absent — surfaced so the
+                                  // assistant can cancel without a second query.
     string? ParentName,
     string? ParentPhone);

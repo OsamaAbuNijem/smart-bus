@@ -41,6 +41,17 @@ final lastRosterProvider = FutureProvider.autoDispose
   },
 );
 
+/// Default driver for the chosen (bus, type), taken from the bus schedule.
+/// The trip-setup screen uses this to pre-fill the driver picker so the
+/// assistant doesn't have to choose from the full list every time.
+final busDefaultDriverProvider = FutureProvider.autoDispose
+    .family<DriverSummaryDto?, ({String busId, String tripType})>(
+  (ref, key) async {
+    final ds = ref.watch(assistantRemoteDataSourceProvider);
+    return ds.getDefaultDriver(busId: key.busId, tripType: key.tripType);
+  },
+);
+
 /// Holds the bus that was resolved from the latest QR scan, so the setup
 /// screen can render it as the "From QR" chip. Cleared on back/start trip.
 class ScannedBusController extends StateNotifier<AsyncValue<BusSummaryDto?>> {
@@ -73,17 +84,20 @@ final startTripActionProvider = Provider<
       required String busId,
       required String driverId,
       required String tripType,
+      bool skipRoster,
     })>((ref) {
   return ({
     required String busId,
     required String driverId,
     required String tripType,
+    bool skipRoster = false,
   }) async {
     final ds = ref.read(assistantRemoteDataSourceProvider);
     final result = await ds.startTrip(
       busId: busId,
       driverId: driverId,
       tripType: tripType,
+      skipRoster: skipRoster,
     );
     ref.invalidate(myTodayTripsProvider);
     return result;

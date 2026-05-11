@@ -9,6 +9,7 @@ using SmartBus.Application.Features.Buses.Commands.UpdateBusLocation;
 using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Buses.Queries.GetBusById;
 using SmartBus.Application.Features.Buses.Queries.GetBusByQrToken;
+using SmartBus.Application.Features.Buses.Queries.GetBusDefaultDriver;
 using SmartBus.Application.Features.Buses.Queries.GetBusLastRoster;
 using SmartBus.Domain.Enums;
 
@@ -66,6 +67,24 @@ public class BusesController : ControllerBase
     {
         var result = await _mediator.Send(
             new GetBusLastRosterQuery(id, tripType), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Default driver for this bus + trip type, taken from the bus schedule.
+    /// Used by the assistant trip-setup screen to pre-fill the driver picker.
+    /// </summary>
+    [HttpGet("{id:guid}/default-driver")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> DefaultDriver(
+        Guid id,
+        [FromQuery] TripType tripType,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetBusDefaultDriverQuery(id, tripType), cancellationToken);
         return result.IsSuccess
             ? Ok(result.Data)
             : BadRequest(new { error = result.Error });

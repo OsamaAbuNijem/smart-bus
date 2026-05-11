@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Trips.Commands.CreateTrip;
+using SmartBus.Application.Features.Trips.Commands.CancelEmptyTrip;
 using SmartBus.Application.Features.Trips.Commands.DeleteTrip;
 using SmartBus.Application.Features.Trips.Commands.ScanBusQr;
 using SmartBus.Application.Features.Trips.Commands.ScanStudent;
@@ -220,6 +221,22 @@ public class TripsController : ControllerBase
     {
         var result = await _mediator.Send(new DeleteTripCommand(id), cancellationToken);
         return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Cancel a trip that has zero students. Used by the assistant flow
+    /// when the trip was started with "Skip auto-roster" and no student
+    /// was scanned — there is nothing to complete, so the trip is deleted.
+    /// </summary>
+    [HttpDelete("{id:guid}/empty")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> CancelEmpty(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new CancelEmptyTripCommand(id), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(new { error = result.Error });
     }
 }
 

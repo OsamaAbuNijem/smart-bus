@@ -81,6 +81,7 @@ class TripStudentDetailDto {
     required this.absencePickupPersonName,
     required this.absencePickupPersonRelation,
     required this.absenceDriverNote,
+    required this.absenceRequestId,
     required this.parentName,
     required this.parentPhone,
   });
@@ -108,6 +109,7 @@ class TripStudentDetailDto {
         absencePickupPersonRelation:
             json['absencePickupPersonRelation'] as String?,
         absenceDriverNote: json['absenceDriverNote'] as String?,
+        absenceRequestId: json['absenceRequestId'] as String?,
         parentName: json['parentName'] as String?,
         parentPhone: json['parentPhone'] as String?,
       );
@@ -128,6 +130,7 @@ class TripStudentDetailDto {
   final String? absencePickupPersonName;
   final String? absencePickupPersonRelation;
   final String? absenceDriverNote;
+  final String? absenceRequestId;
   final String? parentName;
   final String? parentPhone;
 

@@ -85,6 +85,28 @@ class ParentRemoteDataSource {
     }
   }
 
+  /// All non-deleted absence requests for a student (newest day first).
+  Future<List<Map<String, dynamic>>> getAbsenceRequests(String studentId) async {
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        '/absence-requests/students/$studentId',
+      );
+      final list = response.data ?? const [];
+      return list.cast<Map<String, dynamic>>();
+    } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
+  /// Parent-side cancel. Server rejects once the matching trip has started.
+  Future<void> cancelAbsenceRequest(String id) async {
+    try {
+      await _dio.delete<void>('/absence-requests/$id');
+    } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
   static String _dateOnly(DateTime d) {
     final local = d.toLocal();
     final m = local.month.toString().padLeft(2, '0');

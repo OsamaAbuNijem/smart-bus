@@ -52,11 +52,13 @@ public class GetTripDetailsQueryHandler
 
         var absenceRows = await _context.AbsenceRequests
             .Where(a => a.Date == tripDate
+                        && !a.IsDeleted
                         && a.Status != AbsenceRequestStatus.Rejected
                         && (a.TripType == AbsenceTripType.FullDay
                             || a.TripType == legFilter))
             .Select(a => new
             {
+                a.Id,
                 a.StudentId,
                 a.Reason,
                 a.PickupPersonName,
@@ -117,6 +119,7 @@ public class GetTripDetailsQueryHandler
                     absence?.PickupPersonName,
                     absence?.PickupPersonRelation,
                     absence?.DriverNote,
+                    absence?.Id,
                     r.ParentName,
                     r.ParentPhone);
             })

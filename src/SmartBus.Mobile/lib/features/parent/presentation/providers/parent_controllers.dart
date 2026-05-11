@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
 import 'package:smart_bus/features/parent/data/repositories/parent_repository.dart';
+import 'package:smart_bus/features/parent/domain/entities/absence_request_item.dart';
 import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
 import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
 import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
@@ -47,6 +48,15 @@ Future<List<ChildTrip>> childTrips(Ref ref, String studentId) async {
   if (user == null || studentId.isEmpty) return const [];
   final repo = ref.watch(parentRepositoryProvider);
   return repo.getChildTrips(parentId: user.entityId, studentId: studentId);
+}
+
+/// All non-deleted absence requests for the given student, newest first.
+@riverpod
+Future<List<AbsenceRequestItem>> studentAbsences(
+    Ref ref, String studentId) async {
+  if (studentId.isEmpty) return const [];
+  final repo = ref.watch(parentRepositoryProvider);
+  return repo.getAbsenceRequests(studentId);
 }
 
 /// Larger trip window for the dedicated history screen (last ~30 entries).

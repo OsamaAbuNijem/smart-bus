@@ -7,7 +7,6 @@ import 'package:smart_bus/core/errors/failures.dart';
 import 'package:smart_bus/core/locale/locale_controller.dart';
 import 'package:smart_bus/core/routing/app_router.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/auth/domain/entities/user.dart';
 import 'package:smart_bus/features/auth/presentation/providers/otp_controller.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
 
@@ -105,13 +104,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const BrandBlock(),
+                                const BrandBlock(showTagline: false),
                                 const SizedBox(height: 20),
                                 _SignInCard(
                                   title: l.loginCardTitle,
                                   description: l.loginCardDesc,
                                   phoneHint: l.loginPhonePlaceholder,
-                                  phoneHelp: l.loginPhoneHelp,
                                   sendLabel: l.loginSendOtp,
                                   phoneCtrl: _phoneCtrl,
                                   phoneFocus: _phoneFocus,
@@ -126,12 +124,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     setState(() {});
                                   },
                                   onSubmit: _phoneValid ? _submit : null,
-                                ),
-                                const SizedBox(height: 20),
-                                _RegisterHint(
-                                  prompt: l.loginRegisterPrompt,
-                                  cta: l.loginRegisterCta,
-                                  onTap: () => context.push(AppRoute.scanCard),
                                 ),
                               ],
                             ),
@@ -219,7 +211,6 @@ class _SignInCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.phoneHint,
-    required this.phoneHelp,
     required this.sendLabel,
     required this.phoneCtrl,
     required this.phoneFocus,
@@ -236,7 +227,6 @@ class _SignInCard extends StatelessWidget {
   final String title;
   final String description;
   final String phoneHint;
-  final String phoneHelp;
   final String sendLabel;
   final TextEditingController phoneCtrl;
   final FocusNode phoneFocus;
@@ -273,15 +263,23 @@ class _SignInCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w500,
-              color: AppColors.slate500,
-              letterSpacing: -0.05,
-              height: 1.45,
+          // Reserve enough room for a 2-line description so the card height
+          // stays stable when the locale flips (Arabic and English wrap to
+          // different line counts at the same font size).
+          SizedBox(
+            height: 38,
+            child: Text(
+              description,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: AppColors.slate500,
+                letterSpacing: -0.05,
+                height: 1.45,
+              ),
             ),
           ),
           const SizedBox(height: 18),
@@ -297,23 +295,6 @@ class _SignInCard extends StatelessWidget {
             onChanged: onChanged,
             onClear: onClear,
             onSubmitted: (_) => onSubmit?.call(),
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Padding(
-              padding: const EdgeInsetsDirectional.only(start: 2),
-              child: Text(
-                phoneHelp,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.slate500,
-                  letterSpacing: -0.05,
-                  height: 1.4,
-                ),
-              ),
-            ),
           ),
           const SizedBox(height: 14),
           GradientButton(
@@ -607,76 +588,6 @@ class GradientButton extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-// ── Register hint pill ──────────────────────────────────────────────────────
-
-class _RegisterHint extends StatelessWidget {
-  const _RegisterHint({
-    required this.prompt,
-    required this.cta,
-    required this.onTap,
-  });
-  final String prompt;
-  final String cta;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 6,
-      runSpacing: 6,
-      children: [
-        Text(
-          prompt,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppColors.slate500,
-            letterSpacing: -0.05,
-            height: 1.5,
-          ),
-        ),
-        Material(
-          color: AppColors.slate50,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-            side: const BorderSide(color: AppColors.slate100),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(100),
-            onTap: onTap,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.qr_code_scanner,
-                    size: 12,
-                    color: AppColors.yellowDeep,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    cta,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.ink,
-                      letterSpacing: -0.1,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

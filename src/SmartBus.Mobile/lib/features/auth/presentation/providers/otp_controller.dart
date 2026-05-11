@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -39,7 +41,7 @@ class OtpController extends _$OtpController {
         OtpFlow.pending(
           phoneNumber: phoneNumber,
           role: UserRole.parent,
-          expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+          expiresAt: DateTime.now().add(const Duration(minutes: 2)),
           devOtp: Env.demoOtp,
         ),
       );
@@ -49,12 +51,16 @@ class OtpController extends _$OtpController {
     try {
       final repo = ref.read(authRepositoryProvider);
       final res = await repo.requestOtp(phoneNumber: phoneNumber);
+      // Cap the displayed countdown at 2 minutes so the UI matches the
+      // resend cooldown shown on the screen, even if the server returns a
+      // longer expiry.
+      final ttlSeconds = math.min(120, res.expiresInSeconds);
       state = AsyncValue.data(
         OtpFlow.pending(
           phoneNumber: phoneNumber,
           role: res.role,
           expiresAt:
-              DateTime.now().add(Duration(seconds: res.expiresInSeconds)),
+              DateTime.now().add(Duration(seconds: ttlSeconds)),
           devOtp: res.devOtp,
         ),
       );

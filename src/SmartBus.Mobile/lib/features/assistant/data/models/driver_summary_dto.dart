@@ -30,4 +30,15 @@ class DriverSummaryDto {
   final String driverType; // "Driver" | "Assistant"
 
   bool get isAssistant => driverType == 'Assistant';
+
+  // The driver-picker's DropdownButton uses object equality to match the
+  // selected value against its items. Without these overrides, a value
+  // produced by /buses/{id}/default-driver compares !=  to the same driver
+  // instance from /drivers (different objects), tripping a runtime assertion.
+  @override
+  bool operator ==(Object other) =>
+      other is DriverSummaryDto && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
