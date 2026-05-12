@@ -186,7 +186,12 @@ class _IconChip extends StatelessWidget {
             borderRadius: BorderRadius.circular(11),
             border: Border.all(color: AppColors.slate100),
           ),
-          child: Icon(icon, size: 16, color: AppColors.slate700),
+          child: Icon(
+            icon,
+            size: 16,
+            color: AppColors.slate700,
+            textDirection: TextDirection.ltr,
+          ),
         ),
       ),
     );

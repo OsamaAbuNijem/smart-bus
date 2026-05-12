@@ -23,6 +23,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<AbsenceRequest> AbsenceRequests => Set<AbsenceRequest>();
     public DbSet<BusLocation> BusLocations => Set<BusLocation>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<NotificationTemplate> NotificationTemplates =>
+        Set<NotificationTemplate>();
     public DbSet<Alert> Alerts => Set<Alert>();
     public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
     public DbSet<StudentAllergy> StudentAllergies => Set<StudentAllergy>();
@@ -52,6 +54,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<Attendance>().HasQueryFilter(a => !a.IsDeleted);
         builder.Entity<AbsenceRequest>().HasQueryFilter(a => !a.IsDeleted);
         builder.Entity<Notification>().HasQueryFilter(n => !n.IsDeleted);
+        builder.Entity<NotificationTemplate>().HasQueryFilter(t => !t.IsDeleted);
+        // One template per (Type, LanguageCode) — soft-deleted rows allowed
+        // so we can keep history when an admin re-edits copy.
+        builder.Entity<NotificationTemplate>()
+            .HasIndex(t => new { t.Type, t.LanguageCode })
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false");
         builder.Entity<Alert>().HasQueryFilter(a => !a.IsDeleted);
         builder.Entity<EmergencyContact>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<StudentAllergy>().HasQueryFilter(a => !a.IsDeleted);

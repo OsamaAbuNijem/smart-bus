@@ -754,7 +754,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String notificationsCountItems(int count) {
-    return '$count عناصر';
+    return '$count عنصر';
   }
 
   @override
@@ -785,10 +785,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantManualSetupCta => 'أو الإعداد يدويًا';
 
   @override
-  String get assistantMorningPickup => 'نقلة الصباح';
+  String get assistantMorningPickup => 'رحلة الصباح';
 
   @override
-  String get assistantAfternoonDropoff => 'نقلة العودة';
+  String get assistantAfternoonDropoff => 'رحلة العودة';
 
   @override
   String get assistantStartedAt => 'بدأت';

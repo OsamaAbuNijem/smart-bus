@@ -324,18 +324,29 @@ class _OtpCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           if (sentTo.isNotEmpty)
-            Text.rich(
-              TextSpan(
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.slate500,
-                  letterSpacing: -0.05,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    sentLabel,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.slate500,
+                      letterSpacing: -0.05,
+                    ),
+                  ),
                 ),
-                children: [
-                  TextSpan(text: '$sentLabel '),
-                  TextSpan(
-                    text: sentTo,
+                const SizedBox(width: 4),
+                // Force LTR so the leading "+" and the digits keep their
+                // natural left-to-right order even when the app locale is
+                // Arabic — phone numbers shouldn't mirror.
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Text(
+                    sentTo,
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -343,9 +354,8 @@ class _OtpCard extends StatelessWidget {
                       fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
-                ],
-              ),
-              textAlign: TextAlign.center,
+                ),
+              ],
             ),
           const SizedBox(height: 16),
           _OtpRow(

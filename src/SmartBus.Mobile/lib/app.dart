@@ -25,13 +25,12 @@ class SmartBusApp extends ConsumerWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       localeListResolutionCallback: (preferred, supported) {
         if (locale != null) return locale;
-        if (preferred == null) return supported.first;
-        for (final l in preferred) {
-          for (final s in supported) {
-            if (s.languageCode == l.languageCode) return s;
-          }
-        }
-        return supported.first;
+        // Default to Arabic when there's nothing stored — only fall back
+        // to system / supported.first if Arabic isn't actually supported.
+        return supported.firstWhere(
+          (s) => s.languageCode == 'ar',
+          orElse: () => supported.first,
+        );
       },
       debugShowCheckedModeBanner: false,
     );

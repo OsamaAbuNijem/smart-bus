@@ -16,6 +16,7 @@ public class StartTripCommandHandler
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
     private readonly IMediator _mediator;
+    private readonly INotificationTemplateService _templates;
     private readonly ILogger<StartTripCommandHandler> _logger;
 
     public StartTripCommandHandler(
@@ -23,12 +24,14 @@ public class StartTripCommandHandler
         IApplicationDbContext context,
         ICurrentUserService currentUser,
         IMediator mediator,
+        INotificationTemplateService templates,
         ILogger<StartTripCommandHandler> logger)
     {
         _unitOfWork  = unitOfWork;
         _context     = context;
         _currentUser = currentUser;
         _mediator    = mediator;
+        _templates   = templates;
         _logger      = logger;
     }
 
@@ -183,13 +186,20 @@ public class StartTripCommandHandler
         {
             try
             {
-                var legLabel = request.TripType == TripType.Morning
-                    ? "Morning pickup"
-                    : "Return drop-off";
+                var (title, message) = await _templates.RenderAsync(
+                    NotificationType.TripStarted,
+                    "ar",
+                    new Dictionary<string, string?>
+                    {
+                        ["busPlateNumber"] = bus.PlateNumber,
+                        ["tripType"] = request.TripType == TripType.Morning
+                            ? "رحلة الصباح"
+                            : "رحلة العودة",
+                    },
+                    ct);
                 await _mediator.Send(new SendNotificationCommand(
-                    Title: $"{legLabel} started",
-                    Message:
-                        $"Bus {bus.PlateNumber} is now live — open the route map to begin driving.",
+                    Title: title,
+                    Message: message,
                     Type: NotificationType.TripStarted,
                     RecipientId: driver.UserId,
                     RelatedTripId: trip.Id,

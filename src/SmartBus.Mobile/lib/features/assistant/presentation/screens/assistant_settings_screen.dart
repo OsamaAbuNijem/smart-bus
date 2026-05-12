@@ -270,8 +270,16 @@ class _LightIconBtn extends StatelessWidget {
         child: SizedBox(
           width: 38,
           height: 38,
-          child:
-              Center(child: Icon(icon, size: 17, color: AppColors.slate700)),
+          child: Center(
+            child: Icon(
+              icon,
+              size: 17,
+              color: AppColors.slate700,
+              // Pin to LTR so Icons.arrow_forward stays → in Arabic instead
+              // of auto-flipping to ← via matchTextDirection.
+              textDirection: TextDirection.ltr,
+            ),
+          ),
         ),
       ),
     );
@@ -346,49 +354,59 @@ class _FieldShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isRtl = Directionality.of(context) == TextDirection.rtl;
-    return IntrinsicHeight(
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            decoration: BoxDecoration(
-              border: Border(
-                right: isRtl
-                    ? BorderSide.none
-                    : const BorderSide(color: AppColors.slate100),
-                left: isRtl
-                    ? const BorderSide(color: AppColors.slate100)
-                    : BorderSide.none,
+    // Skip IntrinsicHeight here — text-field intrinsic measurement can
+    // round 1 px short of the column's actual rendered height and cause an
+    // overflow stripe. A plain Row + a separately-painted divider keeps the
+    // icon column flush with the field without needing intrinsic sizing.
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Align(
+            alignment: isRtl
+                ? AlignmentDirectional.centerEnd
+                : AlignmentDirectional.centerStart,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(start: 42),
+              child: Container(
+                width: 1,
+                color: AppColors.slate100,
               ),
             ),
-            alignment: Alignment.center,
-            child: Icon(icon, size: 16, color: AppColors.slate400),
           ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(14, 7, 14, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    label.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.slate500,
-                      letterSpacing: 0.7,
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 42,
+              child: Icon(icon, size: 16, color: AppColors.slate400),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.slate500,
+                        letterSpacing: 0.7,
+                        height: 1.0,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 1),
-                  child,
-                ],
+                    const SizedBox(height: 4),
+                    child,
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

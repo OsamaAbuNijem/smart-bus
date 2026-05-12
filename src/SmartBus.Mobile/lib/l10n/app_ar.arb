@@ -275,7 +275,7 @@
   "@notificationsCountNew": {
     "placeholders": { "count": { "type": "int" } }
   },
-  "notificationsCountItems": "{count} عناصر",
+  "notificationsCountItems": "{count} عنصر",
   "@notificationsCountItems": {
     "placeholders": { "count": { "type": "int" } }
   },
@@ -289,8 +289,8 @@
   "assistantScanBusQr": "مسح رمز الحافلة",
   "assistantScanBusQrSub": "امسح لبدء رحلة جديدة",
   "assistantManualSetupCta": "أو الإعداد يدويًا",
-  "assistantMorningPickup": "نقلة الصباح",
-  "assistantAfternoonDropoff": "نقلة العودة",
+  "assistantMorningPickup": "رحلة الصباح",
+  "assistantAfternoonDropoff": "رحلة العودة",
   "assistantStartedAt": "بدأت",
   "assistantBoarded": "صعدوا",
   "assistantStudents": "طلاب",

@@ -6,14 +6,14 @@ import 'package:smart_bus/core/storage/secure_storage.dart';
 
 part 'locale_controller.g.dart';
 
-/// Holds the user's chosen locale (`en` or `ar`). `null` means follow the
-/// system locale. Persisted in [SecureStorage].
+/// Holds the user's chosen locale (`en` or `ar`). Arabic is the default
+/// when no preference is stored. Persisted in [SecureStorage].
 @Riverpod(keepAlive: true)
 class LocaleController extends _$LocaleController {
   @override
   Future<Locale?> build() async {
     final raw = await ref.watch(secureStorageProvider).readLocale();
-    if (raw == null || raw.isEmpty) return null;
+    if (raw == null || raw.isEmpty) return const Locale('ar');
     return Locale(raw);
   }
 
@@ -23,7 +23,7 @@ class LocaleController extends _$LocaleController {
   }
 
   Future<void> toggleEnAr() async {
-    final current = state.valueOrNull?.languageCode ?? 'en';
+    final current = state.valueOrNull?.languageCode ?? 'ar';
     await setLocale(current == 'ar' ? 'en' : 'ar');
   }
 }

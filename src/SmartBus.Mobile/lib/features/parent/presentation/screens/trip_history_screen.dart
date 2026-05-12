@@ -113,34 +113,6 @@ class _Hero extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.yellowTint,
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(color: const Color(0x66F5C518)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.calendar_today_outlined,
-                    size: 11,
-                    color: AppColors.yellowDeep,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    l.tripHistoryThisWeek,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.yellowDeep,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -167,8 +139,14 @@ class _LightIconBtn extends StatelessWidget {
         child: SizedBox(
           width: 38,
           height: 38,
-          child:
-              Center(child: Icon(icon, size: 17, color: AppColors.slate700)),
+          child: Center(
+            child: Icon(
+              icon,
+              size: 17,
+              color: AppColors.slate700,
+              textDirection: TextDirection.ltr,
+            ),
+          ),
         ),
       ),
     );
@@ -355,14 +333,23 @@ class _TripCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 5),
                         Flexible(
-                          child: Text(
-                            _timeText(trip, l),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.slate500,
+                          // Trip times stay in LTR — '9:13 AM' shouldn't
+                          // flip to 'AM 9:13' when the locale is Arabic.
+                          child: Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Text(
+                              _timeText(trip, l),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: Directionality.of(context) ==
+                                      TextDirection.rtl
+                                  ? TextAlign.right
+                                  : TextAlign.left,
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.slate500,
+                              ),
                             ),
                           ),
                         ),

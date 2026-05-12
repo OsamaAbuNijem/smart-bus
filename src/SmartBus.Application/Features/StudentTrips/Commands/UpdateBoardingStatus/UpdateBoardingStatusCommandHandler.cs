@@ -14,15 +14,18 @@ public class UpdateBoardingStatusCommandHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IApplicationDbContext _context;
     private readonly IMediator _mediator;
+    private readonly INotificationTemplateService _templates;
 
     public UpdateBoardingStatusCommandHandler(
         IUnitOfWork unitOfWork,
         IApplicationDbContext context,
-        IMediator mediator)
+        IMediator mediator,
+        INotificationTemplateService templates)
     {
         _unitOfWork = unitOfWork;
         _context    = context;
         _mediator   = mediator;
+        _templates  = templates;
     }
 
     public async Task<Result> Handle(
@@ -131,13 +134,17 @@ public class UpdateBoardingStatusCommandHandler
 
                 if (info?.ParentUserId is not null)
                 {
-                    var (title, message, type) = isMorningPickup
-                        ? ("Bus pickup",
-                           $"{info.FullName} has been picked up by the bus.",
-                           NotificationType.StudentBoarded)
-                        : ("Arrived home",
-                           $"{info.FullName} has been dropped off by the bus.",
-                           NotificationType.StudentArrived);
+                    var type = isMorningPickup
+                        ? NotificationType.StudentBoarded
+                        : NotificationType.StudentArrived;
+                    var (title, message) = await _templates.RenderAsync(
+                        type,
+                        "ar",
+                        new Dictionary<string, string?>
+                        {
+                            ["studentName"] = info.FullName,
+                        },
+                        ct);
 
                     await _mediator.Send(
                         new SendNotificationCommand(

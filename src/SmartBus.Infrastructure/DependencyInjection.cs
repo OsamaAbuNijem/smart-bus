@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Infrastructure.Identity;
 using SmartBus.Infrastructure.Jobs;
+using SmartBus.Infrastructure.Notifications;
 using SmartBus.Infrastructure.Persistence;
 using SmartBus.Infrastructure.Services;
 using StackExchange.Redis;
@@ -138,6 +139,7 @@ public static class DependencyInjection
             }
         }
         services.AddScoped<IPushNotificationService, FcmPushNotificationService>();
+        services.AddScoped<INotificationTemplateService, NotificationTemplateService>();
 
         // Note: ISignalRNotificationService is registered in the API layer (needs Hub type)
 

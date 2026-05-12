@@ -18,6 +18,7 @@ public interface IApplicationDbContext
     DbSet<AbsenceRequest> AbsenceRequests { get; }
     DbSet<BusLocation> BusLocations { get; }
     DbSet<Notification> Notifications { get; }
+    DbSet<NotificationTemplate> NotificationTemplates { get; }
     DbSet<Alert> Alerts { get; }
     DbSet<EmergencyContact> EmergencyContacts { get; }
     DbSet<StudentAllergy> StudentAllergies { get; }

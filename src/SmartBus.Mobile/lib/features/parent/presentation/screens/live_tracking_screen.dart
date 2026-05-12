@@ -284,7 +284,13 @@ class _LightIconBtn extends StatelessWidget {
           width: 38,
           height: 38,
           child: Center(
-              child: Icon(icon, size: 17, color: AppColors.slate700)),
+            child: Icon(
+              icon,
+              size: 17,
+              color: AppColors.slate700,
+              textDirection: TextDirection.ltr,
+            ),
+          ),
         ),
       ),
     );

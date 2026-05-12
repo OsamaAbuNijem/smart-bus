@@ -830,7 +830,7 @@ class _RouteProgress extends StatelessWidget {
                   ),
                   const SizedBox(width: 5),
                   Text(
-                    _formatRemainingRange(remainingMinutes!),
+                    _formatRemainingRange(context, remainingMinutes!),
                     maxLines: 1,
                     style: const TextStyle(
                       color: AppColors.ink,
@@ -851,12 +851,14 @@ class _RouteProgress extends StatelessWidget {
 
 /// Spreads a single ETA estimate into a short range that reflects normal
 /// urban variability — roughly ±15-20%, snapped to whole minutes, with a
-/// minimum spread of 2 min so it always reads as a range.
-String _formatRemainingRange(int mins) {
+/// minimum spread of 2 min so it always reads as a range. Uses the Arabic
+/// minute abbreviation (د) when the locale is Arabic.
+String _formatRemainingRange(BuildContext context, int mins) {
   final low = math.max(1, (mins * 0.85).round());
   var high = (mins * 1.20).round() + 1;
   if (high - low < 2) high = low + 2;
-  return '$low-$high min';
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  return isArabic ? '$low-$high د' : '$low-$high min';
 }
 
 class _EndDot extends StatelessWidget {
@@ -1161,14 +1163,23 @@ class _HistoryRow extends StatelessWidget {
                         size: 11, color: AppColors.slate400),
                     const SizedBox(width: 5),
                     Expanded(
-                      child: Text(
-                        _historyTimeText(trip, l),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.slate500,
+                      // Trip times stay in LTR — '9:13 AM' shouldn't flip
+                      // to 'AM 9:13' when the locale is Arabic.
+                      child: Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Text(
+                          _historyTimeText(trip, l),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: Directionality.of(context) ==
+                                  TextDirection.rtl
+                              ? TextAlign.right
+                              : TextAlign.left,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.slate500,
+                          ),
                         ),
                       ),
                     ),

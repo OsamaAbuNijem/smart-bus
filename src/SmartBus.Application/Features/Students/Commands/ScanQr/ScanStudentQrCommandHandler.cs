@@ -15,15 +15,18 @@ public class ScanStudentQrCommandHandler
     private readonly IApplicationDbContext _context;
     private readonly ILogger<ScanStudentQrCommandHandler> _logger;
     private readonly IMediator _mediator;
+    private readonly INotificationTemplateService _templates;
 
     public ScanStudentQrCommandHandler(
         IApplicationDbContext context,
         ILogger<ScanStudentQrCommandHandler> logger,
-        IMediator mediator)
+        IMediator mediator,
+        INotificationTemplateService templates)
     {
-        _context  = context;
-        _logger   = logger;
-        _mediator = mediator;
+        _context   = context;
+        _logger    = logger;
+        _mediator  = mediator;
+        _templates = templates;
     }
 
     public async Task<Result<ScanStudentQrResponse>> Handle(ScanStudentQrCommand request, CancellationToken ct)
@@ -115,13 +118,17 @@ public class ScanStudentQrCommandHandler
             (trip.Type == TripType.Return  && action == "Dropoff");
         if (notify && studentInfo?.ParentUserId is not null)
         {
-            var (title, message, type) = action == "Boarded"
-                ? ("Bus pickup",
-                   $"{studentName} has been picked up by the bus.",
-                   NotificationType.StudentBoarded)
-                : ("Arrived home",
-                   $"{studentName} has been dropped off by the bus.",
-                   NotificationType.StudentArrived);
+            var type = action == "Boarded"
+                ? NotificationType.StudentBoarded
+                : NotificationType.StudentArrived;
+            var (title, message) = await _templates.RenderAsync(
+                type,
+                "ar",
+                new Dictionary<string, string?>
+                {
+                    ["studentName"] = studentName,
+                },
+                ct);
 
             await _mediator.Send(
                 new SendNotificationCommand(
