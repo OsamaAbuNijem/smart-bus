@@ -282,7 +282,7 @@ class _SignInCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 2),
           _PhoneRow(
             controller: phoneCtrl,
             focusNode: phoneFocus,
