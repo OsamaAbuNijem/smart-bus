@@ -740,6 +740,12 @@ abstract class AppLocalizations {
   /// **'Home Address'**
   String get studentInfoHomeAddress;
 
+  /// No description provided for @studentInfoSchoolAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'School Address'**
+  String get studentInfoSchoolAddress;
+
   /// No description provided for @studentInfoRoute.
   ///
   /// In en, this message translates to:
@@ -827,7 +833,7 @@ abstract class AppLocalizations {
   /// No description provided for @studentEditNotes.
   ///
   /// In en, this message translates to:
-  /// **'Parent Notes'**
+  /// **'Notes'**
   String get studentEditNotes;
 
   /// No description provided for @studentEditDriverNote.
@@ -1009,6 +1015,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Requested absences'**
   String get absenceSectionRequested;
+
+  /// No description provided for @absenceSummaryTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total absences'**
+  String get absenceSummaryTotal;
+
+  /// No description provided for @absenceSummaryMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning absences'**
+  String get absenceSummaryMorning;
+
+  /// No description provided for @absenceSummaryReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Return absences'**
+  String get absenceSummaryReturn;
+
+  /// No description provided for @absenceCancelWindowNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You can cancel this absence anytime before the trip starts. Once the trip is in progress, it can\'t be cancelled.'**
+  String get absenceCancelWindowNote;
+
+  /// No description provided for @absenceNoRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No absence requests for this week yet.'**
+  String get absenceNoRequests;
+
+  /// No description provided for @absenceCreateRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Create absence request'**
+  String get absenceCreateRequest;
+
+  /// No description provided for @absenceCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New absence request'**
+  String get absenceCreateTitle;
+
+  /// No description provided for @absenceCreateSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit a one-off absence for this student'**
+  String get absenceCreateSubtitle;
 
   /// No description provided for @absenceStatusPending.
   ///

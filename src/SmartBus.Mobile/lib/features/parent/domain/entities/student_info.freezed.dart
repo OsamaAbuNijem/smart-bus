@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$StudentInfo {
 
- String get id; String get fullName; String? get fullNameEn; String get nationalNumber; String get grade; String? get className; DateTime? get dateOfBirth; String? get schoolName; String get homeAddress; String? get homeArea; String? get homeStreet; String? get notes; String? get routeName; String? get pickupStopName; List<String> get allergies; StudentContact? get parent;
+ String get id; String get fullName; String? get fullNameEn; String get nationalNumber; String get grade; String? get className; DateTime? get dateOfBirth; String? get schoolName; String? get schoolAddress; String get homeAddress; String? get homeArea; String? get homeStreet; String? get notes; String? get routeName; String? get pickupStopName; List<String> get allergies; StudentContact? get parent;
 /// Create a copy of StudentInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $StudentInfoCopyWith<StudentInfo> get copyWith => _$StudentInfoCopyWithImpl<Stud
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.fullNameEn, fullNameEn) || other.fullNameEn == fullNameEn)&&(identical(other.nationalNumber, nationalNumber) || other.nationalNumber == nationalNumber)&&(identical(other.grade, grade) || other.grade == grade)&&(identical(other.className, className) || other.className == className)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.homeArea, homeArea) || other.homeArea == homeArea)&&(identical(other.homeStreet, homeStreet) || other.homeStreet == homeStreet)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.routeName, routeName) || other.routeName == routeName)&&(identical(other.pickupStopName, pickupStopName) || other.pickupStopName == pickupStopName)&&const DeepCollectionEquality().equals(other.allergies, allergies)&&(identical(other.parent, parent) || other.parent == parent));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.fullNameEn, fullNameEn) || other.fullNameEn == fullNameEn)&&(identical(other.nationalNumber, nationalNumber) || other.nationalNumber == nationalNumber)&&(identical(other.grade, grade) || other.grade == grade)&&(identical(other.className, className) || other.className == className)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.schoolAddress, schoolAddress) || other.schoolAddress == schoolAddress)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.homeArea, homeArea) || other.homeArea == homeArea)&&(identical(other.homeStreet, homeStreet) || other.homeStreet == homeStreet)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.routeName, routeName) || other.routeName == routeName)&&(identical(other.pickupStopName, pickupStopName) || other.pickupStopName == pickupStopName)&&const DeepCollectionEquality().equals(other.allergies, allergies)&&(identical(other.parent, parent) || other.parent == parent));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,fullName,fullNameEn,nationalNumber,grade,className,dateOfBirth,schoolName,homeAddress,homeArea,homeStreet,notes,routeName,pickupStopName,const DeepCollectionEquality().hash(allergies),parent);
+int get hashCode => Object.hash(runtimeType,id,fullName,fullNameEn,nationalNumber,grade,className,dateOfBirth,schoolName,schoolAddress,homeAddress,homeArea,homeStreet,notes,routeName,pickupStopName,const DeepCollectionEquality().hash(allergies),parent);
 
 @override
 String toString() {
-  return 'StudentInfo(id: $id, fullName: $fullName, fullNameEn: $fullNameEn, nationalNumber: $nationalNumber, grade: $grade, className: $className, dateOfBirth: $dateOfBirth, schoolName: $schoolName, homeAddress: $homeAddress, homeArea: $homeArea, homeStreet: $homeStreet, notes: $notes, routeName: $routeName, pickupStopName: $pickupStopName, allergies: $allergies, parent: $parent)';
+  return 'StudentInfo(id: $id, fullName: $fullName, fullNameEn: $fullNameEn, nationalNumber: $nationalNumber, grade: $grade, className: $className, dateOfBirth: $dateOfBirth, schoolName: $schoolName, schoolAddress: $schoolAddress, homeAddress: $homeAddress, homeArea: $homeArea, homeStreet: $homeStreet, notes: $notes, routeName: $routeName, pickupStopName: $pickupStopName, allergies: $allergies, parent: $parent)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $StudentInfoCopyWith<$Res>  {
   factory $StudentInfoCopyWith(StudentInfo value, $Res Function(StudentInfo) _then) = _$StudentInfoCopyWithImpl;
 @useResult
 $Res call({
- String id, String fullName, String? fullNameEn, String nationalNumber, String grade, String? className, DateTime? dateOfBirth, String? schoolName, String homeAddress, String? homeArea, String? homeStreet, String? notes, String? routeName, String? pickupStopName, List<String> allergies, StudentContact? parent
+ String id, String fullName, String? fullNameEn, String nationalNumber, String grade, String? className, DateTime? dateOfBirth, String? schoolName, String? schoolAddress, String homeAddress, String? homeArea, String? homeStreet, String? notes, String? routeName, String? pickupStopName, List<String> allergies, StudentContact? parent
 });
 
 
@@ -62,7 +62,7 @@ class _$StudentInfoCopyWithImpl<$Res>
 
 /// Create a copy of StudentInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? fullNameEn = freezed,Object? nationalNumber = null,Object? grade = null,Object? className = freezed,Object? dateOfBirth = freezed,Object? schoolName = freezed,Object? homeAddress = null,Object? homeArea = freezed,Object? homeStreet = freezed,Object? notes = freezed,Object? routeName = freezed,Object? pickupStopName = freezed,Object? allergies = null,Object? parent = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? fullNameEn = freezed,Object? nationalNumber = null,Object? grade = null,Object? className = freezed,Object? dateOfBirth = freezed,Object? schoolName = freezed,Object? schoolAddress = freezed,Object? homeAddress = null,Object? homeArea = freezed,Object? homeStreet = freezed,Object? notes = freezed,Object? routeName = freezed,Object? pickupStopName = freezed,Object? allergies = null,Object? parent = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
@@ -72,6 +72,7 @@ as String,grade: null == grade ? _self.grade : grade // ignore: cast_nullable_to
 as String,className: freezed == className ? _self.className : className // ignore: cast_nullable_to_non_nullable
 as String?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
 as DateTime?,schoolName: freezed == schoolName ? _self.schoolName : schoolName // ignore: cast_nullable_to_non_nullable
+as String?,schoolAddress: freezed == schoolAddress ? _self.schoolAddress : schoolAddress // ignore: cast_nullable_to_non_nullable
 as String?,homeAddress: null == homeAddress ? _self.homeAddress : homeAddress // ignore: cast_nullable_to_non_nullable
 as String,homeArea: freezed == homeArea ? _self.homeArea : homeArea // ignore: cast_nullable_to_non_nullable
 as String?,homeStreet: freezed == homeStreet ? _self.homeStreet : homeStreet // ignore: cast_nullable_to_non_nullable
@@ -177,10 +178,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade,  String? className,  DateTime? dateOfBirth,  String? schoolName,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContact? parent)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade,  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContact? parent)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _StudentInfo() when $default != null:
-return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
+return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
   return orElse();
 
 }
@@ -198,10 +199,10 @@ return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade,  String? className,  DateTime? dateOfBirth,  String? schoolName,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContact? parent)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade,  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContact? parent)  $default,) {final _that = this;
 switch (_that) {
 case _StudentInfo():
-return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
+return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -218,10 +219,10 @@ return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade,  String? className,  DateTime? dateOfBirth,  String? schoolName,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContact? parent)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade,  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContact? parent)?  $default,) {final _that = this;
 switch (_that) {
 case _StudentInfo() when $default != null:
-return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
+return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
   return null;
 
 }
@@ -233,7 +234,7 @@ return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_t
 
 
 class _StudentInfo implements StudentInfo {
-  const _StudentInfo({required this.id, required this.fullName, this.fullNameEn, required this.nationalNumber, required this.grade, this.className, this.dateOfBirth, this.schoolName, required this.homeAddress, this.homeArea, this.homeStreet, this.notes, this.routeName, this.pickupStopName, final  List<String> allergies = const <String>[], this.parent}): _allergies = allergies;
+  const _StudentInfo({required this.id, required this.fullName, this.fullNameEn, required this.nationalNumber, required this.grade, this.className, this.dateOfBirth, this.schoolName, this.schoolAddress, required this.homeAddress, this.homeArea, this.homeStreet, this.notes, this.routeName, this.pickupStopName, final  List<String> allergies = const <String>[], this.parent}): _allergies = allergies;
   
 
 @override final  String id;
@@ -244,6 +245,7 @@ class _StudentInfo implements StudentInfo {
 @override final  String? className;
 @override final  DateTime? dateOfBirth;
 @override final  String? schoolName;
+@override final  String? schoolAddress;
 @override final  String homeAddress;
 @override final  String? homeArea;
 @override final  String? homeStreet;
@@ -269,16 +271,16 @@ _$StudentInfoCopyWith<_StudentInfo> get copyWith => __$StudentInfoCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StudentInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.fullNameEn, fullNameEn) || other.fullNameEn == fullNameEn)&&(identical(other.nationalNumber, nationalNumber) || other.nationalNumber == nationalNumber)&&(identical(other.grade, grade) || other.grade == grade)&&(identical(other.className, className) || other.className == className)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.homeArea, homeArea) || other.homeArea == homeArea)&&(identical(other.homeStreet, homeStreet) || other.homeStreet == homeStreet)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.routeName, routeName) || other.routeName == routeName)&&(identical(other.pickupStopName, pickupStopName) || other.pickupStopName == pickupStopName)&&const DeepCollectionEquality().equals(other._allergies, _allergies)&&(identical(other.parent, parent) || other.parent == parent));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StudentInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.fullNameEn, fullNameEn) || other.fullNameEn == fullNameEn)&&(identical(other.nationalNumber, nationalNumber) || other.nationalNumber == nationalNumber)&&(identical(other.grade, grade) || other.grade == grade)&&(identical(other.className, className) || other.className == className)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.schoolAddress, schoolAddress) || other.schoolAddress == schoolAddress)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.homeArea, homeArea) || other.homeArea == homeArea)&&(identical(other.homeStreet, homeStreet) || other.homeStreet == homeStreet)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.routeName, routeName) || other.routeName == routeName)&&(identical(other.pickupStopName, pickupStopName) || other.pickupStopName == pickupStopName)&&const DeepCollectionEquality().equals(other._allergies, _allergies)&&(identical(other.parent, parent) || other.parent == parent));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,fullName,fullNameEn,nationalNumber,grade,className,dateOfBirth,schoolName,homeAddress,homeArea,homeStreet,notes,routeName,pickupStopName,const DeepCollectionEquality().hash(_allergies),parent);
+int get hashCode => Object.hash(runtimeType,id,fullName,fullNameEn,nationalNumber,grade,className,dateOfBirth,schoolName,schoolAddress,homeAddress,homeArea,homeStreet,notes,routeName,pickupStopName,const DeepCollectionEquality().hash(_allergies),parent);
 
 @override
 String toString() {
-  return 'StudentInfo(id: $id, fullName: $fullName, fullNameEn: $fullNameEn, nationalNumber: $nationalNumber, grade: $grade, className: $className, dateOfBirth: $dateOfBirth, schoolName: $schoolName, homeAddress: $homeAddress, homeArea: $homeArea, homeStreet: $homeStreet, notes: $notes, routeName: $routeName, pickupStopName: $pickupStopName, allergies: $allergies, parent: $parent)';
+  return 'StudentInfo(id: $id, fullName: $fullName, fullNameEn: $fullNameEn, nationalNumber: $nationalNumber, grade: $grade, className: $className, dateOfBirth: $dateOfBirth, schoolName: $schoolName, schoolAddress: $schoolAddress, homeAddress: $homeAddress, homeArea: $homeArea, homeStreet: $homeStreet, notes: $notes, routeName: $routeName, pickupStopName: $pickupStopName, allergies: $allergies, parent: $parent)';
 }
 
 
@@ -289,7 +291,7 @@ abstract mixin class _$StudentInfoCopyWith<$Res> implements $StudentInfoCopyWith
   factory _$StudentInfoCopyWith(_StudentInfo value, $Res Function(_StudentInfo) _then) = __$StudentInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String fullName, String? fullNameEn, String nationalNumber, String grade, String? className, DateTime? dateOfBirth, String? schoolName, String homeAddress, String? homeArea, String? homeStreet, String? notes, String? routeName, String? pickupStopName, List<String> allergies, StudentContact? parent
+ String id, String fullName, String? fullNameEn, String nationalNumber, String grade, String? className, DateTime? dateOfBirth, String? schoolName, String? schoolAddress, String homeAddress, String? homeArea, String? homeStreet, String? notes, String? routeName, String? pickupStopName, List<String> allergies, StudentContact? parent
 });
 
 
@@ -306,7 +308,7 @@ class __$StudentInfoCopyWithImpl<$Res>
 
 /// Create a copy of StudentInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? fullNameEn = freezed,Object? nationalNumber = null,Object? grade = null,Object? className = freezed,Object? dateOfBirth = freezed,Object? schoolName = freezed,Object? homeAddress = null,Object? homeArea = freezed,Object? homeStreet = freezed,Object? notes = freezed,Object? routeName = freezed,Object? pickupStopName = freezed,Object? allergies = null,Object? parent = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? fullNameEn = freezed,Object? nationalNumber = null,Object? grade = null,Object? className = freezed,Object? dateOfBirth = freezed,Object? schoolName = freezed,Object? schoolAddress = freezed,Object? homeAddress = null,Object? homeArea = freezed,Object? homeStreet = freezed,Object? notes = freezed,Object? routeName = freezed,Object? pickupStopName = freezed,Object? allergies = null,Object? parent = freezed,}) {
   return _then(_StudentInfo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
@@ -316,6 +318,7 @@ as String,grade: null == grade ? _self.grade : grade // ignore: cast_nullable_to
 as String,className: freezed == className ? _self.className : className // ignore: cast_nullable_to_non_nullable
 as String?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
 as DateTime?,schoolName: freezed == schoolName ? _self.schoolName : schoolName // ignore: cast_nullable_to_non_nullable
+as String?,schoolAddress: freezed == schoolAddress ? _self.schoolAddress : schoolAddress // ignore: cast_nullable_to_non_nullable
 as String?,homeAddress: null == homeAddress ? _self.homeAddress : homeAddress // ignore: cast_nullable_to_non_nullable
 as String,homeArea: freezed == homeArea ? _self.homeArea : homeArea // ignore: cast_nullable_to_non_nullable
 as String?,homeStreet: freezed == homeStreet ? _self.homeStreet : homeStreet // ignore: cast_nullable_to_non_nullable

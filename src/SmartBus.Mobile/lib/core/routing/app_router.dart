@@ -54,6 +54,7 @@ abstract class AppRoute {
   static const studentEdit = '/students/:studentId/edit';
   static const studentTrips = '/students/:studentId/trips';
   static const studentAbsence = '/students/:studentId/absence';
+  static const parentAbsenceCreate = '/students/:studentId/absence/new';
   static const studentLive = '/students/:studentId/live';
   static const notifications = '/notifications';
 
@@ -64,6 +65,8 @@ abstract class AppRoute {
       '/students/$studentId/trips';
   static String studentAbsenceFor(String studentId) =>
       '/students/$studentId/absence';
+  static String parentAbsenceCreateFor(String studentId) =>
+      '/students/$studentId/absence/new';
   static String studentLiveFor(String studentId) =>
       '/students/$studentId/live';
 
@@ -214,6 +217,12 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoute.studentAbsence,
         builder: (context, state) => ReportAbsenceScreen(
+          studentId: state.pathParameters['studentId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.parentAbsenceCreate,
+        builder: (context, state) => CreateAbsenceScreen(
           studentId: state.pathParameters['studentId']!,
         ),
       ),

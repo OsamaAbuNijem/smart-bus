@@ -8,17 +8,6 @@ import 'package:smart_bus/features/parent/presentation/providers/parent_controll
 import 'package:smart_bus/features/parent/presentation/providers/student_edit_controller.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
 
-const _gradeOptions = <String>[
-  'KG-A',
-  'KG-B',
-  'Grade 1',
-  'Grade 2',
-  'Grade 3',
-  'Grade 4',
-  'Grade 5',
-  'Grade 6',
-];
-
 class StudentInfoScreen extends ConsumerWidget {
   const StudentInfoScreen({super.key, required this.studentId});
   final String studentId;
@@ -54,53 +43,37 @@ class _Form extends ConsumerStatefulWidget {
 }
 
 class _FormState extends ConsumerState<_Form> {
-  late final TextEditingController _nameCtrl;
-  late final TextEditingController _classCtrl;
   late final TextEditingController _notesCtrl;
-  late String _grade;
 
   @override
   void initState() {
     super.initState();
-    final info = widget.info;
-    _nameCtrl = TextEditingController(text: info.fullName);
-    _classCtrl = TextEditingController(text: info.className ?? '');
-    _notesCtrl = TextEditingController(text: info.notes ?? '');
-    _grade = info.grade;
+    _notesCtrl = TextEditingController(text: widget.info.notes ?? '');
   }
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
-    _classCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     final l = widget.l;
-    if (_nameCtrl.text.trim().isEmpty || _grade.trim().isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l.studentEditMissingFields)));
-      return;
-    }
+    final info = widget.info;
     FocusScope.of(context).unfocus();
+    // Only the note is editable on this screen — every other field is read
+    // from the persisted info, so we pass them through unchanged.
     final ok = await ref
         .read(studentEditControllerProvider(widget.studentId).notifier)
         .save(
-          fullName: _nameCtrl.text.trim(),
-          grade: _grade.trim(),
-          className: _classCtrl.text.trim().isEmpty
-              ? null
-              : _classCtrl.text.trim(),
+          fullName: info.fullName,
+          grade: info.grade,
+          className: info.className,
           notes: _notesCtrl.text.trim().isEmpty
               ? null
               : _notesCtrl.text.trim(),
-          // The API still requires parent contact — pass through whatever's
-          // already on file so the parent details aren't surfaced or modified
-          // from this screen.
-          parentName: widget.info.parent?.name ?? '',
-          parentPhone: widget.info.parent?.phoneNumber ?? '',
+          parentName: info.parent?.name ?? '',
+          parentPhone: info.parent?.phoneNumber ?? '',
         );
     if (!mounted) return;
     if (ok) {
@@ -132,45 +105,40 @@ class _FormState extends ConsumerState<_Form> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
             children: [
-              _AvatarBanner(name: _nameCtrl.text.isEmpty
-                  ? info.fullName
-                  : _nameCtrl.text),
+              _AvatarBanner(name: info.fullName),
               const SizedBox(height: 14),
               _SectionTitle(text: l.studentEditBasicInfo),
               const SizedBox(height: 8),
               _Card(
                 children: [
-                  _TextField(
+                  _ReadOnlyField(
                     icon: Icons.person_outline,
                     label: l.studentEditFullName,
-                    controller: _nameCtrl,
-                    enabled: !saving,
-                    hint: l.studentEditFullNameHint,
-                    onChanged: (_) => setState(() {}),
+                    value: info.fullName,
                   ),
                   _ReadOnlyField(
                     icon: Icons.badge_outlined,
                     label: l.studentEditStudentId,
-                    labelTag: l.studentEditAuto,
                     value: info.nationalNumber,
                   ),
-                  _Row2(
-                    left: _DropdownField(
-                      icon: Icons.school,
-                      label: l.studentEditGrade,
-                      value: _grade,
-                      options: _gradeOptions,
-                      enabled: !saving,
-                      onChanged: (v) => setState(() => _grade = v ?? _grade),
-                    ),
-                    right: _TextField(
-                      icon: Icons.grid_view,
-                      label: l.studentEditClass,
-                      controller: _classCtrl,
-                      enabled: !saving,
-                      hint: l.studentEditClassHint,
-                    ),
+                  _ReadOnlyField(
+                    icon: Icons.school,
+                    label: l.studentEditGrade,
+                    value: info.grade,
                   ),
+                  _ReadOnlyField(
+                    icon: Icons.grid_view,
+                    label: l.studentEditClass,
+                    value: info.className == null || info.className!.isEmpty
+                        ? '—'
+                        : info.className!,
+                  ),
+                  if (info.homeAddress.isNotEmpty)
+                    _ReadOnlyField(
+                      icon: Icons.location_on_outlined,
+                      label: l.studentInfoHomeAddress,
+                      value: info.homeAddress,
+                    ),
                 ],
               ),
               if (info.schoolName != null && info.schoolName!.isNotEmpty) ...[
@@ -184,11 +152,12 @@ class _FormState extends ConsumerState<_Form> {
                       label: l.studentInfoSchool,
                       value: info.schoolName!,
                     ),
-                    if (info.homeAddress.isNotEmpty)
+                    if (info.schoolAddress != null &&
+                        info.schoolAddress!.isNotEmpty)
                       _ReadOnlyField(
-                        icon: Icons.location_on_outlined,
-                        label: l.studentInfoHomeAddress,
-                        value: info.homeAddress,
+                        icon: Icons.place_outlined,
+                        label: l.studentInfoSchoolAddress,
+                        value: info.schoolAddress!,
                       ),
                   ],
                 ),
@@ -494,55 +463,6 @@ class _FieldShell extends StatelessWidget {
   }
 }
 
-class _TextField extends StatelessWidget {
-  const _TextField({
-    required this.icon,
-    required this.label,
-    required this.controller,
-    required this.enabled,
-    this.hint,
-    this.onChanged,
-  });
-  final IconData icon;
-  final String label;
-  final TextEditingController controller;
-  final bool enabled;
-  final String? hint;
-  final ValueChanged<String>? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return _FieldShell(
-      icon: icon,
-      label: label,
-      child: TextField(
-        controller: controller,
-        enabled: enabled,
-        onChanged: onChanged,
-        style: const TextStyle(
-          fontSize: 13.5,
-          fontWeight: FontWeight.w700,
-          color: AppColors.ink,
-          letterSpacing: -0.2,
-        ),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(
-            color: AppColors.slate400,
-            fontWeight: FontWeight.w500,
-          ),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          contentPadding: EdgeInsets.zero,
-          isDense: true,
-          filled: false,
-        ),
-      ),
-    );
-  }
-}
-
 class _ReadOnlyField extends StatelessWidget {
   const _ReadOnlyField({
     required this.icon,
@@ -569,74 +489,6 @@ class _ReadOnlyField extends StatelessWidget {
           color: AppColors.slate500,
           letterSpacing: 0.2,
         ),
-      ),
-    );
-  }
-}
-
-class _DropdownField extends StatelessWidget {
-  const _DropdownField({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.options,
-    required this.enabled,
-    required this.onChanged,
-  });
-  final IconData icon;
-  final String label;
-  final String value;
-  final List<String> options;
-  final bool enabled;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final items = {value, ...options}.toList();
-    return _FieldShell(
-      icon: icon,
-      label: label,
-      borderRight: true,
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isDense: true,
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more,
-              size: 16, color: AppColors.slate500),
-          style: const TextStyle(
-            fontSize: 13.5,
-            fontWeight: FontWeight.w700,
-            color: AppColors.ink,
-            letterSpacing: -0.2,
-          ),
-          onChanged: enabled ? onChanged : null,
-          items: [
-            for (final o in items)
-              DropdownMenuItem<String>(value: o, child: Text(o)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Row2 extends StatelessWidget {
-  const _Row2({required this.left, required this.right});
-  final Widget left;
-  final Widget right;
-
-  @override
-  Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: left),
-          const VerticalDivider(
-              width: 1, thickness: 1, color: AppColors.slate100),
-          Expanded(child: right),
-        ],
       ),
     );
   }

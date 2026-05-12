@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_bus/core/errors/failures.dart';
+import 'package:smart_bus/core/routing/app_router.dart';
 import 'package:smart_bus/core/theme/app_theme.dart';
 import 'package:smart_bus/features/parent/data/repositories/parent_repository.dart';
 import 'package:smart_bus/features/parent/domain/entities/absence_request_item.dart';
@@ -10,8 +11,67 @@ import 'package:smart_bus/features/parent/presentation/providers/absence_control
 import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
 
+/// Lists the student's current-week absence requests with cancel support.
+/// The actual create-request form lives in [CreateAbsenceScreen] now; tapping
+/// the bottom CTA opens it.
 class ReportAbsenceScreen extends ConsumerWidget {
   const ReportAbsenceScreen({super.key, required this.studentId});
+  final String studentId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final infoAsync = ref.watch(studentInfoProvider(studentId));
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
+      body: infoAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text(e.toString())),
+        data: (info) => Column(
+          children: [
+            _Hero(
+              title: l.absenceTitle,
+              subtitle: l.absenceSubtitle,
+              onBack: () => context.pop(),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.yellowDeep,
+                onRefresh: () async =>
+                    ref.invalidate(studentAbsencesProvider(studentId)),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
+                  children: [
+                    _SectionTitle(text: l.absenceSectionStudent),
+                    const SizedBox(height: 8),
+                    _StudentCard(info: info, l: l),
+                    const SizedBox(height: 14),
+                    _RequestedAbsencesSection(
+                      studentId: studentId,
+                      l: l,
+                      showEmpty: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            _CreateAbsenceCta(
+              label: l.absenceCreateRequest,
+              onTap: () => context.push(
+                AppRoute.parentAbsenceCreateFor(studentId),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Dedicated create-absence form, reached from [ReportAbsenceScreen]'s CTA.
+class CreateAbsenceScreen extends ConsumerWidget {
+  const CreateAbsenceScreen({super.key, required this.studentId});
   final String studentId;
 
   @override
@@ -109,7 +169,11 @@ class _FormState extends ConsumerState<_Form> {
 
     return Column(
       children: [
-        _Hero(l: l, onBack: () => context.pop()),
+        _Hero(
+          title: l.absenceCreateTitle,
+          subtitle: l.absenceCreateSubtitle,
+          onBack: () => context.pop(),
+        ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
@@ -118,7 +182,6 @@ class _FormState extends ConsumerState<_Form> {
               const SizedBox(height: 8),
               _StudentCard(info: info, l: l),
               const SizedBox(height: 14),
-              _RequestedAbsencesSection(studentId: widget.studentId, l: l),
               _SectionTitle(text: l.absenceSectionDate),
               const SizedBox(height: 8),
               _DateRow(
@@ -152,6 +215,8 @@ class _FormState extends ConsumerState<_Form> {
                 enabled: !saving,
                 hint: l.absenceNoteHint,
               ),
+              const SizedBox(height: 14),
+              _CancelWindowNote(text: l.absenceCancelWindowNote),
             ],
           ),
         ),
@@ -168,8 +233,13 @@ class _FormState extends ConsumerState<_Form> {
 // ─── Hero ───────────────────────────────────────────────────────────
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.l, required this.onBack});
-  final AppLocalizations l;
+  const _Hero({
+    required this.title,
+    required this.subtitle,
+    required this.onBack,
+  });
+  final String title;
+  final String subtitle;
   final VoidCallback onBack;
 
   @override
@@ -197,7 +267,7 @@ class _Hero extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    l.absenceTitle,
+                    title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -210,7 +280,7 @@ class _Hero extends StatelessWidget {
                   ),
                   const SizedBox(height: 1),
                   Text(
-                    l.absenceSubtitle,
+                    subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -224,6 +294,92 @@ class _Hero extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Bottom-pinned primary CTA. Mirrors the submit-bar shell used by the
+/// create-absence form, so both screens share visual weight at the bottom.
+class _CreateAbsenceCta extends StatelessWidget {
+  const _CreateAbsenceCta({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.slate100)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: FilledButton.icon(
+            onPressed: onTap,
+            icon: const Icon(Icons.add, size: 18, color: AppColors.ink),
+            label: Text(label),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.yellow,
+              foregroundColor: AppColors.ink,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(13),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.2,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Lightweight reminder shown below the form. Surfaces the server-side
+/// cancel rule ("can't undo once the trip starts") so the parent doesn't
+/// hit it as a surprise after submitting.
+class _CancelWindowNote extends StatelessWidget {
+  const _CancelWindowNote({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: BoxDecoration(
+        color: AppColors.yellowTint,
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: const Color(0x66F5C518)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.info_outline,
+            size: 15,
+            color: AppColors.yellowDeep,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+                height: 1.4,
+                letterSpacing: -0.05,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -376,100 +532,225 @@ class _StudentCard extends StatelessWidget {
 // ─── Requested absences (list + cancel) ─────────────────────────────
 
 class _RequestedAbsencesSection extends ConsumerWidget {
-  const _RequestedAbsencesSection({required this.studentId, required this.l});
+  const _RequestedAbsencesSection({
+    required this.studentId,
+    required this.l,
+    this.showEmpty = false,
+  });
   final String studentId;
   final AppLocalizations l;
+  // When true the section is always rendered, with a friendly empty card
+  // standing in for "nothing on file". Used on the dedicated list screen.
+  final bool showEmpty;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(studentAbsencesProvider(studentId));
-    // Skip entirely while loading the first time so the form isn't pushed
-    // around by an empty placeholder.
-    final all = async.valueOrNull;
-    if (all == null || all.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    // Limit to the current week (Mon → Sun, anchored on today) — past or
-    // future absences are filed but not surfaced here.
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final weekStart = today.subtract(Duration(days: today.weekday - 1));
-    final weekEnd = weekStart.add(const Duration(days: 7));
-    final items = all
-        .where((a) =>
-            !a.date.isBefore(weekStart) && a.date.isBefore(weekEnd))
-        .toList();
-    if (items.isEmpty) return const SizedBox.shrink();
+    final items = async.valueOrNull ?? const <AbsenceRequestItem>[];
+    if (items.isEmpty && !showEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SectionTitle(text: l.absenceSectionRequested),
+        _SectionHeaderWithTotal(
+          title: l.absenceSectionRequested,
+          totalLabel: l.absenceSummaryTotal,
+          total: items.length,
+        ),
         const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.slate200),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: [
-              for (var i = 0; i < items.length; i++) ...[
-                if (i != 0)
-                  const Divider(
-                      height: 1, thickness: 1, color: AppColors.slate100),
-                _RequestedAbsenceRow(
-                  item: items[i],
-                  l: l,
-                  onCancel: () async {
-                    final ok = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(l.absenceCancelTitle),
-                        content: Text(l.absenceCancelBody),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: Text(l.commonCancel),
-                          ),
-                          FilledButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.red,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: Text(l.absenceCancelYes),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (ok != true) return;
-                    try {
-                      await ref
-                          .read(parentRepositoryProvider)
-                          .cancelAbsenceRequest(items[i].id);
-                      ref.invalidate(studentAbsencesProvider(studentId));
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l.absenceCancelled)),
-                        );
-                      }
-                    } catch (e) {
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(e is Failure ? e.message : '$e'),
-                        ),
-                      );
-                    }
-                  },
+        if (items.isEmpty) ...[
+          Container(
+            padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.slate200),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.slate50,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.slate100),
+                  ),
+                  child: const Icon(
+                    Icons.inbox_outlined,
+                    size: 16,
+                    color: AppColors.slate500,
+                  ),
+                ),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Text(
+                    l.absenceNoRequests,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate500,
+                      height: 1.4,
+                    ),
+                  ),
                 ),
               ],
-            ],
+            ),
           ),
+          const SizedBox(height: 14),
+        ] else _AbsenceListBuilder(
+          studentId: studentId,
+          items: items,
+          l: l,
         ),
-        const SizedBox(height: 14),
       ],
+    );
+  }
+}
+
+/// Wraps the row builder so we can keep the parent widget concise.
+class _AbsenceListBuilder extends ConsumerWidget {
+  const _AbsenceListBuilder({
+    required this.studentId,
+    required this.items,
+    required this.l,
+  });
+  final String studentId;
+  final List<AbsenceRequestItem> items;
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.slate200),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            if (i != 0)
+              const Divider(
+                  height: 1, thickness: 1, color: AppColors.slate100),
+            _RequestedAbsenceRow(
+              item: items[i],
+              l: l,
+              onCancel: () async {
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(l.absenceCancelTitle),
+                    content: Text(l.absenceCancelBody),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text(l.commonCancel),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text(l.absenceCancelYes),
+                      ),
+                    ],
+                  ),
+                );
+                if (ok != true) return;
+                try {
+                  await ref
+                      .read(parentRepositoryProvider)
+                      .cancelAbsenceRequest(items[i].id);
+                  ref.invalidate(studentAbsencesProvider(studentId));
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l.absenceCancelled)),
+                    );
+                  }
+                } catch (e) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e is Failure ? e.message : '$e'),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Section heading for the requested-absences list with an inline total
+/// count pill on the right.
+class _SectionHeaderWithTotal extends StatelessWidget {
+  const _SectionHeaderWithTotal({
+    required this.title,
+    required this.totalLabel,
+    required this.total,
+  });
+  final String title;
+  final String totalLabel;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Text(
+              title.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                color: AppColors.slate500,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+            decoration: BoxDecoration(
+              color: AppColors.slate100,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$total',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.1,
+                    ),
+                  ),
+                  TextSpan(
+                    text: '  $totalLabel',
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.slate600,
+                      letterSpacing: 0.1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -491,12 +772,9 @@ class _RequestedAbsenceRow extends StatelessWidget {
     final shortDate =
         '$dayName ${item.date.day}/${item.date.month}/${item.date.year}';
     final legLabel = _absenceLegLabel(item.tripType, l);
-    final (pillBg, pillFg) = _statusPalette(item.status);
-    final statusLabel = _statusLabel(item.status, l);
-    final cancellable = item.status != 'Rejected';
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+      padding: EdgeInsets.fromLTRB(12, 10, item.canCancel ? 8 : 12, 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -545,56 +823,22 @@ class _RequestedAbsenceRow extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: pillBg,
-              borderRadius: BorderRadius.circular(100),
-            ),
-            child: Text(
-              statusLabel,
-              style: TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w800,
-                color: pillFg,
+          // Only render the delete affordance while the trip hasn't started.
+          // Once the matching leg is in-progress / completed the icon is
+          // hidden so the parent can't try a cancel the server would reject.
+          if (item.canCancel)
+            IconButton(
+              tooltip: l.absenceCancelTitle,
+              onPressed: onCancel,
+              icon: const Icon(
+                Icons.delete_outline,
+                size: 18,
+                color: AppColors.red,
               ),
             ),
-          ),
-          IconButton(
-            tooltip: l.absenceCancelTitle,
-            onPressed: cancellable ? onCancel : null,
-            icon: Icon(
-              Icons.delete_outline,
-              size: 18,
-              color: cancellable ? AppColors.red : AppColors.slate300,
-            ),
-          ),
         ],
       ),
     );
-  }
-}
-
-(Color, Color) _statusPalette(String status) {
-  switch (status) {
-    case 'Approved':
-      return (AppColors.emeraldSoft, AppColors.emerald);
-    case 'Rejected':
-      return (const Color(0xFFFFE4E6), const Color(0xFFE11D48));
-    default:
-      return (AppColors.slate100, AppColors.slate600);
-  }
-}
-
-String _statusLabel(String status, AppLocalizations l) {
-  switch (status) {
-    case 'Approved':
-      return l.absenceStatusApproved;
-    case 'Rejected':
-      return l.absenceStatusRejected;
-    default:
-      return l.absenceStatusPending;
   }
 }
 

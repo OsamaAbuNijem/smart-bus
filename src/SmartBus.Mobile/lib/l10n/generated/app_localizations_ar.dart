@@ -338,6 +338,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get studentInfoHomeAddress => 'عنوان المنزل';
 
   @override
+  String get studentInfoSchoolAddress => 'عنوان المدرسة';
+
+  @override
   String get studentInfoRoute => 'المسار';
 
   @override
@@ -380,7 +383,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get studentEditClassHint => 'مثال: أ';
 
   @override
-  String get studentEditNotes => 'ملاحظات الوالدين';
+  String get studentEditNotes => 'ملاحظات';
 
   @override
   String get studentEditDriverNote => 'ملاحظة للسائق';
@@ -473,6 +476,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get absenceSectionRequested => 'طلبات الغياب';
+
+  @override
+  String get absenceSummaryTotal => 'إجمالي الغيابات';
+
+  @override
+  String get absenceSummaryMorning => 'غيابات الذهاب';
+
+  @override
+  String get absenceSummaryReturn => 'غيابات الإياب';
+
+  @override
+  String get absenceCancelWindowNote =>
+      'يمكنك إلغاء طلب الغياب في أي وقت قبل بدء الرحلة. لا يمكن الإلغاء بعد بدء الرحلة.';
+
+  @override
+  String get absenceNoRequests => 'لا توجد طلبات غياب لهذا الأسبوع بعد.';
+
+  @override
+  String get absenceCreateRequest => 'إنشاء طلب غياب';
+
+  @override
+  String get absenceCreateTitle => 'طلب غياب جديد';
+
+  @override
+  String get absenceCreateSubtitle => 'أرسل طلب غياب لمرة واحدة للطالب';
 
   @override
   String get absenceStatusPending => 'قيد المراجعة';

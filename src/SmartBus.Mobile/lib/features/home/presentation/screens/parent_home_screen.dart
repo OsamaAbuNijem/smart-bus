@@ -64,13 +64,16 @@ class ParentHomeScreen extends ConsumerWidget {
                 return Expanded(
                   child: Column(
                     children: [
-                      _ChildTabs(
-                        children: children,
-                        activeIndex: safeIndex,
-                        onTap: (i) => ref
-                            .read(selectedChildIndexProvider.notifier)
-                            .select(i),
-                      ),
+                      // Hide the child-picker strip when the parent only has
+                      // one student — there's nothing to switch between.
+                      if (children.length > 1)
+                        _ChildTabs(
+                          children: children,
+                          activeIndex: safeIndex,
+                          onTap: (i) => ref
+                              .read(selectedChildIndexProvider.notifier)
+                              .select(i),
+                        ),
                       Expanded(
                         child: _ChildPanel(child: selected, l: l),
                       ),

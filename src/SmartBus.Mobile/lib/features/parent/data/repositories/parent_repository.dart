@@ -88,6 +88,7 @@ class ParentRepository {
       className: dto.className,
       dateOfBirth: dto.dateOfBirth,
       schoolName: dto.schoolName,
+      schoolAddress: dto.schoolAddress,
       homeAddress: dto.homeAddress,
       homeArea: dto.homeArea,
       homeStreet: dto.homeStreet,

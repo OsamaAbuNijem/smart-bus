@@ -19,6 +19,7 @@ public record StudentInfoDto(
     string? Class,
     DateOnly? DateOfBirth,
     string? SchoolName,
+    string? SchoolAddress,
     string HomeAddress,
     string? HomeArea,
     string? HomeStreet,

@@ -339,6 +339,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studentInfoHomeAddress => 'Home Address';
 
   @override
+  String get studentInfoSchoolAddress => 'School Address';
+
+  @override
   String get studentInfoRoute => 'Route';
 
   @override
@@ -381,7 +384,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studentEditClassHint => 'e.g. A';
 
   @override
-  String get studentEditNotes => 'Parent Notes';
+  String get studentEditNotes => 'Notes';
 
   @override
   String get studentEditDriverNote => 'Note for the driver';
@@ -475,6 +478,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get absenceSectionRequested => 'Requested absences';
+
+  @override
+  String get absenceSummaryTotal => 'Total absences';
+
+  @override
+  String get absenceSummaryMorning => 'Morning absences';
+
+  @override
+  String get absenceSummaryReturn => 'Return absences';
+
+  @override
+  String get absenceCancelWindowNote =>
+      'You can cancel this absence anytime before the trip starts. Once the trip is in progress, it can\'t be cancelled.';
+
+  @override
+  String get absenceNoRequests => 'No absence requests for this week yet.';
+
+  @override
+  String get absenceCreateRequest => 'Create absence request';
+
+  @override
+  String get absenceCreateTitle => 'New absence request';
+
+  @override
+  String get absenceCreateSubtitle =>
+      'Submit a one-off absence for this student';
 
   @override
   String get absenceStatusPending => 'Pending';

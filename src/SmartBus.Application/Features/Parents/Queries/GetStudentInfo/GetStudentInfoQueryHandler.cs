@@ -41,14 +41,20 @@ public class GetStudentInfoQueryHandler
 
         var s = data.Student;
 
-        // SchoolId is a string column; try to resolve the School name.
+        // SchoolId is a string column; try to resolve the School name + the
+        // single-line City we expose as the school address.
         string? schoolName = null;
+        string? schoolAddress = null;
         if (Guid.TryParse(s.SchoolId, out var schoolGuid))
         {
-            schoolName = await _db.Schools
+            var school = await _db.Schools
                 .Where(sc => sc.Id == schoolGuid)
-                .Select(sc => sc.Name)
+                .Select(sc => new { sc.Name, sc.City })
                 .FirstOrDefaultAsync(ct);
+            schoolName = school?.Name;
+            schoolAddress = string.IsNullOrWhiteSpace(school?.City)
+                ? null
+                : school!.City;
         }
 
         // Compose a single human-readable address line.
@@ -71,6 +77,7 @@ public class GetStudentInfoQueryHandler
             Class: s.Class,
             DateOfBirth: s.DateOfBirth,
             SchoolName: schoolName,
+            SchoolAddress: schoolAddress,
             HomeAddress: homeAddress,
             HomeArea: s.HomeArea,
             HomeStreet: s.HomeStreet,

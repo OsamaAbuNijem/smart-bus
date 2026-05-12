@@ -15,6 +15,7 @@ abstract class StudentInfoDto with _$StudentInfoDto {
     @JsonKey(name: 'class') String? className,
     DateTime? dateOfBirth,
     String? schoolName,
+    String? schoolAddress,
     required String homeAddress,
     String? homeArea,
     String? homeStreet,

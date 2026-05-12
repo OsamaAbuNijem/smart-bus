@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.AbsenceRequests.Commands.CancelAbsenceRequest;
+using SmartBus.Application.Features.AbsenceRequests.Commands.ForceCancelAbsenceRequest;
 using SmartBus.Application.Features.AbsenceRequests.Commands.SubmitAbsenceRequest;
 using SmartBus.Application.Features.AbsenceRequests.Commands.UpdateAbsenceRequestStatus;
 using SmartBus.Application.Features.AbsenceRequests.Queries.GetAbsenceRequestsByStudent;
@@ -60,6 +61,23 @@ public class AbsenceRequestsController : ControllerBase
     {
         var result = await _mediator.Send(
             new CancelAbsenceRequestCommand(id), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Crew-side cancel: lets the assistant / driver revert an absent flag
+    /// while the trip is InProgress (e.g. the student showed up). Blocked
+    /// only when the matching trip is already Completed.
+    /// </summary>
+    [HttpDelete("{id:guid}/force")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> ForceCancel(
+        Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new ForceCancelAbsenceRequestCommand(id), cancellationToken);
         return result.IsSuccess
             ? NoContent()
             : BadRequest(new { error = result.Error });

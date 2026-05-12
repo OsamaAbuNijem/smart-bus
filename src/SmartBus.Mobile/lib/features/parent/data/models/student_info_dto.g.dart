@@ -18,6 +18,7 @@ _StudentInfoDto _$StudentInfoDtoFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['dateOfBirth'] as String),
       schoolName: json['schoolName'] as String?,
+      schoolAddress: json['schoolAddress'] as String?,
       homeAddress: json['homeAddress'] as String,
       homeArea: json['homeArea'] as String?,
       homeStreet: json['homeStreet'] as String?,
@@ -45,6 +46,7 @@ Map<String, dynamic> _$StudentInfoDtoToJson(_StudentInfoDto instance) =>
       if (instance.dateOfBirth?.toIso8601String() case final value?)
         'dateOfBirth': value,
       if (instance.schoolName case final value?) 'schoolName': value,
+      if (instance.schoolAddress case final value?) 'schoolAddress': value,
       'homeAddress': instance.homeAddress,
       if (instance.homeArea case final value?) 'homeArea': value,
       if (instance.homeStreet case final value?) 'homeStreet': value,

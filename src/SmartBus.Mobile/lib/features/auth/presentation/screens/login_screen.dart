@@ -48,7 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   bool get _phoneValid =>
-      _phoneCtrl.text.replaceAll(RegExp(r'\D'), '').length >= 8;
+      _phoneCtrl.text.replaceAll(RegExp(r'\D'), '').length == 9;
 
   Future<void> _submit() async {
     if (!_phoneValid) return;

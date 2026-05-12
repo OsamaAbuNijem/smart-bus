@@ -7,6 +7,7 @@ class AbsenceRequestItem {
     required this.reason,
     required this.status,
     required this.createdAt,
+    required this.canCancel,
   });
 
   factory AbsenceRequestItem.fromJson(Map<String, dynamic> json) {
@@ -22,6 +23,7 @@ class AbsenceRequestItem {
       reason: (json['reason'] as String?) ?? 'Other',
       status: (json['status'] as String?) ?? 'Pending',
       createdAt: DateTime.parse(json['createdAt'] as String),
+      canCancel: (json['canCancel'] as bool?) ?? false,
     );
   }
 
@@ -32,4 +34,7 @@ class AbsenceRequestItem {
   final String reason;
   final String status; // Pending | Approved | Rejected
   final DateTime createdAt;
+  // True while the matching trip hasn't started yet — used to decide
+  // whether the parent screen shows the delete icon for this row.
+  final bool canCancel;
 }

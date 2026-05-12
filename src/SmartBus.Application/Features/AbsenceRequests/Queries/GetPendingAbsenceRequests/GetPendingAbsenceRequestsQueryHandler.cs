@@ -24,7 +24,9 @@ public class GetPendingAbsenceRequestsQueryHandler : IRequestHandler<GetPendingA
             .OrderBy(a => a.Date)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
-            .Select(a => new AbsenceRequestDto(a.Id, a.StudentId, a.Student.FullName, a.Date, a.TripType, a.Reason, a.Status, a.CreatedAt))
+            // Admin pending-list doesn't need the parent-side CanCancel
+            // flag — always set false here.
+            .Select(a => new AbsenceRequestDto(a.Id, a.StudentId, a.Student.FullName, a.Date, a.TripType, a.Reason, a.Status, a.CreatedAt, false))
             .ToListAsync(cancellationToken);
 
         return PagedResult<AbsenceRequestDto>.Create(items, total, request.PageNumber, request.PageSize);

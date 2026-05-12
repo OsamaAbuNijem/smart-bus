@@ -224,9 +224,11 @@ class AssistantRemoteDataSource {
   /// Cancel an absence the parent submitted earlier. Used by the assistant
   /// trip-details sheet to undo an absent flag mid-trip when the student
   /// shows up after all. Server rejects once the matching trip is completed.
+  /// Goes through the crew-only "force" endpoint so the in-progress guard
+  /// the parent flow uses doesn't block this path.
   Future<void> cancelAbsenceRequest(String absenceRequestId) async {
     try {
-      await _dio.delete<void>('/absence-requests/$absenceRequestId');
+      await _dio.delete<void>('/absence-requests/$absenceRequestId/force');
     } on DioException catch (e) {
       throw mapDioErrorToFailure(e);
     }

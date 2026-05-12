@@ -13,6 +13,7 @@ abstract class StudentInfo with _$StudentInfo {
     String? className,
     DateTime? dateOfBirth,
     String? schoolName,
+    String? schoolAddress,
     required String homeAddress,
     String? homeArea,
     String? homeStreet,
