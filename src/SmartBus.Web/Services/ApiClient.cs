@@ -149,6 +149,24 @@ public class ApiClient : IApiClient
 
     public Task<bool> DeleteStudentAsync(Guid id) => DeleteAsync($"api/v1/students/{id}");
 
+    public async Task<(bool Ok, SmartBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentsResult? Result, string? Error)>
+        BulkUpsertStudentsAsync(IReadOnlyList<SmartBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentRow> rows)
+    {
+        var payload = new { Rows = rows };
+        var json = JsonSerializer.Serialize(payload, _jsonOptions);
+        using var content = new StringContent(json, Encoding.UTF8, "application/json");
+        using var req = AuthorizedRequest(HttpMethod.Post, "api/v1/students/bulk-upsert", content);
+        using var response = await _httpClient.SendAsync(req);
+        var body = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("Bulk-upsert students failed. Status={Status} Body={Body}", response.StatusCode, body);
+            return (false, null, ExtractError(body));
+        }
+        var result = JsonSerializer.Deserialize<SmartBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentsResult>(body, _jsonOptions);
+        return (true, result, null);
+    }
+
     // ── Buses ──────────────────────────────────────────────────────────────
     public Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10,
         string? plateNumber = null, string? personName = null)

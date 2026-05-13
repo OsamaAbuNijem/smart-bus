@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Schools.Queries.GetMySchool;
+using SmartBus.Application.Features.Students.Commands.BulkUpsertStudents;
 using SmartBus.Application.Features.Students.Commands.CreateStudent;
 using SmartBus.Application.Features.Students.Commands.DeleteStudent;
 using SmartBus.Application.Features.Students.Commands.RegisterFromQr;
@@ -66,6 +67,32 @@ public class StudentsController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Data }, result.Data)
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Admin Excel import — upsert N student rows in a single round trip.
+    /// Match key is NationalNumber; existing rows are updated, missing rows are
+    /// created. Address/GPS fields are not touched (they aren't part of the
+    /// import sheet, so we preserve any value already stored on the row).
+    /// </summary>
+    [HttpPost("bulk-upsert")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> BulkUpsert([FromBody] BulkUpsertStudentsRequest request, CancellationToken cancellationToken)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        if (string.IsNullOrEmpty(email)) return Unauthorized();
+
+        var schoolResult = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
+        if (!schoolResult.IsSuccess) return BadRequest(new { error = "School not found for this admin." });
+
+        var command = new BulkUpsertStudentsCommand(
+            schoolResult.Data!.Id.ToString(),
+            request.Rows ?? Array.Empty<BulkUpsertStudentRow>());
+
+        var result = await _mediator.Send(command, cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
             : BadRequest(new { error = result.Error });
     }
 
@@ -155,3 +182,5 @@ public record RegisterStudentFromQrRequest(
     double? Latitude, double? Longitude);
 
 public record ScanStudentQrRequest(string Token, Guid TripId);
+
+public record BulkUpsertStudentsRequest(IReadOnlyList<BulkUpsertStudentRow> Rows);

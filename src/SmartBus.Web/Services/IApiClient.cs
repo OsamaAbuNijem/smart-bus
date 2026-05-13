@@ -31,6 +31,8 @@ public interface IApiClient
     Task<(bool Ok, string? Error)> CreateStudentAsync(StudentInput input);
     Task<(bool Ok, string? Error)> UpdateStudentAsync(Guid id, StudentInput input);
     Task<bool> DeleteStudentAsync(Guid id);
+    Task<(bool Ok, SmartBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentsResult? Result, string? Error)>
+        BulkUpsertStudentsAsync(IReadOnlyList<SmartBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentRow> rows);
 
     // Buses
     Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10,

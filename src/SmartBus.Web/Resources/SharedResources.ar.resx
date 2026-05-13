@@ -85,6 +85,7 @@
   <data name="Std_Grade12"      xml:space="preserve"><value>الصف الثاني عشر</value></data>
   <data name="Std_GradeKG1"     xml:space="preserve"><value>روضة أولى</value></data>
   <data name="Std_GradeKG2"     xml:space="preserve"><value>روضة ثانية</value></data>
+  <data name="Std_Filter_AllGrades" xml:space="preserve"><value>كل الصفوف</value></data>
   <data name="Std_City"         xml:space="preserve"><value>المدينة</value></data>
   <data name="City_Amman"      xml:space="preserve"><value>عمّان</value></data>
   <data name="City_Zarqa"      xml:space="preserve"><value>الزرقاء</value></data>

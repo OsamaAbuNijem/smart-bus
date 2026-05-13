@@ -85,6 +85,7 @@
   <data name="Std_Grade12"      xml:space="preserve"><value>Grade 12</value></data>
   <data name="Std_GradeKG1"     xml:space="preserve"><value>KG 1</value></data>
   <data name="Std_GradeKG2"     xml:space="preserve"><value>KG 2</value></data>
+  <data name="Std_Filter_AllGrades" xml:space="preserve"><value>All grades</value></data>
   <data name="Std_City"         xml:space="preserve"><value>City</value></data>
   <data name="City_Amman"      xml:space="preserve"><value>Amman</value></data>
   <data name="City_Zarqa"      xml:space="preserve"><value>Zarqa</value></data>

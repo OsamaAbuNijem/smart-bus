@@ -112,39 +112,12 @@
       </div>
     </section>
 
-    @* ── Section: Home Address ────────────────────────────────────── *@
-    <section class="form-section">
-      <header class="form-section-head">
-        <span class="form-section-ico sb-home">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </span>
-        <div>
-          <div class="form-section-title">@L["Std_SectionHome"]</div>
-          <div class="form-section-sub">@L["Std_SectionHome_Sub"]</div>
-        </div>
-      </header>
-
-      @* Preserve any existing GPS coordinates on update (no UI picker anymore). *@
-      <input type="hidden" name="Latitude"  id="sf-lat"
-             value="@(Model?.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"/>
-      <input type="hidden" name="Longitude" id="sf-lng"
-             value="@(Model?.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"/>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">@L["Std_MapArea"]</label>
-          <input type="text" name="HomeArea" class="form-input" id="sf-area" dir="rtl" value="@Model?.HomeArea"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">@L["Std_MapStreet"]</label>
-          <input type="text" name="HomeStreet" class="form-input" id="sf-street" dir="rtl" value="@Model?.HomeStreet"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">@L["Std_Building"]</label>
-          <input type="text" name="HomeBuildingNumber" class="form-input" dir="ltr" value="@Model?.HomeBuildingNumber"/>
-        </div>
-      </div>
-    </section>
+    @* Home Address removed from the UI — values round-trip so existing data isn't lost on edit. *@
+    <input type="hidden" name="Latitude"           id="sf-lat"    value="@(Model?.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"/>
+    <input type="hidden" name="Longitude"          id="sf-lng"    value="@(Model?.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"/>
+    <input type="hidden" name="HomeArea"           id="sf-area"   value="@Model?.HomeArea"/>
+    <input type="hidden" name="HomeStreet"         id="sf-street" value="@Model?.HomeStreet"/>
+    <input type="hidden" name="HomeBuildingNumber"                value="@Model?.HomeBuildingNumber"/>
   </div>
 
   <div class="modal-footer">

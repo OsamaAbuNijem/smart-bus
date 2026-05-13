@@ -113,29 +113,35 @@ public class StudentsController : AdminControllerBase
         var ws = wb.AddWorksheet("Students");
 
         string[] headers = { "FullName","FullNameEn","NationalNumber","Grade","ParentName",
-                             "ParentPhone","HomeArea","HomeStreet","HomeBuildingNumber",
-                             "Latitude","Longitude","CreatedAt" };
+                             "ParentPhone","Latitude","Longitude","CreatedAt" };
         for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
         ws.Row(1).Style.Font.Bold = true;
 
-        var row = 2;
-        foreach (var s in data?.Items ?? Array.Empty<Application.Features.Students.Queries.GetAllStudents.StudentDto>())
-        {
-            ws.Cell(row, 1).Value  = s.FullName;
-            ws.Cell(row, 2).Value  = s.FullNameEn;
-            ws.Cell(row, 3).Value  = s.NationalNumber;
-            ws.Cell(row, 4).Value  = GradeLabel(s.Grade);
-            ws.Cell(row, 5).Value  = s.ParentName;
-            ws.Cell(row, 6).Value  = s.ParentPhone;
-            ws.Cell(row, 7).Value  = s.HomeArea;
-            ws.Cell(row, 8).Value  = s.HomeStreet;
-            ws.Cell(row, 9).Value  = s.HomeBuildingNumber;
-            ws.Cell(row, 10).Value = s.Latitude;
-            ws.Cell(row, 11).Value = s.Longitude;
-            ws.Cell(row, 12).Value = s.CreatedAt;
-            row++;
-        }
-        ws.Columns().AdjustToContents();
+        // Project rows into object[] then hand the whole batch to InsertData — the
+        // bulk path inside ClosedXML is noticeably faster than per-cell .Value = …
+        // assignments once the export gets into the thousands of rows.
+        var rows = (data?.Items ?? Array.Empty<Application.Features.Students.Queries.GetAllStudents.StudentDto>())
+            .Select(s => new object?[]
+            {
+                s.FullName,
+                s.FullNameEn,
+                s.NationalNumber,
+                GradeLabel(s.Grade),
+                s.ParentName,
+                s.ParentPhone,
+                s.Latitude,
+                s.Longitude,
+                s.CreatedAt
+            });
+        ws.Cell(2, 1).InsertData(rows);
+
+        // Fixed column widths — skipping AdjustToContents() is the biggest export
+        // speedup; autosize is O(rows × cols) and dominates wall-clock time for
+        // large sheets. Values chosen to comfortably fit typical content.
+        int[] widths = { 28, 28, 18, 14, 22, 16, 12, 12, 18 };
+        for (int i = 0; i < widths.Length; i++) ws.Column(i + 1).Width = widths[i];
+        // Display CreatedAt as a real date instead of an Excel serial number.
+        ws.Column(9).Style.DateFormat.Format = "yyyy-MM-dd HH:mm";
 
         using var ms = new MemoryStream();
         wb.SaveAs(ms);
@@ -191,8 +197,7 @@ public class StudentsController : AdminControllerBase
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Students");
 
-        string[] headers = { "FullName","FullNameEn","NationalNumber","Grade","ParentName",
-                             "ParentPhone","HomeArea","HomeStreet","HomeBuildingNumber" };
+        string[] headers = { "FullName","FullNameEn","NationalNumber","Grade","ParentName","ParentPhone" };
         for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
         ws.Row(1).Style.Font.Bold = true;
         ws.Row(1).Style.Fill.BackgroundColor = XLColor.FromHtml("#FFFDE7");
@@ -204,9 +209,6 @@ public class StudentsController : AdminControllerBase
         ws.Cell(2, 4).Value = "1";
         ws.Cell(2, 5).Value = "محمد خالد";
         ws.Cell(2, 6).Value = "0791234567";
-        ws.Cell(2, 7).Value = "عمان";
-        ws.Cell(2, 8).Value = "شارع الجامعة";
-        ws.Cell(2, 9).Value = "12";
         ws.Row(2).Style.Font.Italic = true;
         ws.Row(2).Style.Font.FontColor = XLColor.FromHtml("#94A3B8");
 
@@ -247,36 +249,51 @@ public class StudentsController : AdminControllerBase
             int cPar    = Col("ParentName");
             int cPhone  = Col("ParentPhone");
             int cFullEn = Col("FullNameEn");
-            int cArea   = Col("HomeArea");
-            int cStreet = Col("HomeStreet");
-            int cBuild  = Col("HomeBuildingNumber");
 
             if (cFull < 0 || cNat < 0 || cGrade < 0 || cPar < 0 || cPhone < 0)
                 return StatusCode(400, new { result = _l["Student_ImportHint"].Value });
 
+            // Parse every data row into a typed DTO. Row-level structural validation
+            // (required fields) happens here so failed rows are counted client-side
+            // and don't need a server round-trip. Format conversion (Grade label →
+            // canonical code) happens here too.
+            var bulkRows = new List<Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentRow>();
             foreach (var row in sheet.RowsUsed().Skip(1))
             {
                 string Get(int col) => col > 0 ? row.Cell(col).GetString().Trim() : string.Empty;
 
-                var input = new StudentInput
-                {
-                    FullName           = Get(cFull),
-                    NationalNumber     = Get(cNat),
-                    Grade              = GradeFromAnything(Get(cGrade)),  // accept "1" or "الأول"
-                    ParentName         = Get(cPar),
-                    ParentPhone        = Get(cPhone),
-                    FullNameEn         = Get(cFullEn),
-                    HomeArea           = Get(cArea),
-                    HomeStreet         = Get(cStreet),
-                    HomeBuildingNumber = Get(cBuild)
-                };
-                if (string.IsNullOrEmpty(input.FullName) || string.IsNullOrEmpty(input.Grade) ||
-                    string.IsNullOrEmpty(input.NationalNumber) ||
-                    string.IsNullOrEmpty(input.ParentName) || string.IsNullOrEmpty(input.ParentPhone))
-                { failed++; continue; }
+                var fullName   = Get(cFull);
+                var nat        = Get(cNat);
+                var grade      = GradeFromAnything(Get(cGrade));  // accept "1" or "الأول"
+                var parentName = Get(cPar);
+                var phone      = Get(cPhone);
+                var fullEn     = Get(cFullEn);
 
-                var (ok, _) = await ApiClient.CreateStudentAsync(input);
-                if (ok) imported++; else failed++;
+                if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(grade) ||
+                    string.IsNullOrEmpty(nat) ||
+                    string.IsNullOrEmpty(parentName) || string.IsNullOrEmpty(phone))
+                {
+                    failed++;
+                    continue;
+                }
+
+                bulkRows.Add(new Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentRow(
+                    fullName, fullEn, nat, grade, parentName, phone));
+            }
+
+            if (bulkRows.Count > 0)
+            {
+                var (ok, result, error) = await ApiClient.BulkUpsertStudentsAsync(bulkRows);
+                if (ok && result is not null)
+                {
+                    imported += result.Created + result.Updated;
+                    failed   += result.Failed;
+                }
+                else
+                {
+                    _logger.LogWarning("Bulk-upsert returned an error: {Error}", error);
+                    failed += bulkRows.Count;
+                }
             }
         }
         catch (Exception ex)
