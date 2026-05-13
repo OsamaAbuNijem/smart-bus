@@ -39,7 +39,7 @@
   <data name="Login_SASubmit" xml:space="preserve"><value>دخول المشرف العام</value></data>
 
   <!-- Login — school admin (redesigned split layout) -->
-  <data name="Login_BrandTagline" xml:space="preserve"><value>منصة ذكية لإدارة النقل المدرسي</value></data>
+  <data name="Login_BrandTagline" xml:space="preserve"><value>النقل المدرسي الذكي</value></data>
   <data name="Login_BrandLead"    xml:space="preserve"><value>تابع رحلات طلابك لحظة بلحظة، وأدر أسطولك بسلاسة من لوحة واحدة.</value></data>
   <data name="Login_Feature1"     xml:space="preserve"><value>تتبع مباشر للرحلات والباصات</value></data>
   <data name="Login_Feature2"     xml:space="preserve"><value>إدارة متكاملة للسائقين والطلاب</value></data>
@@ -52,6 +52,17 @@
   <data name="Login_PasswordPH"   xml:space="preserve"><value>••••••••</value></data>
   <data name="Login_FooterRights" xml:space="preserve"><value>جميع الحقوق محفوظة</value></data>
   <data name="Login_FooterPowered" xml:space="preserve"><value>مدعوم بواسطة</value></data>
+  <data name="Login_BrandName"    xml:space="preserve"><value>منصة باص التلميذ</value></data>
+  <data name="Login_BrandShort"   xml:space="preserve"><value>تلمز</value></data>
+  <data name="Login_PageTitle"    xml:space="preserve"><value>تلمز — تسجيل الدخول</value></data>
+  <data name="Login_DemoLiveTrip" xml:space="preserve"><value>رحلة مباشرة</value></data>
+  <data name="Login_DemoRoute"    xml:space="preserve"><value>المسار رقم ٣</value></data>
+  <data name="Login_DemoOnTime"   xml:space="preserve"><value>في الوقت</value></data>
+  <data name="Login_DemoBoarded"  xml:space="preserve"><value>١٢/١٢</value></data>
+  <data name="Login_DemoEta"      xml:space="preserve"><value>الوصول خلال ٨ د</value></data>
+  <data name="Login_DemoDistance" xml:space="preserve"><value>٢٫٤ كم</value></data>
+  <data name="Login_DemoSpeed"    xml:space="preserve"><value>٣٨ كم/س</value></data>
+  <data name="Login_DemoOnOff"    xml:space="preserve"><value>١٢ · ٠</value></data>
 
   <!-- Student modal labels -->
   <data name="Std_AddTitle"     xml:space="preserve"><value>إضافة طالب جديد</value></data>

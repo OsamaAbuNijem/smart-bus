@@ -21,7 +21,7 @@ try
     // (by default UseStaticWebAssets only runs in Development; this makes it work under IIS Production too)
     builder.WebHost.UseStaticWebAssets();
 
-    builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
+    builder.Services.AddLocalization();
     builder.Services.AddControllersWithViews(options =>
         {
             // Always parse double/double? form values using InvariantCulture —

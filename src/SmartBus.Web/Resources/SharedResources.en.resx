@@ -39,7 +39,7 @@
   <data name="Login_SASubmit" xml:space="preserve"><value>Super Admin Login</value></data>
 
   <!-- Login — school admin (redesigned split layout) -->
-  <data name="Login_BrandTagline" xml:space="preserve"><value>Smart school transport management</value></data>
+  <data name="Login_BrandTagline" xml:space="preserve"><value>Smart school transport</value></data>
   <data name="Login_BrandLead"    xml:space="preserve"><value>Track every trip in real time and run your fleet from a single dashboard.</value></data>
   <data name="Login_Feature1"     xml:space="preserve"><value>Real-time trip &amp; bus tracking</value></data>
   <data name="Login_Feature2"     xml:space="preserve"><value>End-to-end driver &amp; student management</value></data>
@@ -52,6 +52,17 @@
   <data name="Login_PasswordPH"   xml:space="preserve"><value>••••••••</value></data>
   <data name="Login_FooterRights" xml:space="preserve"><value>All rights reserved</value></data>
   <data name="Login_FooterPowered" xml:space="preserve"><value>Powered by</value></data>
+  <data name="Login_BrandName"    xml:space="preserve"><value>Tilmez Bus Platform</value></data>
+  <data name="Login_BrandShort"   xml:space="preserve"><value>Tilmez</value></data>
+  <data name="Login_PageTitle"    xml:space="preserve"><value>Tilmez — Sign In</value></data>
+  <data name="Login_DemoLiveTrip" xml:space="preserve"><value>Live Trip</value></data>
+  <data name="Login_DemoRoute"    xml:space="preserve"><value>Route #3</value></data>
+  <data name="Login_DemoOnTime"   xml:space="preserve"><value>On time</value></data>
+  <data name="Login_DemoBoarded"  xml:space="preserve"><value>12/12</value></data>
+  <data name="Login_DemoEta"      xml:space="preserve"><value>ETA 8 min</value></data>
+  <data name="Login_DemoDistance" xml:space="preserve"><value>2.4 km</value></data>
+  <data name="Login_DemoSpeed"    xml:space="preserve"><value>38 km/h</value></data>
+  <data name="Login_DemoOnOff"    xml:space="preserve"><value>12 · 0</value></data>
 
   <!-- Student modal labels -->
   <data name="Std_AddTitle"     xml:space="preserve"><value>Add New Student</value></data>
