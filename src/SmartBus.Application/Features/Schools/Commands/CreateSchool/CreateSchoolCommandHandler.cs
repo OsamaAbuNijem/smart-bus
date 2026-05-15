@@ -38,28 +38,44 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
 
         var school = new School
         {
-            Name          = request.Name,
-            City          = request.City,
-            ContactEmail  = request.ContactEmail,
-            PhoneNumber   = request.PhoneNumber,
-            AdminEmail    = request.AdminEmail,
-            Plan          = request.Plan,
-            MaxBuses      = request.MaxBuses,
-            MaxDrivers    = request.MaxDrivers,
-            MaxAssistants = request.MaxAssistants,
-            MaxStudents   = request.MaxStudents,
-            Notes         = request.Notes,
-            Latitude      = request.Latitude,
-            Longitude     = request.Longitude
+            Name         = request.Name,
+            City         = request.City,
+            ContactEmail = request.ContactEmail,
+            PhoneNumber  = request.PhoneNumber,
+            AdminEmail   = request.AdminEmail,
+            Notes        = request.Notes,
+            Latitude     = request.Latitude,
+            Longitude    = request.Longitude
         };
 
         await _unitOfWork.Schools.AddAsync(school, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Pre-mint a registration QR for every driver/assistant slot the school is
-        // entitled to. Each token is single-use and the type determines what the
-        // mobile app creates when the employee scans it for the first time.
-        for (var i = 0; i < school.MaxDrivers; i++)
+        // Initial active subscription — the subscription is now the source of
+        // truth for MaxStudents / MaxBuses (those columns were removed from
+        // School). Super admin can renew/edit via the subscriptions page.
+        var subscription = new Subscription
+        {
+            SchoolId         = school.Id,
+            MaxStudents      = request.SubscriptionMaxStudents,
+            MaxBuses         = request.SubscriptionMaxBuses,
+            ActivationDate   = request.SubscriptionActivationDate,
+            ExpirationDate   = request.SubscriptionExpirationDate,
+            IsActive         = true,
+            Price            = request.SubscriptionPrice,
+            IsPaid           = request.SubscriptionIsPaid,
+            RemainingAmount  = request.SubscriptionRemainingAmount,
+            SubscriptionType = request.SubscriptionType
+        };
+        _context.Subscriptions.Add(subscription);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // Pre-mint registration QRs in fixed pools. Schools used to declare
+        // their own driver / assistant caps; with those gone we mint a
+        // generous pool up front and the admin can ignore the unused tokens.
+        const int driverPoolSize    = 30;
+        const int assistantPoolSize = 30;
+        for (var i = 0; i < driverPoolSize; i++)
         {
             _context.EmployeeQrTokens.Add(new EmployeeQrToken
             {
@@ -68,7 +84,7 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
                 Type     = EmployeeQrTokenType.Driver
             });
         }
-        for (var i = 0; i < school.MaxAssistants; i++)
+        for (var i = 0; i < assistantPoolSize; i++)
         {
             _context.EmployeeQrTokens.Add(new EmployeeQrToken
             {
@@ -77,10 +93,10 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
                 Type     = EmployeeQrTokenType.Assistant
             });
         }
-        // Pre-mint a registration QR per student slot. The first scan binds the
-        // QR to a real Student row (parent submits the details); every later
-        // scan from the bus marks boarding/alighting + attendance.
-        for (var i = 0; i < school.MaxStudents; i++)
+        // Pre-mint a registration QR per student slot. The first scan binds
+        // the QR to a real Student row (parent submits the details); later
+        // scans from the bus mark boarding/alighting + attendance.
+        for (var i = 0; i < request.SubscriptionMaxStudents; i++)
         {
             _context.StudentQrTokens.Add(new StudentQrToken
             {

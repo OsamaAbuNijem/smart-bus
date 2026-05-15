@@ -20,8 +20,7 @@ public class GetAllSchoolsQueryHandler : IRequestHandler<GetAllSchoolsQuery, Pag
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(s => new SchoolDto(s.Id, s.Name, s.City, s.ContactEmail, s.PhoneNumber,
-                s.AdminEmail, s.Plan, s.MaxBuses, s.MaxDrivers, s.MaxAssistants, s.MaxStudents,
-                s.IsActive, s.Notes, s.CreatedAt))
+                s.AdminEmail, s.Notes, s.CreatedAt))
             .ToListAsync(cancellationToken);
 
         return PagedResult<SchoolDto>.Create(items, total, request.PageNumber, request.PageSize);

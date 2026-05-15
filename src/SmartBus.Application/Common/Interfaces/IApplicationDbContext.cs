@@ -23,6 +23,8 @@ public interface IApplicationDbContext
     DbSet<EmergencyContact> EmergencyContacts { get; }
     DbSet<StudentAllergy> StudentAllergies { get; }
     DbSet<School> Schools { get; }
+    DbSet<Subscription> Subscriptions { get; }
+    DbSet<SubscriptionStudent> SubscriptionStudents { get; }
     DbSet<BusSchedule> BusSchedules { get; }
     DbSet<BusScheduleStudent> BusScheduleStudents { get; }
     DbSet<EmployeeQrToken> EmployeeQrTokens { get; }

@@ -17,8 +17,7 @@ public class GetMySchoolQueryHandler : IRequestHandler<GetMySchoolQuery, Result<
         var school = await _context.Schools
             .Where(s => !s.IsDeleted && s.AdminEmail == request.AdminEmail)
             .Select(s => new SchoolDto(s.Id, s.Name, s.City, s.ContactEmail, s.PhoneNumber,
-                s.AdminEmail, s.Plan, s.MaxBuses, s.MaxDrivers, s.MaxAssistants, s.MaxStudents,
-                s.IsActive, s.Notes, s.CreatedAt))
+                s.AdminEmail, s.Notes, s.CreatedAt))
             .FirstOrDefaultAsync(cancellationToken);
 
         return school is not null

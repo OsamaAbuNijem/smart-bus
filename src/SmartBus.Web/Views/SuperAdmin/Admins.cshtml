@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "المديرون";
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+<div class="page active" id="sa-page-admins">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">مديرو المدارس</div>
+        <div class="card-sub">قائمة بجميع مديري المدارس المشتركة</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="table">
+        <thead><tr>
+          <th>المدرسة</th><th>بريد المدير</th><th>المدينة</th><th>الحالة</th>
+        </tr></thead>
+        <tbody id="admins-tbody">
+          <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text3);">جاري التحميل...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // loadAdmins() is defined in superadmin.js — populates the table from /schools.
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof loadAdmins === 'function') loadAdmins();
+  });
+</script>

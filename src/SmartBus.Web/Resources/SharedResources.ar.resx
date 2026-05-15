@@ -64,6 +64,66 @@
   <data name="Login_DemoSpeed"    xml:space="preserve"><value>٣٨ كم/س</value></data>
   <data name="Login_DemoOnOff"    xml:space="preserve"><value>١٢ · ٠</value></data>
 
+  <!-- Super-admin school modal -->
+  <data name="SA_School_Add"            xml:space="preserve"><value>إضافة مدرسة جديدة</value></data>
+  <data name="SA_School_Edit"           xml:space="preserve"><value>تعديل بيانات المدرسة</value></data>
+  <data name="SA_School_Name"           xml:space="preserve"><value>اسم المدرسة</value></data>
+  <data name="SA_School_Name_PH"        xml:space="preserve"><value>مثال: مدرسة النور الابتدائية</value></data>
+  <data name="SA_School_Name_Required"  xml:space="preserve"><value>الاسم مطلوب</value></data>
+  <data name="SA_School_Email"          xml:space="preserve"><value>البريد الإلكتروني</value></data>
+  <data name="SA_School_Email_PH"       xml:space="preserve"><value>contact@school.edu</value></data>
+  <data name="SA_School_Email_Required" xml:space="preserve"><value>بريد إلكتروني صحيح مطلوب</value></data>
+  <data name="SA_School_Phone"          xml:space="preserve"><value>رقم الهاتف</value></data>
+  <data name="SA_School_Phone_PH"       xml:space="preserve"><value>79XXXXXXX</value></data>
+  <data name="SA_School_Phone_Required" xml:space="preserve"><value>رقم الهاتف مطلوب</value></data>
+  <data name="SA_School_Admin"          xml:space="preserve"><value>بريد المدير</value></data>
+  <data name="SA_School_Admin_PH"       xml:space="preserve"><value>admin@school.edu</value></data>
+  <data name="SA_School_Admin_Required" xml:space="preserve"><value>بريد المدير مطلوب</value></data>
+  <data name="SA_School_Password"       xml:space="preserve"><value>كلمة مرور المدير</value></data>
+  <data name="SA_School_Password_Hint"  xml:space="preserve"><value>تُستخدم لأول مرة فقط عند إنشاء الحساب.</value></data>
+  <data name="SA_School_Notes"          xml:space="preserve"><value>ملاحظات</value></data>
+  <data name="SA_School_Notes_PH"       xml:space="preserve"><value>ملاحظات اختيارية…</value></data>
+  <data name="SA_School_Save"           xml:space="preserve"><value>حفظ المدرسة</value></data>
+  <data name="SA_School_Cancel"         xml:space="preserve"><value>إلغاء</value></data>
+
+  <!-- Super-admin subscription block (initial subscription created with the school) -->
+  <data name="SA_Sub_Section"        xml:space="preserve"><value>الاشتراك الابتدائي</value></data>
+  <data name="SA_Sub_Section_Hint"   xml:space="preserve"><value>يُنشأ تلقائياً مع المدرسة. يمكن تعديل التفاصيل لاحقاً.</value></data>
+  <data name="SA_Sub_Type"           xml:space="preserve"><value>نوع الاشتراك</value></data>
+  <data name="SA_Sub_Type_Trial"     xml:space="preserve"><value>تجريبي</value></data>
+  <data name="SA_Sub_Type_Basic"     xml:space="preserve"><value>أساسي</value></data>
+  <data name="SA_Sub_Type_Standard"  xml:space="preserve"><value>معياري</value></data>
+  <data name="SA_Sub_Type_Premium"   xml:space="preserve"><value>مميز</value></data>
+  <data name="SA_Sub_Price"          xml:space="preserve"><value>السعر</value></data>
+  <data name="SA_Sub_ActivationDate" xml:space="preserve"><value>تاريخ التفعيل</value></data>
+  <data name="SA_Sub_ExpirationDate" xml:space="preserve"><value>تاريخ الانتهاء</value></data>
+  <data name="SA_Sub_Paid"           xml:space="preserve"><value>حالة الدفع</value></data>
+  <data name="SA_Sub_Paid_Yes"       xml:space="preserve"><value>مدفوع</value></data>
+  <data name="SA_Sub_Paid_No"        xml:space="preserve"><value>غير مدفوع</value></data>
+  <data name="SA_Sub_Remaining"      xml:space="preserve"><value>المبلغ المتبقي</value></data>
+
+  <!-- Super-admin subscriptions page (per school) -->
+  <data name="SA_Sub_Page_Title"          xml:space="preserve"><value>الاشتراكات</value></data>
+  <data name="SA_Sub_Page_Sub"            xml:space="preserve"><value>إدارة تاريخ اشتراكات كل مدرسة. اشتراك واحد فقط يمكن أن يكون نشطاً لكل مدرسة.</value></data>
+  <data name="SA_Sub_Page_School"         xml:space="preserve"><value>المدرسة</value></data>
+  <data name="SA_Sub_Page_Add"            xml:space="preserve"><value>إضافة اشتراك</value></data>
+  <data name="SA_Sub_Page_Edit"           xml:space="preserve"><value>تعديل</value></data>
+  <data name="SA_Sub_Page_AddTitle"       xml:space="preserve"><value>اشتراك جديد</value></data>
+  <data name="SA_Sub_Page_EditTitle"      xml:space="preserve"><value>تعديل الاشتراك</value></data>
+  <data name="SA_Sub_Page_Status"         xml:space="preserve"><value>الحالة</value></data>
+  <data name="SA_Sub_Page_StatusActive"   xml:space="preserve"><value>راية التفعيل</value></data>
+  <data name="SA_Sub_Page_StatusActive_On"  xml:space="preserve"><value>مُفعَّل</value></data>
+  <data name="SA_Sub_Page_StatusActive_Off" xml:space="preserve"><value>غير مُفعَّل</value></data>
+  <data name="SA_Sub_Page_Status_Live"    xml:space="preserve"><value>نشط</value></data>
+  <data name="SA_Sub_Page_Status_Expired" xml:space="preserve"><value>منتهٍ</value></data>
+  <data name="SA_Sub_Page_Status_Future"  xml:space="preserve"><value>لاحق</value></data>
+  <data name="SA_Sub_Page_Status_Off"     xml:space="preserve"><value>معطّل</value></data>
+  <data name="SA_Sub_Page_MaxStudents"    xml:space="preserve"><value>الحد الأقصى للطلاب</value></data>
+  <data name="SA_Sub_Page_MaxBuses"       xml:space="preserve"><value>الحد الأقصى للباصات</value></data>
+  <data name="SA_Sub_Page_Actions"        xml:space="preserve"><value>الإجراءات</value></data>
+  <data name="SA_Sub_Page_PickSchool"     xml:space="preserve"><value>اختر مدرسة من القائمة لعرض اشتراكاتها.</value></data>
+  <data name="SA_Sub_Page_NoSubs"         xml:space="preserve"><value>لا توجد اشتراكات لهذه المدرسة بعد.</value></data>
+
   <!-- Student modal labels -->
   <data name="Std_AddTitle"     xml:space="preserve"><value>إضافة طالب جديد</value></data>
   <data name="Std_EditTitle"    xml:space="preserve"><value>تعديل بيانات طالب</value></data>

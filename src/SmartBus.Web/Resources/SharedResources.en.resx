@@ -64,6 +64,66 @@
   <data name="Login_DemoSpeed"    xml:space="preserve"><value>38 km/h</value></data>
   <data name="Login_DemoOnOff"    xml:space="preserve"><value>12 · 0</value></data>
 
+  <!-- Super-admin school modal -->
+  <data name="SA_School_Add"            xml:space="preserve"><value>Add new school</value></data>
+  <data name="SA_School_Edit"           xml:space="preserve"><value>Edit school</value></data>
+  <data name="SA_School_Name"           xml:space="preserve"><value>School name</value></data>
+  <data name="SA_School_Name_PH"        xml:space="preserve"><value>e.g. Al-Noor Primary School</value></data>
+  <data name="SA_School_Name_Required"  xml:space="preserve"><value>Name is required</value></data>
+  <data name="SA_School_Email"          xml:space="preserve"><value>Contact email</value></data>
+  <data name="SA_School_Email_PH"       xml:space="preserve"><value>contact@school.edu</value></data>
+  <data name="SA_School_Email_Required" xml:space="preserve"><value>A valid email is required</value></data>
+  <data name="SA_School_Phone"          xml:space="preserve"><value>Phone number</value></data>
+  <data name="SA_School_Phone_PH"       xml:space="preserve"><value>79XXXXXXX</value></data>
+  <data name="SA_School_Phone_Required" xml:space="preserve"><value>Phone number is required</value></data>
+  <data name="SA_School_Admin"          xml:space="preserve"><value>Admin email</value></data>
+  <data name="SA_School_Admin_PH"       xml:space="preserve"><value>admin@school.edu</value></data>
+  <data name="SA_School_Admin_Required" xml:space="preserve"><value>Admin email is required</value></data>
+  <data name="SA_School_Password"       xml:space="preserve"><value>Admin password</value></data>
+  <data name="SA_School_Password_Hint"  xml:space="preserve"><value>Used only when creating the account.</value></data>
+  <data name="SA_School_Notes"          xml:space="preserve"><value>Notes</value></data>
+  <data name="SA_School_Notes_PH"       xml:space="preserve"><value>Optional notes…</value></data>
+  <data name="SA_School_Save"           xml:space="preserve"><value>Save school</value></data>
+  <data name="SA_School_Cancel"         xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- Super-admin subscription block (initial subscription created with the school) -->
+  <data name="SA_Sub_Section"        xml:space="preserve"><value>Initial subscription</value></data>
+  <data name="SA_Sub_Section_Hint"   xml:space="preserve"><value>Created with the school. Details can be edited later.</value></data>
+  <data name="SA_Sub_Type"           xml:space="preserve"><value>Subscription type</value></data>
+  <data name="SA_Sub_Type_Trial"     xml:space="preserve"><value>Trial</value></data>
+  <data name="SA_Sub_Type_Basic"     xml:space="preserve"><value>Basic</value></data>
+  <data name="SA_Sub_Type_Standard"  xml:space="preserve"><value>Standard</value></data>
+  <data name="SA_Sub_Type_Premium"   xml:space="preserve"><value>Premium</value></data>
+  <data name="SA_Sub_Price"          xml:space="preserve"><value>Price</value></data>
+  <data name="SA_Sub_ActivationDate" xml:space="preserve"><value>Activation date</value></data>
+  <data name="SA_Sub_ExpirationDate" xml:space="preserve"><value>Expiration date</value></data>
+  <data name="SA_Sub_Paid"           xml:space="preserve"><value>Payment status</value></data>
+  <data name="SA_Sub_Paid_Yes"       xml:space="preserve"><value>Paid</value></data>
+  <data name="SA_Sub_Paid_No"        xml:space="preserve"><value>Unpaid</value></data>
+  <data name="SA_Sub_Remaining"      xml:space="preserve"><value>Remaining amount</value></data>
+
+  <!-- Super-admin subscriptions page (per school) -->
+  <data name="SA_Sub_Page_Title"          xml:space="preserve"><value>Subscriptions</value></data>
+  <data name="SA_Sub_Page_Sub"            xml:space="preserve"><value>Manage each school's subscription history. Only one subscription can be active per school.</value></data>
+  <data name="SA_Sub_Page_School"         xml:space="preserve"><value>School</value></data>
+  <data name="SA_Sub_Page_Add"            xml:space="preserve"><value>Add subscription</value></data>
+  <data name="SA_Sub_Page_Edit"           xml:space="preserve"><value>Edit</value></data>
+  <data name="SA_Sub_Page_AddTitle"       xml:space="preserve"><value>New subscription</value></data>
+  <data name="SA_Sub_Page_EditTitle"      xml:space="preserve"><value>Edit subscription</value></data>
+  <data name="SA_Sub_Page_Status"         xml:space="preserve"><value>Status</value></data>
+  <data name="SA_Sub_Page_StatusActive"   xml:space="preserve"><value>Active flag</value></data>
+  <data name="SA_Sub_Page_StatusActive_On"  xml:space="preserve"><value>Active</value></data>
+  <data name="SA_Sub_Page_StatusActive_Off" xml:space="preserve"><value>Inactive</value></data>
+  <data name="SA_Sub_Page_Status_Live"    xml:space="preserve"><value>Active</value></data>
+  <data name="SA_Sub_Page_Status_Expired" xml:space="preserve"><value>Expired</value></data>
+  <data name="SA_Sub_Page_Status_Future"  xml:space="preserve"><value>Future</value></data>
+  <data name="SA_Sub_Page_Status_Off"     xml:space="preserve"><value>Disabled</value></data>
+  <data name="SA_Sub_Page_MaxStudents"    xml:space="preserve"><value>Max students</value></data>
+  <data name="SA_Sub_Page_MaxBuses"       xml:space="preserve"><value>Max buses</value></data>
+  <data name="SA_Sub_Page_Actions"        xml:space="preserve"><value>Actions</value></data>
+  <data name="SA_Sub_Page_PickSchool"     xml:space="preserve"><value>Pick a school from the dropdown to view its subscriptions.</value></data>
+  <data name="SA_Sub_Page_NoSubs"         xml:space="preserve"><value>No subscriptions for this school yet.</value></data>
+
   <!-- Student modal labels -->
   <data name="Std_AddTitle"     xml:space="preserve"><value>Add New Student</value></data>
   <data name="Std_EditTitle"    xml:space="preserve"><value>Edit Student</value></data>

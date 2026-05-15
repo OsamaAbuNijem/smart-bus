@@ -46,7 +46,6 @@ public class RegisterStudentFromQrCommandHandler
         if (qr is null)              return Fail("Registration token not found.");
         if (qr.IsRegistered)         return Fail("This QR is already linked to a registered student.");
         if (qr.School.IsDeleted)     return Fail("The school associated with this QR is no longer active.");
-        if (!qr.School.IsActive)     return Fail("The school associated with this QR is currently inactive.");
 
         // ── Parent identity ────────────────────────────────────────────────
         // The caller must be authenticated as a parent — pull their Parent row

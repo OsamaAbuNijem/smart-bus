@@ -13,8 +13,29 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
 
     public async Task<PagedResult<StudentDto>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
     {
+        // School scope is required for tenant isolation. SuperAdmin call sites
+        // that legitimately need cross-school data should use a different
+        // dedicated query rather than passing null here.
+        if (!request.SchoolId.HasValue)
+            return PagedResult<StudentDto>.Create(Array.Empty<StudentDto>(), 0, request.PageNumber, request.PageSize);
+
+        // Filter to the school's currently-active subscription. Once that
+        // subscription expires (or IsActive is cleared), the admin sees an
+        // empty grid — by design.
+        var schoolIdString = request.SchoolId.Value.ToString();
+        var now = DateTime.UtcNow;
+        var activeStudentIds = _context.SubscriptionStudents
+            .Where(x => x.Subscription!.SchoolId == request.SchoolId.Value
+                     && x.Subscription.IsActive
+                     && x.Subscription.ActivationDate <= now
+                     && x.Subscription.ExpirationDate >= now
+                     && !x.Subscription.IsDeleted
+                     && !x.Student!.IsDeleted)
+            .Select(x => x.StudentId);
+
         IQueryable<SmartBus.Domain.Entities.Student> query = _context.Students
-            .Where(s => !s.IsDeleted)
+            .Where(s => !s.IsDeleted && s.SchoolId == schoolIdString)
+            .Where(s => activeStudentIds.Contains(s.Id))
             .Include(s => s.Route)
             .Include(s => s.Parent);
 

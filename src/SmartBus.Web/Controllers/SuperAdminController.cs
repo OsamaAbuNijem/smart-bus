@@ -39,4 +39,20 @@ public class SuperAdminController : Controller
     [RequireJwt]
     public IActionResult Dashboard()
         => View(new SuperAdminPageViewModel { ActivePage = "overview", PageTitle = "لوحة المشرف العام" });
+
+    [RequireJwt]
+    public IActionResult Schools()
+        => View(new SuperAdminPageViewModel { ActivePage = "schools", PageTitle = "المدارس" });
+
+    [RequireJwt]
+    public IActionResult Admins()
+        => View(new SuperAdminPageViewModel { ActivePage = "admins", PageTitle = "المديرون" });
+
+    [RequireJwt]
+    public IActionResult Subscriptions()
+        => View(new SuperAdminPageViewModel { ActivePage = "subscriptions", PageTitle = "الاشتراكات" });
+
+    [RequireJwt]
+    public IActionResult Settings()
+        => View(new SuperAdminPageViewModel { ActivePage = "settings", PageTitle = "الإعدادات" });
 }

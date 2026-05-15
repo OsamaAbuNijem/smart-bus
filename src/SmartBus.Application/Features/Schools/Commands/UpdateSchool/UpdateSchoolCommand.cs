@@ -1,6 +1,5 @@
 using MediatR;
 using SmartBus.Application.Common.Models;
-using SmartBus.Domain.Enums;
 
 namespace SmartBus.Application.Features.Schools.Commands.UpdateSchool;
 
@@ -11,12 +10,6 @@ public record UpdateSchoolCommand(
     string ContactEmail,
     string PhoneNumber,
     string AdminEmail,
-    PlanType Plan,
-    int MaxBuses,
-    int MaxDrivers,
-    int MaxAssistants,
-    int MaxStudents,
-    bool IsActive,
     string? Notes,
     double? Latitude = null,
     double? Longitude = null

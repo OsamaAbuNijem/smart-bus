@@ -29,6 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
     public DbSet<StudentAllergy> StudentAllergies => Set<StudentAllergy>();
     public DbSet<School> Schools => Set<School>();
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<SubscriptionStudent> SubscriptionStudents => Set<SubscriptionStudent>();
     public DbSet<BusSchedule> BusSchedules => Set<BusSchedule>();
     public DbSet<BusScheduleStudent> BusScheduleStudents => Set<BusScheduleStudent>();
     public DbSet<EmployeeQrToken> EmployeeQrTokens => Set<EmployeeQrToken>();
@@ -67,6 +69,45 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<School>().HasQueryFilter(s => !s.IsDeleted);
         builder.Entity<BusSchedule>().HasQueryFilter(s => !s.IsDeleted);
         builder.Entity<EmployeeQrToken>().HasQueryFilter(t => !t.IsDeleted);
+
+        // ── Subscriptions ──────────────────────────────────────────────────
+        builder.Entity<Subscription>().HasQueryFilter(s => !s.IsDeleted);
+
+        builder.Entity<Subscription>()
+            .HasOne(s => s.School)
+            .WithMany()
+            .HasForeignKey(s => s.SchoolId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Lookup index for the "active subscription for this school" query.
+        builder.Entity<Subscription>()
+            .HasIndex(s => new { s.SchoolId, s.IsActive, s.ActivationDate, s.ExpirationDate });
+
+        builder.Entity<Subscription>().Property(s => s.Price).HasColumnType("numeric(12,2)");
+        builder.Entity<Subscription>().Property(s => s.RemainingAmount).HasColumnType("numeric(12,2)");
+
+        // Subscription ↔ Student join. Composite key. Soft-delete filter
+        // tracks the student row (subscription rows themselves aren't soft-deleted on the link).
+        builder.Entity<SubscriptionStudent>()
+            .HasKey(x => new { x.SubscriptionId, x.StudentId });
+
+        builder.Entity<SubscriptionStudent>()
+            .HasQueryFilter(x => !x.Student!.IsDeleted && !x.Subscription!.IsDeleted);
+
+        builder.Entity<SubscriptionStudent>()
+            .HasOne(x => x.Subscription)
+            .WithMany(s => s.StudentLinks)
+            .HasForeignKey(x => x.SubscriptionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<SubscriptionStudent>()
+            .HasOne(x => x.Student)
+            .WithMany()
+            .HasForeignKey(x => x.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<SubscriptionStudent>()
+            .HasIndex(x => x.StudentId);
 
         // Token uniqueness — soft-deleted rows excluded so reissues don't collide.
         builder.Entity<EmployeeQrToken>()

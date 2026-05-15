@@ -10,10 +10,13 @@ public record GetAllStudentsQuery(
     Guid? RouteId = null,
     string? Name = null,
     string? Grade = null,
-    string? HomeArea = null
+    string? HomeArea = null,
+    Guid? SchoolId = null
 ) : IRequest<PagedResult<StudentDto>>, ICacheableQuery
 {
-    public string CacheKey => $"students:page:{PageNumber}:size:{PageSize}:route:{RouteId?.ToString() ?? "_"}:name:{Name ?? "_"}:grade:{Grade ?? "_"}:area:{HomeArea ?? "_"}";
+    // School scope is part of the cache key so each tenant's pages don't bleed
+    // into each other.
+    public string CacheKey => $"students:page:{PageNumber}:size:{PageSize}:route:{RouteId?.ToString() ?? "_"}:name:{Name ?? "_"}:grade:{Grade ?? "_"}:area:{HomeArea ?? "_"}:school:{SchoolId?.ToString() ?? "_"}";
     public TimeSpan? CacheExpiry => TimeSpan.FromMinutes(2);
 }
 

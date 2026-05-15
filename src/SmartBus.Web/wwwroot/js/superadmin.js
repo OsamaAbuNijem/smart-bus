@@ -11,13 +11,6 @@ let _selectedIds = new Set();
 let _drawerSchool = null;    // school object currently in drawer
 let _searchQuery = '';
 
-const pageNames = {
-  overview: window.T?.pageOverview  || 'نظرة عامة',
-  schools:  window.T?.pageSchools   || 'إدارة المدارس',
-  admins:   window.T?.pageAdmins    || 'المديرون',
-  plans:    window.T?.pagePlans     || 'خطط الاشتراك',
-  settings: window.T?.pageSettings  || 'الإعدادات'
-};
 const planLabels  = { 0: 'أساسية', 1: 'معيارية', 2: 'مميزة ⭐' };
 const planClasses = { 0: 'plan-basic', 1: 'plan-standard', 2: 'plan-premium' };
 // API returns Plan as the enum name ("Basic" | "Standard" | "Premium") because
@@ -37,9 +30,10 @@ function normalizeSchools(items) {
 // ── Init ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   setDateChip();
-  loadOverview();
 
-  // Close modals on overlay click
+  // Each super-admin page is its own Razor view at its own URL now; each
+  // view triggers its own data-load. No SPA dispatcher needed here — just
+  // shared helpers (modal close-on-overlay-click, date chip).
   document.querySelectorAll('.modal-overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
   });
@@ -54,26 +48,8 @@ function setDateChip() {
   el.textContent = `${days[d.getDay()]}، ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-// ── Navigation ─────────────────────────────────────────────────────────────
-function showPage(id, navEl) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const page = document.getElementById('sa-page-' + id);
-  if (page) page.classList.add('active');
-  if (navEl) navEl.classList.add('active');
-  setText('sa-page-title', pageNames[id] || id);
-
-  // Show/hide topbar search & export only on schools page
-  const topbarSearch = document.getElementById('topbar-search');
-  const btnExport    = document.getElementById('btn-export');
-  if (topbarSearch) topbarSearch.style.display = id === 'schools' ? '' : 'none';
-  if (btnExport)    btnExport.style.display    = id === 'schools' ? '' : 'none';
-
-  if (id === 'schools') { _searchQuery = ''; clearSearchUI(); loadSchools(1); }
-  if (id === 'plans')   loadPlanStats();
-  if (id === 'admins')  loadAdmins();
-  if (id === 'overview') loadOverview();
-}
+// Navigation is now per-page (each /SuperAdmin/<Page> view triggers its own
+// init in DOMContentLoaded). The old showPage() SPA dispatcher is gone.
 
 // ── API Helpers ────────────────────────────────────────────────────────────
 async function apiGet(path) {
@@ -599,35 +575,58 @@ function exportCSV() {
 // ── School Modal ───────────────────────────────────────────────────────────
 function openSchoolModal() {
   clearSchoolForm();
-  setText('school-modal-title', 'إضافة مدرسة جديدة');
+  const modal = document.getElementById('modal-school');
+  setText('school-modal-title', modal?.dataset.titleCreate || 'Add new school');
   document.getElementById('sch-id').value = '';
-  // Show password field only when creating
+  // Show password field + subscription section only when creating
   const pwGroup = document.getElementById('sch-password-group');
   if (pwGroup) pwGroup.style.display = '';
+  const subSection = document.getElementById('sch-subscription-section');
+  if (subSection) subSection.style.display = '';
+  // Sensible defaults: 1-year Trial sub starting today.
+  const today = new Date();
+  const inOneYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+  const iso = d => d.toISOString().slice(0, 10);
+  const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+  setVal('sch-sub-type', '0');
+  setVal('sch-sub-price', '0');
+  setVal('sch-sub-activation', iso(today));
+  setVal('sch-sub-expiration', iso(inOneYear));
+  setVal('sch-sub-paid', 'false');
+  setVal('sch-sub-remaining', '0');
   openModal('modal-school');
 }
 
 function openEditSchool(data) {
   if (!data) return;
   clearSchoolForm();
-  setText('school-modal-title', 'تعديل بيانات المدرسة');
+  const modal = document.getElementById('modal-school');
+  setText('school-modal-title', modal?.dataset.titleEdit || 'Edit school');
   document.getElementById('sch-id').value = data.id || '';
-  // Hide password field when editing (password was set at creation)
+  // Hide password + subscription fields when editing (sub is managed elsewhere)
   const pwGroup = document.getElementById('sch-password-group');
   if (pwGroup) pwGroup.style.display = 'none';
+  const subSection = document.getElementById('sch-subscription-section');
+  if (subSection) subSection.style.display = 'none';
   document.getElementById('sch-name').value = data.name || '';
   setSelectValueOrAddOption('sch-city', data.city);
   document.getElementById('sch-email').value = data.contactEmail || '';
-  document.getElementById('sch-phone').value = data.phoneNumber || '';
+  // Phone is stored as +962XXXXXXXXX; strip the country dial so the input
+  // shows the 9-digit local part next to the "+962" chip.
+  document.getElementById('sch-phone').value = stripCountryDial(data.phoneNumber);
   document.getElementById('sch-admin').value = data.adminEmail || '';
-  document.getElementById('sch-plan').value = String(planToNumber(data.plan));
-  document.getElementById('sch-buses').value = data.maxBuses || 5;
-  document.getElementById('sch-drivers').value = data.maxDrivers || 5;
-  document.getElementById('sch-assistants').value = data.maxAssistants || 5;
-  document.getElementById('sch-students').value = data.maxStudents || 100;
-  document.getElementById('sch-active').value = String(data.isActive !== false);
   document.getElementById('sch-notes').value = data.notes || '';
   openModal('modal-school');
+}
+
+function stripCountryDial(raw) {
+  if (!raw) return '';
+  const s = String(raw).trim();
+  if (s.startsWith('+962')) return s.slice(4);
+  if (s.startsWith('962'))  return s.slice(3);
+  if (s.startsWith('00962')) return s.slice(5);
+  if (s.startsWith('0')) return s.slice(1);
+  return s;
 }
 
 // Populate a <select> with an arbitrary string. If the value isn't one of the
@@ -657,32 +656,33 @@ function clearSchoolForm() {
   ['err-sch-name','err-sch-city','err-sch-email','err-sch-phone','err-sch-admin'].forEach(id => {
     document.getElementById(id)?.classList.remove('show');
   });
-  const buses    = document.getElementById('sch-buses');      if (buses)    buses.value    = '5';
-  const drivers  = document.getElementById('sch-drivers');    if (drivers)  drivers.value  = '5';
-  const assists  = document.getElementById('sch-assistants'); if (assists)  assists.value  = '5';
-  const students = document.getElementById('sch-students');   if (students) students.value = '100';
-  const plan  = document.getElementById('sch-plan');     if (plan)  plan.value  = '0';
-  const act   = document.getElementById('sch-active');   if (act)   act.value   = 'true';
   const notes = document.getElementById('sch-notes');    if (notes) notes.value = '';
   const pw    = document.getElementById('sch-password'); if (pw)    pw.value    = '';
+  // Clear any prior input-group .err state on the phone/email wrappers.
+  ['grp-sch-email','grp-sch-phone','grp-sch-admin'].forEach(id => {
+    document.getElementById(id)?.classList.remove('err');
+  });
 }
 
 async function saveSchool() {
-  // inline validation
+  // inline validation. Phone + email fields live inside form-input-group
+  // wrappers; the .err class goes on the wrapper so the prefix chip and
+  // input both pick up the red outline.
   let valid = true;
   const required = [
-    { id: 'sch-name',  err: 'err-sch-name',  test: v => v.length > 0 },
-    { id: 'sch-city',  err: 'err-sch-city',  test: v => v.length > 0 },
-    { id: 'sch-email', err: 'err-sch-email', test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
-    { id: 'sch-phone', err: 'err-sch-phone', test: v => v.length >= 7 },
-    { id: 'sch-admin', err: 'err-sch-admin', test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    { id: 'sch-name',  err: 'err-sch-name',  wrap: 'sch-name',       test: v => v.length > 0 },
+    { id: 'sch-city',  err: 'err-sch-city',  wrap: 'sch-city',       test: v => v.length > 0 },
+    { id: 'sch-email', err: 'err-sch-email', wrap: 'grp-sch-email',  test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    { id: 'sch-phone', err: 'err-sch-phone', wrap: 'grp-sch-phone',  test: v => /^7[789]\d{7}$/.test(v) },
+    { id: 'sch-admin', err: 'err-sch-admin', wrap: 'grp-sch-admin',  test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
   ];
-  required.forEach(({ id, err, test }) => {
+  required.forEach(({ id, err, wrap, test }) => {
     const el = document.getElementById(id);
+    const wrapEl = document.getElementById(wrap);
     const errEl = document.getElementById(err);
     const val = el?.value.trim() || '';
     const ok = test(val);
-    el?.classList.toggle('err', !ok);
+    wrapEl?.classList.toggle('err', !ok);
     errEl?.classList.toggle('show', !ok);
     if (!ok) valid = false;
   });
@@ -691,22 +691,36 @@ async function saveSchool() {
   const name  = document.getElementById('sch-name').value.trim();
   const city  = document.getElementById('sch-city').value.trim();
   const email = document.getElementById('sch-email').value.trim();
-  const phone = document.getElementById('sch-phone').value.trim();
+  // The phone input only holds the 9-digit local part — server stores +962…
+  const phone = '+962' + document.getElementById('sch-phone').value.trim();
   const admin = document.getElementById('sch-admin').value.trim();
   const id    = document.getElementById('sch-id').value;
 
-  const planRaw = parseInt(document.getElementById('sch-plan').value);
+  // School entity no longer carries cap / plan / active flags — those live
+  // on the Subscription now. The body only carries identity + contact info
+  // plus the initial subscription fields (added below when creating).
   const body = {
     name, city, contactEmail: email, phoneNumber: phone, adminEmail: admin,
-    plan: Number.isFinite(planRaw) ? planRaw : 0,
-    maxBuses:      parseInt(document.getElementById('sch-buses').value)      || 5,
-    maxDrivers:    parseInt(document.getElementById('sch-drivers').value)    || 5,
-    maxAssistants: parseInt(document.getElementById('sch-assistants').value) || 5,
-    maxStudents:   parseInt(document.getElementById('sch-students').value)   || 100,
-    isActive: document.getElementById('sch-active').value === 'true',
     notes: document.getElementById('sch-notes').value.trim() || null,
     adminPassword: document.getElementById('sch-password')?.value.trim() || 'Admin@123456'
   };
+
+  // Subscription fields apply only when creating (initial active subscription).
+  // The API ignores them on update; we still omit to keep the request lean.
+  if (!id) {
+    const subType = parseInt(document.getElementById('sch-sub-type').value);
+    const subPrice = parseFloat(document.getElementById('sch-sub-price').value);
+    const subRemaining = parseFloat(document.getElementById('sch-sub-remaining').value);
+    const subActIso = document.getElementById('sch-sub-activation').value;
+    const subExpIso = document.getElementById('sch-sub-expiration').value;
+    body.subscriptionType            = Number.isFinite(subType) ? subType : 0;
+    body.subscriptionPrice           = Number.isFinite(subPrice) ? subPrice : 0;
+    body.subscriptionIsPaid          = document.getElementById('sch-sub-paid').value === 'true';
+    body.subscriptionRemainingAmount = Number.isFinite(subRemaining) ? subRemaining : 0;
+    // <input type="date"> gives YYYY-MM-DD; send as ISO start-of-day UTC.
+    body.subscriptionActivationDate  = subActIso ? new Date(subActIso + 'T00:00:00Z').toISOString() : new Date().toISOString();
+    body.subscriptionExpirationDate  = subExpIso ? new Date(subExpIso + 'T23:59:59Z').toISOString() : new Date(Date.now() + 365*24*60*60*1000).toISOString();
+  }
 
   const btn = document.getElementById('btn-save-school');
   if (btn) { btn.disabled = true; btn.textContent = window.T?.saving || 'جاري الحفظ...'; }
@@ -767,17 +781,6 @@ async function loadAdmins() {
       <td>${statusLabel}</td>
     </tr>`;
   }).join('');
-}
-
-// ── Plan Stats ─────────────────────────────────────────────────────────────
-async function loadPlanStats() {
-  const data = await apiGet('/schools?pageNumber=1&pageSize=100');
-  if (!data?.items) return;
-  const items = normalizeSchools(data.items);
-  animateCounter('plan-basic-count',    items.filter(s => s.plan === 0).length);
-  animateCounter('plan-standard-count', items.filter(s => s.plan === 1).length);
-  animateCounter('plan-premium-count',  items.filter(s => s.plan === 2).length);
-  animateCounter('plan-total-buses',    items.reduce((sum, s) => sum + (s.maxBuses || 0), 0));
 }
 
 // ── Modal ──────────────────────────────────────────────────────────────────
@@ -1102,8 +1105,13 @@ function printAllStudentQrTokens() {
 }
 
 // ── Window exports ─────────────────────────────────────────────────────────
+// Per-page Razor views ("/SuperAdmin/Schools", "/SuperAdmin/Admins", etc.)
+// call into these via inline DOMContentLoaded scripts, so every entry point
+// that the views reference must be hoisted out of the IIFE explicitly.
 Object.defineProperty(window, 'schoolsPage', { get: () => schoolsPage });
-window.showPage              = showPage;
+window.loadOverview          = loadOverview;
+window.loadSchools           = loadSchools;
+window.loadAdmins            = loadAdmins;
 window.openModal             = openModal;
 window.closeModal            = closeModal;
 window.openSchoolModal       = openSchoolModal;
@@ -1111,7 +1119,6 @@ window.openEditSchool        = openEditSchool;
 window.saveSchool            = saveSchool;
 window.confirmDeleteSchool   = confirmDeleteSchool;
 window.filterSchools         = filterSchools;
-window.loadSchools           = loadSchools;
 window.onSearchInput         = onSearchInput;
 window.clearSearch           = clearSearch;
 window.openDrawer            = openDrawer;
@@ -1134,4 +1141,4 @@ window.openSchoolStudentQrTokens = openSchoolStudentQrTokens;
 window.printAllStudentQrTokens   = printAllStudentQrTokens;
 
 })();
-window.changePassword        = changePassword;
+

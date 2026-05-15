@@ -11,12 +11,32 @@ public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand,
     private readonly IUnitOfWork _unitOfWork;
     private readonly IApplicationDbContext _context;
     private readonly IParentUpsertService _parentUpsert;
+    private readonly IActiveSubscriptionService _activeSubscription;
 
-    public CreateStudentCommandHandler(IUnitOfWork unitOfWork, IApplicationDbContext context, IParentUpsertService parentUpsert)
-    { _unitOfWork = unitOfWork; _context = context; _parentUpsert = parentUpsert; }
+    public CreateStudentCommandHandler(
+        IUnitOfWork unitOfWork,
+        IApplicationDbContext context,
+        IParentUpsertService parentUpsert,
+        IActiveSubscriptionService activeSubscription)
+    {
+        _unitOfWork         = unitOfWork;
+        _context            = context;
+        _parentUpsert       = parentUpsert;
+        _activeSubscription = activeSubscription;
+    }
 
     public async Task<Result<Guid>> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
     {
+        // Every new student must land in the school's active subscription
+        // window — otherwise the admin panel won't surface them at all.
+        if (!Guid.TryParse(request.SchoolId, out var schoolGuid))
+            return Result<Guid>.Failure("Invalid school identifier.");
+
+        var activeSubId = await _activeSubscription.GetActiveSubscriptionIdAsync(schoolGuid, cancellationToken);
+        if (activeSubId is null)
+            return Result<Guid>.Failure(
+                "This school has no active subscription. The super admin must create one before students can be added.");
+
         if (!string.IsNullOrWhiteSpace(request.NationalNumber))
         {
             var taken = await _context.Students
@@ -50,6 +70,16 @@ public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand,
         };
 
         await _unitOfWork.Students.AddAsync(student, cancellationToken);
+
+        // Link this student to the school's active subscription. New
+        // subscription windows reuse the same Student row and just create
+        // additional SubscriptionStudent rows.
+        _context.SubscriptionStudents.Add(new SubscriptionStudent
+        {
+            SubscriptionId = activeSubId.Value,
+            StudentId      = student.Id
+        });
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Result<Guid>.Success(student.Id);
     }

@@ -44,6 +44,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserStore, UserStoreService>();
         services.AddScoped<IParentUpsertService, ParentUpsertService>();
+        services.AddScoped<IActiveSubscriptionService, Subscriptions.ActiveSubscriptionService>();
 
         // JWT
         services.AddAuthentication(options =>

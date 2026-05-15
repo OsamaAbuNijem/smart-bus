@@ -58,7 +58,6 @@ public class RegisterFromQrCommandHandler
         if (qr is null)             return Fail("Registration token not found.");
         if (qr.IsUsed)              return Fail("This QR has already been used to register an employee.");
         if (qr.School.IsDeleted)    return Fail("The school associated with this QR is no longer active.");
-        if (!qr.School.IsActive)    return Fail("The school associated with this QR is currently inactive.");
 
         // ── Phone uniqueness — guard the right table for the token's type ──
         if (qr.Type == EmployeeQrTokenType.Driver)

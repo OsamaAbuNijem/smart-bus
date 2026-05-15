@@ -35,9 +35,23 @@ public class StudentsController : ControllerBase
         [FromQuery] string? grade = null,
         [FromQuery] string? homeArea = null,
         CancellationToken cancellationToken = default)
-        => Ok(await _mediator.Send(
-            new GetAllStudentsQuery(pageNumber, pageSize, routeId, name, grade, homeArea),
+    {
+        // Resolve the requesting admin's school so the query handler can
+        // scope by school + active subscription. SuperAdmin requests without
+        // a school context get an empty page; cross-school browsing should
+        // use a dedicated SuperAdmin endpoint.
+        Guid? schoolId = null;
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        if (!string.IsNullOrEmpty(email))
+        {
+            var schoolResult = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
+            if (schoolResult.IsSuccess) schoolId = schoolResult.Data!.Id;
+        }
+
+        return Ok(await _mediator.Send(
+            new GetAllStudentsQuery(pageNumber, pageSize, routeId, name, grade, homeArea, schoolId),
             cancellationToken));
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)

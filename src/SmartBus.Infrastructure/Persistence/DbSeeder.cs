@@ -56,12 +56,41 @@ public static class DbSeeder
                 City         = "الرياض",
                 ContactEmail = adminEmail,
                 PhoneNumber  = "0112345678",
-                AdminEmail   = adminEmail,
-                Plan         = PlanType.Standard,
-                MaxBuses     = 20,
-                IsActive     = true
+                AdminEmail   = adminEmail
             });
             await db.SaveChangesAsync();
+        }
+
+        // Ensure the demo school has an active subscription. Without this the
+        // admin panel won't surface any students — student lookups are scoped
+        // to the active subscription window. The subscription is the source
+        // of truth for MaxStudents / MaxBuses now that those caps no longer
+        // live on the School entity.
+        var demoSchool = await db.Schools
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(s => s.AdminEmail == adminEmail);
+        if (demoSchool is not null)
+        {
+            var hasSub = await db.Subscriptions
+                .IgnoreQueryFilters()
+                .AnyAsync(s => s.SchoolId == demoSchool.Id);
+            if (!hasSub)
+            {
+                db.Subscriptions.Add(new Subscription
+                {
+                    SchoolId         = demoSchool.Id,
+                    MaxStudents      = 500,
+                    MaxBuses         = 20,
+                    ActivationDate   = DateTime.UtcNow,
+                    ExpirationDate   = DateTime.UtcNow.AddYears(1),
+                    IsActive         = true,
+                    Price            = 0m,
+                    IsPaid           = false,
+                    RemainingAmount  = 0m,
+                    SubscriptionType = SubscriptionType.Trial
+                });
+                await db.SaveChangesAsync();
+            }
         }
 
         // ── Super Admin ────────────────────────────────────────────────────

@@ -197,9 +197,17 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
 .form-row.full{grid-template-columns:1fr;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
 .form-label{font-size:12px;font-weight:700;color:var(--text2);}
-.form-control{border:1.5px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;background:#fff;}
+.form-control{height:38px;line-height:1.4;box-sizing:border-box;border:1.5px solid var(--border2);border-radius:10px;padding:0 12px;font-size:13px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;background:#fff;}
+textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
 .form-control:focus{border-color:var(--pu);box-shadow:0 0 0 3px rgba(139,92,246,.1);}
 .form-control.err{border-color:var(--r)!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)!important;}
+/* Input-group wrapper with a static prefix (icon or text like "+962"). */
+.form-input-group{display:flex;align-items:stretch;height:38px;box-sizing:border-box;border:1.5px solid var(--border2);border-radius:10px;background:#fff;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+.form-input-group:focus-within{border-color:var(--pu);box-shadow:0 0 0 3px rgba(139,92,246,.1);}
+.form-input-group.err{border-color:var(--r)!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)!important;}
+.form-input-group > .prefix{display:inline-flex;align-items:center;gap:4px;padding:0 12px;background:#F1F5F9;color:#64748B;font-size:13px;font-weight:700;user-select:none;border-inline-end:1px solid var(--border2);}
+.form-input-group > .prefix svg{color:#94A3B8;}
+.form-input-group > input{flex:1;min-width:0;border:none;outline:none;background:transparent;padding:0 12px;font-size:13px;line-height:1.4;color:var(--text);font-family:'Cairo',sans-serif;}
 .form-err{font-size:11px;color:var(--r);margin-top:3px;display:none;}
 .form-err.show{display:block;}
 
@@ -308,31 +316,43 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
     </div>
     <div><div class="sa-badge-title">@L["SA_Badge_Title"]</div><div class="sa-badge-sub">@L["SA_Badge_Sub"]</div></div>
   </div>
+  @{
+    // Every super-admin page has its own /SuperAdmin/{Page} URL now.
+    // Active sidebar item is computed from the current request path so a hard
+    // refresh / direct deep-link always lands with the right item highlighted.
+    var _saPath = Context.Request.Path.Value ?? string.Empty;
+    bool SaOn(string segment) =>
+        _saPath.StartsWith($"/SuperAdmin/{segment}", StringComparison.OrdinalIgnoreCase);
+    bool _saOnDashboard = SaOn("Dashboard") ||
+        _saPath.Equals("/SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
+        _saPath.Equals("/SuperAdmin/", StringComparison.OrdinalIgnoreCase);
+    string SaClass(bool on) => on ? "nav-item active" : "nav-item";
+  }
   <div class="sidebar-nav">
     <div class="nav-section">OVERVIEW</div>
-    <div class="nav-item active" onclick="showPage('overview',this)">
+    <a class="@SaClass(_saOnDashboard)" href="/SuperAdmin/Dashboard" style="text-decoration:none;color:inherit;">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       <span class="nav-label">@L["Nav_Overview"]</span>
-    </div>
+    </a>
     <div class="nav-section">MANAGEMENT</div>
-    <div class="nav-item" onclick="showPage('schools',this)">
+    <a class="@SaClass(SaOn("Schools"))" href="/SuperAdmin/Schools" style="text-decoration:none;color:inherit;">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="nav-label">@L["Nav_Schools"]</span>
       <span class="nav-badge-pill" id="schools-count-badge">0</span>
-    </div>
-    <div class="nav-item" onclick="showPage('admins',this)">
+    </a>
+    <a class="@SaClass(SaOn("Admins"))" href="/SuperAdmin/Admins" style="text-decoration:none;color:inherit;">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span class="nav-label">@L["Nav_Admins"]</span>
-    </div>
+    </a>
     <div class="nav-section">SYSTEM</div>
-    <div class="nav-item" onclick="showPage('plans',this)">
+    <a class="@SaClass(SaOn("Subscriptions"))" href="/SuperAdmin/Subscriptions" style="text-decoration:none;color:inherit;">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       <span class="nav-label">@L["Nav_Plans"]</span>
-    </div>
-    <div class="nav-item" onclick="showPage('settings',this)">
+    </a>
+    <a class="@SaClass(SaOn("Settings"))" href="/SuperAdmin/Settings" style="text-decoration:none;color:inherit;">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span class="nav-label">@L["Nav_Settings"]</span>
-    </div>
+    </a>
   </div>
   <div class="sidebar-bottom">
     <div class="user-row">
@@ -468,7 +488,9 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
 </div>
 
 <!-- MODAL: SCHOOL FORM -->
-<div class="modal-overlay" id="modal-school">
+<div class="modal-overlay" id="modal-school"
+     data-title-create="@L["SA_School_Add"]"
+     data-title-edit="@L["SA_School_Edit"]">
   <div class="modal-box">
     <div class="modal-header">
       <div style="display:flex;align-items:center;gap:10px;">
@@ -485,9 +507,9 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
       <input type="hidden" id="sch-id"/>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">اسم المدرسة *</label>
-          <input type="text" id="sch-name" class="form-control" placeholder="مدرسة النور الابتدائية"/>
-          <span class="form-err" id="err-sch-name">الاسم مطلوب</span>
+          <label class="form-label">@L["SA_School_Name"] *</label>
+          <input type="text" id="sch-name" class="form-control" placeholder="@L["SA_School_Name_PH"]"/>
+          <span class="form-err" id="err-sch-name">@L["SA_School_Name_Required"]</span>
         </div>
         <div class="form-group">
           <label class="form-label">@L["Std_City"] *</label>
@@ -514,78 +536,103 @@ mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">البريد الإلكتروني *</label>
-          <input type="email" id="sch-email" class="form-control" placeholder="contact@school.edu"/>
-          <span class="form-err" id="err-sch-email">بريد إلكتروني صحيح مطلوب</span>
+          <label class="form-label">@L["SA_School_Email"] *</label>
+          <div class="form-input-group" id="grp-sch-email" dir="ltr">
+            <span class="prefix" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <input type="email" id="sch-email" placeholder="@L["SA_School_Email_PH"]"/>
+          </div>
+          <span class="form-err" id="err-sch-email">@L["SA_School_Email_Required"]</span>
         </div>
         <div class="form-group">
-          <label class="form-label">رقم الهاتف *</label>
-          <input type="text" id="sch-phone" class="form-control" placeholder="0112345678"/>
-          <span class="form-err" id="err-sch-phone">رقم الهاتف مطلوب</span>
+          <label class="form-label">@L["SA_School_Phone"] *</label>
+          <div class="form-input-group" id="grp-sch-phone" dir="ltr">
+            <span class="prefix">+962</span>
+            <input type="tel" id="sch-phone" inputmode="numeric" maxlength="9" placeholder="@L["SA_School_Phone_PH"]"/>
+          </div>
+          <span class="form-err" id="err-sch-phone">@L["SA_School_Phone_Required"]</span>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">بريد المدير *</label>
-          <input type="email" id="sch-admin" class="form-control" placeholder="admin@school.edu"/>
-          <span class="form-err" id="err-sch-admin">بريد المدير مطلوب</span>
+          <label class="form-label">@L["SA_School_Admin"] *</label>
+          <div class="form-input-group" id="grp-sch-admin" dir="ltr">
+            <span class="prefix" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <input type="email" id="sch-admin" placeholder="@L["SA_School_Admin_PH"]"/>
+          </div>
+          <span class="form-err" id="err-sch-admin">@L["SA_School_Admin_Required"]</span>
         </div>
         <div class="form-group" id="sch-password-group">
-          <label class="form-label">كلمة مرور المدير</label>
+          <label class="form-label">@L["SA_School_Password"]</label>
           <input type="text" id="sch-password" class="form-control" placeholder="Admin@123456"/>
-          <span style="font-size:11px;color:var(--text3);margin-top:3px;display:block;">تُستخدم لأول مرة فقط عند إنشاء الحساب</span>
+          <span style="font-size:11px;color:var(--text3);margin-top:3px;display:block;">@L["SA_School_Password_Hint"]</span>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">خطة الاشتراك</label>
-          <select id="sch-plan" class="form-control">
-            <option value="0">📦 أساسية (Basic)</option>
-            <option value="1">⭐ معيارية (Standard)</option>
-            <option value="2">🏆 مميزة (Premium)</option>
-          </select>
+      @* Subscription section — shown only when creating a school. The initial *@
+      @* subscription is created in the same transaction; later renewals are    *@
+      @* managed from the subscriptions page (per-school).                      *@
+      <div id="sch-subscription-section">
+        <div class="form-row full">
+          <div class="form-group" style="margin-top:6px;">
+            <div style="font-size:13px;font-weight:800;color:#475569;">@L["SA_Sub_Section"]</div>
+            <div style="font-size:11px;color:#94A3B8;">@L["SA_Sub_Section_Hint"]</div>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">أقصى عدد باصات</label>
-          <input type="number" id="sch-buses" class="form-control" placeholder="5" min="1" max="500"/>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Type"]</label>
+            <select id="sch-sub-type" class="form-control">
+              <option value="0">@L["SA_Sub_Type_Trial"]</option>
+              <option value="1">@L["SA_Sub_Type_Basic"]</option>
+              <option value="2">@L["SA_Sub_Type_Standard"]</option>
+              <option value="3">@L["SA_Sub_Type_Premium"]</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Price"]</label>
+            <input type="number" id="sch-sub-price" class="form-control" placeholder="0" min="0" step="0.01"/>
+          </div>
         </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">أقصى عدد سائقين</label>
-          <input type="number" id="sch-drivers" class="form-control" placeholder="5" min="1" max="2000"/>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_ActivationDate"]</label>
+            <input type="date" id="sch-sub-activation" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_ExpirationDate"]</label>
+            <input type="date" id="sch-sub-expiration" class="form-control"/>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">أقصى عدد مساعدين</label>
-          <input type="number" id="sch-assistants" class="form-control" placeholder="5" min="0" max="2000"/>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">أقصى عدد طلاب</label>
-          <input type="number" id="sch-students" class="form-control" placeholder="100" min="1" max="20000"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">الحالة</label>
-          <select id="sch-active" class="form-control">
-            <option value="true">🟢 نشطة</option>
-            <option value="false">⏸ موقوفة</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Paid"]</label>
+            <select id="sch-sub-paid" class="form-control">
+              <option value="false">@L["SA_Sub_Paid_No"]</option>
+              <option value="true">@L["SA_Sub_Paid_Yes"]</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Remaining"]</label>
+            <input type="number" id="sch-sub-remaining" class="form-control" placeholder="0" min="0" step="0.01"/>
+          </div>
         </div>
       </div>
       <div class="form-row full">
         <div class="form-group">
-          <label class="form-label">ملاحظات</label>
-          <textarea id="sch-notes" class="form-control" rows="2" placeholder="ملاحظات اختيارية..." style="resize:vertical;"></textarea>
+          <label class="form-label">@L["SA_School_Notes"]</label>
+          <textarea id="sch-notes" class="form-control" rows="2" placeholder="@L["SA_School_Notes_PH"]" style="resize:vertical;"></textarea>
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn-primary" id="btn-save-school" onclick="saveSchool()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        حفظ المدرسة
+        @L["SA_School_Save"]
       </button>
-      <button class="btn-secondary" onclick="closeModal('modal-school')">إلغاء</button>
+      <button class="btn-secondary" onclick="closeModal('modal-school')">@L["SA_School_Cancel"]</button>
     </div>
   </div>
 </div>

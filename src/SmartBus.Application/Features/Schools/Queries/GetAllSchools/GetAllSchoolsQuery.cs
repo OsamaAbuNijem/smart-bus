@@ -1,6 +1,5 @@
 using MediatR;
 using SmartBus.Application.Common.Models;
-using SmartBus.Domain.Enums;
 
 namespace SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 
@@ -13,12 +12,6 @@ public record SchoolDto(
     string ContactEmail,
     string PhoneNumber,
     string AdminEmail,
-    PlanType Plan,
-    int MaxBuses,
-    int MaxDrivers,
-    int MaxAssistants,
-    int MaxStudents,
-    bool IsActive,
     string? Notes,
     DateTime CreatedAt
 );
