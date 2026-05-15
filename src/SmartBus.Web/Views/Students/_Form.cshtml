@@ -4,6 +4,18 @@
     var studentId = ViewBag.StudentId as Guid?;
     var errors    = ViewData.ModelState;
     string? ErrFor(string key) => errors[key]?.Errors.FirstOrDefault()?.ErrorMessage;
+
+    // The phone is stored canonical "+9627XXXXXXXX"; strip the country dial
+    // so the input shows the 9-digit local part next to the "+962" chip.
+    string LocalPhone(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
+        var s = raw.Trim();
+        if (s.StartsWith("+962")) s = s[4..];
+        else if (s.StartsWith("962")) s = s[3..];
+        else if (s.StartsWith("0")) s = s[1..];
+        return s;
+    }
 }
 
 <form id="student-form"
@@ -55,7 +67,7 @@
         </div>
       </div>
 
-      <div class="form-row">
+      <div class="form-row full">
         <div class="form-group">
           <label class="form-label">@L["Std_NationalNumber"]</label>
           <input type="text" name="NationalNumber" class="form-input" dir="ltr"
@@ -66,19 +78,9 @@
                  value="@Model?.NationalNumber"/>
           @if (ErrFor(nameof(StudentInput.NationalNumber)) is { } eNat) { <span class="form-err" style="display:block;">@eNat</span> }
         </div>
-        <div class="form-group">
-          <label class="form-label">@L["Std_Grade"]</label>
-          <select name="Grade" class="form-input">
-            @{
-                var gradeCodes = new[] { "KG1", "KG2", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
-            }
-            @foreach (var val in gradeCodes)
-            {
-                <option value="@val" selected="@(Model?.Grade == val)">@L["Std_Grade" + val]</option>
-            }
-          </select>
-        </div>
       </div>
+      @* Grade removed from the UI — value round-trips so existing rows keep their grade. *@
+      <input type="hidden" name="Grade" value="@(string.IsNullOrEmpty(Model?.Grade) ? "1" : Model.Grade)"/>
     </section>
 
     @* ── Section: Parent Info ─────────────────────────────────────── *@
@@ -101,12 +103,15 @@
         </div>
         <div class="form-group">
           <label class="form-label">@L["Std_Phone"]</label>
-          <input type="tel" name="ParentPhone" class="form-input" dir="ltr"
-                 pattern="^07[789]\d{7}$"
-                 placeholder="079XXXXXXX"
-                 inputmode="numeric"
-                 maxlength="10"
-                 value="@Model?.ParentPhone"/>
+          <div class="form-input-group" dir="ltr">
+            <span class="prefix">+962</span>
+            <input type="tel" name="ParentPhone"
+                   pattern="^7[789]\d{7}$"
+                   placeholder="79XXXXXXX"
+                   inputmode="numeric"
+                   maxlength="9"
+                   value="@LocalPhone(Model?.ParentPhone)"/>
+          </div>
           @if (ErrFor(nameof(StudentInput.ParentPhone)) is { } e3) { <span class="form-err" style="display:block;">@e3</span> }
         </div>
       </div>

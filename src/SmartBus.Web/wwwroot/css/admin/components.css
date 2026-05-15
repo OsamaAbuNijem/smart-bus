@@ -162,6 +162,12 @@ select.filter-select::-ms-expand { display: none; }
 .form-label { font-size: 12px; font-weight: 700; color: #475569; font-family: 'Cairo', sans-serif; letter-spacing: .02em; }
 .form-label.sm { font-size: 11px; }
 .form-input { border: 1.5px solid #E5E7EB; border-radius: 10px; padding: 9px 12px; font-size: 13px; line-height: 1.4; color: #111; font-family: 'Cairo', sans-serif; outline: none; background: #F9FAFB; transition: border-color .15s; box-sizing: border-box; }
+/* Input with a fixed text prefix (e.g. "+962" before a phone). The wrapper
+   carries the border + focus state so the chip + field read as one control. */
+.form-input-group { display: flex; align-items: stretch; border: 1.5px solid #E5E7EB; border-radius: 10px; background: #F9FAFB; overflow: hidden; transition: border-color .15s, background-color .15s; }
+.form-input-group:focus-within { border-color: #FFD700; background: #fff; }
+.form-input-group > .prefix { display: inline-flex; align-items: center; padding: 0 12px; background: #F1F5F9; color: #64748B; font-size: 13px; font-weight: 700; font-family: 'Cairo', sans-serif; user-select: none; border-inline-end: 1px solid #E5E7EB; letter-spacing: .01em; }
+.form-input-group > input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; padding: 9px 12px; font-size: 13px; line-height: 1.4; color: #111; font-family: 'Cairo', sans-serif; }
 .form-input.sm { font-size: 12px; }
 .form-input:focus { border-color: #FFD700; background: #fff; }
 .form-input[readonly] { background: #F9FAFB; }

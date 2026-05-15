@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartBus.Application.Common.Interfaces;
+using SmartBus.Application.Common.Utilities;
 using SmartBus.Domain.Entities;
 using SmartBus.Infrastructure.Persistence;
 
@@ -22,10 +23,17 @@ public class ParentUpsertService : IParentUpsertService
         if (string.IsNullOrWhiteSpace(phoneNumber))
             throw new ArgumentException("Phone number is required.", nameof(phoneNumber));
 
-        var phone = phoneNumber.Trim();
+        // Canonical "+9627XXXXXXXX". Legacy "0XXXXXXXXX" is still in the DB for
+        // parents created before this change, so we match against both forms and
+        // migrate the stored value to canonical on first encounter.
+        var phone = PhoneNumberHelper.Normalize(phoneNumber);
+        var legacy = PhoneNumberHelper.LegacyLocalForm(phone);
 
         var parent = await _context.Parents
-            .FirstOrDefaultAsync(p => !p.IsDeleted && p.PhoneNumber == phone, cancellationToken);
+            .FirstOrDefaultAsync(p => !p.IsDeleted &&
+                                      (p.PhoneNumber == phone ||
+                                       (legacy != null && p.PhoneNumber == legacy)),
+                                  cancellationToken);
 
         if (parent is null)
         {
@@ -39,8 +47,11 @@ public class ParentUpsertService : IParentUpsertService
         }
         else
         {
-            // Keep parent name in sync with latest admin input.
-            parent.FullName = fullName;
+            // Keep parent name in sync with latest admin input. Quietly upgrade
+            // the stored phone to canonical so future lookups don't pay the
+            // legacy-fallback cost.
+            parent.FullName    = fullName;
+            parent.PhoneNumber = phone;
         }
 
         // Ensure an Identity user exists for this parent.
