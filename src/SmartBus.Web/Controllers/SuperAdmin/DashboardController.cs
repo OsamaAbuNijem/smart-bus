@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SmartBus.Web.Models;
 using SmartBus.Web.Services;
 
 namespace SmartBus.Web.Controllers.SuperAdmin;
@@ -11,7 +12,17 @@ public class SuperAdminDashboardController : SuperAdminControllerBase
 {
     public SuperAdminDashboardController(IApiClient apiClient) : base(apiClient) { }
 
+    /// <summary>
+    /// Action-level fetch: calls the API's dashboard aggregate, builds a
+    /// typed ViewModel, and renders. Mirrors admin's DashboardController.Index
+    /// pattern — every stat card binds to <c>@Model.*</c> in the view, no
+    /// dashboard XHR roundtrip from the browser.
+    /// </summary>
     [HttpGet]
-    public IActionResult Index() =>
-        View(Page("overview", "لوحة المشرف العام"));
+    public async Task<IActionResult> Index()
+    {
+        var stats = await ApiClient.GetSuperAdminDashboardStatsAsync();
+        var vm    = SuperAdminDashboardViewModel.FromDto(stats, activePage: "overview", pageTitle: "لوحة المشرف العام");
+        return View(vm);
+    }
 }

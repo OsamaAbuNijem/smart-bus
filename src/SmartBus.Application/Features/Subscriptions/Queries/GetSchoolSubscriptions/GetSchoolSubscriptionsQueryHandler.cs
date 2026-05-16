@@ -28,7 +28,7 @@ public class GetSchoolSubscriptionsQueryHandler
                 s.IsActive,
                 s.IsActive && s.ActivationDate <= now && s.ExpirationDate >= now,
                 s.Price,
-                s.IsPaid,
+                s.PaymentStatus,
                 s.RemainingAmount,
                 s.CreatedAt))
             .ToListAsync(cancellationToken);

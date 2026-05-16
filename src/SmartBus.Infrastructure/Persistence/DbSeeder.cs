@@ -52,11 +52,10 @@ public static class DbSeeder
         {
             db.Schools.Add(new School
             {
-                Name         = "SmartBus Demo School",
-                City         = "الرياض",
-                ContactEmail = adminEmail,
-                PhoneNumber  = "0112345678",
-                AdminEmail   = adminEmail
+                Name        = "SmartBus Demo School",
+                City        = "الرياض",
+                PhoneNumber = "0112345678",
+                AdminEmail  = adminEmail
             });
             await db.SaveChangesAsync();
         }
@@ -85,7 +84,7 @@ public static class DbSeeder
                     ExpirationDate   = DateTime.UtcNow.AddYears(1),
                     IsActive         = true,
                     Price            = 0m,
-                    IsPaid           = false,
+                    PaymentStatus    = PaymentStatus.Unpaid,
                     RemainingAmount  = 0m,
                     SubscriptionType = SubscriptionType.Trial
                 });

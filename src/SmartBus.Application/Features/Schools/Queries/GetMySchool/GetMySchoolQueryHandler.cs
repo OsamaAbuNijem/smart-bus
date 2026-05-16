@@ -16,11 +16,11 @@ public class GetMySchoolQueryHandler : IRequestHandler<GetMySchoolQuery, Result<
     {
         var school = await _context.Schools
             .Where(s => !s.IsDeleted && s.AdminEmail == request.AdminEmail)
-            .Select(s => new SchoolDto(s.Id, s.Name, s.City, s.ContactEmail, s.PhoneNumber,
-                s.AdminEmail, s.Notes, s.CreatedAt,
-                // School admins don't need to see their own subscription details
-                // through this endpoint — leave the two extra fields null.
-                null, null))
+            .Select(s => new SchoolDto(s.Id, s.Name, s.City, s.PhoneNumber,
+                s.AdminEmail, s.ContactName, s.Latitude, s.Longitude, s.LogoUrl, s.CreatedAt,
+                // School admins don't need their own subscription details
+                // through this endpoint — leave the four extra fields null.
+                null, null, null, null))
             .FirstOrDefaultAsync(cancellationToken);
 
         return school is not null

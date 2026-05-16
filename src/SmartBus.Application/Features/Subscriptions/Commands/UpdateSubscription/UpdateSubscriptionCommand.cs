@@ -14,7 +14,7 @@ public record UpdateSubscriptionCommand(
     DateTime ExpirationDate,
     bool IsActive,
     decimal Price,
-    bool IsPaid,
+    PaymentStatus PaymentStatus,
     decimal RemainingAmount
 ) : IRequest<Result>, ICacheInvalidator
 {

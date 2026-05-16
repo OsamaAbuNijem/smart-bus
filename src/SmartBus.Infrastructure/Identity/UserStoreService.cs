@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SmartBus.Application.Common.Interfaces;
 
 namespace SmartBus.Infrastructure.Identity;
@@ -6,9 +7,15 @@ namespace SmartBus.Infrastructure.Identity;
 public class UserStoreService : IUserStore
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole>    _roleManager;
 
-    public UserStoreService(UserManager<ApplicationUser> userManager)
-        => _userManager = userManager;
+    public UserStoreService(
+        UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole>    roleManager)
+    {
+        _userManager = userManager;
+        _roleManager = roleManager;
+    }
 
     public async Task<AppUser?> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
@@ -64,5 +71,22 @@ public class UserStoreService : IUserStore
             return (false, string.Join(" ", result.Errors.Select(e => e.Description)));
 
         return (true, null);
+    }
+
+    public async Task<int> CountActiveUsersByRoleAsync(
+        string role, TimeSpan window,
+        CancellationToken cancellationToken = default)
+    {
+        // Resolve the role first; bail early when the role doesn't exist
+        // so we don't trip an exception on an Identity lookup.
+        var roleEntity = await _roleManager.FindByNameAsync(role);
+        if (roleEntity is null) return 0;
+
+        // GetUsersInRoleAsync is a single SQL join under the hood and the
+        // populations we care about (Parent / Driver / Assistant) are
+        // bounded — fine to filter the result in memory.
+        var users     = await _userManager.GetUsersInRoleAsync(role);
+        var threshold = DateTime.UtcNow - window;
+        return users.Count(u => u.LastSeenAt is { } seen && seen >= threshold);
     }
 }

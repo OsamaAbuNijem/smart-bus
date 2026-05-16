@@ -4,6 +4,7 @@ using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
+using SmartBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
 using SmartBus.Web.Models;
@@ -16,6 +17,10 @@ public interface IApiClient
 
     // Schools
     Task<SchoolDto?> GetMySchoolAsync();
+
+    // Super-admin dashboard aggregate (schools / buses / drivers / students /
+    // active users by role / today's trips by status). Single roundtrip.
+    Task<DashboardStatsDto?> GetSuperAdminDashboardStatsAsync();
 
     // Drivers
     Task<PagedResult<DriverDto>?> GetDriversAsync(int pageNumber = 1, int pageSize = 10, string? driverType = null);

@@ -42,7 +42,7 @@ public class CreateSubscriptionCommandHandler : IRequestHandler<CreateSubscripti
             ExpirationDate   = request.ExpirationDate,
             IsActive         = request.IsActive,
             Price            = request.Price,
-            IsPaid           = request.IsPaid,
+            PaymentStatus    = request.PaymentStatus,
             RemainingAmount  = request.RemainingAmount
         };
         _context.Subscriptions.Add(subscription);

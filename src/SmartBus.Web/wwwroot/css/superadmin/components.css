@@ -41,6 +41,12 @@
 
 /* ── Filter bar ───────────────────────────────────────────────────── */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+
+/* Schools page — filter controls on the left, add-btn pushed to the end. */
+.schools-filter-bar      { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.schools-filter-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; flex: 1; min-width: 0; }
+.schools-filter-controls .form-control { height: 36px; min-width: 140px; }
+.schools-filter-controls input.form-control { min-width: 200px; }
 .filter-btn { border: 1px solid var(--border); border-radius: 9px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Cairo', sans-serif; color: var(--text2); background: var(--card); transition: all .15s; white-space: nowrap; }
 .filter-btn:hover  { border-color: var(--text2); }
 .filter-btn.active { background: #111; color: #fff; border-color: #111; }
@@ -73,9 +79,10 @@
 .sub-pill-expired   { background: #FEF2F2; color: #B91C1C; }
 .sub-pill-future    { background: #FFF7ED; color: #C2410C; }
 .sub-pill-off       { background: #F1F5F9; color: #475569; }
-.sub-pill-paid      { padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 700; display: inline-block; }
-.sub-pill-paid.yes  { background: #F0FDF4; color: #15803D; }
-.sub-pill-paid.no   { background: #FEF2F2; color: #B91C1C; }
+.sub-pill-paid          { padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 700; display: inline-block; }
+.sub-pill-paid.yes      { background: #F0FDF4; color: #15803D; }
+.sub-pill-paid.partial  { background: #FFF7ED; color: #C2410C; }
+.sub-pill-paid.no       { background: #FEF2F2; color: #B91C1C; }
 
 /* ── Status toggle ────────────────────────────────────────────────── */
 .st-toggle { width: 36px; height: 20px; border-radius: 10px; position: relative; cursor: pointer; flex-shrink: 0; border: none; transition: background .2s; }
@@ -184,6 +191,29 @@ mark { background: rgba(255,215,0,.4); border-radius: 3px; padding: 0 2px; }
 /* Date chip in topbar */
 .tb-date-chip { font-size: 11px; color: var(--text3); }
 
+/* School logo upload (modal) */
+.logo-upload      { display: flex; align-items: center; gap: 14px; }
+.logo-tile        { width: 72px; height: 72px; border-radius: 14px; border: 1.5px dashed var(--border2); background: var(--bg); padding: 0; overflow: hidden; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: border-color .15s, background .15s; }
+.logo-tile:hover  { border-color: var(--pu); background: var(--pul); }
+.logo-tile.is-set { border-style: solid; }
+.logo-preview     { width: 100%; height: 100%; object-fit: cover; }
+.logo-placeholder { color: var(--text3); display: flex; align-items: center; justify-content: center; }
+.logo-upload-body { display: flex; flex-direction: column; gap: 4px; }
+.logo-upload-hint { font-size: 12px; color: var(--text3); }
+
+/* Logo embedded in tables / drawer avatars (square thumbnail with the same
+   palette tint as initials-only avatars). */
+.has-logo { padding: 0; overflow: hidden; }
+.has-logo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* School map picker (modal) */
+.sa-map-canvas { width: 100%; height: 260px; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--border2); }
+.map-search-results { display: none; max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; background: var(--card); margin-top: -4px; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.map-search-results.is-open { display: block; }
+.map-search-result { padding: 8px 12px; font-size: 12px; color: var(--text2); cursor: pointer; border-bottom: 1px solid var(--border); }
+.map-search-result:last-child { border-bottom: none; }
+.map-search-result:hover { background: var(--pul); color: var(--pu); }
+
 /* ── Forms ────────────────────────────────────────────────────────── */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 .form-row.full { grid-template-columns: 1fr; }
@@ -200,6 +230,7 @@ textarea.form-control { height: auto; min-height: 64px; padding: 10px 12px; }
 .form-input-group.err          { border-color: var(--r) !important; box-shadow: 0 0 0 3px rgba(239,68,68,.1) !important; }
 .form-input-group > .prefix    { display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; background: #F1F5F9; color: #64748B; font-size: 13px; font-weight: 700; user-select: none; border-inline-end: 1px solid var(--border2); }
 .form-input-group > .prefix svg { color: #94A3B8; }
+.form-input-group > .suffix    { display: inline-flex; align-items: center; padding: 0 12px; background: #F1F5F9; color: #64748B; font-size: 13px; font-weight: 700; user-select: none; border-inline-start: 1px solid var(--border2); }
 .form-input-group > input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; padding: 0 12px; font-size: 13px; line-height: 1.4; color: var(--text); font-family: 'Cairo', sans-serif; }
 .form-err { font-size: 11px; color: var(--r); margin-top: 3px; display: none; }
 .form-err.show { display: block; }
@@ -228,6 +259,14 @@ textarea.form-control { height: auto; min-height: 64px; padding: 10px 12px; }
 .drawer-date-row { margin-right: auto; font-size: 11px; color: var(--text3); }
 [dir="ltr"] .drawer-date-row { margin-right: 0; margin-left: auto; }
 .drawer-plan-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+/* Active-subscription detail grid in the drawer */
+.drawer-section-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.drawer-sub-fields    { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin-top: 12px; }
+.drawer-sub-field     { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.drawer-sub-field .k  { font-size: 11px; color: var(--text3); }
+.drawer-sub-field .v  { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.drawer-sub-empty     { font-size: 12px; color: var(--text3); margin-top: 8px; }
+#drw-sub-update-btn   { width: 100%; justify-content: center; }
 .drawer-notes    { font-size: 13px; color: var(--text2); white-space: pre-wrap; }
 .drawer-btn-edit { flex: 1; }
 .drawer-btn-del  { flex: 1; }

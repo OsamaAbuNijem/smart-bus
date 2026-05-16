@@ -200,6 +200,10 @@ try
     app.UseAuthorization();
     app.UseRateLimiter();
 
+    // Stamp ApplicationUser.LastSeenAt on each authenticated request (throttled).
+    // Powers the SuperAdmin dashboard's "currently active users" counter.
+    app.UseMiddleware<SmartBus.API.Middleware.LastSeenTrackingMiddleware>();
+
     // Hangfire Dashboard (admin only in production)
     app.UseHangfireDashboard("/hangfire", new DashboardOptions
     {

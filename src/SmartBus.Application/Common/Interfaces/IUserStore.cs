@@ -15,6 +15,16 @@ public interface IUserStore
     Task<(bool Succeeded, string? Error)> ChangePasswordAsync(
         string userId, string currentPassword, string newPassword,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Counts ApplicationUsers that are members of the given role AND have
+    /// pinged the API within <paramref name="window"/> (their LastSeenAt is
+    /// within that window). Powers the SuperAdmin dashboard's "currently
+    /// active users by role" widget.
+    /// </summary>
+    Task<int> CountActiveUsersByRoleAsync(
+        string role, TimeSpan window,
+        CancellationToken cancellationToken = default);
 }
 
 public record AppUser(string Id, string Email, string FullName);

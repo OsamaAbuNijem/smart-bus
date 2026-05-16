@@ -11,16 +11,39 @@ const subscriptions = {
   items: [],
   _typeNames: ['Trial', 'Basic', 'Standard', 'Premium'],
   _strings: null,
+  // Optional callback invoked after a successful save — used by the Schools
+  // drawer to refresh the active-subscription panel without a full reload.
+  _onSaved: null,
+  // Per-modal flag so the cross-page handlers only attach once even if
+  // multiple SA pages call initModal() during their bootstrap.
+  _modalReady: false,
 
-  async init() {
+  /**
+   * Modal-only wiring. Safe to call on any super-admin page (the modal
+   * markup lives in the shared layout). Idempotent.
+   */
+  initModal() {
+    if (subscriptions._modalReady) return;
     subscriptions._strings = subscriptions._readStrings();
+    if (!document.getElementById('modal-subscription')) return;
+    document.getElementById('sub-save-btn')  ?.addEventListener('click', subscriptions.save);
+    document.getElementById('sub-close-btn') ?.addEventListener('click', subscriptions._close);
+    document.getElementById('sub-cancel-btn')?.addEventListener('click', subscriptions._close);
+    subscriptions._modalReady = true;
+  },
+
+  _close() { SB.closeModal('modal-subscription'); subscriptions._onSaved = null; },
+
+  /**
+   * Subscriptions page (per-school list) bootstrap. Adds the school-select
+   * + grid wiring on top of the shared modal init.
+   */
+  async init() {
+    subscriptions.initModal();
     const sel = document.getElementById('sub-school-select');
     if (!sel) return;
     sel.addEventListener('change', () => subscriptions.loadFor(sel.value));
     document.getElementById('sub-add-btn')?.addEventListener('click', subscriptions.openCreate);
-    document.getElementById('sub-save-btn')?.addEventListener('click', subscriptions.save);
-    document.getElementById('sub-close-btn')?.addEventListener('click', () => SB.closeModal('modal-subscription'));
-    document.getElementById('sub-cancel-btn')?.addEventListener('click', () => SB.closeModal('modal-subscription'));
     document.getElementById('sub-tbody')?.addEventListener('click', e => {
       const btn = e.target.closest('button[data-sub-id]');
       if (!btn) return;
@@ -28,6 +51,42 @@ const subscriptions = {
       if (row) subscriptions._openEdit(row);
     });
     await subscriptions._loadSchools();
+  },
+
+  /**
+   * Open the edit modal for a specific school + subscription. Called from
+   * the Schools drawer's "Update subscription" button. `onSaved` is invoked
+   * after a successful save so the caller can refresh its own view.
+   */
+  openForSchool(schoolId, sub, onSaved) {
+    if (!schoolId) return;
+    subscriptions.initModal();
+    subscriptions.schoolId = schoolId;
+    subscriptions._onSaved = typeof onSaved === 'function' ? onSaved : null;
+    if (sub) {
+      subscriptions._openEdit(sub);
+    } else {
+      // No active sub yet — open the create flow targeting this school.
+      const modal = document.getElementById('modal-subscription');
+      SB.setText('sub-modal-title', modal?.dataset.titleCreate || 'New subscription');
+      document.getElementById('sub-id').value = '';
+      document.getElementById('sub-target-school').value = schoolId;
+      const today = new Date();
+      const inOneYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+      const iso = d => d.toISOString().slice(0, 10);
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      setVal('sub-activation',   iso(today));
+      setVal('sub-expiration',   iso(inOneYear));
+      setVal('sub-type',         '0');
+      setVal('sub-active',       'true');
+      setVal('sub-max-students', '500');
+      setVal('sub-max-buses',    '20');
+      setVal('sub-price',        '0');
+      setVal('sub-paid',         'false');
+      setVal('sub-remaining',    '0');
+      subscriptions._hideError();
+      SB.openModal('modal-subscription');
+    }
   },
 
   async _loadSchools() {
@@ -99,7 +158,10 @@ const subscriptions = {
     document.getElementById('sub-max-students').value = s.maxStudents ?? 0;
     document.getElementById('sub-max-buses').value    = s.maxBuses    ?? 0;
     document.getElementById('sub-price').value        = s.price       ?? 0;
-    document.getElementById('sub-paid').value         = String(!!s.isPaid);
+    // PaymentStatus arrives from the API as a JSON string ("Unpaid"|"Partial"|"Paid")
+    // because the project's JsonStringEnumConverter is global. _paymentToNum
+    // maps both the string form and any legacy int payloads.
+    document.getElementById('sub-paid').value         = String(subscriptions._paymentToNum(s.paymentStatus));
     document.getElementById('sub-remaining').value    = s.remainingAmount ?? 0;
     subscriptions._hideError();
     SB.openModal('modal-subscription');
@@ -122,7 +184,7 @@ const subscriptions = {
       expirationDate:   new Date(expIso + 'T23:59:59Z').toISOString(),
       isActive:         document.getElementById('sub-active').value === 'true',
       price:            parseFloat(document.getElementById('sub-price').value) || 0,
-      isPaid:           document.getElementById('sub-paid').value === 'true',
+      paymentStatus:    parseInt(document.getElementById('sub-paid').value, 10) || 0,
       remainingAmount:  parseFloat(document.getElementById('sub-remaining').value) || 0,
     };
     const saveBtn = document.getElementById('sub-save-btn');
@@ -136,7 +198,12 @@ const subscriptions = {
         return;
       }
       SB.closeModal('modal-subscription');
-      await subscriptions.loadFor(schoolId);
+      // Page-grid refresh (Subscriptions page only) AND a callback for any
+      // drawer/caller that wired one up.
+      if (document.getElementById('sub-tbody')) await subscriptions.loadFor(schoolId);
+      if (subscriptions._onSaved) {
+        try { await subscriptions._onSaved(); } finally { subscriptions._onSaved = null; }
+      }
     } finally {
       if (saveBtn) saveBtn.disabled = false;
     }
@@ -153,9 +220,7 @@ const subscriptions = {
     const type = subscriptions._typeLabel(s.subscriptionType);
     const act  = SB.formatDate(s.activationDate);
     const exp  = SB.formatDate(s.expirationDate);
-    const paidPill = s.isPaid
-      ? `<span class="sub-pill-paid yes">${SB.escHtml(t.paidYes)}</span>`
-      : `<span class="sub-pill-paid no">${SB.escHtml(t.paidNo)}</span>`;
+    const paidPill = subscriptions._paidPill(s.paymentStatus);
     return `
       <tr>
         <td class="u-weight-700">${SB.escHtml(type)}</td>
@@ -200,6 +265,22 @@ const subscriptions = {
     return subscriptions._strings.types[subscriptions._typeToNum(v)] ?? String(v);
   },
 
+  _paymentNames: ['Unpaid', 'Partial', 'Paid'],
+  _paymentToNum(v) {
+    if (typeof v === 'number') return v;
+    if (typeof v === 'boolean') return v ? 2 : 0;  // legacy data
+    const i = subscriptions._paymentNames.indexOf(String(v));
+    return i >= 0 ? i : 0;
+  },
+  // 3-state pill renderer used by the subs grid AND the schools-drawer panel.
+  _paidPill(v) {
+    const t = subscriptions._strings;
+    const n = subscriptions._paymentToNum(v);
+    if (n === 2) return `<span class="sub-pill-paid yes">${SB.escHtml(t.paidYes)}</span>`;
+    if (n === 1) return `<span class="sub-pill-paid partial">${SB.escHtml(t.paidPartial)}</span>`;
+    return            `<span class="sub-pill-paid no">${SB.escHtml(t.paidNo)}</span>`;
+  },
+
   _showError(msg) {
     const box = document.getElementById('sub-error');
     if (!box) return;
@@ -219,6 +300,7 @@ const subscriptions = {
       failed:        d.failed        || 'Failed to load subscriptions.',
       requiredErr:   d.requiredErr   || 'School and dates are required.',
       paidYes:       d.paidYes       || 'Paid',
+      paidPartial:   d.paidPartial   || 'Partial',
       paidNo:        d.paidNo        || 'Unpaid',
       edit:          d.edit          || 'Edit',
       statusLive:    d.statusLive    || 'Active',

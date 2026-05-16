@@ -40,7 +40,7 @@ public class UpdateSubscriptionCommandHandler : IRequestHandler<UpdateSubscripti
         subscription.ExpirationDate   = request.ExpirationDate;
         subscription.IsActive         = request.IsActive;
         subscription.Price            = request.Price;
-        subscription.IsPaid           = request.IsPaid;
+        subscription.PaymentStatus    = request.PaymentStatus;
         subscription.RemainingAmount  = request.RemainingAmount;
 
         await _context.SaveChangesAsync(cancellationToken);

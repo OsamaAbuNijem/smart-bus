@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartBus.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using SmartBus.Infrastructure.Persistence;
 namespace SmartBus.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260516111543_RemoveSchoolContactEmailAndNotes")]
+    partial class RemoveSchoolContactEmailAndNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -793,9 +796,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ContactName")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1083,13 +1083,13 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("MaxBuses")
                         .HasColumnType("integer");
 
                     b.Property<int>("MaxStudents")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PaymentStatus")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Price")
@@ -1260,9 +1260,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime?>("LastSeenAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");

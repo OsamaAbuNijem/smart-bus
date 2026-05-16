@@ -6,11 +6,11 @@ public class School : BaseEntity
 {
     public string Name { get; set; } = default!;
     public string City { get; set; } = default!;
-    public string ContactEmail { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
     public string AdminEmail { get; set; } = default!;
+    /// <summary>Optional human contact at the school (e.g. school registrar).</summary>
+    public string? ContactName { get; set; }
     public string? LogoUrl { get; set; }
-    public string? Notes { get; set; }
 
     /// <summary>
     /// School map location supplied by the SuperAdmin. Used by the driver

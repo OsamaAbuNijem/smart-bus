@@ -5,7 +5,43 @@
 
 <div class="page active" id="sa-page-schools">
 
-  <div class="filter-bar">
+  <!-- Filter bar — all filters go to the server as query params so they
+       narrow the full result set, not just the current page. -->
+  <div class="schools-filter-bar">
+    <div class="schools-filter-controls">
+      <input type="text" id="flt-name" class="form-control" placeholder="@L["SA_Schools_Filter_Name"]" oninput="schools.onFilterDebounced()"/>
+      <select id="flt-city" class="form-control" onchange="schools.applyFilters()">
+        <option value="">@L["SA_Schools_Filter_AllCities"]</option>
+        <option value="Amman">@L["City_Amman"]</option>
+        <option value="Zarqa">@L["City_Zarqa"]</option>
+        <option value="Irbid">@L["City_Irbid"]</option>
+        <option value="Aqaba">@L["City_Aqaba"]</option>
+        <option value="Salt">@L["City_Salt"]</option>
+        <option value="Madaba">@L["City_Madaba"]</option>
+        <option value="Karak">@L["City_Karak"]</option>
+        <option value="Jerash">@L["City_Jerash"]</option>
+        <option value="Ajloun">@L["City_Ajloun"]</option>
+        <option value="Mafraq">@L["City_Mafraq"]</option>
+        <option value="Tafilah">@L["City_Tafilah"]</option>
+        <option value="Maan">@L["City_Maan"]</option>
+        <option value="Russeifa">@L["City_Russeifa"]</option>
+        <option value="Ramtha">@L["City_Ramtha"]</option>
+        <option value="WadiMusa">@L["City_WadiMusa"]</option>
+      </select>
+      <select id="flt-plan" class="form-control" onchange="schools.applyFilters()">
+        <option value="">@L["SA_Schools_Filter_AllPlans"]</option>
+        <option value="Trial">@L["SA_Sub_Type_Trial"]</option>
+        <option value="Basic">@L["SA_Sub_Type_Basic"]</option>
+        <option value="Standard">@L["SA_Sub_Type_Standard"]</option>
+        <option value="Premium">@L["SA_Sub_Type_Premium"]</option>
+      </select>
+      <select id="flt-status" class="form-control" onchange="schools.applyFilters()">
+        <option value="">@L["SA_Schools_Filter_AllStatuses"]</option>
+        <option value="Active">@L["SA_Status_Active"]</option>
+        <option value="Inactive">@L["SA_Status_Inactive"]</option>
+      </select>
+      <button type="button" class="btn-secondary btn-sm" onclick="schools.resetFilters()">@L["SA_Schools_Filter_Reset"]</button>
+    </div>
     <button type="button" class="add-btn" onclick="schools.openCreate()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       @L["SA_Schools_AddBtn"]
@@ -29,13 +65,14 @@
             <th>@L["SA_Schools_Col_Admin"]</th>
             <th>@L["SA_Schools_Col_Activation"]</th>
             <th>@L["SA_Schools_Col_Plan"]</th>
+            <th>@L["SA_Schools_Col_Status"]</th>
             <th>@L["SA_Schools_Col_Actions"]</th>
           </tr>
         </thead>
         <tbody id="schools-tbody">
-          <tr class="skel-row"><td><div class="skel skel-h-16 skel-w-150"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-160"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td></td></tr>
-          <tr class="skel-row"><td><div class="skel skel-h-16"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-160"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td></td></tr>
-          <tr class="skel-row"><td><div class="skel skel-h-16 skel-w-160"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-150"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td></td></tr>
+          <tr class="skel-row"><td><div class="skel skel-h-16 skel-w-150"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-160"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-60"></div></td><td></td></tr>
+          <tr class="skel-row"><td><div class="skel skel-h-16"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-160"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-60"></div></td><td></td></tr>
+          <tr class="skel-row"><td><div class="skel skel-h-16 skel-w-160"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-150"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-60"></div></td><td></td></tr>
         </tbody>
       </table>
     </div>
@@ -48,13 +85,11 @@
   </div>
 </div>
 
-<script src="~/js/superadmin/schools.js" asp-append-version="true"></script>
 <script>
-  // Reveal the topbar search (only meaningful on this page) and trigger the
-  // initial load. The schools.* module is loaded above.
+  // The Schools page has its own in-page filter bar (name + city + plan +
+  // status), so the topbar search stays hidden. schools.* loads via the
+  // shared layout.
   document.addEventListener('DOMContentLoaded', async () => {
-    const search = document.getElementById('topbar-search');
-    if (search) search.classList.remove('u-hidden');
     try { await SB.translationsReady; } catch {}
     if (typeof schools === 'object') schools.load(1);
   });

@@ -21,10 +21,6 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
 
     public async Task<Result<Guid>> Handle(CreateSchoolCommand request, CancellationToken cancellationToken)
     {
-        var existing = await _unitOfWork.Schools.GetByContactEmailAsync(request.ContactEmail, cancellationToken);
-        if (existing is not null)
-            return Result<Guid>.Failure($"A school with contact email '{request.ContactEmail}' already exists.");
-
         // Ensure an Admin Identity account exists for the school's admin email
         var (_, userError) = await _userStore.CreateUserIfNotExistsAsync(
             request.AdminEmail,
@@ -38,14 +34,14 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
 
         var school = new School
         {
-            Name         = request.Name,
-            City         = request.City,
-            ContactEmail = request.ContactEmail,
-            PhoneNumber  = request.PhoneNumber,
-            AdminEmail   = request.AdminEmail,
-            Notes        = request.Notes,
-            Latitude     = request.Latitude,
-            Longitude    = request.Longitude
+            Name        = request.Name,
+            City        = request.City,
+            PhoneNumber = request.PhoneNumber,
+            AdminEmail  = request.AdminEmail,
+            ContactName = request.ContactName,
+            Latitude    = request.Latitude,
+            Longitude   = request.Longitude,
+            LogoUrl     = request.LogoUrl
         };
 
         await _unitOfWork.Schools.AddAsync(school, cancellationToken);
@@ -63,7 +59,7 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
             ExpirationDate   = request.SubscriptionExpirationDate,
             IsActive         = true,
             Price            = request.SubscriptionPrice,
-            IsPaid           = request.SubscriptionIsPaid,
+            PaymentStatus    = request.SubscriptionPaymentStatus,
             RemainingAmount  = request.SubscriptionRemainingAmount,
             SubscriptionType = request.SubscriptionType
         };

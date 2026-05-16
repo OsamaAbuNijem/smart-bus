@@ -7,10 +7,10 @@ public record UpdateSchoolCommand(
     Guid SchoolId,
     string Name,
     string City,
-    string ContactEmail,
     string PhoneNumber,
     string AdminEmail,
-    string? Notes,
-    double? Latitude = null,
-    double? Longitude = null
+    string? ContactName = null,
+    double? Latitude    = null,
+    double? Longitude   = null,
+    string? LogoUrl     = null
 ) : IRequest<Result>;

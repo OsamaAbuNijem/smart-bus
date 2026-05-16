@@ -70,9 +70,25 @@
   <data name="SA_School_Name"           xml:space="preserve"><value>اسم المدرسة</value></data>
   <data name="SA_School_Name_PH"        xml:space="preserve"><value>مثال: مدرسة النور الابتدائية</value></data>
   <data name="SA_School_Name_Required"  xml:space="preserve"><value>الاسم مطلوب</value></data>
-  <data name="SA_School_Email"          xml:space="preserve"><value>البريد الإلكتروني</value></data>
-  <data name="SA_School_Email_PH"       xml:space="preserve"><value>contact@school.edu</value></data>
-  <data name="SA_School_Email_Required" xml:space="preserve"><value>بريد إلكتروني صحيح مطلوب</value></data>
+  <data name="SA_School_ContactName"     xml:space="preserve"><value>اسم جهة الاتصال</value></data>
+  <data name="SA_School_ContactName_PH"  xml:space="preserve"><value>مثلاً: سارة — مسجلة المدرسة</value></data>
+  <data name="SA_Currency_JD"            xml:space="preserve"><value>د.أ</value></data>
+  <data name="SA_Status_Active"          xml:space="preserve"><value>نشط</value></data>
+  <data name="SA_Status_Inactive"        xml:space="preserve"><value>غير نشط</value></data>
+  <data name="SA_School_Logo"           xml:space="preserve"><value>شعار المدرسة</value></data>
+  <data name="SA_School_Logo_Hint"      xml:space="preserve"><value>PNG أو JPG أو WebP أو GIF أو SVG حتى 4 ميغابايت.</value></data>
+  <data name="SA_School_Logo_Choose"    xml:space="preserve"><value>اختيار ملف</value></data>
+  <data name="SA_School_Logo_Remove"    xml:space="preserve"><value>إزالة</value></data>
+  <data name="SA_School_Logo_UploadFailed" xml:space="preserve"><value>فشل الرفع. جرّب صورة أخرى.</value></data>
+  <data name="SA_Drawer_Sub_Title"      xml:space="preserve"><value>الاشتراك النشط</value></data>
+  <data name="SA_Drawer_Sub_Update"     xml:space="preserve"><value>تحديث الاشتراك</value></data>
+  <data name="SA_Drawer_Sub_Create"     xml:space="preserve"><value>إضافة اشتراك</value></data>
+  <data name="SA_Drawer_Sub_None"       xml:space="preserve"><value>لا يوجد اشتراك نشط.</value></data>
+  <data name="SA_School_Map_Section"    xml:space="preserve"><value>موقع المدرسة</value></data>
+  <data name="SA_School_Map_Hint"       xml:space="preserve"><value>ابحث عن عنوان أو انقر على الخريطة لتثبيت موقع المدرسة. يُستخدم بداية/نهاية مسارات السائق.</value></data>
+  <data name="SA_School_Map_Search"     xml:space="preserve"><value>ابحث عن عنوان أو مكان…</value></data>
+  <data name="SA_School_Map_NoPin"      xml:space="preserve"><value>لم يتم اختيار موقع.</value></data>
+  <data name="SA_School_Map_Coords"     xml:space="preserve"><value>الإحداثيات</value></data>
   <data name="SA_School_Phone"          xml:space="preserve"><value>رقم الهاتف</value></data>
   <data name="SA_School_Phone_PH"       xml:space="preserve"><value>79XXXXXXX</value></data>
   <data name="SA_School_Phone_Required" xml:space="preserve"><value>رقم الهاتف مطلوب</value></data>
@@ -81,8 +97,6 @@
   <data name="SA_School_Admin_Required" xml:space="preserve"><value>بريد المدير مطلوب</value></data>
   <data name="SA_School_Password"       xml:space="preserve"><value>كلمة مرور المدير</value></data>
   <data name="SA_School_Password_Hint"  xml:space="preserve"><value>تُستخدم لأول مرة فقط عند إنشاء الحساب.</value></data>
-  <data name="SA_School_Notes"          xml:space="preserve"><value>ملاحظات</value></data>
-  <data name="SA_School_Notes_PH"       xml:space="preserve"><value>ملاحظات اختيارية…</value></data>
   <data name="SA_School_Save"           xml:space="preserve"><value>حفظ المدرسة</value></data>
   <data name="SA_School_Cancel"         xml:space="preserve"><value>إلغاء</value></data>
 
@@ -99,6 +113,7 @@
   <data name="SA_Sub_ExpirationDate" xml:space="preserve"><value>تاريخ الانتهاء</value></data>
   <data name="SA_Sub_Paid"           xml:space="preserve"><value>حالة الدفع</value></data>
   <data name="SA_Sub_Paid_Yes"       xml:space="preserve"><value>مدفوع</value></data>
+  <data name="SA_Sub_Paid_Partial"   xml:space="preserve"><value>مدفوع جزئياً</value></data>
   <data name="SA_Sub_Paid_No"        xml:space="preserve"><value>غير مدفوع</value></data>
   <data name="SA_Sub_Remaining"      xml:space="preserve"><value>المبلغ المتبقي</value></data>
 
@@ -132,7 +147,6 @@
   <data name="SA_TopBar_Logout"        xml:space="preserve"><value>تسجيل الخروج</value></data>
   <data name="SA_TopBar_ExportCSV"     xml:space="preserve"><value>تصدير CSV</value></data>
   <data name="SA_Drawer_ContactInfo"   xml:space="preserve"><value>معلومات التواصل</value></data>
-  <data name="SA_Drawer_Notes"         xml:space="preserve"><value>ملاحظات</value></data>
   <data name="SA_Common_Edit"          xml:space="preserve"><value>تعديل</value></data>
   <data name="SA_Common_Delete"        xml:space="preserve"><value>حذف</value></data>
   <data name="SA_Common_Loading"       xml:space="preserve"><value>جاري التحميل…</value></data>
@@ -179,6 +193,22 @@
   <data name="SA_Dash_ViewAll"         xml:space="preserve"><value>عرض الكل</value></data>
   <data name="SA_Dash_EmptyTitle"      xml:space="preserve"><value>لا توجد مدارس بعد</value></data>
   <data name="SA_Dash_EmptyHint"       xml:space="preserve"><value>ابدأ بإضافة أول مدرسة في المنصة</value></data>
+  <data name="SA_Dash_TotalStudents"        xml:space="preserve"><value>إجمالي الطلاب</value></data>
+  <data name="SA_Dash_Drivers_Assistants"   xml:space="preserve"><value>السائقون والمساعدون</value></data>
+  <data name="SA_Dash_ActiveUsers"          xml:space="preserve"><value>المستخدمون النشطون حسب الدور</value></data>
+  <data name="SA_Dash_ActiveUsers_Sub"      xml:space="preserve"><value>الحسابات المُفعَّلة حالياً مُصنَّفة حسب الدور</value></data>
+  <data name="SA_Dash_TodayUsers"           xml:space="preserve"><value>نشاط المستخدمين اليوم</value></data>
+  <data name="SA_Dash_TodayUsers_Sub"       xml:space="preserve"><value>المستخدمون الذين سجّلوا الدخول مرة واحدة على الأقل اليوم، حسب الدور</value></data>
+  <data name="SA_Dash_Role_Parent"          xml:space="preserve"><value>أولياء الأمور</value></data>
+  <data name="SA_Dash_Role_Driver"          xml:space="preserve"><value>السائقون</value></data>
+  <data name="SA_Dash_Role_Assistant"       xml:space="preserve"><value>المساعدون</value></data>
+  <data name="SA_Dash_TodayTrips"           xml:space="preserve"><value>رحلات اليوم</value></data>
+  <data name="SA_Dash_TodayTrips_Sub"       xml:space="preserve"><value>الأعداد مُصنَّفة حسب حالة الرحلة</value></data>
+  <data name="SA_Dash_Trip_Created"         xml:space="preserve"><value>مُنشأة</value></data>
+  <data name="SA_Dash_Trip_InProgress"      xml:space="preserve"><value>قيد التنفيذ</value></data>
+  <data name="SA_Dash_Trip_Ended"           xml:space="preserve"><value>منتهية</value></data>
+  <data name="SA_Dash_SchoolsActiveSub"     xml:space="preserve"><value>{0} اشتراك نشط</value></data>
+  <data name="SA_Dash_DriversBreakdown"     xml:space="preserve"><value>{0} سائق · {1} مساعد</value></data>
 
   <!-- Super-admin schools page -->
   <data name="SA_Schools_PageTitle"    xml:space="preserve"><value>المدارس</value></data>
@@ -189,7 +219,14 @@
   <data name="SA_Schools_Col_Admin"    xml:space="preserve"><value>بريد المدير</value></data>
   <data name="SA_Schools_Col_Activation" xml:space="preserve"><value>تاريخ التفعيل</value></data>
   <data name="SA_Schools_Col_Plan"     xml:space="preserve"><value>خطة الاشتراك</value></data>
+  <data name="SA_Schools_Col_Status"   xml:space="preserve"><value>حالة التفعيل</value></data>
   <data name="SA_Schools_Col_Actions"  xml:space="preserve"><value>إجراءات</value></data>
+  <data name="SA_Schools_Filter_Name"   xml:space="preserve"><value>ابحث بالاسم…</value></data>
+  <data name="SA_Schools_Filter_AllCities"   xml:space="preserve"><value>كل المدن</value></data>
+  <data name="SA_Schools_Filter_AllPlans"    xml:space="preserve"><value>كل الخطط</value></data>
+  <data name="SA_Schools_Filter_AllStatuses" xml:space="preserve"><value>كل الحالات</value></data>
+  <data name="SA_Schools_Filter_Reset"  xml:space="preserve"><value>إعادة ضبط</value></data>
+  <data name="SA_Schools_Filter_Empty"  xml:space="preserve"><value>لا توجد مدارس تطابق عوامل التصفية.</value></data>
   <data name="SA_Schools_PrevPage"     xml:space="preserve"><value>السابق</value></data>
   <data name="SA_Schools_NextPage"     xml:space="preserve"><value>التالي</value></data>
   <data name="SA_Schools_LoadFailed"   xml:space="preserve"><value>تعذر تحميل البيانات</value></data>

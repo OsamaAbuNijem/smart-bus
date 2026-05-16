@@ -70,9 +70,25 @@
   <data name="SA_School_Name"           xml:space="preserve"><value>School name</value></data>
   <data name="SA_School_Name_PH"        xml:space="preserve"><value>e.g. Al-Noor Primary School</value></data>
   <data name="SA_School_Name_Required"  xml:space="preserve"><value>Name is required</value></data>
-  <data name="SA_School_Email"          xml:space="preserve"><value>Contact email</value></data>
-  <data name="SA_School_Email_PH"       xml:space="preserve"><value>contact@school.edu</value></data>
-  <data name="SA_School_Email_Required" xml:space="preserve"><value>A valid email is required</value></data>
+  <data name="SA_School_ContactName"     xml:space="preserve"><value>Contact name</value></data>
+  <data name="SA_School_ContactName_PH"  xml:space="preserve"><value>e.g. Sarah — school registrar</value></data>
+  <data name="SA_Currency_JD"            xml:space="preserve"><value>JD</value></data>
+  <data name="SA_Status_Active"          xml:space="preserve"><value>Active</value></data>
+  <data name="SA_Status_Inactive"        xml:space="preserve"><value>Inactive</value></data>
+  <data name="SA_School_Logo"           xml:space="preserve"><value>School logo</value></data>
+  <data name="SA_School_Logo_Hint"      xml:space="preserve"><value>PNG, JPG, WebP, GIF or SVG up to 4 MB.</value></data>
+  <data name="SA_School_Logo_Choose"    xml:space="preserve"><value>Choose file</value></data>
+  <data name="SA_School_Logo_Remove"    xml:space="preserve"><value>Remove</value></data>
+  <data name="SA_School_Logo_UploadFailed" xml:space="preserve"><value>Upload failed. Try a different image.</value></data>
+  <data name="SA_Drawer_Sub_Title"      xml:space="preserve"><value>Active subscription</value></data>
+  <data name="SA_Drawer_Sub_Update"     xml:space="preserve"><value>Update subscription</value></data>
+  <data name="SA_Drawer_Sub_Create"     xml:space="preserve"><value>Add subscription</value></data>
+  <data name="SA_Drawer_Sub_None"       xml:space="preserve"><value>No active subscription.</value></data>
+  <data name="SA_School_Map_Section"    xml:space="preserve"><value>School location</value></data>
+  <data name="SA_School_Map_Hint"       xml:space="preserve"><value>Search for an address or click the map to drop a pin. Used by driver routes as the trip start/end.</value></data>
+  <data name="SA_School_Map_Search"     xml:space="preserve"><value>Search address or place…</value></data>
+  <data name="SA_School_Map_NoPin"      xml:space="preserve"><value>No location selected.</value></data>
+  <data name="SA_School_Map_Coords"     xml:space="preserve"><value>Coordinates</value></data>
   <data name="SA_School_Phone"          xml:space="preserve"><value>Phone number</value></data>
   <data name="SA_School_Phone_PH"       xml:space="preserve"><value>79XXXXXXX</value></data>
   <data name="SA_School_Phone_Required" xml:space="preserve"><value>Phone number is required</value></data>
@@ -81,8 +97,6 @@
   <data name="SA_School_Admin_Required" xml:space="preserve"><value>Admin email is required</value></data>
   <data name="SA_School_Password"       xml:space="preserve"><value>Admin password</value></data>
   <data name="SA_School_Password_Hint"  xml:space="preserve"><value>Used only when creating the account.</value></data>
-  <data name="SA_School_Notes"          xml:space="preserve"><value>Notes</value></data>
-  <data name="SA_School_Notes_PH"       xml:space="preserve"><value>Optional notes…</value></data>
   <data name="SA_School_Save"           xml:space="preserve"><value>Save school</value></data>
   <data name="SA_School_Cancel"         xml:space="preserve"><value>Cancel</value></data>
 
@@ -99,6 +113,7 @@
   <data name="SA_Sub_ExpirationDate" xml:space="preserve"><value>Expiration date</value></data>
   <data name="SA_Sub_Paid"           xml:space="preserve"><value>Payment status</value></data>
   <data name="SA_Sub_Paid_Yes"       xml:space="preserve"><value>Paid</value></data>
+  <data name="SA_Sub_Paid_Partial"   xml:space="preserve"><value>Paid partially</value></data>
   <data name="SA_Sub_Paid_No"        xml:space="preserve"><value>Unpaid</value></data>
   <data name="SA_Sub_Remaining"      xml:space="preserve"><value>Remaining amount</value></data>
 
@@ -132,7 +147,6 @@
   <data name="SA_TopBar_Logout"        xml:space="preserve"><value>Sign out</value></data>
   <data name="SA_TopBar_ExportCSV"     xml:space="preserve"><value>Export CSV</value></data>
   <data name="SA_Drawer_ContactInfo"   xml:space="preserve"><value>Contact info</value></data>
-  <data name="SA_Drawer_Notes"         xml:space="preserve"><value>Notes</value></data>
   <data name="SA_Common_Edit"          xml:space="preserve"><value>Edit</value></data>
   <data name="SA_Common_Delete"        xml:space="preserve"><value>Delete</value></data>
   <data name="SA_Common_Loading"       xml:space="preserve"><value>Loading…</value></data>
@@ -179,6 +193,22 @@
   <data name="SA_Dash_ViewAll"         xml:space="preserve"><value>View all</value></data>
   <data name="SA_Dash_EmptyTitle"      xml:space="preserve"><value>No schools yet</value></data>
   <data name="SA_Dash_EmptyHint"       xml:space="preserve"><value>Start by adding the first school to the platform</value></data>
+  <data name="SA_Dash_TotalStudents"        xml:space="preserve"><value>Total students</value></data>
+  <data name="SA_Dash_Drivers_Assistants"   xml:space="preserve"><value>Drivers + assistants</value></data>
+  <data name="SA_Dash_ActiveUsers"          xml:space="preserve"><value>Active users by role</value></data>
+  <data name="SA_Dash_ActiveUsers_Sub"      xml:space="preserve"><value>Accounts currently enabled, grouped by role</value></data>
+  <data name="SA_Dash_TodayUsers"           xml:space="preserve"><value>Today's user activity</value></data>
+  <data name="SA_Dash_TodayUsers_Sub"       xml:space="preserve"><value>Users who signed in at least once today, by role</value></data>
+  <data name="SA_Dash_Role_Parent"          xml:space="preserve"><value>Parents</value></data>
+  <data name="SA_Dash_Role_Driver"          xml:space="preserve"><value>Drivers</value></data>
+  <data name="SA_Dash_Role_Assistant"       xml:space="preserve"><value>Assistants</value></data>
+  <data name="SA_Dash_TodayTrips"           xml:space="preserve"><value>Today's trips</value></data>
+  <data name="SA_Dash_TodayTrips_Sub"       xml:space="preserve"><value>Counts grouped by trip status</value></data>
+  <data name="SA_Dash_Trip_Created"         xml:space="preserve"><value>Created</value></data>
+  <data name="SA_Dash_Trip_InProgress"      xml:space="preserve"><value>In progress</value></data>
+  <data name="SA_Dash_Trip_Ended"           xml:space="preserve"><value>Ended</value></data>
+  <data name="SA_Dash_SchoolsActiveSub"     xml:space="preserve"><value>{0} active subscription(s)</value></data>
+  <data name="SA_Dash_DriversBreakdown"     xml:space="preserve"><value>{0} drivers · {1} assistants</value></data>
 
   <!-- Super-admin schools page -->
   <data name="SA_Schools_PageTitle"    xml:space="preserve"><value>Schools</value></data>
@@ -189,7 +219,14 @@
   <data name="SA_Schools_Col_Admin"    xml:space="preserve"><value>Admin email</value></data>
   <data name="SA_Schools_Col_Activation" xml:space="preserve"><value>Activation date</value></data>
   <data name="SA_Schools_Col_Plan"     xml:space="preserve"><value>Subscription plan</value></data>
+  <data name="SA_Schools_Col_Status"   xml:space="preserve"><value>Activation status</value></data>
   <data name="SA_Schools_Col_Actions"  xml:space="preserve"><value>Actions</value></data>
+  <data name="SA_Schools_Filter_Name"   xml:space="preserve"><value>Search by name…</value></data>
+  <data name="SA_Schools_Filter_AllCities"   xml:space="preserve"><value>All cities</value></data>
+  <data name="SA_Schools_Filter_AllPlans"    xml:space="preserve"><value>All plans</value></data>
+  <data name="SA_Schools_Filter_AllStatuses" xml:space="preserve"><value>All statuses</value></data>
+  <data name="SA_Schools_Filter_Reset"  xml:space="preserve"><value>Reset</value></data>
+  <data name="SA_Schools_Filter_Empty"  xml:space="preserve"><value>No schools match the current filters.</value></data>
   <data name="SA_Schools_PrevPage"     xml:space="preserve"><value>Previous</value></data>
   <data name="SA_Schools_NextPage"     xml:space="preserve"><value>Next</value></data>
   <data name="SA_Schools_LoadFailed"   xml:space="preserve"><value>Failed to load data</value></data>

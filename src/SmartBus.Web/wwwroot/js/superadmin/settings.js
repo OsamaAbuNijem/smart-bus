@@ -6,7 +6,11 @@ const settings = {
   openChangePassword() {
     ['cp-current', 'cp-new', 'cp-confirm'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) { el.value = ''; el.classList.remove('err'); }
+      if (el) el.value = '';
+    });
+    // Clear the red ring on each input-group wrapper (mirrors the school form).
+    ['grp-cp-current', 'grp-cp-new', 'grp-cp-confirm'].forEach(id => {
+      document.getElementById(id)?.classList.remove('err');
     });
     ['err-cp-current', 'err-cp-new', 'err-cp-confirm'].forEach(id => {
       document.getElementById(id)?.classList.remove('show');
@@ -22,14 +26,16 @@ const settings = {
     const confirm = document.getElementById('cp-confirm')?.value ?? '';
 
     let valid = true;
-    const setErr = (errId, inputId, show) => {
+    // Toggle the error ring on the form-input-group wrapper, same pattern
+    // schools.js uses for grp-sch-email / grp-sch-phone / grp-sch-admin.
+    const setErr = (errId, wrapId, show) => {
       document.getElementById(errId)?.classList.toggle('show', show);
-      document.getElementById(inputId)?.classList.toggle('err', show);
+      document.getElementById(wrapId)?.classList.toggle('err',  show);
       if (show) valid = false;
     };
-    setErr('err-cp-current', 'cp-current', !current);
-    setErr('err-cp-new',     'cp-new',     newPwd.length < 8);
-    setErr('err-cp-confirm', 'cp-confirm', newPwd !== confirm);
+    setErr('err-cp-current', 'grp-cp-current', !current);
+    setErr('err-cp-new',     'grp-cp-new',     newPwd.length < 8);
+    setErr('err-cp-confirm', 'grp-cp-confirm', newPwd !== confirm);
     if (!valid) return;
 
     const btn = document.getElementById('btn-save-password');

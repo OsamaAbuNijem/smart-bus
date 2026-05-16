@@ -4,19 +4,46 @@ using SmartBus.Domain.Enums;
 
 namespace SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 
-public record GetAllSchoolsQuery(int PageNumber = 1, int PageSize = 10) : IRequest<PagedResult<SchoolDto>>;
+/// <summary>
+/// SuperAdmin schools grid. Filters are all optional and server-side so
+/// they narrow across the full result set (not just the current page).
+/// </summary>
+public record GetAllSchoolsQuery(
+    int PageNumber = 1,
+    int PageSize   = 10,
+    string? Name   = null,
+    string? City   = null,
+    SubscriptionType?    Plan   = null,
+    SchoolStatusFilter?  Status = null
+) : IRequest<PagedResult<SchoolDto>>;
+
+/// <summary>
+/// 2-state filter for "what's the last subscription's status":
+///   * Active   — IsActive AND today ∈ [activation, expiration]
+///   * Inactive — everything else (disabled, expired, future, or no sub)
+/// </summary>
+public enum SchoolStatusFilter
+{
+    Active   = 0,
+    Inactive = 1
+}
 
 public record SchoolDto(
     Guid Id,
     string Name,
     string City,
-    string ContactEmail,
     string PhoneNumber,
     string AdminEmail,
-    string? Notes,
+    string? ContactName,
+    double? Latitude,
+    double? Longitude,
+    string? LogoUrl,
     DateTime CreatedAt,
-    // Pulled from the school's currently-active Subscription (if any). Null when
-    // no subscription is live so the grid can render "—".
-    DateTime? ActiveSubscriptionActivationDate,
-    SubscriptionType? ActiveSubscriptionType
+    // The school's most-recent Subscription (regardless of state). Null when
+    // no sub has ever been created. The client computes a 4-state status pill
+    // (live/expired/future/disabled) from IsActive + the two date bounds.
+    DateTime? LastSubscriptionActivationDate,
+    DateTime? LastSubscriptionExpirationDate,
+    SubscriptionType? LastSubscriptionType,
+    bool?     LastSubscriptionIsActive
 );

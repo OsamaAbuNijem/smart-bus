@@ -37,7 +37,7 @@ public class SubscriptionsController : ControllerBase
             ExpirationDate:   request.ExpirationDate,
             IsActive:         request.IsActive,
             Price:            request.Price,
-            IsPaid:           request.IsPaid,
+            PaymentStatus:    request.PaymentStatus,
             RemainingAmount:  request.RemainingAmount);
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
@@ -58,7 +58,7 @@ public class SubscriptionsController : ControllerBase
             ExpirationDate:   request.ExpirationDate,
             IsActive:         request.IsActive,
             Price:            request.Price,
-            IsPaid:           request.IsPaid,
+            PaymentStatus:    request.PaymentStatus,
             RemainingAmount:  request.RemainingAmount);
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
@@ -75,5 +75,5 @@ public record SubscriptionRequest(
     DateTime ExpirationDate,
     bool IsActive,
     decimal Price,
-    bool IsPaid,
+    PaymentStatus PaymentStatus,
     decimal RemainingAmount);

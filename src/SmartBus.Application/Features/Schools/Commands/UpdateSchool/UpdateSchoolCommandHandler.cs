@@ -15,25 +15,21 @@ public class UpdateSchoolCommandHandler : IRequestHandler<UpdateSchoolCommand, R
         var school = await _unitOfWork.Schools.GetByIdAsync(request.SchoolId, cancellationToken);
         if (school is null) return Result.Failure("School not found.");
 
-        var existing = await _unitOfWork.Schools.GetByContactEmailAsync(request.ContactEmail, cancellationToken);
-        if (existing is not null && existing.Id != request.SchoolId)
-            return Result.Failure($"Email '{request.ContactEmail}' is already used by another school.");
-
-        school.Name         = request.Name;
-        school.City         = request.City;
-        school.ContactEmail = request.ContactEmail;
-        school.PhoneNumber  = request.PhoneNumber;
-        school.AdminEmail   = request.AdminEmail;
-        school.Notes        = request.Notes;
+        school.Name        = request.Name;
+        school.City        = request.City;
+        school.PhoneNumber = request.PhoneNumber;
+        school.AdminEmail  = request.AdminEmail;
+        school.ContactName = request.ContactName;
+        // Coordinates / logo: null on update means "leave as-is". The form
+        // always submits both lat+lng together when the map picker is used,
+        // and submits LogoUrl only when a new logo has been uploaded.
         if (request.Latitude  is not null) school.Latitude  = request.Latitude;
         if (request.Longitude is not null) school.Longitude = request.Longitude;
+        if (request.LogoUrl   is not null) school.LogoUrl   = request.LogoUrl;
 
         await _unitOfWork.Schools.UpdateAsync(school);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Token pools used to top up based on the school's caps. Those caps
-        // are gone now; QR token expansion (if/when needed) belongs on the
-        // subscription / a dedicated endpoint, not on the school edit path.
         return Result.Success();
     }
 }

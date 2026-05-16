@@ -25,7 +25,12 @@ public class Subscription : BaseEntity
     public bool IsActive { get; set; } = true;
 
     public decimal Price { get; set; }
-    public bool IsPaid { get; set; }
+    /// <summary>
+    /// 3-state payment status. Replaces the older boolean IsPaid so the
+    /// SuperAdmin can record partial payments without overloading
+    /// RemainingAmount as a payment flag.
+    /// </summary>
+    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
     public decimal RemainingAmount { get; set; }
 
     public SubscriptionType SubscriptionType { get; set; } = SubscriptionType.Trial;

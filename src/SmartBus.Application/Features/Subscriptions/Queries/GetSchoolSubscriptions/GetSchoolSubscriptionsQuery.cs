@@ -16,7 +16,7 @@ public record SubscriptionDto(
     bool IsActive,
     bool IsCurrentlyActive,   // IsActive && today ∈ [Activation, Expiration]
     decimal Price,
-    bool IsPaid,
+    PaymentStatus PaymentStatus,
     decimal RemainingAmount,
     DateTime CreatedAt
 );

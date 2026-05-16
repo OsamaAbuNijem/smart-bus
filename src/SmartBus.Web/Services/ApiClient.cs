@@ -7,6 +7,7 @@ using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
+using SmartBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
 using SmartBus.Web.Models;
@@ -107,6 +108,10 @@ public class ApiClient : IApiClient
     // ── Schools ────────────────────────────────────────────────────────────
     public Task<SchoolDto?> GetMySchoolAsync()
         => GetAsync<SchoolDto>("api/v1/schools/current");
+
+    // ── SuperAdmin dashboard ───────────────────────────────────────────────
+    public Task<DashboardStatsDto?> GetSuperAdminDashboardStatsAsync()
+        => GetAsync<DashboardStatsDto>("api/v1/superadmin/dashboard");
 
     // ── Drivers ────────────────────────────────────────────────────────────
     public Task<PagedResult<DriverDto>?> GetDriversAsync(int pageNumber = 1, int pageSize = 10, string? driverType = null)

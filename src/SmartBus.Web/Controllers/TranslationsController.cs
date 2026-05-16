@@ -121,6 +121,8 @@ public class TranslationsController : Controller
             ["saDashEmptyTitle"]       = _l["SA_Dash_EmptyTitle"].Value,
             ["saDashEmptyHint"]        = _l["SA_Dash_EmptyHint"].Value,
             ["saDashActiveSuffix"]     = _l["SA_Dash_ActiveSuffix"].Value,
+            ["saDashSchoolsActiveSub"] = _l["SA_Dash_SchoolsActiveSub"].Value,
+            ["saDashDriversBreakdown"] = _l["SA_Dash_DriversBreakdown"].Value,
 
             // Subscription type labels (used both in subscriptions table + schools badge fallback)
             ["saSubTypeTrial"]         = _l["SA_Sub_Type_Trial"].Value,
@@ -132,6 +134,30 @@ public class TranslationsController : Controller
             ["saEdit"]                 = _l["SA_Common_Edit"].Value,
             ["saDelete"]               = _l["SA_Common_Delete"].Value,
             ["saLoading"]              = _l["SA_Common_Loading"].Value,
+
+            // School map picker (read by schools.js when clearing the form)
+            ["saSchoolMapNoPin"]       = _l["SA_School_Map_NoPin"].Value,
+
+            // Schools filter bar — empty state + 2 status pill labels reused in the grid.
+            ["saSchoolsFilterEmpty"]   = _l["SA_Schools_Filter_Empty"].Value,
+            ["saSchoolsFilterReset"]   = _l["SA_Schools_Filter_Reset"].Value,
+            ["saStatusActive"]         = _l["SA_Status_Active"].Value,
+            ["saStatusInactive"]       = _l["SA_Status_Inactive"].Value,
+
+            // Drawer — active subscription panel
+            ["saDrawerSubUpdate"]      = _l["SA_Drawer_Sub_Update"].Value,
+            ["saDrawerSubCreate"]      = _l["SA_Drawer_Sub_Create"].Value,
+            ["saDrawerSubNone"]        = _l["SA_Drawer_Sub_None"].Value,
+            ["saSubActivationDate"]    = _l["SA_Sub_ActivationDate"].Value,
+            ["saSubExpirationDate"]    = _l["SA_Sub_ExpirationDate"].Value,
+            ["saSubMaxStudents"]       = _l["SA_Sub_Page_MaxStudents"].Value,
+            ["saSubMaxBuses"]          = _l["SA_Sub_Page_MaxBuses"].Value,
+            ["saSubPrice"]             = _l["SA_Sub_Price"].Value,
+            ["saSubRemaining"]         = _l["SA_Sub_Remaining"].Value,
+            ["saSubPaid"]              = _l["SA_Sub_Paid"].Value,
+            ["saSubPaidYes"]           = _l["SA_Sub_Paid_Yes"].Value,
+            ["saSubPaidPartial"]       = _l["SA_Sub_Paid_Partial"].Value,
+            ["saSubPaidNo"]            = _l["SA_Sub_Paid_No"].Value,
 
             // Settings (change password)
             ["saChangePwdSuccess"]     = _l["SA_Settings_PwdSuccess"].Value,

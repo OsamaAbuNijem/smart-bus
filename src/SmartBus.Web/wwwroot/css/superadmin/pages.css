@@ -32,6 +32,20 @@
 /* ── Recent-schools card header link ─────────────────────────────── */
 .card-header-link { font-size: 12px; padding: 7px 14px; text-decoration: none; display: inline-block; }
 
+/* ── Dashboard breakdown cards (active users / today users / today trips) ── */
+.dash-breakdown-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.breakdown-card      { margin-bottom: 0; }  /* the grid owns spacing */
+.breakdown-stats     { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.breakdown-stat      { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.breakdown-icon      { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.breakdown-icon.bg-purple { background: var(--pul); }
+.breakdown-icon.bg-blue   { background: var(--bll); }
+.breakdown-icon.bg-green  { background: var(--gl);  }
+.breakdown-icon.bg-orange { background: var(--ol);  }
+.breakdown-icon.bg-yellow { background: var(--yl);  }
+.breakdown-num       { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
+.breakdown-label     { font-size: 11px; color: var(--text2); }
+
 /* ── Settings page tiles ─────────────────────────────────────────── */
 .settings-list  { display: flex; flex-direction: column; gap: 12px; }
 .settings-tile  { background: var(--bg); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }

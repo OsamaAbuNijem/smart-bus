@@ -26,8 +26,15 @@ public class SchoolsController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "SuperAdmin")]
-    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
-        => Ok(await _mediator.Send(new GetAllSchoolsQuery(pageNumber, pageSize), cancellationToken));
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize   = 10,
+        [FromQuery] string? name   = null,
+        [FromQuery] string? city   = null,
+        [FromQuery] SubscriptionType?    plan   = null,
+        [FromQuery] SchoolStatusFilter?  status = null,
+        CancellationToken cancellationToken = default)
+        => Ok(await _mediator.Send(new GetAllSchoolsQuery(pageNumber, pageSize, name, city, plan, status), cancellationToken));
 
     [HttpGet("current")]
     [Authorize(Roles = "Admin,SuperAdmin")]
@@ -47,20 +54,20 @@ public class SchoolsController : ControllerBase
             new CreateSchoolCommand(
                 Name: request.Name,
                 City: request.City,
-                ContactEmail: request.ContactEmail,
                 PhoneNumber: request.PhoneNumber,
                 AdminEmail: request.AdminEmail,
-                Notes: request.Notes,
+                ContactName: request.ContactName,
                 SubscriptionActivationDate:  request.SubscriptionActivationDate,
                 SubscriptionExpirationDate:  request.SubscriptionExpirationDate,
                 SubscriptionType:            request.SubscriptionType,
                 SubscriptionPrice:           request.SubscriptionPrice,
-                SubscriptionIsPaid:          request.SubscriptionIsPaid,
+                SubscriptionPaymentStatus:   request.SubscriptionPaymentStatus,
                 SubscriptionRemainingAmount: request.SubscriptionRemainingAmount,
                 SubscriptionMaxStudents:     request.SubscriptionMaxStudents,
                 SubscriptionMaxBuses:        request.SubscriptionMaxBuses,
-                Latitude: request.Latitude,
+                Latitude:  request.Latitude,
                 Longitude: request.Longitude,
+                LogoUrl:   request.LogoUrl,
                 AdminPassword: request.AdminPassword),
             cancellationToken);
         return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
@@ -75,12 +82,12 @@ public class SchoolsController : ControllerBase
                 SchoolId: id,
                 Name: request.Name,
                 City: request.City,
-                ContactEmail: request.ContactEmail,
                 PhoneNumber: request.PhoneNumber,
                 AdminEmail: request.AdminEmail,
-                Notes: request.Notes,
-                Latitude: request.Latitude,
-                Longitude: request.Longitude),
+                ContactName: request.ContactName,
+                Latitude:  request.Latitude,
+                Longitude: request.Longitude,
+                LogoUrl:   request.LogoUrl),
             cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
@@ -112,19 +119,25 @@ public class SchoolsController : ControllerBase
     }
 }
 
-public record CreateSchoolRequest(string Name, string City, string ContactEmail, string PhoneNumber,
+public record CreateSchoolRequest(string Name, string City, string PhoneNumber,
     string AdminEmail,
-    string? Notes,
     DateTime SubscriptionActivationDate,
     DateTime SubscriptionExpirationDate,
     SubscriptionType SubscriptionType,
     decimal SubscriptionPrice,
-    bool SubscriptionIsPaid,
+    PaymentStatus SubscriptionPaymentStatus,
     decimal SubscriptionRemainingAmount,
     int SubscriptionMaxStudents = 500,
     int SubscriptionMaxBuses    = 20,
-    double? Latitude = null, double? Longitude = null,
+    string? ContactName = null,
+    double? Latitude    = null,
+    double? Longitude   = null,
+    string? LogoUrl     = null,
     string AdminPassword = "Admin@123456");
 
-public record UpdateSchoolRequest(string Name, string City, string ContactEmail, string PhoneNumber,
-    string AdminEmail, string? Notes, double? Latitude = null, double? Longitude = null);
+public record UpdateSchoolRequest(string Name, string City, string PhoneNumber,
+    string AdminEmail,
+    string? ContactName = null,
+    double? Latitude    = null,
+    double? Longitude   = null,
+    string? LogoUrl     = null);
