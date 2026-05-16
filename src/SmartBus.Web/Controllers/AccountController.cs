@@ -33,8 +33,12 @@ public class AccountController : Controller
 
         HttpContext.Session.SetString("JwtToken", token);
 
+        // Use explicit URLs: both Admin and SuperAdmin namespaces have a
+        // DashboardController, so RedirectToAction("Index","Dashboard") would
+        // resolve to whichever URL gen finds first (the SA attribute route
+        // wins). Same reasoning for the SA branch.
         if (roles.Contains("SuperAdmin"))
-            return RedirectToAction("Dashboard", "SuperAdmin");
+            return Redirect("/SuperAdmin/Dashboard");
 
         // Cache the admin's school once so every page doesn't re-hit /schools/current.
         var school = await _apiClient.GetMySchoolAsync();
@@ -44,7 +48,7 @@ public class AccountController : Controller
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
 
-        return RedirectToAction("Index", "Dashboard");
+        return Redirect("/Dashboard");
     }
 
     [HttpPost]

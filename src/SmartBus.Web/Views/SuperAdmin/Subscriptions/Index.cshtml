@@ -1,0 +1,167 @@
+@{
+    ViewData["Title"] = L["SA_Sub_PageTitle"];
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+<div class="page active" id="sa-page-subscriptions">
+
+  <div class="card card-mb-16">
+    <div class="card-body card-body-row">
+      <div class="card-body-grow">
+        <div class="card-title-strong">@L["SA_Sub_Page_Title"]</div>
+        <div class="card-sub-strong">@L["SA_Sub_Page_Sub"]</div>
+      </div>
+      <div class="u-flex u-items-center u-gap-10 u-flex-wrap">
+        <label class="form-label u-m-0">@L["SA_Sub_Page_School"]</label>
+        <select id="sub-school-select" class="form-control form-control-narrow">
+          <option value="">—</option>
+        </select>
+        <button type="button" class="btn-primary" id="sub-add-btn" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          @L["SA_Sub_Page_Add"]
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>@L["SA_Sub_Type"]</th>
+            <th>@L["SA_Sub_ActivationDate"]</th>
+            <th>@L["SA_Sub_ExpirationDate"]</th>
+            <th>@L["SA_Sub_Page_Status"]</th>
+            <th>@L["SA_Sub_Page_MaxStudents"]</th>
+            <th>@L["SA_Sub_Page_MaxBuses"]</th>
+            <th>@L["SA_Sub_Price"]</th>
+            <th>@L["SA_Sub_Paid"]</th>
+            <th>@L["SA_Sub_Remaining"]</th>
+            <th class="col-actions">@L["SA_Sub_Page_Actions"]</th>
+          </tr>
+        </thead>
+        <tbody id="sub-tbody">
+          <tr><td colspan="10" class="td-empty">@L["SA_Sub_Page_PickSchool"]</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: subscription create / edit -->
+<div class="modal-overlay" id="modal-subscription"
+     data-title-create="@L["SA_Sub_Page_AddTitle"]"
+     data-title-edit="@L["SA_Sub_Page_EditTitle"]">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-header-title" id="sub-modal-title">@L["SA_Sub_Page_AddTitle"]</div>
+      <button class="modal-close-btn" id="sub-close-btn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="sub-id"/>
+      <input type="hidden" id="sub-target-school"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Type"]</label>
+          <select id="sub-type" class="form-control">
+            <option value="0">@L["SA_Sub_Type_Trial"]</option>
+            <option value="1">@L["SA_Sub_Type_Basic"]</option>
+            <option value="2">@L["SA_Sub_Type_Standard"]</option>
+            <option value="3">@L["SA_Sub_Type_Premium"]</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Page_StatusActive"]</label>
+          <select id="sub-active" class="form-control">
+            <option value="true">@L["SA_Sub_Page_StatusActive_On"]</option>
+            <option value="false">@L["SA_Sub_Page_StatusActive_Off"]</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_ActivationDate"]</label>
+          <input type="date" id="sub-activation" class="form-control"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_ExpirationDate"]</label>
+          <input type="date" id="sub-expiration" class="form-control"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Page_MaxStudents"]</label>
+          <input type="number" id="sub-max-students" class="form-control" min="0"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Page_MaxBuses"]</label>
+          <input type="number" id="sub-max-buses" class="form-control" min="0"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Price"]</label>
+          <input type="number" id="sub-price" class="form-control" min="0" step="0.01"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Remaining"]</label>
+          <input type="number" id="sub-remaining" class="form-control" min="0" step="0.01"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Paid"]</label>
+          <select id="sub-paid" class="form-control">
+            <option value="false">@L["SA_Sub_Paid_No"]</option>
+            <option value="true">@L["SA_Sub_Paid_Yes"]</option>
+          </select>
+        </div>
+        <div class="form-group"></div>
+      </div>
+      <div id="sub-error" class="modal-form-err u-hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="sub-save-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        @L["SA_School_Save"]
+      </button>
+      <button class="btn-secondary" id="sub-cancel-btn">@L["SA_School_Cancel"]</button>
+    </div>
+  </div>
+</div>
+
+@{
+    // Strings the JS needs at runtime. Marshalled via data-attributes on a
+    // hidden node so the in-page <script> stays culture-agnostic.
+}
+<div id="sub-strings"
+     data-pick-school="@L["SA_Sub_Page_PickSchool"]"
+     data-no-subs="@L["SA_Sub_Page_NoSubs"]"
+     data-failed="@L["SA_Sub_Page_Failed"]"
+     data-saving="@L["SA_Sub_Page_Saving"]"
+     data-saved="@L["SA_Sub_Page_Saved"]"
+     data-required-err="@L["SA_Sub_Page_RequiredErr"]"
+     data-paid-yes="@L["SA_Sub_Paid_Yes"]"
+     data-paid-no="@L["SA_Sub_Paid_No"]"
+     data-edit="@L["SA_Sub_Page_Edit"]"
+     data-status-live="@L["SA_Sub_Page_Status_Live"]"
+     data-status-expired="@L["SA_Sub_Page_Status_Expired"]"
+     data-status-future="@L["SA_Sub_Page_Status_Future"]"
+     data-status-off="@L["SA_Sub_Page_Status_Off"]"
+     data-type-0="@L["SA_Sub_Type_Trial"]"
+     data-type-1="@L["SA_Sub_Type_Basic"]"
+     data-type-2="@L["SA_Sub_Type_Standard"]"
+     data-type-3="@L["SA_Sub_Type_Premium"]"
+     class="modal-strings-bag"></div>
+
+
+<script src="~/js/superadmin/subscriptions.js" asp-append-version="true"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    try { await SB.translationsReady; } catch {}
+    if (typeof subscriptions === 'object') subscriptions.init();
+  });
+</script>

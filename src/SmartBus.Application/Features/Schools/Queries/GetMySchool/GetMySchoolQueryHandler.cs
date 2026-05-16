@@ -17,7 +17,10 @@ public class GetMySchoolQueryHandler : IRequestHandler<GetMySchoolQuery, Result<
         var school = await _context.Schools
             .Where(s => !s.IsDeleted && s.AdminEmail == request.AdminEmail)
             .Select(s => new SchoolDto(s.Id, s.Name, s.City, s.ContactEmail, s.PhoneNumber,
-                s.AdminEmail, s.Notes, s.CreatedAt))
+                s.AdminEmail, s.Notes, s.CreatedAt,
+                // School admins don't need to see their own subscription details
+                // through this endpoint — leave the two extra fields null.
+                null, null))
             .FirstOrDefaultAsync(cancellationToken);
 
         return school is not null

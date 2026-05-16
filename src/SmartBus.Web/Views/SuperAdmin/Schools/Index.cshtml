@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = L["SA_Schools_PageTitle"];
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+<div class="page active" id="sa-page-schools">
+
+  <div class="filter-bar">
+    <button type="button" class="add-btn" onclick="schools.openCreate()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      @L["SA_Schools_AddBtn"]
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">@L["SA_Schools_ListTitle"]</div>
+        <div class="card-sub" id="schools-pager-info">@L["SA_Common_Loading"]</div>
+      </div>
+      <div class="card-total-num" id="schools-total">—</div>
+    </div>
+    <div class="card-table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>@L["SA_Schools_Col_School"]</th>
+            <th>@L["SA_Schools_Col_City"]</th>
+            <th>@L["SA_Schools_Col_Admin"]</th>
+            <th>@L["SA_Schools_Col_Activation"]</th>
+            <th>@L["SA_Schools_Col_Plan"]</th>
+            <th>@L["SA_Schools_Col_Actions"]</th>
+          </tr>
+        </thead>
+        <tbody id="schools-tbody">
+          <tr class="skel-row"><td><div class="skel skel-h-16 skel-w-150"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-160"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td></td></tr>
+          <tr class="skel-row"><td><div class="skel skel-h-16"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-160"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td></td></tr>
+          <tr class="skel-row"><td><div class="skel skel-h-16 skel-w-160"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-150"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-80"></div></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <span class="pager-info" id="schools-pager-text"></span>
+      <button type="button" class="pager-btn" id="schools-prev" onclick="schools.prev()" disabled>@L["SA_Schools_PrevPage"]</button>
+      <span class="pager-num" id="schools-pager-num"></span>
+      <button type="button" class="pager-btn" id="schools-next" onclick="schools.next()" disabled>@L["SA_Schools_NextPage"]</button>
+    </div>
+  </div>
+</div>
+
+<script src="~/js/superadmin/schools.js" asp-append-version="true"></script>
+<script>
+  // Reveal the topbar search (only meaningful on this page) and trigger the
+  // initial load. The schools.* module is loaded above.
+  document.addEventListener('DOMContentLoaded', async () => {
+    const search = document.getElementById('topbar-search');
+    if (search) search.classList.remove('u-hidden');
+    try { await SB.translationsReady; } catch {}
+    if (typeof schools === 'object') schools.load(1);
+  });
+</script>

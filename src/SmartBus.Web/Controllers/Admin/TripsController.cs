@@ -4,7 +4,7 @@ using SmartBus.Web.Models;
 using SmartBus.Web.Resources;
 using SmartBus.Web.Services;
 
-namespace SmartBus.Web.Controllers;
+namespace SmartBus.Web.Controllers.Admin;
 
 public class TripsController : AdminControllerBase
 {

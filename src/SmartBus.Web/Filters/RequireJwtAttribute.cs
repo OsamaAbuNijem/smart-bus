@@ -15,8 +15,15 @@ public class RequireJwtAttribute : Attribute, IAuthorizationFilter
         if (!string.IsNullOrEmpty(token)) return;
 
         var isXhr = context.HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
-        context.Result = isXhr
-            ? new UnauthorizedResult()
-            : new RedirectToActionResult("Login", "Account", null);
+        if (isXhr) { context.Result = new UnauthorizedResult(); return; }
+
+        // Path-aware redirect: there's both an admin and a super-admin
+        // AccountController; RedirectToAction("Login","Account") is ambiguous
+        // and URL gen picks the attribute-routed SA one. Pick by the request
+        // path so super-admin pages bounce to /SuperAdmin/Login and everything
+        // else to /Account/Login.
+        var path = context.HttpContext.Request.Path.Value ?? string.Empty;
+        var isSuperAdmin = path.StartsWith("/SuperAdmin", StringComparison.OrdinalIgnoreCase);
+        context.Result = new RedirectResult(isSuperAdmin ? "/SuperAdmin/Login" : "/Account/Login");
     }
 }

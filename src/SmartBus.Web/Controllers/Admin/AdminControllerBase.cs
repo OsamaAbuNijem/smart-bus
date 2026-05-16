@@ -6,7 +6,7 @@ using SmartBus.Web.Filters;
 using SmartBus.Web.Models;
 using SmartBus.Web.Services;
 
-namespace SmartBus.Web.Controllers;
+namespace SmartBus.Web.Controllers.Admin;
 
 [RequireJwt]
 public abstract class AdminControllerBase : Controller

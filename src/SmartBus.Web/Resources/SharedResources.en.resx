@@ -123,6 +123,108 @@
   <data name="SA_Sub_Page_Actions"        xml:space="preserve"><value>Actions</value></data>
   <data name="SA_Sub_Page_PickSchool"     xml:space="preserve"><value>Pick a school from the dropdown to view its subscriptions.</value></data>
   <data name="SA_Sub_Page_NoSubs"         xml:space="preserve"><value>No subscriptions for this school yet.</value></data>
+  <data name="SA_Sub_Page_Failed"         xml:space="preserve"><value>Failed to load subscriptions. Try refreshing or signing in again.</value></data>
+  <data name="SA_Sub_Page_Saving"         xml:space="preserve"><value>Saving…</value></data>
+  <data name="SA_Sub_Page_Saved"          xml:space="preserve"><value>Saved ✓</value></data>
+  <data name="SA_Sub_Page_RequiredErr"    xml:space="preserve"><value>School and dates are required.</value></data>
+
+  <!-- Super-admin layout: drawer + modals + topbar -->
+  <data name="SA_TopBar_Logout"        xml:space="preserve"><value>Sign out</value></data>
+  <data name="SA_TopBar_ExportCSV"     xml:space="preserve"><value>Export CSV</value></data>
+  <data name="SA_Drawer_ContactInfo"   xml:space="preserve"><value>Contact info</value></data>
+  <data name="SA_Drawer_Notes"         xml:space="preserve"><value>Notes</value></data>
+  <data name="SA_Common_Edit"          xml:space="preserve"><value>Edit</value></data>
+  <data name="SA_Common_Delete"        xml:space="preserve"><value>Delete</value></data>
+  <data name="SA_Common_Loading"       xml:space="preserve"><value>Loading…</value></data>
+  <data name="SA_Common_Close"         xml:space="preserve"><value>Close</value></data>
+  <data name="SA_Common_Cancel"        xml:space="preserve"><value>Cancel</value></data>
+  <data name="SA_Common_PrintAll"      xml:space="preserve"><value>Print all</value></data>
+  <data name="SA_QrEmployees_Title"    xml:space="preserve"><value>Employee QR codes</value></data>
+  <data name="SA_QrStudents_Title"     xml:space="preserve"><value>Student QR codes</value></data>
+  <data name="SA_Delete_Title"         xml:space="preserve"><value>⚠️ Confirm deletion</value></data>
+  <data name="SA_Delete_Heading"       xml:space="preserve"><value>Are you absolutely sure?</value></data>
+  <data name="SA_Delete_WillDelete"    xml:space="preserve"><value>Will delete</value></data>
+  <data name="SA_Delete_DefaultLabel"  xml:space="preserve"><value>the school</value></data>
+  <data name="SA_Delete_Irreversible"  xml:space="preserve"><value>This action cannot be undone.</value></data>
+  <data name="SA_Delete_Confirm"       xml:space="preserve"><value>🗑️ Yes, delete permanently</value></data>
+  <data name="SA_ChangePwd_Title"      xml:space="preserve"><value>Change password</value></data>
+  <data name="SA_ChangePwd_Current"    xml:space="preserve"><value>Current password</value></data>
+  <data name="SA_ChangePwd_New"        xml:space="preserve"><value>New password</value></data>
+  <data name="SA_ChangePwd_NewPH"      xml:space="preserve"><value>At least 8 characters</value></data>
+  <data name="SA_ChangePwd_Confirm"    xml:space="preserve"><value>Confirm password</value></data>
+  <data name="SA_ChangePwd_RequiredErr" xml:space="preserve"><value>This field is required</value></data>
+  <data name="SA_ChangePwd_MinLenErr"  xml:space="preserve"><value>At least 8 characters</value></data>
+  <data name="SA_ChangePwd_MismatchErr" xml:space="preserve"><value>Passwords do not match</value></data>
+  <data name="SA_ChangePwd_Save"       xml:space="preserve"><value>Save password</value></data>
+
+  <!-- Super-admin dashboard (overview) -->
+  <data name="SA_Dash_PageTitle"       xml:space="preserve"><value>Super-admin dashboard</value></data>
+  <data name="SA_Dash_Welcome"         xml:space="preserve"><value>Welcome back, Super Admin 👋</value></data>
+  <data name="SA_Dash_Subtitle"        xml:space="preserve"><value>Full management of every school subscribed to the SmartBus platform.</value></data>
+  <data name="SA_Dash_TotalSchools"    xml:space="preserve"><value>Total schools</value></data>
+  <data name="SA_Dash_ActiveSuffix"    xml:space="preserve"><value>active</value></data>
+  <data name="SA_Dash_PremiumSubs"     xml:space="preserve"><value>Premium subscriptions</value></data>
+  <data name="SA_Dash_PremiumNote"     xml:space="preserve"><value>Premium plan</value></data>
+  <data name="SA_Dash_TotalBuses"      xml:space="preserve"><value>Total buses</value></data>
+  <data name="SA_Dash_AcrossAll"       xml:space="preserve"><value>Across all schools</value></data>
+  <data name="SA_Dash_SchoolAdmins"    xml:space="preserve"><value>School admins</value></data>
+  <data name="SA_Dash_ActiveAccounts"  xml:space="preserve"><value>Active accounts</value></data>
+  <data name="SA_Dash_Col_Buses"       xml:space="preserve"><value>Buses</value></data>
+  <data name="SA_Dash_Col_Drivers"     xml:space="preserve"><value>Drivers</value></data>
+  <data name="SA_Dash_Col_Assistants"  xml:space="preserve"><value>Assistants</value></data>
+  <data name="SA_Dash_Col_Students"    xml:space="preserve"><value>Students</value></data>
+  <data name="SA_Dash_Col_Status"      xml:space="preserve"><value>Status</value></data>
+  <data name="SA_Dash_RecentTitle"     xml:space="preserve"><value>Recently added schools</value></data>
+  <data name="SA_Dash_RecentSub"       xml:space="preserve"><value>Latest 5 schools on the platform</value></data>
+  <data name="SA_Dash_ViewAll"         xml:space="preserve"><value>View all</value></data>
+  <data name="SA_Dash_EmptyTitle"      xml:space="preserve"><value>No schools yet</value></data>
+  <data name="SA_Dash_EmptyHint"       xml:space="preserve"><value>Start by adding the first school to the platform</value></data>
+
+  <!-- Super-admin schools page -->
+  <data name="SA_Schools_PageTitle"    xml:space="preserve"><value>Schools</value></data>
+  <data name="SA_Schools_AddBtn"       xml:space="preserve"><value>Add school</value></data>
+  <data name="SA_Schools_ListTitle"    xml:space="preserve"><value>Schools list</value></data>
+  <data name="SA_Schools_Col_School"   xml:space="preserve"><value>School</value></data>
+  <data name="SA_Schools_Col_City"     xml:space="preserve"><value>City</value></data>
+  <data name="SA_Schools_Col_Admin"    xml:space="preserve"><value>Admin email</value></data>
+  <data name="SA_Schools_Col_Activation" xml:space="preserve"><value>Activation date</value></data>
+  <data name="SA_Schools_Col_Plan"     xml:space="preserve"><value>Subscription plan</value></data>
+  <data name="SA_Schools_Col_Actions"  xml:space="preserve"><value>Actions</value></data>
+  <data name="SA_Schools_PrevPage"     xml:space="preserve"><value>Previous</value></data>
+  <data name="SA_Schools_NextPage"     xml:space="preserve"><value>Next</value></data>
+  <data name="SA_Schools_LoadFailed"   xml:space="preserve"><value>Failed to load data</value></data>
+  <data name="SA_Schools_CountInfo"    xml:space="preserve"><value>Showing {0} of {1} schools</value></data>
+  <data name="SA_Schools_Updated"      xml:space="preserve"><value>School updated ✓</value></data>
+  <data name="SA_Schools_Created"      xml:space="preserve"><value>School added successfully ✓</value></data>
+  <data name="SA_Schools_SaveFailed"   xml:space="preserve"><value>Save failed. Check the form data.</value></data>
+  <data name="SA_Schools_ConfirmDelete" xml:space="preserve"><value>Are you sure you want to delete the school "{0}"?</value></data>
+  <data name="SA_Schools_Deleted"      xml:space="preserve"><value>School deleted successfully</value></data>
+  <data name="SA_Schools_DeleteFailed" xml:space="preserve"><value>Delete failed. Please try again.</value></data>
+  <data name="SA_Schools_CreatedAt"    xml:space="preserve"><value>Created {0}</value></data>
+  <data name="SA_Schools_NoResults"    xml:space="preserve"><value>No results</value></data>
+  <data name="SA_Schools_NoSchools"    xml:space="preserve"><value>No schools yet</value></data>
+  <data name="SA_Schools_NoSearchMatch" xml:space="preserve"><value>No schools match "{0}"</value></data>
+  <data name="SA_Schools_EmptyHint"    xml:space="preserve"><value>Start by adding the first school to the platform</value></data>
+  <data name="SA_Schools_ClearSearch"  xml:space="preserve"><value>Clear search</value></data>
+
+  <!-- Super-admin subscriptions page (page title) -->
+  <data name="SA_Sub_PageTitle"        xml:space="preserve"><value>Subscriptions</value></data>
+
+  <!-- Super-admin settings page -->
+  <data name="SA_Settings_PageTitle"   xml:space="preserve"><value>Settings</value></data>
+  <data name="SA_Settings_Section"     xml:space="preserve"><value>System settings</value></data>
+  <data name="SA_Settings_Version"     xml:space="preserve"><value>Platform version</value></data>
+  <data name="SA_Settings_VersionValue" xml:space="preserve"><value>SmartBus Platform v2.0</value></data>
+  <data name="SA_Settings_ServiceStatus" xml:space="preserve"><value>Service status</value></data>
+  <data name="SA_Settings_ServiceOk"   xml:space="preserve"><value>All systems operational ✓</value></data>
+  <data name="SA_Settings_DefaultCreds" xml:space="preserve"><value>Default credentials</value></data>
+  <data name="SA_Settings_PwdSuccess"  xml:space="preserve"><value>Password updated successfully ✓</value></data>
+  <data name="SA_Settings_PwdFailed"   xml:space="preserve"><value>Failed to change password.</value></data>
+  <data name="SA_Settings_ChangePwdSub" xml:space="preserve"><value>Update super-admin sign-in credentials</value></data>
+
+  <!-- Super-admin login page extras -->
+  <data name="SA_Login_PageTitle"      xml:space="preserve"><value>Super Admin — Sign in</value></data>
+  <data name="SA_Login_Footer"         xml:space="preserve"><value>For authorized super-admins only</value></data>
 
   <!-- Student modal labels -->
   <data name="Std_AddTitle"     xml:space="preserve"><value>Add New Student</value></data>

@@ -1,6 +1,6 @@
 @model SmartBus.Web.Models.SuperAdminLoginViewModel
 @{
-    ViewData["Title"] = "Super Admin — تسجيل الدخول";
+    ViewData["Title"] = L["SA_Login_PageTitle"];
     Layout = null;
     var _isRtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
     var _dir   = _isRtl ? "rtl" : "ltr";
@@ -35,6 +35,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
 
 /* particles */
 .particle{position:fixed;width:3px;height:3px;border-radius:50%;background:rgba(255,215,0,.3);pointer-events:none;z-index:0;animation:float linear infinite;}
+.particle.p1{left:10%;animation-duration:8s;animation-delay:0s;}
+.particle.p2{left:25%;animation-duration:10s;animation-delay:2s;width:4px;height:4px;}
+.particle.p3{left:50%;animation-duration:7s;animation-delay:4s;}
+.particle.p4{left:75%;animation-duration:12s;animation-delay:1s;width:2px;height:2px;}
+.particle.p5{left:88%;animation-duration:9s;animation-delay:3s;}
 @@keyframes float{0%{transform:translateY(100vh) rotate(0deg);opacity:0;}10%{opacity:1;}90%{opacity:.5;}100%{transform:translateY(-100px) rotate(720deg);opacity:0;}}
 
 .login-wrap{position:relative;z-index:1;width:100%;max-width:460px;padding:24px 16px;}
@@ -93,11 +98,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
 <div class="bg-orb o2"></div>
 <div class="bg-orb o3"></div>
 <a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)">@L["SwitchLang"]</a>
-<div class="particle" style="left:10%;animation-duration:8s;animation-delay:0s;"></div>
-<div class="particle" style="left:25%;animation-duration:10s;animation-delay:2s;width:4px;height:4px;"></div>
-<div class="particle" style="left:50%;animation-duration:7s;animation-delay:4s;"></div>
-<div class="particle" style="left:75%;animation-duration:12s;animation-delay:1s;width:2px;height:2px;"></div>
-<div class="particle" style="left:88%;animation-duration:9s;animation-delay:3s;"></div>
+<div class="particle p1"></div>
+<div class="particle p2"></div>
+<div class="particle p3"></div>
+<div class="particle p4"></div>
+<div class="particle p5"></div>
 
 <div class="login-wrap">
   <div class="login-logo">
@@ -127,7 +132,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
       </div>
     }
 
-    <form asp-controller="SuperAdmin" asp-action="Login" method="post" autocomplete="off">
+    <form asp-controller="SuperAdminAccount" asp-action="Login" method="post" autocomplete="off">
       @Html.AntiForgeryToken()
 
       <div class="field">
@@ -165,7 +170,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;displa
   </div>
 
   <div class="login-footer">
-    للمشرفين المعتمدين فقط — <strong>SmartBus</strong> © @DateTime.Now.Year
+    @L["SA_Login_Footer"] — <strong>SmartBus</strong> © @DateTime.Now.Year
   </div>
 </div>
 

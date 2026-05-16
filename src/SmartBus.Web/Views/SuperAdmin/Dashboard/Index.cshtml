@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = L["SA_Dash_PageTitle"];
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+<!-- ══ OVERVIEW PAGE ══ -->
+<div class="page active" id="sa-page-overview">
+
+  <div class="welcome-banner">
+    <div class="wb-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+    <div class="wb-text">
+      <div class="wb-title">@L["SA_Dash_Welcome"]</div>
+      <div class="wb-sub">@L["SA_Dash_Subtitle"]</div>
+    </div>
+    <div class="wb-date" id="sa-date-chip"></div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon bg-purple">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="stat-num" id="stat-total-schools">—</div>
+      <div class="stat-label">@L["SA_Dash_TotalSchools"]</div>
+      <div class="stat-change up" id="stat-active-schools">— @L["SA_Dash_ActiveSuffix"]</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-green">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div class="stat-num" id="stat-premium">—</div>
+      <div class="stat-label">@L["SA_Dash_PremiumSubs"]</div>
+      <div class="stat-change up">@L["SA_Dash_PremiumNote"]</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <div class="stat-num" id="stat-buses">—</div>
+      <div class="stat-label">@L["SA_Dash_TotalBuses"]</div>
+      <div class="stat-change up">@L["SA_Dash_AcrossAll"]</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-orange">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="stat-num" id="stat-admins">—</div>
+      <div class="stat-label">@L["SA_Dash_SchoolAdmins"]</div>
+      <div class="stat-change up">@L["SA_Dash_ActiveAccounts"]</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">@L["SA_Dash_RecentTitle"]</div>
+        <div class="card-sub">@L["SA_Dash_RecentSub"]</div>
+      </div>
+      <a class="btn-primary card-header-link" href="/SuperAdmin/Schools">@L["SA_Dash_ViewAll"]</a>
+    </div>
+    <div class="card-table-wrap">
+      <table class="table">
+        <thead><tr>
+          <th>@L["SA_Schools_Col_School"]</th><th>@L["SA_Schools_Col_City"]</th><th>@L["SA_Schools_Col_Plan"]</th><th>@L["SA_Dash_Col_Buses"]</th><th>@L["SA_Dash_Col_Drivers"]</th><th>@L["SA_Dash_Col_Assistants"]</th><th>@L["SA_Dash_Col_Students"]</th><th>@L["SA_Dash_Col_Status"]</th>
+        </tr></thead>
+        <tbody id="overview-schools-tbody">
+          <tr class="skel-row"><td><div class="skel skel-h-16 skel-w-140"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-60"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-55"></div></td></tr>
+          <tr class="skel-row"><td><div class="skel skel-h-16"></div></td><td><div class="skel skel-w-80"></div></td><td><div class="skel skel-w-55"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-55"></div></td></tr>
+          <tr class="skel-row"><td><div class="skel skel-h-16 skel-w-160"></div></td><td><div class="skel skel-w-90"></div></td><td><div class="skel skel-w-60"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-30"></div></td><td><div class="skel skel-w-55"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script src="~/js/superadmin/dashboard.js" asp-append-version="true"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    try { await SB.translationsReady; } catch {}
+    if (typeof dashboard === 'object') dashboard.load();
+  });
+</script>

@@ -1,5 +1,6 @@
 using MediatR;
 using SmartBus.Application.Common.Models;
+using SmartBus.Domain.Enums;
 
 namespace SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 
@@ -13,5 +14,9 @@ public record SchoolDto(
     string PhoneNumber,
     string AdminEmail,
     string? Notes,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    // Pulled from the school's currently-active Subscription (if any). Null when
+    // no subscription is live so the grid can render "—".
+    DateTime? ActiveSubscriptionActivationDate,
+    SubscriptionType? ActiveSubscriptionType
 );

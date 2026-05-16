@@ -1,0 +1,23 @@
+/* Super-admin base — CSS variables, global reset, scrollbar. */
+:root {
+  --y: #FFD700;  --yl: #FFFDE7; --yd: #B8960C;
+  --bl: #3B82F6; --bll: #EFF6FF; --bld: #1E40AF;
+  --g: #22C55E;  --gl: #F0FDF4; --gd: #15803D;
+  --r: #EF4444;  --rl: #FEF2F2; --rd: #B91C1C;
+  --pu: #8B5CF6; --pul: #F5F3FF; --pud: #6D28D9;
+  --o: #F97316;  --ol: #FFF7ED;
+  --sb: #0F1117; --sb2: #1A1D27; --sb3: #22263A; --sb-border: #2A2F45;
+  --sb-text: #CBD5E1; --sb-text2: #64748B;
+  --bg: #F1F5F9; --card: #FFFFFF;
+  --text: #111827; --text2: #475569; --text3: #9CA3AF;
+  --border: #E5E7EB; --border2: #D1D5DB;
+  --shadow:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.03);
+  --shadow2: 0 4px 16px rgba(0,0,0,.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }

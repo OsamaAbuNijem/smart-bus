@@ -12,284 +12,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>@ViewData["Title"] - SmartBus Super Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --y:#FFD700;--yl:#FFFDE7;--yd:#B8960C;
-  --bl:#3B82F6;--bll:#EFF6FF;--bld:#1E40AF;
-  --g:#22C55E;--gl:#F0FDF4;--gd:#15803D;
-  --r:#EF4444;--rl:#FEF2F2;--rd:#B91C1C;
-  --pu:#8B5CF6;--pul:#F5F3FF;--pud:#6D28D9;
-  --o:#F97316;--ol:#FFF7ED;
-  --sb:#0F1117;--sb2:#1A1D27;--sb3:#22263A;--sb-border:#2A2F45;
-  --sb-text:#CBD5E1;--sb-text2:#64748B;
-  --bg:#F1F5F9;--card:#FFFFFF;
-  --text:#111827;--text2:#475569;--text3:#9CA3AF;
-  --border:#E5E7EB;--border2:#D1D5DB;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.03);
-  --shadow2:0 4px 16px rgba(0,0,0,.08);
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px;}
-
-/* ══ SIDEBAR ══ */
-.sidebar{width:256px;background:var(--sb);min-height:100vh;display:flex;flex-direction:column;flex-shrink:0;position:fixed;right:0;top:0;bottom:0;z-index:100;}
-.sidebar-logo{padding:22px 20px 16px;border-bottom:1px solid var(--sb-border);}
-.logo-mark{display:flex;align-items:center;gap:10px;}
-.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(255,215,0,.3);}
-.logo-name{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.3px;}
-.logo-sub{font-size:10px;color:var(--y);margin-top:1px;font-weight:600;letter-spacing:.05em;}
-.sa-badge{background:linear-gradient(135deg,var(--pu) 0%,#EC4899 100%);border-radius:14px;padding:12px 16px;margin:14px;display:flex;align-items:center;gap:10px;}
-.sa-badge-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.sa-badge-title{font-size:12px;font-weight:700;color:#fff;}
-.sa-badge-sub{font-size:10px;color:rgba(255,255,255,.7);margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 0;overflow-y:auto;}
-.nav-section{font-size:10px;font-weight:700;color:var(--sb-text2);padding:14px 20px 4px;letter-spacing:.08em;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:all .15s;position:relative;}
-.nav-item:hover{background:var(--sb2);}
-.nav-item.active{background:var(--sb2);}
-.nav-item.active::before{content:'';position:absolute;right:0;top:4px;bottom:4px;width:3px;background:var(--y);border-radius:2px 0 0 2px;}
-.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.4;}
-.nav-item.active .nav-icon,.nav-item:hover .nav-icon{opacity:.9;}
-.nav-label{font-size:13px;color:var(--sb-text);font-weight:500;}
-.nav-item.active .nav-label{color:#fff;font-weight:700;}
-.nav-badge-pill{margin-right:auto;background:var(--pu);border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;color:#fff;transition:background .3s;}
-.sidebar-bottom{padding:14px;border-top:1px solid var(--sb-border);}
-.user-row{display:flex;align-items:center;gap:10px;}
-.user-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pu) 0%,#EC4899 100%);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
-.user-name{font-size:12px;font-weight:700;color:#fff;}
-.user-role{font-size:10px;color:var(--sb-text2);margin-top:1px;}
-.logout-btn{width:28px;height:28px;border-radius:8px;background:var(--sb2);border:1px solid var(--sb-border);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-right:auto;transition:background .15s;}
-.logout-btn:hover{background:#EF4444;border-color:#EF4444;}
-
-/* ══ MAIN ══ */
-.main{margin-right:256px;flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin-right .3s;}
-.topbar{background:var(--card);border-bottom:2px solid var(--y);padding:0 24px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow);gap:16px;}
-.topbar-left{display:flex;align-items:center;gap:12px;flex:1;}
-.topbar-title{font-size:17px;font-weight:700;color:var(--text);white-space:nowrap;}
-.tb-search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;min-width:260px;max-width:380px;flex:1;transition:border-color .2s;}
-.tb-search:focus-within{border-color:var(--pu);box-shadow:0 0 0 3px rgba(139,92,246,.1);}
-.tb-search input{border:none;background:transparent;font-size:13px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;width:100%;}
-.tb-search input::placeholder{color:var(--text3);}
-.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.tb-chip{background:linear-gradient(135deg,var(--pu) 0%,#EC4899 100%);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:#fff;}
-.tb-icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
-.tb-icon-btn:hover{background:var(--pul);border-color:var(--pu);}
-.content{padding:24px 28px;flex:1;}
-
-/* ══ PAGE ══ */
-.page{display:none;}
-.page.active{display:block;}
-
-/* ══ STAT CARDS ══ */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-.stat-card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:default;transition:box-shadow .2s,transform .2s;}
-.stat-card:hover{box-shadow:var(--shadow2);transform:translateY(-2px);}
-.stat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
-.stat-num{font-size:30px;font-weight:800;color:var(--text);line-height:1;margin-bottom:4px;}
-.stat-label{font-size:12px;color:var(--text2);}
-.stat-change{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:3px;}
-.stat-change.up{color:var(--gd);}
-.stat-change.neutral{color:var(--text3);}
-
-/* ══ CARD ══ */
-.card{background:var(--card);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
-.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.card-title{font-size:14px;font-weight:700;color:var(--text);}
-.card-sub{font-size:11px;color:var(--text3);margin-top:2px;}
-.card-body{padding:16px 20px;}
-
-/* ══ TABLE ══ */
-.table{width:100%;border-collapse:collapse;}
-.table th{text-align:right;padding:10px 14px;font-size:11px;font-weight:700;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg);letter-spacing:.04em;white-space:nowrap;user-select:none;}
-.table th.sortable{cursor:pointer;}
-.table th.sortable:hover{color:var(--text2);}
-.table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);vertical-align:middle;}
-.table tr:last-child td{border-bottom:none;}
-.table tr:hover td{background:#FAFBFC;}
-.table tr.selected td{background:#F5F3FF;}
-.td-name{font-weight:700;line-height:1.3;}
-.td-sub{font-size:11px;color:var(--text3);margin-top:2px;}
-.table tbody tr{cursor:pointer;}
-
-/* ══ CHECKBOX ══ */
-.cb{width:16px;height:16px;border-radius:4px;accent-color:var(--pu);cursor:pointer;}
-
-/* ══ FILTER BAR ══ */
-.filter-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
-.filter-btn{border:1px solid var(--border);border-radius:9px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;color:var(--text2);background:var(--card);transition:all .15s;white-space:nowrap;}
-.filter-btn:hover{border-color:var(--text2);}
-.filter-btn.active{background:#111;color:#fff;border-color:#111;}
-.add-btn{background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);border-radius:9px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Cairo',sans-serif;color:#111;display:flex;align-items:center;gap:6px;margin-right:auto;box-shadow:0 2px 8px rgba(255,215,0,.3);transition:all .15s;}
-.add-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,215,0,.45);}
-.icon-btn{border:1px solid var(--border);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;color:var(--text2);background:var(--card);display:flex;align-items:center;gap:6px;transition:all .15s;}
-.icon-btn:hover{background:var(--pul);border-color:var(--pu);color:var(--pu);}
-
-/* ══ BULK BAR ══ */
-.bulk-bar{background:linear-gradient(135deg,var(--pu),#EC4899);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;animation:slideDown .2s ease;}
-@@keyframes slideDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
-.bulk-count{font-size:13px;font-weight:700;color:#fff;flex:1;}
-.bulk-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:#fff;cursor:pointer;transition:background .15s;}
-.bulk-btn:hover{background:rgba(255,255,255,.25);}
-.bulk-btn.del{background:rgba(239,68,68,.3);border-color:rgba(239,68,68,.5);}
-.bulk-btn.del:hover{background:rgba(239,68,68,.5);}
-
-/* ══ PLAN BADGES ══ */
-.plan-basic{background:#F1F5F9;color:#475569;}
-.plan-standard{background:#EFF6FF;color:#1E40AF;}
-.plan-premium{background:linear-gradient(135deg,#FFF9E0,#FFFDE7);color:#B8960C;border:1px solid #FFD700;}
-.plan-badge{border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
-
-/* ══ STATUS TOGGLE ══ */
-.st-toggle{width:36px;height:20px;border-radius:10px;position:relative;cursor:pointer;flex-shrink:0;border:none;transition:background .2s;}
-.st-toggle.on{background:var(--g);}
-.st-toggle.off{background:var(--border2);}
-.st-toggle-knob{position:absolute;top:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:right .2s,left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
-.st-toggle.on .st-toggle-knob{right:2px;}
-.st-toggle.off .st-toggle-knob{right:18px;}
-
-/* ══ ACTION BTNS ══ */
-.tbl-actions{display:flex;gap:5px;align-items:center;}
-.tbl-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0;}
-.tbl-btn:hover{transform:scale(1.1);}
-.tbl-view:hover{background:var(--pul);border-color:var(--pu);}
-.tbl-edit:hover{background:var(--bll);border-color:var(--bl);}
-.tbl-del:hover{background:var(--rl);border-color:var(--r);}
-
-/* ══ SKELETON ══ */
-.skel{background:linear-gradient(90deg,#E5E7EB 25%,#F3F4F6 50%,#E5E7EB 75%);background-size:200% 100%;animation:skel-wave 1.4s ease infinite;border-radius:6px;}
-@@keyframes skel-wave{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-.skel-row td{padding:14px 14px!important;}
-
-/* ══ SEARCH HIGHLIGHT ══ */
-mark{background:rgba(255,215,0,.4);border-radius:3px;padding:0 2px;}
-
-/* ══ MODAL ══ */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal-box{background:var(--card);border-radius:20px;width:100%;max-width:580px;margin:16px;box-shadow:0 24px 64px rgba(0,0,0,.2);animation:mopen .2s ease;max-height:90vh;display:flex;flex-direction:column;}
-@@keyframes mopen{from{opacity:0;transform:scale(.96) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
-.modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.modal-header-title{font-size:15px;font-weight:700;color:var(--text);}
-.modal-close-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
-.modal-close-btn:hover{background:var(--rl);}
-.modal-body{padding:22px;overflow-y:auto;flex:1;}
-.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;}
-
-/* Employee QR tokens modal */
-.qr-section{margin-bottom:22px;}
-.qr-section h4{font-size:13px;font-weight:800;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #94A3B8;display:flex;align-items:center;gap:8px;}
-.qr-count{background:#F1F5F9;color:#475569;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;}
-.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
-.qr-card{position:relative;border:1px solid var(--border);border-radius:12px;padding:14px 12px;background:var(--card);text-align:center;}
-.qr-card.is-used{opacity:.65;background:#F8FAFC;}
-.qr-card-head{display:flex;justify-content:flex-end;margin-bottom:6px;}
-.qr-badge{font-size:10px;font-weight:700;border-radius:999px;padding:2px 8px;}
-.qr-badge-fresh{background:#F0FDF4;color:#15803D;}
-.qr-badge-used{background:#FEF2F2;color:#B91C1C;}
-.qr-canvas{display:flex;justify-content:center;}
-.qr-canvas canvas{border-radius:8px;}
-.qr-token{font-size:9px;color:#94A3B8;margin-top:8px;word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace;}
-.qr-used-info{font-size:11px;color:var(--text2);margin-top:8px;line-height:1.4;}
-.qr-used-phone{font-size:10px;color:var(--text3);}
-.tbl-btn.tbl-qr{background:#F5F3FF;}
-.tbl-btn.tbl-qr-students{background:#F0FDF4;}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.form-row.full{grid-template-columns:1fr;}
-.form-group{display:flex;flex-direction:column;gap:5px;}
-.form-label{font-size:12px;font-weight:700;color:var(--text2);}
-.form-control{height:38px;line-height:1.4;box-sizing:border-box;border:1.5px solid var(--border2);border-radius:10px;padding:0 12px;font-size:13px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;background:#fff;}
-textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
-.form-control:focus{border-color:var(--pu);box-shadow:0 0 0 3px rgba(139,92,246,.1);}
-.form-control.err{border-color:var(--r)!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)!important;}
-/* Input-group wrapper with a static prefix (icon or text like "+962"). */
-.form-input-group{display:flex;align-items:stretch;height:38px;box-sizing:border-box;border:1.5px solid var(--border2);border-radius:10px;background:#fff;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
-.form-input-group:focus-within{border-color:var(--pu);box-shadow:0 0 0 3px rgba(139,92,246,.1);}
-.form-input-group.err{border-color:var(--r)!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)!important;}
-.form-input-group > .prefix{display:inline-flex;align-items:center;gap:4px;padding:0 12px;background:#F1F5F9;color:#64748B;font-size:13px;font-weight:700;user-select:none;border-inline-end:1px solid var(--border2);}
-.form-input-group > .prefix svg{color:#94A3B8;}
-.form-input-group > input{flex:1;min-width:0;border:none;outline:none;background:transparent;padding:0 12px;font-size:13px;line-height:1.4;color:var(--text);font-family:'Cairo',sans-serif;}
-.form-err{font-size:11px;color:var(--r);margin-top:3px;display:none;}
-.form-err.show{display:block;}
-
-/* ══ DETAIL DRAWER ══ */
-.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:900;display:none;backdrop-filter:blur(2px);}
-.drawer-overlay.open{display:block;}
-.drawer{position:fixed;left:0;top:0;bottom:0;width:420px;background:var(--card);z-index:901;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:8px 0 40px rgba(0,0,0,.15);display:flex;flex-direction:column;overflow:hidden;}
-.drawer.open{transform:translateX(0);}
-.drawer-head{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:linear-gradient(135deg,var(--sb) 0%,#1E1B4B 100%);}
-.drawer-close{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.drawer-close:hover{background:rgba(239,68,68,.3);border-color:rgba(239,68,68,.4);}
-.drawer-body{flex:1;overflow-y:auto;padding:0;}
-.drawer-section{padding:18px 22px;border-bottom:1px solid var(--border);}
-.drawer-section-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;margin-bottom:12px;}
-.drawer-field{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
-.drawer-field:last-child{margin-bottom:0;}
-.df-icon{width:32px;height:32px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
-.df-label{font-size:11px;color:var(--text3);}
-.df-value{font-size:13px;font-weight:600;color:var(--text);margin-top:1px;}
-.drawer-footer{padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;}
-
-/* ══ BUTTONS ══ */
-.btn-primary{background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);border:none;border-radius:10px;padding:10px 22px;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;color:#111;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;align-items:center;gap:6px;}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(255,215,0,.4);}
-.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-.btn-secondary{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;font-family:'Cairo',sans-serif;color:var(--text2);cursor:pointer;}
-.btn-secondary:hover{background:var(--border);color:var(--text);}
-.btn-danger{background:#EF4444;border:none;border-radius:10px;padding:10px 22px;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;}
-.btn-danger:hover{background:#DC2626;}
-.btn-pu{background:linear-gradient(135deg,var(--pu) 0%,#EC4899 100%);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;}
-.btn-pu:hover{box-shadow:0 4px 14px rgba(139,92,246,.4);}
-
-/* ══ WELCOME BANNER ══ */
-.welcome-banner{background:linear-gradient(135deg,var(--sb) 0%,#1E1B4B 100%);border-radius:18px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden;}
-.welcome-banner::after{content:'';position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:rgba(255,215,0,.06);border-radius:50%;}
-.wb-text{flex:1;}
-.wb-title{font-size:20px;font-weight:800;color:#fff;}
-.wb-sub{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px;}
-.wb-icon{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--y) 0%,#FFA500 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 24px rgba(255,215,0,.4);}
-
-/* ══ PAGER ══ */
-.pager{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--border);}
-.pager-info{font-size:12px;color:var(--text3);flex:1;}
-.pager-btn{border:1px solid var(--border);border-radius:8px;background:var(--card);padding:6px 16px;font-size:12px;font-weight:600;font-family:'Cairo',sans-serif;color:var(--text2);cursor:pointer;transition:all .15s;}
-.pager-btn:disabled{opacity:.35;cursor:not-allowed;}
-.pager-btn:not(:disabled):hover{background:var(--y);color:#111;border-color:var(--y);}
-.pager-num{font-size:12px;font-weight:700;color:var(--text2);padding:0 8px;}
-
-/* ══ EMPTY STATE ══ */
-.empty-state{text-align:center;padding:64px 24px;}
-.empty-icon{width:80px;height:80px;border-radius:24px;background:var(--pul);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
-.empty-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;}
-.empty-sub{font-size:13px;color:var(--text3);line-height:1.6;max-width:320px;margin:0 auto 20px;}
-
-/* ══ MINI CHART BAR ══ */
-.mini-bar-wrap{display:flex;gap:3px;height:32px;align-items:flex-end;}
-.mini-bar{border-radius:3px 3px 0 0;transition:height .4s ease;min-width:10px;}
-
-/* Toast */
-@@keyframes mslide{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.toast{position:fixed;bottom:24px;left:24px;border-radius:12px;padding:12px 18px 12px 14px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;z-index:9999;animation:mslide .2s ease;box-shadow:0 4px 20px rgba(0,0,0,.2);display:flex;align-items:center;gap:10px;max-width:320px;}
-.toast.success{background:#111;color:#fff;}
-.toast.error{background:#EF4444;color:#fff;}
-.toast-icon{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-
-/* ══ LANGUAGE BUTTON ══ */
-.lang-btn{height:32px;min-width:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:var(--text2);cursor:pointer;padding:0 10px;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
-.lang-btn:hover{background:var(--y);border-color:var(--yd);color:#111;}
-
-/* ══ LTR OVERRIDES ══ */
-[dir="ltr"] .sidebar{right:auto;left:0;}
-[dir="ltr"] .main{margin-right:0;margin-left:256px;}
-[dir="ltr"] .nav-item.active::before{right:auto;left:0;border-radius:0 2px 2px 0;}
-[dir="ltr"] .nav-badge-pill{margin-right:unset;margin-left:auto;}
-[dir="ltr"] .add-btn{margin-right:0;margin-left:auto;}
-[dir="ltr"] .table th{text-align:left;}
-[dir="ltr"] .st-toggle.on  .st-toggle-knob{right:auto;left:2px;}
-[dir="ltr"] .st-toggle.off .st-toggle-knob{right:auto;left:18px;}
-[dir="ltr"] .logout-btn{margin-right:0;margin-left:auto;}
-[dir="ltr"] .drawer{left:auto;right:0;transform:translateX(100%);box-shadow:-8px 0 40px rgba(0,0,0,.15);}
-[dir="ltr"] .drawer.open{transform:translateX(0);}
-</style>
+<link rel="stylesheet" href="~/css/superadmin/base.css"       asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/superadmin/layout.css"     asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/superadmin/components.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/superadmin/pages.css"      asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/superadmin/utilities.css"  asp-append-version="true"/>
 </head>
 <body>
 
@@ -330,26 +57,22 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
   }
   <div class="sidebar-nav">
     <div class="nav-section">OVERVIEW</div>
-    <a class="@SaClass(_saOnDashboard)" href="/SuperAdmin/Dashboard" style="text-decoration:none;color:inherit;">
+    <a class="@SaClass(_saOnDashboard)" href="/SuperAdmin/Dashboard">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       <span class="nav-label">@L["Nav_Overview"]</span>
     </a>
     <div class="nav-section">MANAGEMENT</div>
-    <a class="@SaClass(SaOn("Schools"))" href="/SuperAdmin/Schools" style="text-decoration:none;color:inherit;">
+    <a class="@SaClass(SaOn("Schools"))" href="/SuperAdmin/Schools">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="nav-label">@L["Nav_Schools"]</span>
       <span class="nav-badge-pill" id="schools-count-badge">0</span>
     </a>
-    <a class="@SaClass(SaOn("Admins"))" href="/SuperAdmin/Admins" style="text-decoration:none;color:inherit;">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span class="nav-label">@L["Nav_Admins"]</span>
-    </a>
     <div class="nav-section">SYSTEM</div>
-    <a class="@SaClass(SaOn("Subscriptions"))" href="/SuperAdmin/Subscriptions" style="text-decoration:none;color:inherit;">
+    <a class="@SaClass(SaOn("Subscriptions"))" href="/SuperAdmin/Subscriptions">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       <span class="nav-label">@L["Nav_Plans"]</span>
     </a>
-    <a class="@SaClass(SaOn("Settings"))" href="/SuperAdmin/Settings" style="text-decoration:none;color:inherit;">
+    <a class="@SaClass(SaOn("Settings"))" href="/SuperAdmin/Settings">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span class="nav-label">@L["Nav_Settings"]</span>
     </a>
@@ -358,9 +81,9 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
     <div class="user-row">
       <div class="user-av">S</div>
       <div><div class="user-name">Super Admin</div><div class="user-role">superadmin@smartbus.com</div></div>
-      <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+      <form asp-controller="Account" asp-action="Logout" method="post" class="u-m-0">
         @Html.AntiForgeryToken()
-        <button type="submit" class="logout-btn" title="تسجيل الخروج">
+        <button type="submit" class="logout-btn" title="@L["SA_TopBar_Logout"]">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </button>
       </form>
@@ -373,116 +96,79 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
   <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-title" id="sa-page-title">@L["Nav_Overview"]</div>
-      <div class="tb-search" id="topbar-search" style="display:none;">
+      <div class="tb-search u-hidden" id="topbar-search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="schools-search-input" placeholder="@L["SearchShort"]" oninput="onSearchInput(this.value)"/>
-        <button onclick="clearSearch()" id="search-clear" style="display:none;background:none;border:none;cursor:pointer;color:var(--text3);padding:0;">
+        <input type="text" id="schools-search-input" placeholder="@L["SearchShort"]" oninput="if (window.schools) schools.onSearchInput(this.value)"/>
+        <button type="button" onclick="schools.clearSearch()" id="search-clear" class="search-clear-btn">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     </div>
     <div class="topbar-right">
-      <button class="tb-icon-btn" id="btn-export" onclick="exportCSV()" title="تصدير CSV" style="display:none;">
+      <button class="tb-icon-btn u-hidden" id="btn-export" onclick="exportCSV()" title="@L["SA_TopBar_ExportCSV"]">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </button>
       <a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)" title="@L["LangName"]">@L["SwitchLang"]</a>
       <div class="tb-chip">⚡ Super Admin</div>
-      <div id="sa-date-chip" style="font-size:11px;color:var(--text3);"></div>
+      <div id="sa-date-chip" class="tb-date-chip"></div>
     </div>
   </div>
   <div class="content">@RenderBody()</div>
 </div>
 
 <!-- SCHOOL DETAIL DRAWER -->
-<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer-overlay" id="drawer-overlay" onclick="schools.closeDrawer()"></div>
 <div class="drawer" id="school-drawer">
   <div class="drawer-head">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div id="drw-avatar" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--pu),#EC4899);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;"></div>
+    <div class="drawer-head-row">
+      <div id="drw-avatar" class="drawer-avatar"></div>
       <div>
-        <div id="drw-name" style="font-size:15px;font-weight:800;color:#fff;"></div>
-        <div id="drw-city" style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;"></div>
+        <div id="drw-name" class="drawer-name"></div>
+        <div id="drw-city" class="drawer-city"></div>
       </div>
     </div>
-    <button class="drawer-close" onclick="closeDrawer()">
+    <button type="button" class="drawer-close" onclick="schools.closeDrawer()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
   <div class="drawer-body">
-    <!-- Status + Plan row -->
+    <!-- Active subscription summary -->
     <div class="drawer-section">
-      <div style="display:flex;gap:10px;align-items:center;">
-        <span id="drw-plan-badge" class="plan-badge"></span>
-        <span id="drw-status-badge" style="border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;"></span>
-        <div style="margin-right:auto;font-size:11px;color:var(--text3);" id="drw-date"></div>
+      <div class="drawer-plan-row">
+        <span id="drw-plan-badge" class="sub-pill"></span>
+        <div class="drawer-date-row" id="drw-date"></div>
       </div>
     </div>
     <!-- Contact info -->
     <div class="drawer-section">
-      <div class="drawer-section-title">معلومات التواصل</div>
+      <div class="drawer-section-title">@L["SA_Drawer_ContactInfo"]</div>
       <div class="drawer-field">
         <div class="df-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-        <div><div class="df-label">البريد الإلكتروني</div><div class="df-value" id="drw-email"></div></div>
+        <div><div class="df-label">@L["SA_School_Email"]</div><div class="df-value" id="drw-email"></div></div>
       </div>
       <div class="drawer-field">
         <div class="df-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.56 3.59 2 2 0 0 1 3.54 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-        <div><div class="df-label">رقم الهاتف</div><div class="df-value" id="drw-phone"></div></div>
+        <div><div class="df-label">@L["SA_School_Phone"]</div><div class="df-value" id="drw-phone" dir="ltr"></div></div>
       </div>
       <div class="drawer-field">
         <div class="df-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-        <div><div class="df-label">بريد المدير</div><div class="df-value" id="drw-admin"></div></div>
-      </div>
-    </div>
-    <!-- Subscription -->
-    <div class="drawer-section">
-      <div class="drawer-section-title">الاشتراك والحدود</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-          <div style="font-size:24px;font-weight:800;" id="drw-max-buses">—</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">أقصى باصات</div>
-        </div>
-        <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-          <div id="drw-plan-big" style="font-size:14px;font-weight:800;margin-top:4px;"></div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">الخطة الحالية</div>
-        </div>
-        <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-          <div style="font-size:24px;font-weight:800;" id="drw-max-drivers">—</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">أقصى سائقين</div>
-        </div>
-        <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-          <div style="font-size:24px;font-weight:800;" id="drw-max-assistants">—</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">أقصى مساعدين</div>
-        </div>
-        <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;grid-column:1/-1;">
-          <div style="font-size:24px;font-weight:800;" id="drw-max-students">—</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">أقصى طلاب</div>
-        </div>
-      </div>
-    </div>
-    <!-- Quick upgrade plan -->
-    <div class="drawer-section">
-      <div class="drawer-section-title">تغيير الخطة بسرعة</div>
-      <div style="display:flex;gap:8px;">
-        <button class="plan-quick-btn" data-plan="0" onclick="quickChangePlan(0)" style="flex:1;border:1.5px solid var(--border);border-radius:9px;padding:8px 4px;font-size:11px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;background:var(--card);transition:all .15s;">أساسية</button>
-        <button class="plan-quick-btn" data-plan="1" onclick="quickChangePlan(1)" style="flex:1;border:1.5px solid #3B82F6;border-radius:9px;padding:8px 4px;font-size:11px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;background:#EFF6FF;color:#1E40AF;transition:all .15s;">معيارية</button>
-        <button class="plan-quick-btn" data-plan="2" onclick="quickChangePlan(2)" style="flex:1;border:1.5px solid #FFD700;border-radius:9px;padding:8px 4px;font-size:11px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;background:#FFFDE7;color:#B8960C;transition:all .15s;">مميزة ⭐</button>
+        <div><div class="df-label">@L["SA_School_Admin"]</div><div class="df-value" id="drw-admin" dir="ltr"></div></div>
       </div>
     </div>
     <!-- Notes -->
-    <div class="drawer-section" id="drw-notes-section" style="display:none;">
-      <div class="drawer-section-title">ملاحظات</div>
-      <div id="drw-notes" style="font-size:13px;color:var(--text2);line-height:1.6;"></div>
+    <div class="drawer-section u-hidden" id="drw-notes-section">
+      <div class="drawer-section-title">@L["SA_Drawer_Notes"]</div>
+      <div id="drw-notes" class="drawer-notes"></div>
     </div>
   </div>
   <div class="drawer-footer">
-    <button class="btn-pu" onclick="editFromDrawer()">
+    <button type="button" class="btn-pu" onclick="schools.editFromDrawer()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
-      تعديل
+      @L["SA_Common_Edit"]
     </button>
-    <button class="btn-secondary" onclick="toggleStatusFromDrawer()" id="drw-toggle-btn">تعطيل</button>
-    <button class="btn-danger" onclick="deleteFromDrawer()" style="margin-right:auto;">
+    <button type="button" class="btn-danger u-mr-auto" onclick="schools.deleteFromDrawer()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-      حذف
+      @L["SA_Common_Delete"]
     </button>
   </div>
 </div>
@@ -493,11 +179,11 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
      data-title-edit="@L["SA_School_Edit"]">
   <div class="modal-box">
     <div class="modal-header">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:9px;background:var(--pul);display:flex;align-items:center;justify-content:center;">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-purple">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         </div>
-        <div class="modal-header-title" id="school-modal-title">إضافة مدرسة جديدة</div>
+        <div class="modal-header-title" id="school-modal-title">@L["SA_School_Add"]</div>
       </div>
       <button class="modal-close-btn" onclick="closeModal('modal-school')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -568,7 +254,7 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
         <div class="form-group" id="sch-password-group">
           <label class="form-label">@L["SA_School_Password"]</label>
           <input type="text" id="sch-password" class="form-control" placeholder="Admin@123456"/>
-          <span style="font-size:11px;color:var(--text3);margin-top:3px;display:block;">@L["SA_School_Password_Hint"]</span>
+          <span class="form-hint">@L["SA_School_Password_Hint"]</span>
         </div>
       </div>
       @* Subscription section — shown only when creating a school. The initial *@
@@ -576,9 +262,9 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
       @* managed from the subscriptions page (per-school).                      *@
       <div id="sch-subscription-section">
         <div class="form-row full">
-          <div class="form-group" style="margin-top:6px;">
-            <div style="font-size:13px;font-weight:800;color:#475569;">@L["SA_Sub_Section"]</div>
-            <div style="font-size:11px;color:#94A3B8;">@L["SA_Sub_Section_Hint"]</div>
+          <div class="form-group u-mt-6">
+            <div class="sub-section-title">@L["SA_Sub_Section"]</div>
+            <div class="sub-section-hint">@L["SA_Sub_Section_Hint"]</div>
           </div>
         </div>
         <div class="form-row">
@@ -623,12 +309,12 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
       <div class="form-row full">
         <div class="form-group">
           <label class="form-label">@L["SA_School_Notes"]</label>
-          <textarea id="sch-notes" class="form-control" rows="2" placeholder="@L["SA_School_Notes_PH"]" style="resize:vertical;"></textarea>
+          <textarea id="sch-notes" class="form-control form-textarea-vresize" rows="2" placeholder="@L["SA_School_Notes_PH"]"></textarea>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-primary" id="btn-save-school" onclick="saveSchool()">
+      <button type="button" class="btn-primary" id="btn-save-school" onclick="schools.save()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         @L["SA_School_Save"]
       </button>
@@ -641,13 +327,13 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
 <div class="modal-overlay" id="modal-school-qr">
   <div class="modal-box lg">
     <div class="modal-header">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:9px;background:var(--pul);display:flex;align-items:center;justify-content:center;">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-purple">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="17"/><line x1="17" y1="14" x2="21" y2="14"/></svg>
         </div>
         <div>
-          <div class="modal-header-title" id="qr-tokens-title">رموز QR للسائقين والمساعدين</div>
-          <div class="modal-header-sub" id="qr-tokens-sub" style="font-size:12px;color:var(--text3);"></div>
+          <div class="modal-header-title" id="qr-tokens-title">@L["SA_QrEmployees_Title"]</div>
+          <div class="modal-header-sub" id="qr-tokens-sub"></div>
         </div>
       </div>
       <button class="modal-close-btn" onclick="closeModal('modal-school-qr')">
@@ -655,14 +341,14 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
       </button>
     </div>
     <div class="modal-body" id="qr-tokens-body">
-      <div class="u-empty-state" id="qr-tokens-loading">جاري التحميل...</div>
+      <div class="u-empty-state" id="qr-tokens-loading">@L["SA_Common_Loading"]</div>
     </div>
     <div class="modal-footer">
       <button class="btn-primary" id="qr-tokens-print" onclick="printAllQrTokens()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        طباعة الكل
+        @L["SA_Common_PrintAll"]
       </button>
-      <button class="btn-secondary" onclick="closeModal('modal-school-qr')">إغلاق</button>
+      <button class="btn-secondary" onclick="closeModal('modal-school-qr')">@L["SA_Common_Close"]</button>
     </div>
   </div>
 </div>
@@ -671,13 +357,13 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
 <div class="modal-overlay" id="modal-school-students-qr">
   <div class="modal-box lg">
     <div class="modal-header">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:9px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-green">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><rect x="14" y="11" width="7" height="7" rx="1"/></svg>
         </div>
         <div>
-          <div class="modal-header-title" id="qr-students-title">رموز QR للطلاب</div>
-          <div class="modal-header-sub" id="qr-students-sub" style="font-size:12px;color:var(--text3);"></div>
+          <div class="modal-header-title" id="qr-students-title">@L["SA_QrStudents_Title"]</div>
+          <div class="modal-header-sub" id="qr-students-sub"></div>
         </div>
       </div>
       <button class="modal-close-btn" onclick="closeModal('modal-school-students-qr')">
@@ -685,83 +371,83 @@ textarea.form-control{height:auto;min-height:64px;padding:10px 12px;}
       </button>
     </div>
     <div class="modal-body" id="qr-students-body">
-      <div class="u-empty-state" id="qr-students-loading">جاري التحميل...</div>
+      <div class="u-empty-state" id="qr-students-loading">@L["SA_Common_Loading"]</div>
     </div>
     <div class="modal-footer">
       <button class="btn-primary" id="qr-students-print" onclick="printAllStudentQrTokens()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        طباعة الكل
+        @L["SA_Common_PrintAll"]
       </button>
-      <button class="btn-secondary" onclick="closeModal('modal-school-students-qr')">إغلاق</button>
+      <button class="btn-secondary" onclick="closeModal('modal-school-students-qr')">@L["SA_Common_Close"]</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL: DELETE CONFIRM -->
 <div class="modal-overlay" id="modal-delete">
-  <div class="modal-box" style="max-width:400px;">
+  <div class="modal-box modal-box-sm">
     <div class="modal-header">
-      <div class="modal-header-title" style="color:#DC2626;">⚠️ تأكيد الحذف</div>
+      <div class="modal-header-title u-text-danger">@L["SA_Delete_Title"]</div>
       <button class="modal-close-btn" onclick="closeModal('modal-delete')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="modal-body" style="padding:28px 24px;text-align:center;">
-      <div style="width:60px;height:60px;border-radius:50%;background:#FEF2F2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+    <div class="modal-body modal-body-center">
+      <div class="delete-icon-wrap">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
       </div>
-      <div style="font-size:16px;font-weight:800;color:#111;margin-bottom:8px;">هل أنت متأكد تماماً؟</div>
-      <div style="font-size:13px;color:#475569;line-height:1.7;font-family:'Cairo',sans-serif;">
-        سيتم حذف <strong id="del-count-label">المدرسة</strong><br/>
-        "<span id="del-school-name" style="color:#DC2626;font-weight:700;"></span>"<br/>
-        <span style="color:#EF4444;font-size:12px;">هذا الإجراء لا يمكن التراجع عنه.</span>
+      <div class="delete-heading">@L["SA_Delete_Heading"]</div>
+      <div class="delete-body">
+        @L["SA_Delete_WillDelete"] <strong id="del-count-label">@L["SA_Delete_DefaultLabel"]</strong><br/>
+        "<span id="del-school-name" class="delete-target"></span>"<br/>
+        <span class="delete-irrev">@L["SA_Delete_Irreversible"]</span>
       </div>
     </div>
-    <div class="modal-footer" style="justify-content:center;gap:12px;">
-      <button class="btn-danger" id="del-confirm-btn">🗑️ نعم، احذف نهائياً</button>
-      <button class="btn-secondary" onclick="closeModal('modal-delete')">إلغاء</button>
+    <div class="modal-footer modal-footer-center">
+      <button class="btn-danger" id="del-confirm-btn">@L["SA_Delete_Confirm"]</button>
+      <button class="btn-secondary" onclick="closeModal('modal-delete')">@L["SA_Common_Cancel"]</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL: CHANGE PASSWORD -->
 <div class="modal-overlay" id="modal-change-password">
-  <div class="modal-box" style="max-width:420px;">
+  <div class="modal-box modal-box-md">
     <div class="modal-header">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:9px;background:var(--pul);display:flex;align-items:center;justify-content:center;">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-purple">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
-        <div class="modal-header-title">تغيير كلمة المرور</div>
+        <div class="modal-header-title">@L["SA_ChangePwd_Title"]</div>
       </div>
       <button class="modal-close-btn" onclick="closeModal('modal-change-password')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+    <div class="modal-body modal-body-stack">
       <div class="form-group">
-        <label class="form-label">كلمة المرور الحالية</label>
+        <label class="form-label">@L["SA_ChangePwd_Current"]</label>
         <input type="password" id="cp-current" class="form-input" placeholder="••••••••" autocomplete="current-password"/>
-        <span class="form-err" id="err-cp-current">هذا الحقل مطلوب</span>
+        <span class="form-err" id="err-cp-current">@L["SA_ChangePwd_RequiredErr"]</span>
       </div>
       <div class="form-group">
-        <label class="form-label">كلمة المرور الجديدة</label>
-        <input type="password" id="cp-new" class="fform-input" placeholder="8 أحرف على الأقل" autocomplete="new-password"/>
-        <span class="form-err" id="err-cp-new">8 أحرف على الأقل</span>
+        <label class="form-label">@L["SA_ChangePwd_New"]</label>
+        <input type="password" id="cp-new" class="fform-input" placeholder="@L["SA_ChangePwd_NewPH"]" autocomplete="new-password"/>
+        <span class="form-err" id="err-cp-new">@L["SA_ChangePwd_MinLenErr"]</span>
       </div>
       <div class="form-group">
-        <label class="form-label">تأكيد كلمة المرور</label>
+        <label class="form-label">@L["SA_ChangePwd_Confirm"]</label>
         <input type="password" id="cp-confirm" class="form-input" placeholder="••••••••" autocomplete="new-password"/>
-        <span class="form-err" id="err-cp-confirm">كلمتا المرور غير متطابقتين</span>
+        <span class="form-err" id="err-cp-confirm">@L["SA_ChangePwd_MismatchErr"]</span>
       </div>
-      <div id="cp-server-err" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 12px;font-size:12px;color:#DC2626;"></div>
+      <div id="cp-server-err" class="modal-server-err u-hidden"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-primary" id="btn-save-password" onclick="changePassword()">
+      <button type="button" class="btn-primary" id="btn-save-password" onclick="settings.savePassword()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        حفظ كلمة المرور
+        @L["SA_ChangePwd_Save"]
       </button>
-      <button class="btn-secondary" onclick="closeModal('modal-change-password')">إلغاء</button>
+      <button class="btn-secondary" onclick="closeModal('modal-change-password')">@L["SA_Common_Cancel"]</button>
     </div>
   </div>
 </div>
@@ -795,7 +481,8 @@ window.T = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
 }));
 </script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-<script src="~/js/superadmin.js" asp-append-version="true"></script>
+<script src="~/js/superadmin/api.js"   asp-append-version="true"></script>
+<script src="~/js/superadmin/utils.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

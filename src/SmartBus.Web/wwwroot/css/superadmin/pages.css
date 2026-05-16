@@ -1,0 +1,48 @@
+/* Super-admin page-specific styles — dashboard cards, welcome banner,
+   mini bar chart, settings tiles. */
+
+/* ── Welcome banner (dashboard) ───────────────────────────────────── */
+.welcome-banner { background: linear-gradient(135deg, var(--sb) 0%, #1E1B4B 100%); border-radius: 18px; padding: 24px 28px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; position: relative; overflow: hidden; }
+.welcome-banner::after { content: ''; position: absolute; top: -40px; left: -40px; width: 200px; height: 200px; background: rgba(255,215,0,.06); border-radius: 50%; }
+.wb-text { flex: 1; }
+.wb-title { font-size: 20px; font-weight: 800; color: #fff; }
+.wb-sub   { font-size: 13px; color: rgba(255,255,255,.6); margin-top: 4px; }
+.wb-icon  { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, var(--y) 0%, #FFA500 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 8px 24px rgba(255,215,0,.4); }
+.wb-date  { font-size: 12px; color: rgba(255,255,255,.4); flex-shrink: 0; }
+
+/* ── Stat cards (dashboard top row) ──────────────────────────────── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card  { background: var(--card); border-radius: 16px; border: 1px solid var(--border); padding: 18px 20px; box-shadow: var(--shadow); position: relative; overflow: hidden; cursor: default; transition: box-shadow .2s, transform .2s; }
+.stat-card:hover { box-shadow: var(--shadow2); transform: translateY(-2px); }
+.stat-icon  { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.stat-icon.bg-purple { background: var(--pul); }
+.stat-icon.bg-green  { background: var(--gl);  }
+.stat-icon.bg-blue   { background: var(--bll); }
+.stat-icon.bg-orange { background: var(--ol);  }
+.stat-num   { font-size: 30px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: var(--text2); }
+.stat-change { font-size: 11px; margin-top: 6px; display: flex; align-items: center; gap: 3px; }
+.stat-change.up      { color: var(--gd); }
+.stat-change.neutral { color: var(--text3); }
+
+/* ── Mini-bar chart placeholder ──────────────────────────────────── */
+.mini-bar-wrap { display: flex; gap: 3px; height: 32px; align-items: flex-end; }
+.mini-bar      { border-radius: 3px 3px 0 0; transition: height .4s ease; min-width: 10px; }
+
+/* ── Recent-schools card header link ─────────────────────────────── */
+.card-header-link { font-size: 12px; padding: 7px 14px; text-decoration: none; display: inline-block; }
+
+/* ── Settings page tiles ─────────────────────────────────────────── */
+.settings-list  { display: flex; flex-direction: column; gap: 12px; }
+.settings-tile  { background: var(--bg); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.settings-tile.is-clickable { cursor: pointer; transition: background .15s; }
+.settings-tile.is-clickable:hover { background: var(--pul); }
+.settings-tile-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.settings-tile-icon.bg-purple { background: var(--pul); }
+.settings-tile-icon.bg-green  { background: var(--gl); }
+.settings-tile-icon.bg-yellow { background: var(--yl); }
+.settings-tile-body { flex: 1; }
+.settings-tile-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.settings-tile-sub   { font-size: 11px; color: var(--text3); }
+.settings-tile-sub.is-ok { color: var(--gd); }
+.settings-tile-chev  { color: var(--text3); flex-shrink: 0; }

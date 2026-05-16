@@ -89,4 +89,57 @@ public class TranslationsController : Controller
         };
         return Json(payload);
     }
+
+    // GET /api/translations/superadmin — keys consumed by wwwroot/js/superadmin/*.
+    // Keep this dictionary in sync with keys referenced in those modules.
+    [HttpGet("superadmin")]
+    public IActionResult SuperAdmin()
+    {
+        var culture = System.Globalization.CultureInfo.CurrentUICulture;
+        var isRtl   = culture.TextInfo.IsRightToLeft;
+
+        var payload = new Dictionary<string, object>
+        {
+            // Schools page
+            ["saSchoolsLoadFailed"]    = _l["SA_Schools_LoadFailed"].Value,
+            ["saSchoolsCountInfo"]     = _l["SA_Schools_CountInfo"].Value,
+            ["saSchoolsUpdated"]       = _l["SA_Schools_Updated"].Value,
+            ["saSchoolsCreated"]       = _l["SA_Schools_Created"].Value,
+            ["saSchoolsSaveFailed"]    = _l["SA_Schools_SaveFailed"].Value,
+            ["saSchoolsConfirmDelete"] = _l["SA_Schools_ConfirmDelete"].Value,
+            ["saSchoolsDeleted"]       = _l["SA_Schools_Deleted"].Value,
+            ["saSchoolsDeleteFailed"]  = _l["SA_Schools_DeleteFailed"].Value,
+            ["saSchoolsCreatedAt"]     = _l["SA_Schools_CreatedAt"].Value,
+            ["saSchoolsNoResults"]     = _l["SA_Schools_NoResults"].Value,
+            ["saSchoolsNoSchools"]     = _l["SA_Schools_NoSchools"].Value,
+            ["saSchoolsNoSearchMatch"] = _l["SA_Schools_NoSearchMatch"].Value,
+            ["saSchoolsEmptyHint"]     = _l["SA_Schools_EmptyHint"].Value,
+            ["saSchoolsClearSearch"]   = _l["SA_Schools_ClearSearch"].Value,
+            ["saSchoolsAddBtn"]        = _l["SA_Schools_AddBtn"].Value,
+
+            // Dashboard
+            ["saDashEmptyTitle"]       = _l["SA_Dash_EmptyTitle"].Value,
+            ["saDashEmptyHint"]        = _l["SA_Dash_EmptyHint"].Value,
+            ["saDashActiveSuffix"]     = _l["SA_Dash_ActiveSuffix"].Value,
+
+            // Subscription type labels (used both in subscriptions table + schools badge fallback)
+            ["saSubTypeTrial"]         = _l["SA_Sub_Type_Trial"].Value,
+            ["saSubTypeBasic"]         = _l["SA_Sub_Type_Basic"].Value,
+            ["saSubTypeStandard"]     = _l["SA_Sub_Type_Standard"].Value,
+            ["saSubTypePremium"]       = _l["SA_Sub_Type_Premium"].Value,
+
+            // Common
+            ["saEdit"]                 = _l["SA_Common_Edit"].Value,
+            ["saDelete"]               = _l["SA_Common_Delete"].Value,
+            ["saLoading"]              = _l["SA_Common_Loading"].Value,
+
+            // Settings (change password)
+            ["saChangePwdSuccess"]     = _l["SA_Settings_PwdSuccess"].Value,
+            ["saChangePwdFailed"]      = _l["SA_Settings_PwdFailed"].Value,
+
+            ["isRtl"]                  = isRtl,
+            ["dir"]                    = isRtl ? "rtl" : "ltr"
+        };
+        return Json(payload);
+    }
 }
