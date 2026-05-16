@@ -1,3 +1,23 @@
+/* SuperAdmin "log in as" banner — pinned to the very top of the viewport,
+   spans full width, and sits above the sidebar (z 100) + topbar (z 50) so
+   the "exit impersonation" link is always reachable. The companion body
+   class `has-impersonate-banner` (set in _AdminLayout when the session is
+   impersonating) shifts the sidebar + topbar down by --imp-h to make room. */
+:root { --imp-h: 36px; }
+.impersonate-banner { position: fixed; top: 0; inset-inline: 0; height: var(--imp-h); z-index: 200;
+                      display: flex; align-items: center; gap: 10px;
+                      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%); color: #fff;
+                      padding: 0 16px; font-size: 13px; font-weight: 600; }
+.impersonate-banner-icon { font-size: 14px; }
+.impersonate-banner-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.impersonate-banner-exit { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35);
+                            color: #fff; text-decoration: none; padding: 4px 12px; border-radius: 6px;
+                            font-size: 12px; font-weight: 700; }
+.impersonate-banner-exit:hover { background: rgba(255,255,255,.3); }
+body.has-impersonate-banner .sidebar { top: var(--imp-h); }
+body.has-impersonate-banner .topbar  { top: var(--imp-h); }
+body.has-impersonate-banner .main    { padding-top: var(--imp-h); }
+
 /* ══ STAT CARDS ══ */
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
 .stat-card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); padding: 18px 20px; box-shadow: var(--shadow); position: relative; overflow: hidden; }

@@ -99,6 +99,9 @@
 .tbl-view:hover { background: var(--pul); border-color: var(--pu); }
 .tbl-edit:hover { background: var(--bll); border-color: var(--bl); }
 .tbl-del:hover  { background: var(--rl);  border-color: var(--r); }
+/* SuperAdmin row actions: open-admin (purple) + reset-password (yellow). */
+.tbl-imp:hover  { background: var(--pul); border-color: var(--pu); }
+.tbl-pwd:hover  { background: var(--yl);  border-color: var(--yd); }
 
 /* ── Skeleton ─────────────────────────────────────────────────────── */
 .skel { background: linear-gradient(90deg, #E5E7EB 25%, #F3F4F6 50%, #E5E7EB 75%); background-size: 200% 100%; animation: skel-wave 1.4s ease infinite; border-radius: 6px; height: 14px; width: 70%; }
@@ -261,6 +264,31 @@ textarea.form-control { height: auto; min-height: 64px; padding: 10px 12px; }
 .df-label { font-size: 11px; color: var(--text3); }
 .df-value { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 1px; }
 .drawer-footer { padding: 16px 22px; border-top: 1px solid var(--border); display: flex; gap: 10px; flex-shrink: 0; }
+
+/* Prominent "Open admin" CTA — sits between the drawer body and the
+   Edit/Delete footer. The full-width purple→pink gradient + larger
+   padding make it the clear primary action for an SA reviewing a school. */
+.drawer-cta { padding: 14px 22px 0; flex-shrink: 0; }
+.btn-impersonate {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--pu) 0%, #EC4899 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: 'Cairo', sans-serif;
+  color: #fff;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s, filter .15s;
+  box-shadow: 0 6px 18px rgba(139, 92, 246, .35);
+}
+.btn-impersonate:hover  { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(139, 92, 246, .45); filter: brightness(1.05); }
+.btn-impersonate:active { transform: translateY(0); }
 .drawer-head-row { display: flex; align-items: center; gap: 12px; }
 .drawer-avatar { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--pu), #EC4899); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; color: #fff; flex-shrink: 0; }
 .drawer-name { font-size: 16px; font-weight: 800; color: #fff; }

@@ -4,6 +4,7 @@ using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
+using SmartBus.Application.Features.SuperAdmin.Commands.ImpersonateSchoolAdmin;
 using SmartBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
@@ -13,7 +14,7 @@ namespace SmartBus.Web.Services;
 
 public interface IApiClient
 {
-    Task<(string? Token, IEnumerable<string> Roles)> LoginAsync(string email, string password);
+    Task<(string? Token, IEnumerable<string> Roles, bool RateLimited)> LoginAsync(string email, string password);
 
     // Schools
     Task<SchoolDto?> GetMySchoolAsync();
@@ -21,6 +22,13 @@ public interface IApiClient
     // Super-admin dashboard aggregate (schools / buses / drivers / students /
     // active users by role / today's trips by status). Single roundtrip.
     Task<DashboardStatsDto?> GetSuperAdminDashboardStatsAsync();
+
+    /// <summary>
+    /// SuperAdmin operation — mints a JWT for the given school's admin so
+    /// the SA UI can swap into the admin session. Returns null on failure
+    /// so the caller can fall back to a redirect.
+    /// </summary>
+    Task<(ImpersonateResultDto? Data, string? Error)> ImpersonateSchoolAdminAsync(Guid schoolId);
 
     // Drivers
     Task<PagedResult<DriverDto>?> GetDriversAsync(int pageNumber = 1, int pageSize = 10, string? driverType = null);

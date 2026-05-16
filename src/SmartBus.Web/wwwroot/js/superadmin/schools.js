@@ -431,6 +431,12 @@ const schools = {
       <td ${open}>${schools._statusPill(s)}</td>
       <td onclick="event.stopPropagation()">
         <div class="tbl-actions">
+          <button type="button" class="tbl-btn tbl-imp" title="${SB.escHtml(SB.t.saImpersonate || 'Open admin')}" onclick="schools.openAdminDashboard('${s.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          </button>
+          <button type="button" class="tbl-btn tbl-pwd" title="${SB.escHtml(SB.t.saResetPwdTitle || 'Reset admin password')}" onclick="schools.openResetAdminPassword('${s.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B8960C" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </button>
           <button type="button" class="tbl-btn tbl-edit" title="${SB.escHtml(SB.t.saEdit || 'Edit')}" onclick="schools.openEdit('${s.id}')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
           </button>
@@ -566,15 +572,43 @@ const schools = {
     } catch { errEl?.classList.add('show'); }
   },
 
+  // ── Impersonate (open admin dashboard as this school's admin) ───────────
+  /**
+   * Mints an admin JWT server-side via POST /SuperAdmin/Impersonate/{id},
+   * then the 302 in the response navigates the browser to /Dashboard.
+   * Submitted via a programmatic form (real navigation, not fetch) so the
+   * server's redirect handles the page swap natively.
+   */
+  openAdminDashboard(schoolId) {
+    if (!schoolId) return;
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/SuperAdmin/Impersonate/' + encodeURIComponent(schoolId);
+    const csrf = document.querySelector('#sa-csrf-form input[name="__RequestVerificationToken"]')
+              || document.querySelector('input[name="__RequestVerificationToken"]');
+    if (csrf) {
+      const t = document.createElement('input');
+      t.type = 'hidden';
+      t.name = '__RequestVerificationToken';
+      t.value = csrf.value;
+      form.appendChild(t);
+    }
+    document.body.appendChild(form);
+    form.submit();
+  },
+
   // ── Reset school admin password ──────────────────────────────────────────
   /**
-   * Opens the reset-admin-password modal targeting the drawer's current
-   * school. Pre-fills the "target email" subtitle so the SuperAdmin can
-   * see whose password they're about to overwrite.
+   * Opens the reset-admin-password modal targeting the passed school. The
+   * schoolId is parked on schools._resetTargetId so resetAdminPassword can
+   * POST against the right path even after the modal has been open for a
+   * while (no dependency on whatever drawer / row is rendered).
    */
-  openResetAdminPassword() {
-    const s = schools._drawerSchool;
+  _resetTargetId: null,
+  openResetAdminPassword(schoolId) {
+    const s = schools.items.find(x => x.id === schoolId);
     if (!s) return;
+    schools._resetTargetId = s.id;
     SB.setText('rap-target-email', s.adminEmail || '');
     ['rap-new', 'rap-confirm'].forEach(id => {
       const el = document.getElementById(id);
@@ -589,8 +623,8 @@ const schools = {
   },
 
   async resetAdminPassword() {
-    const s = schools._drawerSchool;
-    if (!s) return;
+    const targetId = schools._resetTargetId;
+    if (!targetId) return;
     const newPwd  = document.getElementById('rap-new')?.value     ?? '';
     const confirm = document.getElementById('rap-confirm')?.value ?? '';
 
@@ -608,7 +642,7 @@ const schools = {
     if (btn) btn.disabled = true;
     const srv = document.getElementById('rap-server-err');
     try {
-      const res = await SB.api.post('/schools/' + s.id + '/reset-admin-password',
+      const res = await SB.api.post('/schools/' + targetId + '/reset-admin-password',
         { newPassword: newPwd });
       if (res?.ok) {
         SB.closeModal('modal-reset-admin-password');

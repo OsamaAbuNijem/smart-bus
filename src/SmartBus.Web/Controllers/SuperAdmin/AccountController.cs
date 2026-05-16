@@ -38,7 +38,12 @@ public class SuperAdminAccountController : Controller
     {
         if (!ModelState.IsValid) return View(model);
 
-        var (token, roles) = await _apiClient.LoginAsync(model.Email, model.Password);
+        var (token, roles, rateLimited) = await _apiClient.LoginAsync(model.Email, model.Password);
+        if (rateLimited)
+        {
+            ModelState.AddModelError(string.Empty, "عدد كبير من الطلبات في وقت قصير. يرجى الانتظار دقيقة والمحاولة مجددًا.");
+            return View(model);
+        }
         if (token is null || !roles.Contains("SuperAdmin"))
         {
             ModelState.AddModelError(string.Empty, "بيانات الاعتماد غير صحيحة أو ليس لديك صلاحية المشرف العام.");

@@ -134,6 +134,8 @@ public class TranslationsController : Controller
             ["saEdit"]                 = _l["SA_Common_Edit"].Value,
             ["saDelete"]               = _l["SA_Common_Delete"].Value,
             ["saLoading"]              = _l["SA_Common_Loading"].Value,
+            ["saImpersonate"]          = _l["SA_Schools_Action_Impersonate"].Value,
+            ["saResetPwdTitle"]        = _l["SA_Schools_Action_ResetPwd"].Value,
 
             // School map picker (read by schools.js when clearing the form)
             ["saSchoolMapNoPin"]       = _l["SA_School_Map_NoPin"].Value,

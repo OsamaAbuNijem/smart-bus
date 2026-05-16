@@ -92,5 +92,13 @@
   document.addEventListener('DOMContentLoaded', async () => {
     try { await SB.translationsReady; } catch {}
     if (typeof schools === 'object') schools.load(1);
+@{
+    if (TempData["ImpersonateError"] is string impErr && !string.IsNullOrWhiteSpace(impErr))
+    {
+        <text>
+    SB.ShowMessage(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(impErr)));
+        </text>
+    }
+}
   });
 </script>

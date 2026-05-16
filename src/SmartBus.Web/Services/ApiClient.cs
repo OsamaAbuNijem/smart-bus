@@ -7,6 +7,7 @@ using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
+using SmartBus.Application.Features.SuperAdmin.Commands.ImpersonateSchoolAdmin;
 using SmartBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
@@ -47,16 +48,18 @@ public class ApiClient : IApiClient
         return req;
     }
 
-    public async Task<(string? Token, IEnumerable<string> Roles)> LoginAsync(string email, string password)
+    public async Task<(string? Token, IEnumerable<string> Roles, bool RateLimited)> LoginAsync(string email, string password)
     {
         // Login has no bearer yet — no auth header needed.
         var content = new StringContent(
             JsonSerializer.Serialize(new { email, password }), Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync("api/v1/auth/login", content);
-        if (!response.IsSuccessStatusCode) return (null, []);
+        if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            return (null, [], true);
+        if (!response.IsSuccessStatusCode) return (null, [], false);
         var json = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<LoginResult>(json, _jsonOptions);
-        return (result?.Token, result?.Roles ?? []);
+        return (result?.Token, result?.Roles ?? [], false);
     }
 
     // ── Generic HTTP helpers ───────────────────────────────────────────────
@@ -112,6 +115,20 @@ public class ApiClient : IApiClient
     // ── SuperAdmin dashboard ───────────────────────────────────────────────
     public Task<DashboardStatsDto?> GetSuperAdminDashboardStatsAsync()
         => GetAsync<DashboardStatsDto>("api/v1/superadmin/dashboard");
+
+    public async Task<(ImpersonateResultDto? Data, string? Error)> ImpersonateSchoolAdminAsync(Guid schoolId)
+    {
+        // POST with empty body — schoolId travels in the URL. Returns
+        // (data,null) on success, (null,error-message) on failure so the
+        // caller can show the server's reason verbatim.
+        using var req = AuthorizedRequest(HttpMethod.Post, $"api/v1/superadmin/impersonate/{schoolId}",
+            new StringContent("", Encoding.UTF8, "application/json"));
+        using var response = await _httpClient.SendAsync(req);
+        var body = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+            return (null, ExtractError(body) ?? $"HTTP {(int)response.StatusCode}");
+        return (JsonSerializer.Deserialize<ImpersonateResultDto>(body, _jsonOptions), null);
+    }
 
     // ── Drivers ────────────────────────────────────────────────────────────
     public Task<PagedResult<DriverDto>?> GetDriversAsync(int pageNumber = 1, int pageSize = 10, string? driverType = null)

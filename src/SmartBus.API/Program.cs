@@ -132,23 +132,44 @@ try
                 return RateLimitPartition.GetNoLimiter<string>("unlimited");
             }
 
+            // Per-user partitioning when authenticated, per-IP otherwise.
+            // The Web layer proxies every browser fetch to the API from
+            // localhost, so an IP-only key would collapse all users behind a
+            // single bucket. Once a request carries a JWT the API has
+            // populated ctx.User (UseRateLimiter runs after UseAuthentication),
+            // so we key by NameIdentifier and each user gets their own bucket.
+            // Prefixes prevent a hypothetical "userId looks like an IP" clash.
+            var userId = ctx.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var partitionKey = !string.IsNullOrEmpty(userId)
+                ? $"user:{userId}"
+                : $"ip:{ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
+
             return RateLimitPartition.GetFixedWindowLimiter(
-                partitionKey: ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                partitionKey: partitionKey,
                 factory: _ => new FixedWindowRateLimiterOptions
                 {
-                    PermitLimit = 60,
+                    PermitLimit = 300,
                     Window = TimeSpan.FromMinutes(1),
                     QueueLimit = 0
                 });
         });
-        o.AddPolicy("auth", ctx => RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 10,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            }));
+        // Auth bucket: per (IP, email) so multiple users behind one NAT (or
+        // sharing localhost in dev) don't collide. Brute-force on a single
+        // account still hits this bucket; brute-force across many accounts
+        // is bounded by the global limiter above.
+        o.AddPolicy("auth", ctx =>
+        {
+            var ip = ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var email = SmartBus.API.RateLimitHelpers.PeekLoginEmail(ctx) ?? "anon";
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: $"{ip}|{email}",
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 30,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0
+                });
+        });
     });
 
     // CORS

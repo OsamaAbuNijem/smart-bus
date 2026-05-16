@@ -166,6 +166,8 @@
   <data name="SA_Common_Edit"          xml:space="preserve"><value>Edit</value></data>
   <data name="SA_Common_Delete"        xml:space="preserve"><value>Delete</value></data>
   <data name="SA_Common_Loading"       xml:space="preserve"><value>Loading…</value></data>
+  <data name="SA_Schools_Action_Impersonate" xml:space="preserve"><value>Open admin</value></data>
+  <data name="SA_Schools_Action_ResetPwd"    xml:space="preserve"><value>Reset admin password</value></data>
   <data name="SA_Common_Close"         xml:space="preserve"><value>Close</value></data>
   <data name="SA_Common_Cancel"        xml:space="preserve"><value>Cancel</value></data>
   <data name="SA_Common_PrintAll"      xml:space="preserve"><value>Print all</value></data>
@@ -196,6 +198,10 @@
   <data name="SA_ResetPwd_Save"        xml:space="preserve"><value>Reset password</value></data>
   <data name="SA_ResetPwd_Success"     xml:space="preserve"><value>Admin password reset ✓</value></data>
   <data name="SA_ResetPwd_Failed"      xml:space="preserve"><value>Failed to reset admin password.</value></data>
+  <data name="SA_Impersonate_Title"    xml:space="preserve"><value>Open this school's admin dashboard with SuperAdmin privileges.</value></data>
+  <data name="SA_Impersonate_Button"   xml:space="preserve"><value>Open admin</value></data>
+  <data name="Impersonate_BannerFormat" xml:space="preserve"><value>You are signed in on behalf of {0}.</value></data>
+  <data name="Impersonate_Exit"        xml:space="preserve"><value>Exit impersonation</value></data>
 
   <!-- Super-admin dashboard (overview) -->
   <data name="SA_Dash_PageTitle"       xml:space="preserve"><value>Super-admin dashboard</value></data>

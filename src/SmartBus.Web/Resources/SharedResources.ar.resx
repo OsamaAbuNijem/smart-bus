@@ -166,6 +166,8 @@
   <data name="SA_Common_Edit"          xml:space="preserve"><value>تعديل</value></data>
   <data name="SA_Common_Delete"        xml:space="preserve"><value>حذف</value></data>
   <data name="SA_Common_Loading"       xml:space="preserve"><value>جاري التحميل…</value></data>
+  <data name="SA_Schools_Action_Impersonate" xml:space="preserve"><value>فتح لوحة المدير</value></data>
+  <data name="SA_Schools_Action_ResetPwd"    xml:space="preserve"><value>إعادة تعيين كلمة مرور المدير</value></data>
   <data name="SA_Common_Close"         xml:space="preserve"><value>إغلاق</value></data>
   <data name="SA_Common_Cancel"        xml:space="preserve"><value>إلغاء</value></data>
   <data name="SA_Common_PrintAll"      xml:space="preserve"><value>طباعة الكل</value></data>
@@ -196,6 +198,10 @@
   <data name="SA_ResetPwd_Save"        xml:space="preserve"><value>إعادة تعيين كلمة المرور</value></data>
   <data name="SA_ResetPwd_Success"     xml:space="preserve"><value>تم إعادة تعيين كلمة مرور المدير ✓</value></data>
   <data name="SA_ResetPwd_Failed"      xml:space="preserve"><value>تعذَّر إعادة تعيين كلمة مرور المدير.</value></data>
+  <data name="SA_Impersonate_Title"    xml:space="preserve"><value>افتح لوحة مدير هذه المدرسة بصلاحيات المشرف العام.</value></data>
+  <data name="SA_Impersonate_Button"   xml:space="preserve"><value>فتح كمدير</value></data>
+  <data name="Impersonate_BannerFormat" xml:space="preserve"><value>أنت متصل نيابة عن {0}.</value></data>
+  <data name="Impersonate_Exit"        xml:space="preserve"><value>إنهاء انتحال الهوية</value></data>
 
   <!-- Super-admin dashboard (overview) -->
   <data name="SA_Dash_PageTitle"       xml:space="preserve"><value>لوحة التحكم العامة</value></data>

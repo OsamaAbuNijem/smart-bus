@@ -3,6 +3,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartBus.Application.Features.SuperAdmin.Commands.ImpersonateSchoolAdmin;
 using SmartBus.Application.Features.SuperAdmin.Commands.SendBroadcast;
 using SmartBus.Application.Features.SuperAdmin.Queries.GetBroadcasts;
 using SmartBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
@@ -55,6 +56,21 @@ public class SuperAdminController : ControllerBase
                 SchoolIds:    request.SchoolIds ?? Array.Empty<Guid>(),
                 SentByUserId: senderUserId),
             cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Mint a JWT for a school's admin user (no password required). The
+    /// SuperAdmin's UI swaps this token into its session so it can operate
+    /// the admin dashboard with full privileges; calling Stop swaps the
+    /// SA's original token back.
+    /// </summary>
+    [HttpPost("impersonate/{schoolId:guid}")]
+    public async Task<IActionResult> Impersonate(Guid schoolId, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new ImpersonateSchoolAdminCommand(schoolId), cancellationToken);
         return result.IsSuccess
             ? Ok(result.Data)
             : BadRequest(new { error = result.Error });
