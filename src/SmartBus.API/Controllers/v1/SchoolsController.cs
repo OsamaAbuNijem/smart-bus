@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Schools.Commands.CreateSchool;
 using SmartBus.Application.Features.Schools.Commands.DeleteSchool;
+using SmartBus.Application.Features.Schools.Commands.ResetSchoolAdminPassword;
 using SmartBus.Application.Features.Schools.Commands.UpdateSchool;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Schools.Queries.GetMySchool;
@@ -100,6 +101,23 @@ public class SchoolsController : ControllerBase
         return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
     }
 
+    /// <summary>
+    /// SuperAdmin: force-reset the school admin's password. Resolves the
+    /// admin by the School.AdminEmail recorded on the school row.
+    /// </summary>
+    [HttpPost("{id:guid}/reset-admin-password")]
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> ResetAdminPassword(
+        Guid id,
+        [FromBody] ResetAdminPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new ResetSchoolAdminPasswordCommand(id, request.NewPassword),
+            cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
+    }
+
     /// <summary>SuperAdmin: list every employee-registration QR token for a school.</summary>
     [HttpGet("{id:guid}/employee-qr-tokens")]
     [Authorize(Roles = "SuperAdmin")]
@@ -134,6 +152,8 @@ public record CreateSchoolRequest(string Name, string City, string PhoneNumber,
     double? Longitude   = null,
     string? LogoUrl     = null,
     string AdminPassword = "Admin@123456");
+
+public record ResetAdminPasswordRequest(string NewPassword);
 
 public record UpdateSchoolRequest(string Name, string City, string PhoneNumber,
     string AdminEmail,

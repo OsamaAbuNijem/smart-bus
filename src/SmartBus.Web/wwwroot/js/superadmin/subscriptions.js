@@ -29,6 +29,10 @@ const subscriptions = {
     document.getElementById('sub-save-btn')  ?.addEventListener('click', subscriptions.save);
     document.getElementById('sub-close-btn') ?.addEventListener('click', subscriptions._close);
     document.getElementById('sub-cancel-btn')?.addEventListener('click', subscriptions._close);
+    document.getElementById('sub-pay-add-btn')?.addEventListener('click', subscriptions.addPayment);
+    // Mirror Price → Remaining live so the SuperAdmin sees the projected
+    // balance immediately when editing Price (server confirms on save).
+    document.getElementById('sub-price')?.addEventListener('input', subscriptions._refreshRemainingFromPayments);
     subscriptions._modalReady = true;
   },
 
@@ -129,6 +133,8 @@ const subscriptions = {
     SB.setText('sub-modal-title', modal?.dataset.titleCreate || 'New subscription');
     document.getElementById('sub-id').value = '';
     document.getElementById('sub-target-school').value = subscriptions.schoolId;
+    // Payments section is meaningless before the sub exists — hide it.
+    document.getElementById('sub-payments-section')?.classList.add('u-hidden');
     const today = new Date();
     const inOneYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
     const iso = d => d.toISOString().slice(0, 10);
@@ -151,6 +157,10 @@ const subscriptions = {
     SB.setText('sub-modal-title', modal?.dataset.titleEdit || 'Edit subscription');
     document.getElementById('sub-id').value = s.id;
     document.getElementById('sub-target-school').value = s.schoolId;
+    // Reveal + load the payments panel for this sub.
+    document.getElementById('sub-payments-section')?.classList.remove('u-hidden');
+    subscriptions._resetPaymentForm();
+    subscriptions._loadPayments(s.id);
     document.getElementById('sub-activation').value   = (s.activationDate || '').slice(0, 10);
     document.getElementById('sub-expiration').value   = (s.expirationDate || '').slice(0, 10);
     document.getElementById('sub-type').value         = String(subscriptions._typeToNum(s.subscriptionType));
@@ -308,6 +318,196 @@ const subscriptions = {
       statusFuture:  d.statusFuture  || 'Future',
       statusOff:     d.statusOff     || 'Disabled',
       types: [d.type0 || 'Trial', d.type1 || 'Basic', d.type2 || 'Standard', d.type3 || 'Premium'],
+      payMethods: [
+        d.payMethodCash     || 'Cash',
+        d.payMethodTransfer || 'Transfer',
+        d.payMethodCheque   || 'Cheque',
+      ],
+      payEmpty:      d.payEmpty      || 'No payments recorded yet.',
+      payLoadFailed: d.payLoadFailed || 'Failed to load payments.',
+      payFullyPaid:        d.payFullyPaid        || 'Subscription is fully paid — no further payments accepted.',
+      payExceedsRemaining: d.payExceedsRemaining || 'Payment exceeds the remaining amount ({0}).',
     };
+  },
+
+  // ── Subscription payments ────────────────────────────────────────────────
+  /**
+   * Defaults the date input to today and clears the rest of the inline form.
+   */
+  _resetPaymentForm() {
+    const today = new Date().toISOString().slice(0, 10);
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+    setVal('sub-pay-date',   today);
+    setVal('sub-pay-amount', '');
+    setVal('sub-pay-method', '0');
+    document.getElementById('sub-pay-error')?.classList.add('u-hidden');
+  },
+
+  async _loadPayments(subId) {
+    const tbody = document.getElementById('sub-pay-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = `<tr><td colspan="3" class="td-empty">${SB.escHtml(SB.t.saLoading || 'Loading…')}</td></tr>`;
+    const rows = await SB.api.get('/subscriptions/' + subId + '/payments');
+    subscriptions._renderPayments(rows);
+    // Re-derive Remaining + PaymentStatus from the now-rendered rows so
+    // the readonly fields match the server's view.
+    subscriptions._refreshRemainingFromPayments();
+  },
+
+  _renderPayments(rows) {
+    const t = subscriptions._strings;
+    const tbody = document.getElementById('sub-pay-tbody');
+    if (!tbody) return;
+    if (!Array.isArray(rows)) {
+      tbody.innerHTML = `<tr><td colspan="3" class="td-empty u-text-danger">${SB.escHtml(t.payLoadFailed)}</td></tr>`;
+      return;
+    }
+    if (rows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" class="td-empty">${SB.escHtml(t.payEmpty)}</td></tr>`;
+      return;
+    }
+    const money = v => Number.isFinite(Number(v)) ? Number(v).toFixed(2) : '—';
+    const methodToNum = m => {
+      if (typeof m === 'number') return m;
+      const s = String(m);
+      if (s === 'Transfer') return 1;
+      if (s === 'Cheque')   return 2;
+      return 0;  // Cash / unknown
+    };
+    const methodLabel = m => t.payMethods[methodToNum(m)] ?? String(m);
+    tbody.innerHTML = rows.map(p => `
+      <tr>
+        <td>${SB.escHtml(SB.formatDate(p.paymentDate))}</td>
+        <td>${SB.escHtml(money(p.amount))}</td>
+        <td>${SB.escHtml(methodLabel(p.method))}</td>
+      </tr>`).join('');
+  },
+
+  async addPayment() {
+    const subId  = document.getElementById('sub-id').value;
+    if (!subId) return;
+    const dateIso = document.getElementById('sub-pay-date').value;
+    const amount  = parseFloat(document.getElementById('sub-pay-amount').value);
+    const method  = parseInt(document.getElementById('sub-pay-method').value, 10) || 0;
+    const errEl   = document.getElementById('sub-pay-error');
+    const showErr = msg => { if (errEl) { errEl.textContent = msg; errEl.classList.remove('u-hidden'); } };
+
+    if (!dateIso || !Number.isFinite(amount) || amount <= 0) {
+      showErr(subscriptions._strings.requiredErr);
+      return;
+    }
+    // Mirror the server-side guard so the SuperAdmin gets immediate feedback.
+    const remaining = subscriptions._currentRemaining();
+    if (remaining <= 0) {
+      showErr(subscriptions._strings.payFullyPaid);
+      return;
+    }
+    if (amount > remaining) {
+      const tmpl = subscriptions._strings.payExceedsRemaining;
+      showErr(tmpl.replace('{0}', remaining.toFixed(2)));
+      return;
+    }
+    errEl?.classList.add('u-hidden');
+
+    const btn = document.getElementById('sub-pay-add-btn');
+    if (btn) btn.disabled = true;
+    try {
+      const res = await SB.api.post('/subscriptions/' + subId + '/payments', {
+        paymentDate: new Date(dateIso + 'T00:00:00Z').toISOString(),
+        amount,
+        method
+      });
+      if (!res?.ok) {
+        if (errEl) {
+          errEl.textContent = res?.data?.error || ('HTTP ' + res?.status);
+          errEl.classList.remove('u-hidden');
+        }
+        return;
+      }
+      subscriptions._resetPaymentForm();
+      await subscriptions._loadPayments(subId);
+      // The server just recomputed RemainingAmount = Price − Σ payments.
+      // Mirror that on the (readonly) Remaining input so the SuperAdmin
+      // sees the new balance without closing+reopening the modal.
+      subscriptions._refreshRemainingFromPayments();
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  },
+
+  /**
+   * Recomputes the sub modal's Remaining input AND the disabled Paid
+   * select from the loaded payments + the Price input. Also toggles the
+   * add-payment row off when the sub is fully paid. Mirrors the server
+   * rule so the form preview matches what'll be persisted.
+   */
+  _refreshRemainingFromPayments() {
+    const priceEl  = document.getElementById('sub-price');
+    const remainEl = document.getElementById('sub-remaining');
+    const paidEl   = document.getElementById('sub-paid');
+    if (!priceEl || !remainEl) return;
+    const price = parseFloat(priceEl.value) || 0;
+    const paid  = subscriptions._sumPaidFromRows();
+    const remaining = price - paid;
+    remainEl.value = remaining.toFixed(2);
+    if (paidEl) paidEl.value = String(subscriptions._deriveStatus(price, paid));
+    subscriptions._togglePaymentForm(remaining);
+  },
+
+  /** Σ amounts from the payments table — empty-state row ignored. */
+  _sumPaidFromRows() {
+    let paid = 0;
+    document.querySelectorAll('#sub-pay-tbody tr').forEach(tr => {
+      // 2nd <td> = amount; the empty-state row only has 1 cell (colspan=3)
+      // so it naturally produces NaN and is ignored.
+      const n = parseFloat(tr.children?.[1]?.textContent);
+      if (Number.isFinite(n)) paid += n;
+    });
+    return paid;
+  },
+
+  _currentRemaining() {
+    const price = parseFloat(document.getElementById('sub-price')?.value) || 0;
+    return price - subscriptions._sumPaidFromRows();
+  },
+
+  /**
+   * Hide the inline add-payment row and stick a "fully paid" notice in
+   * the error banner when remaining ≤ 0. Re-enables itself the moment
+   * Price is bumped back up (input event re-runs the refresh).
+   */
+  _togglePaymentForm(remaining) {
+    const addBtn = document.getElementById('sub-pay-add-btn');
+    const amount = document.getElementById('sub-pay-amount');
+    const date   = document.getElementById('sub-pay-date');
+    const method = document.getElementById('sub-pay-method');
+    const errEl  = document.getElementById('sub-pay-error');
+    const fullyPaid = remaining <= 0;
+    [addBtn, amount, date, method].forEach(el => { if (el) el.disabled = fullyPaid; });
+    if (errEl) {
+      if (fullyPaid) {
+        errEl.textContent = subscriptions._strings.payFullyPaid;
+        errEl.classList.remove('u-hidden');
+      } else if (errEl.textContent === subscriptions._strings.payFullyPaid) {
+        // Only clear the banner if it was carrying our own "fully paid"
+        // message — leave validation errors alone.
+        errEl.classList.add('u-hidden');
+        errEl.textContent = '';
+      }
+    }
+  },
+
+  /**
+   * 3-state PaymentStatus derived from price + total paid. Mirrors the
+   * server's <c>DerivePaymentStatus</c> exactly so the disabled select
+   * preview can't drift from what gets persisted.
+   *   * 0 (Unpaid)  — nothing collected
+   *   * 1 (Partial) — some collected but less than the price
+   *   * 2 (Paid)    — collected meets or exceeds the price
+   */
+  _deriveStatus(price, paid) {
+    if (paid <= 0)                 return 0;
+    if (price > 0 && paid >= price) return 2;
+    return 1;
   }
 };

@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
+using SmartBus.Application.Features.Subscriptions.Commands.CreateSubscriptionPayment;
 
 namespace SmartBus.Application.Features.Subscriptions.Commands.UpdateSubscription;
 
@@ -39,9 +40,17 @@ public class UpdateSubscriptionCommandHandler : IRequestHandler<UpdateSubscripti
         subscription.ActivationDate   = request.ActivationDate;
         subscription.ExpirationDate   = request.ExpirationDate;
         subscription.IsActive         = request.IsActive;
-        subscription.Price            = request.Price;
-        subscription.PaymentStatus    = request.PaymentStatus;
-        subscription.RemainingAmount  = request.RemainingAmount;
+        subscription.Price = request.Price;
+
+        // RemainingAmount + PaymentStatus are server-derived from the
+        // payments log so the client's values are ignored. A price edit
+        // immediately re-balances both fields.
+        var paidSoFar = await _context.SubscriptionPayments
+            .Where(p => p.SubscriptionId == subscription.Id && !p.IsDeleted)
+            .SumAsync(p => (decimal?)p.Amount, cancellationToken) ?? 0m;
+        subscription.RemainingAmount = request.Price - paidSoFar;
+        subscription.PaymentStatus   = CreateSubscriptionPaymentCommandHandler
+            .DerivePaymentStatus(request.Price, paidSoFar);
 
         await _context.SaveChangesAsync(cancellationToken);
         return Result.Success();

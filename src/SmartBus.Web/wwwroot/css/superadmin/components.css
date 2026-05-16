@@ -231,6 +231,15 @@ textarea.form-control { height: auto; min-height: 64px; padding: 10px 12px; }
 .form-input-group > .prefix    { display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; background: #F1F5F9; color: #64748B; font-size: 13px; font-weight: 700; user-select: none; border-inline-end: 1px solid var(--border2); }
 .form-input-group > .prefix svg { color: #94A3B8; }
 .form-input-group > .suffix    { display: inline-flex; align-items: center; padding: 0 12px; background: #F1F5F9; color: #64748B; font-size: 13px; font-weight: 700; user-select: none; border-inline-start: 1px solid var(--border2); }
+/* Readonly state — used by the auto-computed Remaining field. Muted
+   background + greyed text so the SuperAdmin doesn't try to edit it. */
+.form-input-group.is-readonly                { background: var(--bg); cursor: not-allowed; }
+.form-input-group.is-readonly:focus-within   { border-color: var(--border2); box-shadow: none; }
+.form-input-group.is-readonly > input        { color: var(--text2); cursor: not-allowed; }
+.form-input-group.is-readonly > input:focus  { outline: none; }
+/* Same muted treatment for selects (auto-derived PaymentStatus). */
+.form-control.is-readonly,
+.form-control:disabled { background: var(--bg); color: var(--text2); cursor: not-allowed; }
 .form-input-group > input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; padding: 0 12px; font-size: 13px; line-height: 1.4; color: var(--text); font-family: 'Cairo', sans-serif; }
 .form-err { font-size: 11px; color: var(--r); margin-top: 3px; display: none; }
 .form-err.show { display: block; }

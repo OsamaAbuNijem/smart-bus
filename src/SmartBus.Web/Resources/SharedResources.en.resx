@@ -24,6 +24,7 @@
   <data name="Nav_Schools"    xml:space="preserve"><value>Schools</value></data>
   <data name="Nav_Admins"     xml:space="preserve"><value>Admins</value></data>
   <data name="Nav_Plans"      xml:space="preserve"><value>Subscription Plans</value></data>
+  <data name="Nav_Notifications" xml:space="preserve"><value>Notifications</value></data>
   <data name="SA_Badge_Title" xml:space="preserve"><value>Super Admin</value></data>
   <data name="SA_Badge_Sub"   xml:space="preserve"><value>Full platform access</value></data>
 
@@ -114,8 +115,23 @@
   <data name="SA_Sub_Paid"           xml:space="preserve"><value>Payment status</value></data>
   <data name="SA_Sub_Paid_Yes"       xml:space="preserve"><value>Paid</value></data>
   <data name="SA_Sub_Paid_Partial"   xml:space="preserve"><value>Paid partially</value></data>
+  <data name="SA_Sub_Payments_Title"      xml:space="preserve"><value>Payments</value></data>
+  <data name="SA_Sub_Payments_Hint"       xml:space="preserve"><value>Record each instalment as the school pays. The list below shows every payment captured for this subscription.</value></data>
+  <data name="SA_Sub_Payments_Date"       xml:space="preserve"><value>Payment date</value></data>
+  <data name="SA_Sub_Payments_Amount"     xml:space="preserve"><value>Amount</value></data>
+  <data name="SA_Sub_Payments_Method"     xml:space="preserve"><value>Payment method</value></data>
+  <data name="SA_Sub_Payments_Add"        xml:space="preserve"><value>Add payment</value></data>
+  <data name="SA_Sub_Payments_Empty"      xml:space="preserve"><value>No payments recorded yet.</value></data>
+  <data name="SA_Sub_Payments_LoadFailed" xml:space="preserve"><value>Failed to load payments.</value></data>
+  <data name="SA_Sub_Payments_FullyPaid"  xml:space="preserve"><value>Subscription is fully paid — no further payments accepted.</value></data>
+  <data name="SA_Sub_Payments_Exceeds"    xml:space="preserve"><value>Payment exceeds the remaining amount ({0}).</value></data>
+  <data name="SA_Pay_Method_Cash"         xml:space="preserve"><value>Cash</value></data>
+  <data name="SA_Pay_Method_Transfer"     xml:space="preserve"><value>Bank transfer</value></data>
+  <data name="SA_Pay_Method_Cheque"       xml:space="preserve"><value>Cheque</value></data>
+  <data name="SA_Sub_Paid_AutoHint"       xml:space="preserve"><value>Auto-derived from the total of recorded payments versus the price.</value></data>
   <data name="SA_Sub_Paid_No"        xml:space="preserve"><value>Unpaid</value></data>
   <data name="SA_Sub_Remaining"      xml:space="preserve"><value>Remaining amount</value></data>
+  <data name="SA_Sub_Remaining_AutoHint" xml:space="preserve"><value>Auto-computed from price minus the sum of recorded payments.</value></data>
 
   <!-- Super-admin subscriptions page (per school) -->
   <data name="SA_Sub_Page_Title"          xml:space="preserve"><value>Subscriptions</value></data>
@@ -170,6 +186,16 @@
   <data name="SA_ChangePwd_MinLenErr"  xml:space="preserve"><value>At least 8 characters</value></data>
   <data name="SA_ChangePwd_MismatchErr" xml:space="preserve"><value>Passwords do not match</value></data>
   <data name="SA_ChangePwd_Save"       xml:space="preserve"><value>Save password</value></data>
+  <data name="SA_ResetPwd_Title"       xml:space="preserve"><value>Reset admin password</value></data>
+  <data name="SA_ResetPwd_Button"      xml:space="preserve"><value>Reset password</value></data>
+  <data name="SA_ResetPwd_New"         xml:space="preserve"><value>New password</value></data>
+  <data name="SA_ResetPwd_NewPH"       xml:space="preserve"><value>At least 8 characters</value></data>
+  <data name="SA_ResetPwd_Confirm"     xml:space="preserve"><value>Confirm new password</value></data>
+  <data name="SA_ResetPwd_MinLenErr"   xml:space="preserve"><value>Password must be at least 8 characters.</value></data>
+  <data name="SA_ResetPwd_MismatchErr" xml:space="preserve"><value>Passwords don't match.</value></data>
+  <data name="SA_ResetPwd_Save"        xml:space="preserve"><value>Reset password</value></data>
+  <data name="SA_ResetPwd_Success"     xml:space="preserve"><value>Admin password reset ✓</value></data>
+  <data name="SA_ResetPwd_Failed"      xml:space="preserve"><value>Failed to reset admin password.</value></data>
 
   <!-- Super-admin dashboard (overview) -->
   <data name="SA_Dash_PageTitle"       xml:space="preserve"><value>Super-admin dashboard</value></data>
@@ -249,6 +275,35 @@
 
   <!-- Super-admin settings page -->
   <data name="SA_Settings_PageTitle"   xml:space="preserve"><value>Settings</value></data>
+
+  <!-- SuperAdmin notifications tab -->
+  <data name="SA_Notifs_PageTitle"           xml:space="preserve"><value>Notifications</value></data>
+  <data name="SA_Notifs_ComposerTitle"       xml:space="preserve"><value>Send a push notification</value></data>
+  <data name="SA_Notifs_ComposerSub"         xml:space="preserve"><value>Compose a broadcast and pick its audience.</value></data>
+  <data name="SA_Notifs_Title"               xml:space="preserve"><value>Title</value></data>
+  <data name="SA_Notifs_Title_PH"            xml:space="preserve"><value>e.g. Scheduled maintenance tonight</value></data>
+  <data name="SA_Notifs_Title_Required"      xml:space="preserve"><value>Title is required</value></data>
+  <data name="SA_Notifs_Message"             xml:space="preserve"><value>Message</value></data>
+  <data name="SA_Notifs_Message_PH"          xml:space="preserve"><value>Body of the push notification</value></data>
+  <data name="SA_Notifs_Message_Required"    xml:space="preserve"><value>Message is required</value></data>
+  <data name="SA_Notifs_Target"              xml:space="preserve"><value>Audience</value></data>
+  <data name="SA_Notifs_Target_All"          xml:space="preserve"><value>All users</value></data>
+  <data name="SA_Notifs_Target_SchoolUsers"  xml:space="preserve"><value>Selected schools' users</value></data>
+  <data name="SA_Notifs_Target_Admins"       xml:space="preserve"><value>School admins</value></data>
+  <data name="SA_Notifs_Schools"             xml:space="preserve"><value>Schools</value></data>
+  <data name="SA_Notifs_Schools_Hint"        xml:space="preserve"><value>Hold Cmd / Ctrl to pick multiple. Leave empty for "all" when targeting admins.</value></data>
+  <data name="SA_Notifs_PickSchools"         xml:space="preserve"><value>Pick at least one school.</value></data>
+  <data name="SA_Notifs_Send"                xml:space="preserve"><value>Send broadcast</value></data>
+  <data name="SA_Notifs_SentFormat"          xml:space="preserve"><value>Sent to {0} users · {1} devices</value></data>
+  <data name="SA_Notifs_HistoryTitle"        xml:space="preserve"><value>Broadcast history</value></data>
+  <data name="SA_Notifs_HistorySub"          xml:space="preserve"><value>Most recent platform-wide pushes (newest first).</value></data>
+  <data name="SA_Notifs_HistoryEmpty"        xml:space="preserve"><value>No broadcasts sent yet.</value></data>
+  <data name="SA_Notifs_LoadFailed"          xml:space="preserve"><value>Failed to load broadcast history.</value></data>
+  <data name="SA_Notifs_Col_Date"            xml:space="preserve"><value>Date</value></data>
+  <data name="SA_Notifs_Col_Title"           xml:space="preserve"><value>Title</value></data>
+  <data name="SA_Notifs_Col_Target"          xml:space="preserve"><value>Audience</value></data>
+  <data name="SA_Notifs_Col_Recipients"      xml:space="preserve"><value>Recipients</value></data>
+  <data name="SA_Notifs_Col_Delivered"       xml:space="preserve"><value>Delivered</value></data>
   <data name="SA_Settings_Section"     xml:space="preserve"><value>System settings</value></data>
   <data name="SA_Settings_Version"     xml:space="preserve"><value>Platform version</value></data>
   <data name="SA_Settings_VersionValue" xml:space="preserve"><value>SmartBus Platform v2.0</value></data>

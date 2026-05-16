@@ -73,6 +73,26 @@ public class UserStoreService : IUserStore
         return (true, null);
     }
 
+    public async Task<(bool Succeeded, string? Error)> ResetPasswordByEmailAsync(
+        string email, string newPassword,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user is null)
+            return (false, "User not found for that email.");
+
+        // Drop the existing hash then add the new one. AddPasswordAsync
+        // runs the configured PasswordValidator pipeline, so weak passwords
+        // are rejected with a descriptive error.
+        var remove = await _userManager.RemovePasswordAsync(user);
+        if (!remove.Succeeded)
+            return (false, string.Join(" ", remove.Errors.Select(e => e.Description)));
+        var add = await _userManager.AddPasswordAsync(user, newPassword);
+        if (!add.Succeeded)
+            return (false, string.Join(" ", add.Errors.Select(e => e.Description)));
+        return (true, null);
+    }
+
     public async Task<int> CountActiveUsersByRoleAsync(
         string role, TimeSpan window,
         CancellationToken cancellationToken = default)
@@ -88,5 +108,15 @@ public class UserStoreService : IUserStore
         var users     = await _userManager.GetUsersInRoleAsync(role);
         var threshold = DateTime.UtcNow - window;
         return users.Count(u => u.LastSeenAt is { } seen && seen >= threshold);
+    }
+
+    public async Task<IReadOnlyList<string>> GetUserIdsInRoleAsync(
+        string role,
+        CancellationToken cancellationToken = default)
+    {
+        var roleEntity = await _roleManager.FindByNameAsync(role);
+        if (roleEntity is null) return Array.Empty<string>();
+        var users = await _userManager.GetUsersInRoleAsync(role);
+        return users.Select(u => u.Id).ToList();
     }
 }

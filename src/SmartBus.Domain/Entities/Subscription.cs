@@ -36,4 +36,12 @@ public class Subscription : BaseEntity
     public SubscriptionType SubscriptionType { get; set; } = SubscriptionType.Trial;
 
     public ICollection<SubscriptionStudent> StudentLinks { get; set; } = new List<SubscriptionStudent>();
+
+    /// <summary>
+    /// Payment instalments recorded against this subscription. The
+    /// SuperAdmin logs each one (cash or transfer) so the platform has a
+    /// receipts trail; RemainingAmount / PaymentStatus remain the
+    /// SuperAdmin's call rather than auto-derived from this collection.
+    /// </summary>
+    public ICollection<SubscriptionPayment> Payments { get; set; } = new List<SubscriptionPayment>();
 }

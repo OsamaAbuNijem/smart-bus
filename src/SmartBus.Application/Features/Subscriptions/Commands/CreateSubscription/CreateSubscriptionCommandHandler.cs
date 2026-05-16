@@ -42,8 +42,11 @@ public class CreateSubscriptionCommandHandler : IRequestHandler<CreateSubscripti
             ExpirationDate   = request.ExpirationDate,
             IsActive         = request.IsActive,
             Price            = request.Price,
-            PaymentStatus    = request.PaymentStatus,
-            RemainingAmount  = request.RemainingAmount
+            // Brand-new sub has no payments yet — both PaymentStatus and
+            // RemainingAmount are derived from the payments log, so the
+            // client's values are ignored here.
+            PaymentStatus    = Domain.Enums.PaymentStatus.Unpaid,
+            RemainingAmount  = request.Price
         };
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync(cancellationToken);

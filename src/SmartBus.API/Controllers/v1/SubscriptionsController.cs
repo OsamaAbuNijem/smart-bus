@@ -3,8 +3,10 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBus.Application.Features.Subscriptions.Commands.CreateSubscription;
+using SmartBus.Application.Features.Subscriptions.Commands.CreateSubscriptionPayment;
 using SmartBus.Application.Features.Subscriptions.Commands.UpdateSubscription;
 using SmartBus.Application.Features.Subscriptions.Queries.GetSchoolSubscriptions;
+using SmartBus.Application.Features.Subscriptions.Queries.GetSubscriptionPayments;
 using SmartBus.Domain.Enums;
 
 namespace SmartBus.API.Controllers.v1;
@@ -65,6 +67,30 @@ public class SubscriptionsController : ControllerBase
             ? NoContent()
             : BadRequest(new { error = result.Error });
     }
+
+    /// <summary>List every payment instalment recorded against a subscription, newest first.</summary>
+    [HttpGet("subscriptions/{id:guid}/payments")]
+    public async Task<IActionResult> ListPayments(Guid id, CancellationToken cancellationToken)
+        => Ok(await _mediator.Send(new GetSubscriptionPaymentsQuery(id), cancellationToken));
+
+    /// <summary>Record a single payment instalment (cash or transfer) against a subscription.</summary>
+    [HttpPost("subscriptions/{id:guid}/payments")]
+    public async Task<IActionResult> CreatePayment(
+        Guid id,
+        [FromBody] SubscriptionPaymentRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new CreateSubscriptionPaymentCommand(
+                SubscriptionId: id,
+                PaymentDate:    request.PaymentDate,
+                Amount:         request.Amount,
+                Method:         request.Method),
+            cancellationToken);
+        return result.IsSuccess
+            ? Ok(new { id = result.Data })
+            : BadRequest(new { error = result.Error });
+    }
 }
 
 public record SubscriptionRequest(
@@ -77,3 +103,8 @@ public record SubscriptionRequest(
     decimal Price,
     PaymentStatus PaymentStatus,
     decimal RemainingAmount);
+
+public record SubscriptionPaymentRequest(
+    DateTime      PaymentDate,
+    decimal       Amount,
+    PaymentMethod Method);

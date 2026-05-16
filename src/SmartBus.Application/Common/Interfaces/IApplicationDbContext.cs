@@ -25,6 +25,8 @@ public interface IApplicationDbContext
     DbSet<School> Schools { get; }
     DbSet<Subscription> Subscriptions { get; }
     DbSet<SubscriptionStudent> SubscriptionStudents { get; }
+    DbSet<SubscriptionPayment> SubscriptionPayments { get; }
+    DbSet<SuperAdminBroadcast> SuperAdminBroadcasts { get; }
     DbSet<BusSchedule> BusSchedules { get; }
     DbSet<BusScheduleStudent> BusScheduleStudents { get; }
     DbSet<EmployeeQrToken> EmployeeQrTokens { get; }

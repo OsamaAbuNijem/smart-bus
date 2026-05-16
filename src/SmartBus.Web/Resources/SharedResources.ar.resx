@@ -24,6 +24,7 @@
   <data name="Nav_Schools"    xml:space="preserve"><value>المدارس</value></data>
   <data name="Nav_Admins"     xml:space="preserve"><value>المديرون</value></data>
   <data name="Nav_Plans"      xml:space="preserve"><value>خطط الاشتراك</value></data>
+  <data name="Nav_Notifications" xml:space="preserve"><value>الإشعارات</value></data>
   <data name="SA_Badge_Title" xml:space="preserve"><value>المشرف العام</value></data>
   <data name="SA_Badge_Sub"   xml:space="preserve"><value>صلاحيات كاملة للمنصة</value></data>
 
@@ -114,8 +115,23 @@
   <data name="SA_Sub_Paid"           xml:space="preserve"><value>حالة الدفع</value></data>
   <data name="SA_Sub_Paid_Yes"       xml:space="preserve"><value>مدفوع</value></data>
   <data name="SA_Sub_Paid_Partial"   xml:space="preserve"><value>مدفوع جزئياً</value></data>
+  <data name="SA_Sub_Payments_Title"      xml:space="preserve"><value>الدفعات</value></data>
+  <data name="SA_Sub_Payments_Hint"       xml:space="preserve"><value>سجِّل كل دفعة عند استلامها من المدرسة. تعرض القائمة أدناه جميع الدفعات المسجَّلة لهذا الاشتراك.</value></data>
+  <data name="SA_Sub_Payments_Date"       xml:space="preserve"><value>تاريخ الدفعة</value></data>
+  <data name="SA_Sub_Payments_Amount"     xml:space="preserve"><value>المبلغ</value></data>
+  <data name="SA_Sub_Payments_Method"     xml:space="preserve"><value>طريقة الدفع</value></data>
+  <data name="SA_Sub_Payments_Add"        xml:space="preserve"><value>إضافة دفعة</value></data>
+  <data name="SA_Sub_Payments_Empty"      xml:space="preserve"><value>لا توجد دفعات مسجَّلة بعد.</value></data>
+  <data name="SA_Sub_Payments_LoadFailed" xml:space="preserve"><value>تعذَّر تحميل الدفعات.</value></data>
+  <data name="SA_Sub_Payments_FullyPaid"  xml:space="preserve"><value>الاشتراك مدفوع بالكامل — لا تُقبل دفعات إضافية.</value></data>
+  <data name="SA_Sub_Payments_Exceeds"    xml:space="preserve"><value>الدفعة تتجاوز المبلغ المتبقي ({0}).</value></data>
+  <data name="SA_Pay_Method_Cash"         xml:space="preserve"><value>نقداً</value></data>
+  <data name="SA_Pay_Method_Transfer"     xml:space="preserve"><value>حوالة بنكية</value></data>
+  <data name="SA_Pay_Method_Cheque"       xml:space="preserve"><value>شيك</value></data>
+  <data name="SA_Sub_Paid_AutoHint"       xml:space="preserve"><value>محسوبة تلقائياً من مجموع الدفعات المسجَّلة مقارنةً بالسعر.</value></data>
   <data name="SA_Sub_Paid_No"        xml:space="preserve"><value>غير مدفوع</value></data>
   <data name="SA_Sub_Remaining"      xml:space="preserve"><value>المبلغ المتبقي</value></data>
+  <data name="SA_Sub_Remaining_AutoHint" xml:space="preserve"><value>محسوب تلقائياً من السعر مطروحاً منه مجموع الدفعات المسجَّلة.</value></data>
 
   <!-- Super-admin subscriptions page (per school) -->
   <data name="SA_Sub_Page_Title"          xml:space="preserve"><value>الاشتراكات</value></data>
@@ -170,6 +186,16 @@
   <data name="SA_ChangePwd_MinLenErr"  xml:space="preserve"><value>8 أحرف على الأقل</value></data>
   <data name="SA_ChangePwd_MismatchErr" xml:space="preserve"><value>كلمتا المرور غير متطابقتين</value></data>
   <data name="SA_ChangePwd_Save"       xml:space="preserve"><value>حفظ كلمة المرور</value></data>
+  <data name="SA_ResetPwd_Title"       xml:space="preserve"><value>إعادة تعيين كلمة مرور المدير</value></data>
+  <data name="SA_ResetPwd_Button"      xml:space="preserve"><value>إعادة تعيين</value></data>
+  <data name="SA_ResetPwd_New"         xml:space="preserve"><value>كلمة المرور الجديدة</value></data>
+  <data name="SA_ResetPwd_NewPH"       xml:space="preserve"><value>8 أحرف على الأقل</value></data>
+  <data name="SA_ResetPwd_Confirm"     xml:space="preserve"><value>تأكيد كلمة المرور الجديدة</value></data>
+  <data name="SA_ResetPwd_MinLenErr"   xml:space="preserve"><value>يجب ألا تقل كلمة المرور عن 8 أحرف.</value></data>
+  <data name="SA_ResetPwd_MismatchErr" xml:space="preserve"><value>كلمتا المرور غير متطابقتين.</value></data>
+  <data name="SA_ResetPwd_Save"        xml:space="preserve"><value>إعادة تعيين كلمة المرور</value></data>
+  <data name="SA_ResetPwd_Success"     xml:space="preserve"><value>تم إعادة تعيين كلمة مرور المدير ✓</value></data>
+  <data name="SA_ResetPwd_Failed"      xml:space="preserve"><value>تعذَّر إعادة تعيين كلمة مرور المدير.</value></data>
 
   <!-- Super-admin dashboard (overview) -->
   <data name="SA_Dash_PageTitle"       xml:space="preserve"><value>لوحة التحكم العامة</value></data>
@@ -249,6 +275,35 @@
 
   <!-- Super-admin settings page -->
   <data name="SA_Settings_PageTitle"   xml:space="preserve"><value>الإعدادات</value></data>
+
+  <!-- SuperAdmin notifications tab -->
+  <data name="SA_Notifs_PageTitle"           xml:space="preserve"><value>الإشعارات</value></data>
+  <data name="SA_Notifs_ComposerTitle"       xml:space="preserve"><value>إرسال إشعار دفع</value></data>
+  <data name="SA_Notifs_ComposerSub"         xml:space="preserve"><value>اكتب الإشعار واختر الجمهور المستهدف.</value></data>
+  <data name="SA_Notifs_Title"               xml:space="preserve"><value>العنوان</value></data>
+  <data name="SA_Notifs_Title_PH"            xml:space="preserve"><value>مثلاً: صيانة مقررة الليلة</value></data>
+  <data name="SA_Notifs_Title_Required"      xml:space="preserve"><value>العنوان مطلوب</value></data>
+  <data name="SA_Notifs_Message"             xml:space="preserve"><value>نص الإشعار</value></data>
+  <data name="SA_Notifs_Message_PH"          xml:space="preserve"><value>نص إشعار الدفع</value></data>
+  <data name="SA_Notifs_Message_Required"    xml:space="preserve"><value>نص الإشعار مطلوب</value></data>
+  <data name="SA_Notifs_Target"              xml:space="preserve"><value>الجمهور</value></data>
+  <data name="SA_Notifs_Target_All"          xml:space="preserve"><value>جميع المستخدمين</value></data>
+  <data name="SA_Notifs_Target_SchoolUsers"  xml:space="preserve"><value>مستخدمو المدارس المختارة</value></data>
+  <data name="SA_Notifs_Target_Admins"       xml:space="preserve"><value>مديرو المدارس</value></data>
+  <data name="SA_Notifs_Schools"             xml:space="preserve"><value>المدارس</value></data>
+  <data name="SA_Notifs_Schools_Hint"        xml:space="preserve"><value>اضغط Cmd / Ctrl لاختيار أكثر من مدرسة. اتركها فارغة لاستهداف جميع المديرين.</value></data>
+  <data name="SA_Notifs_PickSchools"         xml:space="preserve"><value>اختر مدرسة واحدة على الأقل.</value></data>
+  <data name="SA_Notifs_Send"                xml:space="preserve"><value>إرسال الإشعار</value></data>
+  <data name="SA_Notifs_SentFormat"          xml:space="preserve"><value>تم الإرسال إلى {0} مستخدم · {1} جهاز</value></data>
+  <data name="SA_Notifs_HistoryTitle"        xml:space="preserve"><value>سجل الإشعارات</value></data>
+  <data name="SA_Notifs_HistorySub"          xml:space="preserve"><value>أحدث إشعارات الدفع على مستوى المنصة (الأحدث أولاً).</value></data>
+  <data name="SA_Notifs_HistoryEmpty"        xml:space="preserve"><value>لم يتم إرسال أي إشعارات بعد.</value></data>
+  <data name="SA_Notifs_LoadFailed"          xml:space="preserve"><value>تعذَّر تحميل سجل الإشعارات.</value></data>
+  <data name="SA_Notifs_Col_Date"            xml:space="preserve"><value>التاريخ</value></data>
+  <data name="SA_Notifs_Col_Title"           xml:space="preserve"><value>العنوان</value></data>
+  <data name="SA_Notifs_Col_Target"          xml:space="preserve"><value>الجمهور</value></data>
+  <data name="SA_Notifs_Col_Recipients"      xml:space="preserve"><value>المستلمون</value></data>
+  <data name="SA_Notifs_Col_Delivered"       xml:space="preserve"><value>المُسلَّمة</value></data>
   <data name="SA_Settings_Section"     xml:space="preserve"><value>إعدادات النظام</value></data>
   <data name="SA_Settings_Version"     xml:space="preserve"><value>إصدار النظام</value></data>
   <data name="SA_Settings_VersionValue" xml:space="preserve"><value>SmartBus Platform v2.0</value></data>

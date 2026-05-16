@@ -31,6 +31,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<School> Schools => Set<School>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
     public DbSet<SubscriptionStudent> SubscriptionStudents => Set<SubscriptionStudent>();
+    public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
+    public DbSet<SuperAdminBroadcast> SuperAdminBroadcasts => Set<SuperAdminBroadcast>();
     public DbSet<BusSchedule> BusSchedules => Set<BusSchedule>();
     public DbSet<BusScheduleStudent> BusScheduleStudents => Set<BusScheduleStudent>();
     public DbSet<EmployeeQrToken> EmployeeQrTokens => Set<EmployeeQrToken>();
@@ -72,6 +74,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
         // ── Subscriptions ──────────────────────────────────────────────────
         builder.Entity<Subscription>().HasQueryFilter(s => !s.IsDeleted);
+        // Mirror the Subscription filter so the required relationship from
+        // SubscriptionPayment doesn't trip EF Core's "missing matching filter"
+        // warning and so deleted subscriptions don't surface their payments.
+        builder.Entity<SubscriptionPayment>().HasQueryFilter(p => !p.IsDeleted && !p.Subscription!.IsDeleted);
 
         builder.Entity<Subscription>()
             .HasOne(s => s.School)

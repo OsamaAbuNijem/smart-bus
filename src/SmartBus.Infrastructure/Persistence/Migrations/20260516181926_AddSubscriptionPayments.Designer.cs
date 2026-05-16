@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartBus.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using SmartBus.Infrastructure.Persistence;
 namespace SmartBus.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260516181926_AddSubscriptionPayments")]
+    partial class AddSubscriptionPayments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1164,49 +1167,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("SubscriptionStudents");
-                });
-
-            modelBuilder.Entity("SmartBus.Domain.Entities.SuperAdminBroadcast", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Delivered")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Recipients")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SchoolIdsCsv")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SentByUserId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Target")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SuperAdminBroadcasts");
                 });
 
             modelBuilder.Entity("SmartBus.Domain.Entities.Trip", b =>

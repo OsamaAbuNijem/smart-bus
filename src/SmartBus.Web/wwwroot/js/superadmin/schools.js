@@ -90,8 +90,22 @@ const schools = {
     setVal('sch-sub-price', '0');
     setVal('sch-sub-activation', iso(today));
     setVal('sch-sub-expiration', iso(inOneYear));
-    setVal('sch-sub-paid', 'false');
+    // PaymentStatus is server-derived (and the dropdown is disabled);
+    // a brand-new sub has zero payments → "Unpaid" (0). Server enforces
+    // this regardless of what we send.
+    setVal('sch-sub-paid', '0');
+    // New sub has no payments yet → Remaining mirrors Price. Wire the
+    // change handler once so the readonly Remaining field stays in sync
+    // as the SuperAdmin tweaks Price.
     setVal('sch-sub-remaining', '0');
+    const priceEl = document.getElementById('sch-sub-price');
+    if (priceEl && !priceEl._mirroredRemaining) {
+      priceEl.addEventListener('input', () => {
+        const v = parseFloat(priceEl.value);
+        document.getElementById('sch-sub-remaining').value = Number.isFinite(v) ? v : 0;
+      });
+      priceEl._mirroredRemaining = true;
+    }
     SB.openModal('modal-school');
     // Map needs to size against the now-visible modal; defer one tick so
     // Leaflet measures the container after layout. No starting pin → user
@@ -217,7 +231,8 @@ const schools = {
     const avEl = document.getElementById('drw-avatar');
     if (avEl) {
       if (s.logoUrl) {
-        avEl.innerHTML = `<img src="${SB.escHtml(s.logoUrl)}" alt=""/>`;
+        avEl.innerHTML = `<img src="${SB.escHtml(s.logoUrl)}" alt=""
+                               onerror="schools._onDrawerLogoMissing('${SB.escHtml(initials)}', '${av.bg}', '${av.text}')"/>`;
         avEl.classList.add('has-logo');
         avEl.style.background = '';
         avEl.style.color = '';
@@ -388,10 +403,16 @@ const schools = {
     const activation = s.lastSubscriptionActivationDate
       ? SB.formatDate(s.lastSubscriptionActivationDate)
       : '<span class="u-text-muted">—</span>';
-    // Avatar swaps to a logo thumbnail when the school has one; falls back to
-    // initials on the deterministic palette.
+    // Avatar swaps to a logo thumbnail when the school has one; falls back
+    // to initials on the deterministic palette. The img.onerror handler
+    // also catches the case where the URL is stored but the file is gone
+    // (e.g. a stale row from a prior dev cleanup) — it swaps the wrapper
+    // back to the initials look at runtime.
     const avatarHtml = s.logoUrl
-      ? `<div class="td-avatar has-logo"><img src="${SB.escHtml(s.logoUrl)}" alt=""/></div>`
+      ? `<div class="td-avatar has-logo">
+           <img src="${SB.escHtml(s.logoUrl)}" alt=""
+                onerror="schools._onLogoMissing(this, '${SB.escHtml(initials)}', '${av.bg}', '${av.text}')"/>
+         </div>`
       : `<div class="td-avatar" style="background:${av.bg};color:${av.text};">${initials}</div>`;
     // Row body (everything except the actions cell) opens the side drawer.
     // The actions cell stops propagation so the inner buttons stay clickable.
@@ -544,6 +565,89 @@ const schools = {
       schools._setLogoPreview(data.url);
     } catch { errEl?.classList.add('show'); }
   },
+
+  // ── Reset school admin password ──────────────────────────────────────────
+  /**
+   * Opens the reset-admin-password modal targeting the drawer's current
+   * school. Pre-fills the "target email" subtitle so the SuperAdmin can
+   * see whose password they're about to overwrite.
+   */
+  openResetAdminPassword() {
+    const s = schools._drawerSchool;
+    if (!s) return;
+    SB.setText('rap-target-email', s.adminEmail || '');
+    ['rap-new', 'rap-confirm'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    ['grp-rap-new', 'grp-rap-confirm'].forEach(id =>
+      document.getElementById(id)?.classList.remove('err'));
+    ['err-rap-new', 'err-rap-confirm'].forEach(id =>
+      document.getElementById(id)?.classList.remove('show'));
+    document.getElementById('rap-server-err')?.classList.add('u-hidden');
+    SB.openModal('modal-reset-admin-password');
+  },
+
+  async resetAdminPassword() {
+    const s = schools._drawerSchool;
+    if (!s) return;
+    const newPwd  = document.getElementById('rap-new')?.value     ?? '';
+    const confirm = document.getElementById('rap-confirm')?.value ?? '';
+
+    let valid = true;
+    const setErr = (errId, wrapId, show) => {
+      document.getElementById(errId)?.classList.toggle('show', show);
+      document.getElementById(wrapId)?.classList.toggle('err',  show);
+      if (show) valid = false;
+    };
+    setErr('err-rap-new',     'grp-rap-new',     newPwd.length < 8);
+    setErr('err-rap-confirm', 'grp-rap-confirm', newPwd !== confirm);
+    if (!valid) return;
+
+    const btn = document.getElementById('btn-rap-save');
+    if (btn) btn.disabled = true;
+    const srv = document.getElementById('rap-server-err');
+    try {
+      const res = await SB.api.post('/schools/' + s.id + '/reset-admin-password',
+        { newPassword: newPwd });
+      if (res?.ok) {
+        SB.closeModal('modal-reset-admin-password');
+        SB.ShowMessage(SB.t.saResetPwdSuccess || 'Admin password reset ✓');
+      } else {
+        const msg = res?.data?.error || SB.t.saResetPwdFailed || 'Failed to reset password.';
+        if (srv) { srv.textContent = msg; srv.classList.remove('u-hidden'); }
+      }
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  },
+
+  /**
+   * Grid avatar img.onerror handler — swaps the wrapper from a broken
+   * <img> back to the initials look so the row doesn't show a busted
+   * placeholder. Triggered when the file the DB references no longer
+   * exists on disk.
+   */
+  _onLogoMissing(img, initials, bg, text) {
+    const wrap = img.closest('.td-avatar');
+    if (!wrap) return;
+    wrap.classList.remove('has-logo');
+    wrap.setAttribute('style', `background:${bg};color:${text};`);
+    wrap.textContent = initials;
+  },
+  /**
+   * Drawer avatar variant of the same fallback — the drawer-avatar uses
+   * a different gradient when rendering initials.
+   */
+  _onDrawerLogoMissing(initials, bg, text) {
+    const avEl = document.getElementById('drw-avatar');
+    if (!avEl) return;
+    avEl.classList.remove('has-logo');
+    avEl.style.background = `linear-gradient(135deg, ${bg}, var(--pu))`;
+    avEl.style.color = text;
+    avEl.textContent = initials;
+  },
+
   _setLogoPreview(url) {
     const img        = document.getElementById('sch-logo-preview');
     const ph         = document.getElementById('sch-logo-placeholder');

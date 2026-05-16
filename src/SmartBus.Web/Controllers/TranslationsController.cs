@@ -163,6 +163,10 @@ public class TranslationsController : Controller
             ["saChangePwdSuccess"]     = _l["SA_Settings_PwdSuccess"].Value,
             ["saChangePwdFailed"]      = _l["SA_Settings_PwdFailed"].Value,
 
+            // Reset school admin password (drawer modal)
+            ["saResetPwdSuccess"]      = _l["SA_ResetPwd_Success"].Value,
+            ["saResetPwdFailed"]       = _l["SA_ResetPwd_Failed"].Value,
+
             ["isRtl"]                  = isRtl,
             ["dir"]                    = isRtl ? "rtl" : "ltr"
         };

@@ -59,8 +59,10 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
             ExpirationDate   = request.SubscriptionExpirationDate,
             IsActive         = true,
             Price            = request.SubscriptionPrice,
-            PaymentStatus    = request.SubscriptionPaymentStatus,
-            RemainingAmount  = request.SubscriptionRemainingAmount,
+            // Brand-new sub has no payments — both PaymentStatus and
+            // RemainingAmount are server-derived from the payments log.
+            PaymentStatus    = SmartBus.Domain.Enums.PaymentStatus.Unpaid,
+            RemainingAmount  = request.SubscriptionPrice,
             SubscriptionType = request.SubscriptionType
         };
         _context.Subscriptions.Add(subscription);

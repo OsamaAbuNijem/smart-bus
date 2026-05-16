@@ -1,0 +1,100 @@
+@{
+    ViewData["Title"] = L["SA_Notifs_PageTitle"];
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+<div class="page active" id="sa-page-notifications">
+
+  <!-- Composer card — title + message + audience selector + send button.
+       The schools multi-select is revealed only when the audience needs
+       it (SchoolUsers / SchoolAdmins). -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">@L["SA_Notifs_ComposerTitle"]</div>
+        <div class="card-sub">@L["SA_Notifs_ComposerSub"]</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Notifs_Title"] *</label>
+          <input type="text" id="notif-title" class="form-control" placeholder="@L["SA_Notifs_Title_PH"]"/>
+          <span class="form-err" id="err-notif-title">@L["SA_Notifs_Title_Required"]</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Notifs_Target"] *</label>
+          <select id="notif-target" class="form-control">
+            <option value="0">@L["SA_Notifs_Target_All"]</option>
+            <option value="1">@L["SA_Notifs_Target_SchoolUsers"]</option>
+            <option value="2">@L["SA_Notifs_Target_Admins"]</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Notifs_Message"] *</label>
+          <textarea id="notif-message" class="form-control form-textarea-vresize" rows="3" placeholder="@L["SA_Notifs_Message_PH"]"></textarea>
+          <span class="form-err" id="err-notif-message">@L["SA_Notifs_Message_Required"]</span>
+        </div>
+      </div>
+      <div class="form-row full u-hidden" id="notif-schools-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Notifs_Schools"]</label>
+          <select id="notif-schools" class="form-control notif-schools-select" multiple size="14"></select>
+          <span class="form-hint">@L["SA_Notifs_Schools_Hint"]</span>
+        </div>
+      </div>
+      <div id="notif-error" class="modal-form-err u-hidden"></div>
+      <div class="u-flex u-gap-12 u-mt-12">
+        <button type="button" class="btn-primary" id="notif-send-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span id="notif-send-label">@L["SA_Notifs_Send"]</span>
+        </button>
+        <span id="notif-result" class="u-text-sm u-text-muted"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- History — newest broadcasts first. -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">@L["SA_Notifs_HistoryTitle"]</div>
+        <div class="card-sub">@L["SA_Notifs_HistorySub"]</div>
+      </div>
+    </div>
+    <div class="card-table-wrap">
+      <table class="table">
+        <thead><tr>
+          <th>@L["SA_Notifs_Col_Date"]</th>
+          <th>@L["SA_Notifs_Col_Title"]</th>
+          <th>@L["SA_Notifs_Col_Target"]</th>
+          <th>@L["SA_Notifs_Col_Recipients"]</th>
+          <th>@L["SA_Notifs_Col_Delivered"]</th>
+        </tr></thead>
+        <tbody id="notif-history-tbody">
+          <tr><td colspan="5" class="td-empty">@L["SA_Common_Loading"]</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="notif-strings"
+     data-target-all="@L["SA_Notifs_Target_All"]"
+     data-target-school-users="@L["SA_Notifs_Target_SchoolUsers"]"
+     data-target-admins="@L["SA_Notifs_Target_Admins"]"
+     data-empty="@L["SA_Notifs_HistoryEmpty"]"
+     data-sent-format="@L["SA_Notifs_SentFormat"]"
+     data-load-failed="@L["SA_Notifs_LoadFailed"]"
+     data-pick-schools="@L["SA_Notifs_PickSchools"]"
+     class="modal-strings-bag"></div>
+
+<script src="~/js/superadmin/notifications.js" asp-append-version="true"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    try { await SB.translationsReady; } catch {}
+    if (typeof notifications === 'object') notifications.init();
+  });
+</script>

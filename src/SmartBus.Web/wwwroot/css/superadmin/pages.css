@@ -46,6 +46,14 @@
 .breakdown-num       { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
 .breakdown-label     { font-size: 11px; color: var(--text2); }
 
+/* ── Notifications composer — taller schools multi-select ─────────── */
+/* form-control caps height at 38px for single-line inputs; a multi-select
+   needs the full height for the size= rows to render. min-height keeps the
+   widget generously tall, padding/line-height give each option breathing
+   room so a 14-row select doesn't feel cramped. */
+.notif-schools-select { height: auto !important; min-height: 320px; padding: 6px 4px; line-height: 1.6; }
+.notif-schools-select option { padding: 4px 8px; }
+
 /* ── Settings page tiles ─────────────────────────────────────────── */
 .settings-list  { display: flex; flex-direction: column; gap: 12px; }
 .settings-tile  { background: var(--bg); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
