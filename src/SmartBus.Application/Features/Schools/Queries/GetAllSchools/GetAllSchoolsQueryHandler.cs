@@ -84,7 +84,8 @@ public class GetAllSchoolsQueryHandler : IRequestHandler<GetAllSchoolsQuery, Pag
                 x.LastSub != null ? (DateTime?)x.LastSub.ActivationDate : null,
                 x.LastSub != null ? (DateTime?)x.LastSub.ExpirationDate : null,
                 x.LastSub != null ? (SmartBus.Domain.Enums.SubscriptionType?)x.LastSub.SubscriptionType : null,
-                x.LastSub != null ? (bool?)x.LastSub.IsActive : null))
+                x.LastSub != null ? (bool?)x.LastSub.IsActive : null,
+                (int?)null, (int?)null, (decimal?)null))
             .ToListAsync(cancellationToken);
 
         return PagedResult<SchoolDto>.Create(items, total, request.PageNumber, request.PageSize);

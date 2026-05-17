@@ -1,18 +1,22 @@
 @model SmartBus.Web.Models.DriverInput?
+@functions {
+    /// <summary>Strip the leading "0" so the input only carries the 9-digit local part next to the "+962" chip.</summary>
+    string LocalPhone(string? s)
+    {
+        if (string.IsNullOrEmpty(s)) return string.Empty;
+        return s.StartsWith("0") ? s[1..] : s;
+    }
+}
 @{
-    var isEdit   = ViewBag.DriverId is not null;
-    var driverId = ViewBag.DriverId as Guid?;
-    var errors   = ViewData.ModelState;
-
+    var errors = ViewData.ModelState;
     string? ErrFor(string key) => errors[key]?.Errors.FirstOrDefault()?.ErrorMessage;
 }
 
 <form id="driver-form"
-      data-id="@driverId"
       onsubmit="event.preventDefault(); drivers.submit(this);">
 
   <div class="modal-header">
-    <div class="modal-header-title">@(isEdit ? L["Driver_EditTitle"] : L["Driver_AddTitle"])</div>
+    <div class="modal-header-title">@L["Driver_AddTitle"]</div>
     <button type="button" class="modal-close-btn" onclick="SB.closeModal('modal-driver')">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -36,25 +40,26 @@
 
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">@L["Driver_NameAr"]</label>
-        <input type="text" name="FullName" class="form-input" dir="rtl" value="@Model?.FullName"/>
+        <label class="form-label">@L["Driver_Name"]</label>
+        <input type="text" name="FullName" class="form-input" value="@Model?.FullName"/>
         @if (ErrFor(nameof(DriverInput.FullName)) is { } e1) { <span class="form-err" style="display:block;">@e1</span> }
-      </div>
-      <div class="form-group">
-        <label class="form-label">@L["Driver_NameEn"]</label>
-        <input type="text" name="FullNameEn" class="form-input" dir="ltr" value="@Model?.FullNameEn"/>
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">@L["Driver_Phone"]</label>
-        <input type="tel" name="PhoneNumber" class="form-input" dir="ltr"
-               pattern="^07[789]\d{7}$"
-               placeholder="079XXXXXXX"
-               inputmode="numeric"
-               maxlength="10"
-               value="@Model?.PhoneNumber"/>
+        <div class="form-input-group" dir="ltr">
+          <span class="prefix">+962</span>
+          @* The stored value is "07XXXXXXXXX" but the input is 9-digit local part.
+             The JS submit prepends "0" before posting so the server-side regex matches. *@
+          <input type="tel" name="PhoneNumber"
+                 pattern="^7[789]\d{7}$"
+                 placeholder="79XXXXXXX"
+                 inputmode="numeric"
+                 maxlength="9"
+                 value="@LocalPhone(Model?.PhoneNumber)"/>
+        </div>
         @if (ErrFor(nameof(DriverInput.PhoneNumber)) is { } e2) { <span class="form-err" style="display:block;">@e2</span> }
       </div>
       <div class="form-group">
@@ -64,17 +69,6 @@
           <option value="Assistant" selected="@(Model?.DriverType == "Assistant")">@L["Driver_TypeAssist"]</option>
         </select>
       </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">@L["Driver_Status"]</label>
-        <select name="IsActive" class="form-input">
-          <option value="true"  selected="@(Model?.IsActive ?? true)">@L["Driver_Active"]</option>
-          <option value="false" selected="@(Model is not null && !Model.IsActive)">@L["Driver_Inactive"]</option>
-        </select>
-      </div>
-      <div class="form-group"></div>
     </div>
 
   </div>

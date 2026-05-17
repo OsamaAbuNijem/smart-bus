@@ -7,11 +7,19 @@ public class UpdateDriverCommandValidator : AbstractValidator<UpdateDriverComman
     public UpdateDriverCommandValidator()
     {
         RuleFor(x => x.DriverId).NotEmpty();
-        RuleFor(x => x.FullName).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.PhoneNumber)
-            .NotEmpty()
-            .MaximumLength(20)
-            .Matches(@"^07[789]\d{7}$")
-            .WithMessage("Phone must start with 077, 078 or 079 and be 10 digits long.");
+        // Partial update: only enforce constraints on fields the caller is
+        // actually changing (null means "leave as-is").
+        When(x => x.FullName is not null, () =>
+        {
+            RuleFor(x => x.FullName!).NotEmpty().MaximumLength(100);
+        });
+        When(x => x.PhoneNumber is not null, () =>
+        {
+            RuleFor(x => x.PhoneNumber!)
+                .NotEmpty()
+                .MaximumLength(20)
+                .Matches(@"^(\+962|0)?7[789]\d{7}$")
+                .WithMessage("Phone must be a Jordan mobile: 9-digit local part starting with 77, 78, or 79 (the '+962' prefix is implicit).");
+        });
     }
 }

@@ -1,11 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using QRCoder;
 using SmartBus.Web.Models;
 using SmartBus.Web.Resources;
 using SmartBus.Web.Services;
 
 namespace SmartBus.Web.Controllers.Admin;
 
+/// <summary>
+/// Admin Buses page. The list is fully server-rendered; the grid supports
+/// bulk-create (the only add path), inline rename + status toggle, and
+/// delete. Trip-schedule editing happens elsewhere — the grid no longer
+/// surfaces a schedule icon per the latest design.
+/// </summary>
 public class BusesController : AdminControllerBase
 {
     private readonly IStringLocalizer<SharedResources> _l;
@@ -23,46 +30,30 @@ public class BusesController : AdminControllerBase
                                           [FromQuery] string? personName = null)
         => PartialView("_List", await ApiClient.GetBusesAsync(page, 10, plateNumber, personName));
 
-    [HttpGet]
-    public async Task<IActionResult> Form(Guid? id = null)
+    /// <summary>Bulk-create N buses. The server picks BUS-#### serials.</summary>
+    [HttpPost]
+    public async Task<IActionResult> CreateBatch([FromForm] int count,
+                                                 [FromQuery] string? plateNumber = null,
+                                                 [FromQuery] string? personName = null)
     {
-        var vm = new BusFormViewModel();
-        if (id.HasValue)
-        {
-            var b = await ApiClient.GetBusByIdAsync(id.Value);
-            if (b is null) return NotFound();
-            vm.BusId = b.Id;
-            vm.Input = new BusInput
-            {
-                PlateNumber = b.PlateNumber,
-                Capacity    = b.Capacity,
-                Status      = b.Status
-            };
-        }
-        return PartialView("_Form", vm);
+        if (count <= 0) return StatusCode(400, new { result = _l["Bus_Batch_InvalidCount"].Value });
+        var (ok, err) = await ApiClient.CreateBusesBatchAsync(count);
+        if (!ok) return StatusCode(502, new { result = err ?? "Upstream API error" });
+        return await SuccessWithList(_l["Bus_Batch_Created", count].Value, 1, plateNumber, personName);
     }
 
+    /// <summary>Inline update: change a single field (number or status).</summary>
     [HttpPost]
-    public async Task<IActionResult> Save(BusInput input,
-                                          [FromQuery] string? plateNumber = null,
-                                          [FromQuery] string? personName = null)
+    public async Task<IActionResult> UpdateField(Guid id,
+                                                 [FromForm] string? plateNumber = null,
+                                                 [FromForm] string? status = null,
+                                                 [FromQuery] int page = 1,
+                                                 [FromQuery] string? plateFilter = null,
+                                                 [FromQuery] string? personName = null)
     {
-        if (!ModelState.IsValid) return await FormWithErrors(null, input);
-        var (ok, err) = await ApiClient.CreateBusAsync(input);
+        var (ok, err) = await ApiClient.UpdateBusFieldAsync(id, plateNumber, status);
         if (!ok) return StatusCode(502, new { result = err ?? "Upstream API error" });
-        return await SuccessWithList(_l["JS_BusSaved"], 1, plateNumber, personName);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Update(Guid id, BusInput input,
-                                            [FromQuery] int page = 1,
-                                            [FromQuery] string? plateNumber = null,
-                                            [FromQuery] string? personName = null)
-    {
-        if (!ModelState.IsValid) return await FormWithErrors(id, input);
-        var (ok, err) = await ApiClient.UpdateBusAsync(id, input);
-        if (!ok) return StatusCode(502, new { result = err ?? "Upstream API error" });
-        return await SuccessWithList(_l["JS_BusSaved"], page, plateNumber, personName);
+        return await SuccessWithList(_l["JS_BusSaved"], page, plateFilter, personName);
     }
 
     [HttpPost]
@@ -75,83 +66,24 @@ public class BusesController : AdminControllerBase
         return await SuccessWithList(_l["JS_DeletedSuccess"], page, plateNumber, personName);
     }
 
+    /// <summary>
+    /// Returns a PNG QR code for the given token. Generation happens server-
+    /// side via QRCoder so the grid no longer depends on the qrcode.js CDN
+    /// (which was loading inconsistently in some networks). The token is
+    /// the bus's QrToken value; size is the pixels-per-module multiplier so
+    /// callers can ask for a thumbnail (size=4) or print resolution (size=10).
+    /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Schedule(Guid id)
+    [ResponseCache(Duration = 60 * 60 * 24, Location = ResponseCacheLocation.Any)]
+    public IActionResult Qr(string token, int size = 4)
     {
-        var bus = await ApiClient.GetBusByIdAsync(id);
-        if (bus is null) return NotFound();
-
-        var schedule = await ApiClient.GetBusScheduleAsync(id);
-        var drivers  = await ApiClient.GetDriversAsync(1, 200);
-        var students = await ApiClient.GetStudentsAsync(1, 500);
-        var allDrivers = drivers?.Items?.ToList() ?? new();
-
-        var selectedIds = schedule?.StudentIds?.ToHashSet() ?? new HashSet<Guid>();
-        var vm = new BusScheduleViewModel
-        {
-            BusId          = id,
-            BusPlateNumber = bus.PlateNumber,
-            Input = new BusScheduleInput
-            {
-                MorningTime        = schedule?.MorningTime ?? "07:00",
-                ReturnTime         = schedule?.ReturnTime  ?? "14:00",
-                RepeatDays         = schedule?.RepeatDays  ?? 0,
-                MorningDriverId    = schedule?.MorningDriverId,
-                MorningAssistantId = schedule?.MorningAssistantId,
-                ReturnDriverId     = schedule?.ReturnDriverId,
-                ReturnAssistantId  = schedule?.ReturnAssistantId,
-                StudentIds         = selectedIds.ToList()
-            },
-            Drivers    = allDrivers.Where(d => d.DriverType != SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
-            Assistants = allDrivers.Where(d => d.DriverType == SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
-            Students   = students?.Items?.ToList() ?? new(),
-            SelectedStudentIds = selectedIds
-        };
-        return PartialView("_Schedule", vm);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> SaveSchedule(Guid id, BusScheduleInput input,
-                                                  [FromQuery] int page = 1,
-                                                  [FromQuery] string? plateNumber = null,
-                                                  [FromQuery] string? personName = null)
-    {
-        if (!ModelState.IsValid) return await ScheduleWithErrors(id, input);
-        var (ok, err) = await ApiClient.SetBusScheduleAsync(id, input);
-        if (!ok) return StatusCode(502, new { result = err ?? "Upstream API error" });
-        return await SuccessWithList(_l["BusSchedule_Saved"], page, plateNumber, personName);
-    }
-
-    private async Task<IActionResult> ScheduleWithErrors(Guid id, BusScheduleInput input)
-    {
-        var bus = await ApiClient.GetBusByIdAsync(id);
-        var drivers  = await ApiClient.GetDriversAsync(1, 200);
-        var students = await ApiClient.GetStudentsAsync(1, 500);
-        var allDrivers = drivers?.Items?.ToList() ?? new();
-        var selectedIds = input.StudentIds.ToHashSet();
-        var vm = new BusScheduleViewModel
-        {
-            BusId          = id,
-            BusPlateNumber = bus?.PlateNumber ?? string.Empty,
-            Input          = input,
-            Drivers    = allDrivers.Where(d => d.DriverType != SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
-            Assistants = allDrivers.Where(d => d.DriverType == SmartBus.Domain.Enums.DriverType.Assistant).ToList(),
-            Students   = students?.Items?.ToList() ?? new(),
-            SelectedStudentIds = selectedIds
-        };
-        Response.StatusCode = 400;
-        return PartialView("_Schedule", vm);
-    }
-
-    private Task<IActionResult> FormWithErrors(Guid? id, BusInput input)
-    {
-        foreach (var kvp in ModelState)
-            foreach (var err in kvp.Value!.Errors)
-                _logger.LogWarning("Bus form ModelState: {Field} = {Error}", kvp.Key, err.ErrorMessage);
-
-        var vm = new BusFormViewModel { BusId = id, Input = input };
-        Response.StatusCode = 400;
-        return Task.FromResult<IActionResult>(PartialView("_Form", vm));
+        if (string.IsNullOrWhiteSpace(token)) return BadRequest();
+        if (size < 1 || size > 20) size = 4;
+        using var gen   = new QRCodeGenerator();
+        using var data  = gen.CreateQrCode(token, QRCodeGenerator.ECCLevel.M);
+        using var png   = new PngByteQRCode(data);
+        var bytes       = png.GetGraphic(size);
+        return File(bytes, "image/png");
     }
 
     private async Task<IActionResult> SuccessWithList(string message, int page, string? plateNumber = null, string? personName = null)

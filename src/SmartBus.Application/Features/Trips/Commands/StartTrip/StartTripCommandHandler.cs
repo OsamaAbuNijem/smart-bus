@@ -47,10 +47,10 @@ public class StartTripCommandHandler
         if (driver is null || driver.DriverType != DriverType.Driver)
             return Result<StartTripResponse>.Failure("Driver not found.");
 
-        // Block opening a second trip while the assistant is mid-trip on
-        // any bus / leg — finishing or completing the active one is the
-        // only way out. Resolves the assistant by the JWT user id; admins
-        // and drivers using this endpoint directly aren't affected.
+        // Block opening a second trip while the assistant already has one
+        // pending or live on any bus in their school. The assistant must
+        // either start the Scheduled trip and finish it, or delete it,
+        // before creating a new one. Drivers and admins bypass this check.
         var callerUserId = _currentUser.UserId;
         if (!string.IsNullOrEmpty(callerUserId))
         {
@@ -58,23 +58,24 @@ public class StartTripCommandHandler
                 .FirstOrDefaultAsync(d => d.UserId == callerUserId, ct);
             if (caller is not null && caller.DriverType == DriverType.Assistant)
             {
-                var liveBusIds = await _context.BusSchedules
-                    .Where(s => s.MorningAssistantId == caller.Id ||
-                                s.ReturnAssistantId  == caller.Id)
-                    .Select(s => s.BusId)
-                    .ToListAsync(ct);
+                var schoolBusIds = caller.SchoolId is null
+                    ? new List<Guid>()
+                    : await _context.Buses
+                        .Where(b => b.SchoolId == caller.SchoolId && !b.IsDeleted)
+                        .Select(b => b.Id)
+                        .ToListAsync(ct);
 
-                if (liveBusIds.Count > 0)
+                if (schoolBusIds.Count > 0)
                 {
-                    var hasLive = await _context.Trips.AnyAsync(t =>
-                        !t.IsTemplate &&
-                        t.Status == TripStatus.InProgress &&
-                        liveBusIds.Contains(t.BusId), ct);
-
-                    if (hasLive)
+                    var hasPending = await _context.Trips.AnyAsync(t =>
+                        !t.IsTemplate
+                        && (t.Status == TripStatus.Scheduled ||
+                            t.Status == TripStatus.InProgress)
+                        && schoolBusIds.Contains(t.BusId), ct);
+                    if (hasPending)
                     {
                         return Result<StartTripResponse>.Failure(
-                            "You already have an active trip. End it before starting a new one.");
+                            "You already have a pending or active trip. Start or delete it before creating a new one.");
                     }
                 }
             }
@@ -104,28 +105,42 @@ public class StartTripCommandHandler
 
         var now = DateTime.UtcNow;
         var typeLabel = request.TripType == TripType.Morning ? "ذهاب" : "إياب";
+        // Scheduled trips are materialised without an ActualDeparture; the
+        // assistant taps "Start" later (UpdateTripStatusCommand) to flip the
+        // trip to InProgress and stamp ActualDeparture then. The handler still
+        // creates the roster up-front so the assistant can review it.
         var trip = new Trip
         {
             BusId              = bus.Id,
             Type               = request.TripType,
             Name               = $"{bus.PlateNumber} — {typeLabel} — {today:dd/MM/yyyy}",
             ScheduledDeparture = now,
-            ActualDeparture    = now,
-            Status             = TripStatus.InProgress,
+            ActualDeparture    = request.Scheduled ? null : now,
+            Status             = request.Scheduled
+                                    ? TripStatus.Scheduled
+                                    : TripStatus.InProgress,
             RepeatDays         = 0,
             IsTemplate         = false
         };
         await _unitOfWork.Trips.AddAsync(trip, ct);
         await _unitOfWork.SaveChangesAsync(ct);
 
-        // Roster: prefer most recent prior trip on (bus, type); fall back to
-        // the BusSchedule's assigned students. When the assistant explicitly
-        // chose to skip the auto-roster the trip is created empty and
-        // students are attached as their QR/NFC is scanned.
+        // Roster precedence: SkipRoster (explicit empty) → ManualStudentIds
+        // (hand-picked) → last trip on (bus, type) → BusSchedule assignment.
         List<Guid> studentIds;
         if (request.SkipRoster)
         {
             studentIds = new List<Guid>();
+        }
+        else if (request.ManualStudentIds is { Count: > 0 } manualIds)
+        {
+            // Deduplicate + ignore anything the caller passed that doesn't
+            // resolve to a live, non-deleted student.
+            var distinct = manualIds.Distinct().ToList();
+            studentIds = await _context.Students
+                .Where(s => !s.IsDeleted && distinct.Contains(s.Id))
+                .Select(s => s.Id)
+                .ToListAsync(ct);
         }
         else
         {
@@ -154,11 +169,23 @@ public class StartTripCommandHandler
             }
         }
 
+        // Reject empty rosters unless the caller explicitly opted in via
+        // SkipRoster. The trip-setup screen now enforces this client-side
+        // too, but the server guard prevents a stray empty trip from any
+        // other caller (older mobile build, API misuse).
+        if (studentIds.Count == 0 && !request.SkipRoster)
+        {
+            return Result<StartTripResponse>.Failure(
+                "Cannot start an empty trip — add at least one student.");
+        }
+
         // Return trips start with everyone already on the bus (the assistant
         // collected them at school), so seed Boarded with a boarding time
         // stamped at trip start. Morning trips begin with everyone Waiting
-        // and the assistant marks each pickup as it happens.
-        var initial = request.TripType == TripType.Return
+        // and the assistant marks each pickup as it happens. For Scheduled
+        // trips we leave EVERY row Waiting and let the activate step seed
+        // the Return-trip boarding when the assistant taps Start.
+        var initial = (!request.Scheduled && request.TripType == TripType.Return)
             ? BoardingStatus.Boarded
             : BoardingStatus.Waiting;
         foreach (var sid in studentIds)
@@ -181,8 +208,9 @@ public class StartTripCommandHandler
         // Tell the driver the trip is live — shows up in their notifications
         // list and triggers a SignalR push so a logged-in driver app reacts
         // immediately. Best-effort: a notification failure shouldn't fail
-        // the trip creation itself.
-        if (!string.IsNullOrEmpty(driver.UserId))
+        // the trip creation itself. Suppressed for Scheduled trips — those
+        // fire the "trip started" push from UpdateTripStatusCommand instead.
+        if (!request.Scheduled && !string.IsNullOrEmpty(driver.UserId))
         {
             try
             {

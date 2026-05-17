@@ -4,11 +4,16 @@ using SmartBus.Application.Common.Models;
 
 namespace SmartBus.Application.Features.Buses.Commands.UpdateBus;
 
+/// <summary>
+/// Partial-update command: every non-id field is nullable so the admin grid
+/// can flip a single field (status toggle, inline rename) without re-sending
+/// the whole bus. Fields left null preserve the existing value.
+/// </summary>
 public record UpdateBusCommand(
     Guid BusId,
-    string PlateNumber,
-    int Capacity,
-    string Status
+    string? PlateNumber = null,
+    int? Capacity = null,
+    string? Status = null
 ) : IRequest<Result>, ICacheInvalidator
 {
     public IEnumerable<string> CacheKeysToInvalidate      => new[] { $"bus:{BusId}" };

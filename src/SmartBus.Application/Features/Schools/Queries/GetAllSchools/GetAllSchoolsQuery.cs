@@ -45,5 +45,10 @@ public record SchoolDto(
     DateTime? LastSubscriptionActivationDate,
     DateTime? LastSubscriptionExpirationDate,
     SubscriptionType? LastSubscriptionType,
-    bool?     LastSubscriptionIsActive
+    bool?     LastSubscriptionIsActive,
+    // Plan details surfaced on the admin Settings page. Null when the
+    // school has no subscription yet.
+    int?      LastSubscriptionMaxStudents = null,
+    int?      LastSubscriptionMaxBuses    = null,
+    decimal?  LastSubscriptionPrice       = null
 );

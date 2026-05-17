@@ -18,4 +18,15 @@ class BusSummaryDto {
   final String plateNumber;
   final String? model;
   final int capacity;
+
+  // The bus-picker DropdownButton uses object equality to match the
+  // selected value against its items. Without these overrides, the
+  // selection state-held reference compares unequal to "the same" bus
+  // instance returned by /buses on rebuild, leaving the picker stuck.
+  @override
+  bool operator ==(Object other) =>
+      other is BusSummaryDto && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

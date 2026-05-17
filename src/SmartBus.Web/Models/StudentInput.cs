@@ -20,10 +20,13 @@ public class StudentInput
     [Required(ErrorMessage = "Validation_Required")]
     public string ParentName { get; set; } = string.Empty;
 
-    // Jordan mobile: 077 / 078 / 079 followed by 7 digits. 10 digits total.
-    // Callers should strip spaces/dashes client-side; server enforces the final shape.
+    // Jordan mobile: 9-digit local part shaped "7XXXXXXXX" — first digit is
+    // always 7 and the second digit is 7, 8, or 9 (077 / 078 / 079 prefixes).
+    // The wire value is either "07XXXXXXXX" (legacy local form) or
+    // "+9627XXXXXXXX" (canonical) depending on the caller — both are accepted
+    // server-side; the handler normalises via PhoneNumberHelper.Normalize.
     [Required(ErrorMessage = "Validation_Required")]
-    [RegularExpression(@"^07[789]\d{7}$", ErrorMessage = "Validation_PhoneFormat")]
+    [RegularExpression(@"^(\+962|0)?7[789]\d{7}$", ErrorMessage = "Validation_PhoneFormat")]
     public string ParentPhone { get; set; } = string.Empty;
 
     public double? Latitude    { get; set; }

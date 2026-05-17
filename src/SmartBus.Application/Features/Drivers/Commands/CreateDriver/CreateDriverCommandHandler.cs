@@ -28,7 +28,8 @@ public class CreateDriverCommandHandler : IRequestHandler<CreateDriverCommand, R
             FullNameEn  = request.FullNameEn,
             PhoneNumber = request.PhoneNumber,
             IsActive    = request.IsActive,
-            DriverType  = request.DriverType
+            DriverType  = request.DriverType,
+            SchoolId    = request.SchoolId
         };
 
         await _unitOfWork.Drivers.AddAsync(driver, cancellationToken);

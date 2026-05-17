@@ -8,6 +8,13 @@ using SmartBus.Web.Services;
 
 namespace SmartBus.Web.Controllers.Admin;
 
+/// <summary>
+/// Admin Drivers + Assistants page. Add/edit uses a slim 3-field form
+/// (name, phone, type) — status defaults to Active and is toggled from
+/// the grid. Every grid field (name, phone, status, type) is inline-
+/// editable; the action column only carries delete. Export / Import use a
+/// 3-column sheet matching the form.
+/// </summary>
 public class DriversController : AdminControllerBase
 {
     private readonly IStringLocalizer<SharedResources> _l;
@@ -24,24 +31,10 @@ public class DriversController : AdminControllerBase
         => PartialView("_List", await ApiClient.GetDriversAsync(page, 10, driverType));
 
     [HttpGet]
-    public async Task<IActionResult> Form(Guid? id = null)
+    public IActionResult Form()
     {
-        DriverInput? model = null;
-        if (id.HasValue)
-        {
-            var d = await ApiClient.GetDriverByIdAsync(id.Value);
-            if (d is null) return NotFound();
-            model = new DriverInput
-            {
-                FullName    = d.FullName,
-                FullNameEn  = d.FullNameEn,
-                PhoneNumber = d.PhoneNumber,
-                IsActive    = d.IsActive,
-                DriverType  = d.DriverType.ToString()
-            };
-            ViewBag.DriverId = d.Id;
-        }
-        return PartialView("_Form", model);
+        // Only used for "add new" — row edits happen inline in the grid.
+        return PartialView("_Form", new DriverInput { DriverType = "Driver" });
     }
 
     [HttpPost]
@@ -53,17 +46,20 @@ public class DriversController : AdminControllerBase
         return await SuccessWithList(_l["JS_DriverSaved"], page: 1);
     }
 
+    /// <summary>Inline patch: one or more grid fields at once.</summary>
     [HttpPost]
-    public async Task<IActionResult> Update(
+    public async Task<IActionResult> UpdateField(
         Guid id,
-        DriverInput input,
-        [FromQuery] int page = 1,
-        [FromQuery] string? driverType = null)
+        [FromForm] string? fullName    = null,
+        [FromForm] string? phoneNumber = null,
+        [FromForm] bool?   isActive    = null,
+        [FromForm] string? driverType  = null,
+        [FromQuery] int    page        = 1,
+        [FromQuery] string? typeFilter = null)
     {
-        if (!ModelState.IsValid) { Response.StatusCode = 400; ViewBag.DriverId = id; return PartialView("_Form", input); }
-        var (ok, err) = await ApiClient.UpdateDriverAsync(id, input);
+        var (ok, err) = await ApiClient.UpdateDriverFieldAsync(id, fullName, phoneNumber, isActive, driverType);
         if (!ok) return StatusCode(502, new { result = err ?? "Upstream API error" });
-        return await SuccessWithList(_l["JS_DriverSaved"], page, driverType);
+        return await SuccessWithList(_l["JS_DriverSaved"], page, typeFilter);
     }
 
     [HttpPost]
@@ -84,7 +80,7 @@ public class DriversController : AdminControllerBase
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Drivers");
 
-        string[] headers = { "FullName","FullNameEn","PhoneNumber","DriverType","IsActive","CreatedAt" };
+        string[] headers = { "FullName", "PhoneNumber", "DriverType" };
         for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
         ws.Row(1).Style.Font.Bold = true;
 
@@ -92,11 +88,8 @@ public class DriversController : AdminControllerBase
         foreach (var d in data?.Items ?? Array.Empty<Application.Features.Drivers.Queries.GetAllDrivers.DriverDto>())
         {
             ws.Cell(row, 1).Value = d.FullName;
-            ws.Cell(row, 2).Value = d.FullNameEn;
-            ws.Cell(row, 3).Value = d.PhoneNumber;
-            ws.Cell(row, 4).Value = TypeLabel(d.DriverType);
-            ws.Cell(row, 5).Value = d.IsActive ? _l["Driver_Active"].Value : _l["Driver_Inactive"].Value;
-            ws.Cell(row, 6).Value = d.CreatedAt;
+            ws.Cell(row, 2).Value = d.PhoneNumber;
+            ws.Cell(row, 3).Value = TypeLabel(d.DriverType);
             row++;
         }
         ws.Columns().AdjustToContents();
@@ -115,15 +108,14 @@ public class DriversController : AdminControllerBase
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Drivers");
 
-        string[] headers = { "FullName","FullNameEn","PhoneNumber","DriverType" };
+        string[] headers = { "FullName", "PhoneNumber", "DriverType" };
         for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
         ws.Row(1).Style.Font.Bold = true;
         ws.Row(1).Style.Fill.BackgroundColor = XLColor.FromHtml("#FFFDE7");
 
         ws.Cell(2, 1).Value = "محمد أحمد";
-        ws.Cell(2, 2).Value = "Mohammad Ahmad";
-        ws.Cell(2, 3).Value = "0791234567";
-        ws.Cell(2, 4).Value = "Driver";
+        ws.Cell(2, 2).Value = "0791234567";
+        ws.Cell(2, 3).Value = "Driver";
         ws.Row(2).Style.Font.Italic = true;
         ws.Row(2).Style.Font.FontColor = XLColor.FromHtml("#94A3B8");
         ws.Columns().AdjustToContents();
@@ -157,10 +149,9 @@ public class DriversController : AdminControllerBase
                 cols[c.GetString().Trim()] = c.Address.ColumnNumber;
 
             int Col(string n) => cols.TryGetValue(n, out var x) ? x : -1;
-            int cFull   = Col("FullName");
-            int cPhone  = Col("PhoneNumber");
-            int cType   = Col("DriverType");
-            int cFullEn = Col("FullNameEn");
+            int cFull  = Col("FullName");
+            int cPhone = Col("PhoneNumber");
+            int cType  = Col("DriverType");
 
             if (cFull < 0 || cPhone < 0 || cType < 0)
                 return StatusCode(400, new { result = _l["Driver_ImportHint"].Value });
@@ -169,7 +160,7 @@ public class DriversController : AdminControllerBase
             {
                 string Get(int col) => col > 0 ? row.Cell(col).GetString().Trim() : string.Empty;
 
-                // DriverType accepted as enum name ("Driver"/"Assistant") or localized label
+                // DriverType accepted as enum name or localized label.
                 var rawType = Get(cType);
                 var driverType = rawType.Equals("Assistant", StringComparison.OrdinalIgnoreCase)
                               || rawType == _l["Driver_TypeAssist"].Value
@@ -178,10 +169,8 @@ public class DriversController : AdminControllerBase
                 var input = new DriverInput
                 {
                     FullName    = Get(cFull),
-                    FullNameEn  = Get(cFullEn),
                     PhoneNumber = Get(cPhone),
-                    DriverType  = driverType,
-                    IsActive    = true
+                    DriverType  = driverType
                 };
                 if (string.IsNullOrEmpty(input.FullName) || string.IsNullOrEmpty(input.PhoneNumber))
                 { failed++; continue; }

@@ -12,6 +12,12 @@ public class Bus : BaseEntity
     public BusStatus Status { get; set; } = BusStatus.Inactive;
     public DateOnly? LastMaintenanceDate { get; set; }
 
+    // School scope. Nullable for back-compat with rows that pre-date this
+    // column; new buses are always created with a SchoolId stamped by the
+    // calling admin's context.
+    public Guid? SchoolId { get; set; }
+    public School? School { get; set; }
+
     /// <summary>
     /// Opaque token printed on the bus's QR sticker. Drivers/assistants scan
     /// this from the mobile app to start a trip on demand. Generated once at

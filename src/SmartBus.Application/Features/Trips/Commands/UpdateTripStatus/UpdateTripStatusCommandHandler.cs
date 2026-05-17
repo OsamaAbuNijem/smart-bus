@@ -31,6 +31,7 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
         var trip = await _unitOfWork.Trips.GetByIdAsync(request.TripId, cancellationToken);
         if (trip is null) return Result.Failure("Trip not found.");
 
+        var fromStatus = trip.Status;
         switch (request.NewStatus)
         {
             case TripStatus.InProgress: trip.Start(); break;
@@ -40,6 +41,28 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
 
         await _unitOfWork.Trips.UpdateAsync(trip);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Scheduled → InProgress on a Return trip: students were left Waiting
+        // when the trip was scheduled (the assistant hadn't picked them up
+        // yet). Flip them all to Boarded with the live boarding time so the
+        // recap reflects who actually started the journey.
+        if (fromStatus == TripStatus.Scheduled
+            && request.NewStatus == TripStatus.InProgress
+            && trip.Type == TripType.Return)
+        {
+            var now = DateTime.UtcNow;
+            var waiting = await _context.StudentTrips
+                .Where(st => st.TripId == trip.Id
+                             && st.BoardingStatus == BoardingStatus.Waiting)
+                .ToListAsync(cancellationToken);
+            foreach (var st in waiting)
+            {
+                st.BoardingStatus = BoardingStatus.Boarded;
+                st.BoardingTime  = now;
+            }
+            if (waiting.Count > 0)
+                await _context.SaveChangesAsync(cancellationToken);
+        }
 
         // Morning trips end at the school, so completing the trip is the
         // same event as "all boarded students have arrived". Flip them to

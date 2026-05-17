@@ -897,6 +897,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantNfcUnavailable => 'الـ NFC غير متاح على هذا الجهاز.';
 
   @override
+  String get assistantScanQr => 'مسح QR';
+
+  @override
+  String get assistantScanNfc => 'مسح NFC';
+
+  @override
+  String get assistantSearchByName => 'ابحث عن الطالب بالاسم';
+
+  @override
+  String get assistantRosterHeader => 'طلاب الرحلة';
+
+  @override
+  String get assistantRosterEmpty =>
+      'أضف طالبًا واحدًا على الأقل قبل بدء الرحلة';
+
+  @override
+  String get assistantNoResults => 'لا توجد نتائج';
+
+  @override
   String get assistantBoardedLabel => 'صعدوا';
 
   @override

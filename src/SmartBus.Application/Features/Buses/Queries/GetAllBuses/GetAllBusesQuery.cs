@@ -8,11 +8,14 @@ public record GetAllBusesQuery(
     int PageNumber = 1,
     int PageSize = 10,
     string? PlateNumber = null,
-    string? PersonName  = null
+    string? PersonName  = null,
+    Guid?   SchoolId    = null
 ) : IRequest<PagedResult<BusDto>>, ICacheableQuery
 {
+    // Cache key includes the school scope so two admins on different schools
+    // don't share a result set.
     public string CacheKey =>
-        $"buses:page:{PageNumber}:size:{PageSize}:plate:{PlateNumber ?? ""}:person:{PersonName ?? ""}";
+        $"buses:page:{PageNumber}:size:{PageSize}:plate:{PlateNumber ?? ""}:person:{PersonName ?? ""}:school:{SchoolId?.ToString() ?? ""}";
     public TimeSpan? CacheExpiry => TimeSpan.FromMinutes(2);
 }
 

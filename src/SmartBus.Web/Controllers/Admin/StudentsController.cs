@@ -112,7 +112,9 @@ public class StudentsController : AdminControllerBase
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Students");
 
-        string[] headers = { "FullName","FullNameEn","NationalNumber","Grade","ParentName",
+        // Grade dropped from the sheet per UX request; the entity still has
+        // a Grade column but it's no longer surfaced to admins via Excel.
+        string[] headers = { "FullName","FullNameEn","NationalNumber","ParentName",
                              "ParentPhone","Latitude","Longitude","CreatedAt" };
         for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
         ws.Row(1).Style.Font.Bold = true;
@@ -126,7 +128,6 @@ public class StudentsController : AdminControllerBase
                 s.FullName,
                 s.FullNameEn,
                 s.NationalNumber,
-                GradeLabel(s.Grade),
                 s.ParentName,
                 s.ParentPhone,
                 s.Latitude,
@@ -135,59 +136,16 @@ public class StudentsController : AdminControllerBase
             });
         ws.Cell(2, 1).InsertData(rows);
 
-        // Fixed column widths — skipping AdjustToContents() is the biggest export
-        // speedup; autosize is O(rows × cols) and dominates wall-clock time for
-        // large sheets. Values chosen to comfortably fit typical content.
-        int[] widths = { 28, 28, 18, 14, 22, 16, 12, 12, 18 };
+        int[] widths = { 28, 28, 18, 22, 16, 12, 12, 18 };
         for (int i = 0; i < widths.Length; i++) ws.Column(i + 1).Width = widths[i];
         // Display CreatedAt as a real date instead of an Excel serial number.
-        ws.Column(9).Style.DateFormat.Format = "yyyy-MM-dd HH:mm";
+        ws.Column(8).Style.DateFormat.Format = "yyyy-MM-dd HH:mm";
 
         using var ms = new MemoryStream();
         wb.SaveAs(ms);
         return File(ms.ToArray(),
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             $"students-{DateTime.UtcNow:yyyyMMdd-HHmm}.xlsx");
-    }
-
-    // Translates a grade code ("1", "2", ...) to its localized label.
-    // Tries the resource localizer first; if that returns the key unchanged
-    // (ResourceNotFound) or any unexpected value, falls back to a hardcoded
-    // table so the export is never left with raw numeric codes.
-    private static readonly Dictionary<string, (string Ar, string En)> _gradeFallback = new()
-    {
-        ["KG1"] = ("روضة أولى",       "KG 1"),
-        ["KG2"] = ("روضة ثانية",      "KG 2"),
-        ["1"]   = ("الصف الأول",       "Grade 1"),
-        ["2"]   = ("الصف الثاني",      "Grade 2"),
-        ["3"]   = ("الصف الثالث",      "Grade 3"),
-        ["4"]   = ("الصف الرابع",      "Grade 4"),
-        ["5"]   = ("الصف الخامس",      "Grade 5"),
-        ["6"]   = ("الصف السادس",      "Grade 6"),
-        ["7"]   = ("الصف السابع",      "Grade 7"),
-        ["8"]   = ("الصف الثامن",      "Grade 8"),
-        ["9"]   = ("الصف التاسع",      "Grade 9"),
-        ["10"]  = ("الصف العاشر",      "Grade 10"),
-        ["11"]  = ("الصف الحادي عشر",  "Grade 11"),
-        ["12"]  = ("الصف الثاني عشر",  "Grade 12"),
-    };
-
-    private string GradeLabel(string? grade)
-    {
-        if (string.IsNullOrEmpty(grade)) return string.Empty;
-
-        var key = "Std_Grade" + grade;
-        var ls  = _l[key];
-        if (!ls.ResourceNotFound && !string.IsNullOrEmpty(ls.Value) && ls.Value != key)
-            return ls.Value;
-
-        // Fallback table — honours the current UI culture.
-        if (_gradeFallback.TryGetValue(grade, out var pair))
-        {
-            var isAr = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
-            return isAr ? pair.Ar : pair.En;
-        }
-        return grade;
     }
 
     // ── Import template (empty file with headers + example row) ────────────
@@ -197,7 +155,7 @@ public class StudentsController : AdminControllerBase
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Students");
 
-        string[] headers = { "FullName","FullNameEn","NationalNumber","Grade","ParentName","ParentPhone" };
+        string[] headers = { "FullName","FullNameEn","NationalNumber","ParentName","ParentPhone" };
         for (int i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
         ws.Row(1).Style.Font.Bold = true;
         ws.Row(1).Style.Fill.BackgroundColor = XLColor.FromHtml("#FFFDE7");
@@ -206,9 +164,8 @@ public class StudentsController : AdminControllerBase
         ws.Cell(2, 1).Value = "أحمد محمد";
         ws.Cell(2, 2).Value = "Ahmad Mohammad";
         ws.Cell(2, 3).Value = "9991234567";
-        ws.Cell(2, 4).Value = "1";
-        ws.Cell(2, 5).Value = "محمد خالد";
-        ws.Cell(2, 6).Value = "0791234567";
+        ws.Cell(2, 4).Value = "محمد خالد";
+        ws.Cell(2, 5).Value = "0791234567";
         ws.Row(2).Style.Font.Italic = true;
         ws.Row(2).Style.Font.FontColor = XLColor.FromHtml("#94A3B8");
 
@@ -245,18 +202,17 @@ public class StudentsController : AdminControllerBase
             int Col(string n) => cols.TryGetValue(n, out var x) ? x : -1;
             int cFull   = Col("FullName");
             int cNat    = Col("NationalNumber");
-            int cGrade  = Col("Grade");
             int cPar    = Col("ParentName");
             int cPhone  = Col("ParentPhone");
             int cFullEn = Col("FullNameEn");
+            // Grade dropped from the sheet; the entity still requires a value
+            // so the importer fills in "1" as a default (matches the hidden
+            // input on the admin add/edit form).
+            const string DefaultGrade = "1";
 
-            if (cFull < 0 || cNat < 0 || cGrade < 0 || cPar < 0 || cPhone < 0)
+            if (cFull < 0 || cNat < 0 || cPar < 0 || cPhone < 0)
                 return StatusCode(400, new { result = _l["Student_ImportHint"].Value });
 
-            // Parse every data row into a typed DTO. Row-level structural validation
-            // (required fields) happens here so failed rows are counted client-side
-            // and don't need a server round-trip. Format conversion (Grade label →
-            // canonical code) happens here too.
             var bulkRows = new List<Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentRow>();
             foreach (var row in sheet.RowsUsed().Skip(1))
             {
@@ -264,12 +220,11 @@ public class StudentsController : AdminControllerBase
 
                 var fullName   = Get(cFull);
                 var nat        = Get(cNat);
-                var grade      = GradeFromAnything(Get(cGrade));  // accept "1" or "الأول"
                 var parentName = Get(cPar);
                 var phone      = Get(cPhone);
                 var fullEn     = Get(cFullEn);
 
-                if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(grade) ||
+                if (string.IsNullOrEmpty(fullName) ||
                     string.IsNullOrEmpty(nat) ||
                     string.IsNullOrEmpty(parentName) || string.IsNullOrEmpty(phone))
                 {
@@ -278,7 +233,7 @@ public class StudentsController : AdminControllerBase
                 }
 
                 bulkRows.Add(new Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentRow(
-                    fullName, fullEn, nat, grade, parentName, phone));
+                    fullName, fullEn, nat, DefaultGrade, parentName, phone));
             }
 
             if (bulkRows.Count > 0)
@@ -304,27 +259,6 @@ public class StudentsController : AdminControllerBase
 
         var message = string.Format(_l["Student_ImportResult"].Value, imported, failed);
         return await SuccessWithList(message, page: 1, null, null);
-    }
-
-    // Accepts a numeric code like "1" OR a localized label like "الأول" / "Grade 1"
-    // and returns the canonical code ("1" — "9" / "KG1" / "KG2").
-    private string GradeFromAnything(string raw)
-    {
-        if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
-        var trimmed = raw.Trim();
-        // Direct numeric / KG code passthrough
-        if (trimmed.All(char.IsDigit) || trimmed.StartsWith("KG", StringComparison.OrdinalIgnoreCase))
-            return trimmed.ToUpperInvariant();
-
-        // Try to reverse-map a label to its code
-        string[] candidates = ["KG1","KG2","1","2","3","4","5","6","7","8","9","10","11","12"];
-        foreach (var code in candidates)
-        {
-            var ls = _l["Std_Grade" + code];
-            if (!ls.ResourceNotFound && string.Equals(ls.Value, trimmed, StringComparison.OrdinalIgnoreCase))
-                return code;
-        }
-        return trimmed;
     }
 
     private async Task<IActionResult> SuccessWithList(string message, int page, string? name, string? grade, string? homeArea = null)

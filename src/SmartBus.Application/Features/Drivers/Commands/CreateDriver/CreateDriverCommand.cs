@@ -10,7 +10,8 @@ public record CreateDriverCommand(
     string? FullNameEn,
     string PhoneNumber,
     bool IsActive = true,
-    DriverType DriverType = DriverType.Driver
+    DriverType DriverType = DriverType.Driver,
+    Guid? SchoolId = null
 ) : IRequest<Result<Guid>>, ICacheInvalidator
 {
     public IEnumerable<string> CachePatternsToInvalidate => new[] { "drivers:page:*" };

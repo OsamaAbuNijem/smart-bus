@@ -6,13 +6,11 @@
 
 <input type="hidden" id="buses-page"        value="1"/>
 <input type="hidden" id="buses-plate"       value=""/>
-<input type="hidden" id="buses-person"      value=""/>
 
 <div class="filter-bar panel">
   <div class="filter-group">
     @* Honeypot decoys — Chrome re-runs autofill after every DOM change (modal open,
-       partial swap, etc.). These absorb the autofill instead of the real inputs.
-       Must be placed before the real fields and visible enough for Chrome to find. *@
+       partial swap, etc.). These absorb the autofill instead of the real inputs. *@
     <input type="text"     class="u-honeypot" tabindex="-1" aria-hidden="true"
            autocomplete="username"          name="fake-user"/>
     <input type="password" class="u-honeypot" tabindex="-1" aria-hidden="true"
@@ -34,26 +32,10 @@
            data-lpignore="true"
            data-form-type="other"
            oninput="buses.onPlateSearch(this.value)"/>
-    <input type="search"
-           id="buses-person-input"
-           name="search-person"
-           class="form-input"
-           placeholder="@L["Bus_SearchPerson"]"
-           value=""
-           readonly
-           onfocus="this.removeAttribute('readonly')"
-           onblur="this.setAttribute('readonly','')"
-           autocomplete="off"
-           autocorrect="off"
-           autocapitalize="none"
-           spellcheck="false"
-           data-lpignore="true"
-           data-form-type="other"
-           oninput="buses.onPersonSearch(this.value)"/>
   </div>
 
   <div class="action-group">
-    <button class="add-btn" onclick="buses.openForm()">
+    <button class="add-btn" onclick="buses.openBatchForm()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       @L["Bus_AddBtn"]
     </button>
@@ -64,18 +46,14 @@
   <table class="table">
     <thead>
       <tr>
-        <th scope="col">@L["Bus_ColNumber"]</th>
         <th scope="col">@L["Bus_Number"]</th>
-        <th scope="col">@L["Bus_Capacity"]</th>
         <th scope="col">@L["Bus_Status"]</th>
-        <th scope="col">@L["Bus_Driver"]</th>
-        <th scope="col">@L["Bus_Assistant"]</th>
-        <th scope="col">@L["Nav_Students"]</th>
+        <th scope="col">@L["Bus_QRTitle"]</th>
         <th scope="col"></th>
       </tr>
     </thead>
     <tbody id="buses-tbody">
-      <tr><td colspan="8" class="u-loading-state">@L["Bus_Loading"]</td></tr>
+      <tr><td colspan="4" class="u-loading-state">@L["Bus_Loading"]</td></tr>
     </tbody>
   </table>
   <div class="table-pager">
@@ -89,6 +67,29 @@
     <div class="table-pager-controls">
       <button class="filter-btn" id="buses-prev" onclick="buses.prev()">@L["Pager_Prev"]</button>
       <button class="filter-btn" id="buses-next" onclick="buses.next()">@L["Pager_Next"]</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk-add modal — "Add N buses" -->
+<div class="modal-overlay" id="modal-bus-batch">
+  <div class="modal-box sm">
+    <div class="modal-header">
+      <div>
+        <div class="modal-header-title">@L["Bus_Batch_Title"]</div>
+        <div class="modal-header-sub">@L["Bus_Batch_Hint"]</div>
+      </div>
+      <button class="modal-close-btn" data-action="modal-close" data-target="modal-bus-batch">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label class="form-label" for="bus-batch-count">@L["Bus_Batch_Count"]</label>
+      <input id="bus-batch-count" type="number" min="1" max="200" value="1" class="form-input"/>
+    </div>
+    <div class="modal-footer">
+      <button id="bus-batch-save" class="btn-primary" onclick="buses.submitBatch()">@L["Bus_Batch_Create"]</button>
+      <button class="btn-secondary" data-action="modal-close" data-target="modal-bus-batch">@L["Del_Cancel"]</button>
     </div>
   </div>
 </div>
@@ -118,6 +119,5 @@
 </div>
 
 @section Scripts {
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="~/js/admin/buses.js" asp-append-version="true"></script>
 }

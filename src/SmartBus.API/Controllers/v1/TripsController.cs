@@ -1,7 +1,10 @@
+using System.Security.Claims;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartBus.Application.Features.Schools.Queries.GetMyFleetSchool;
+using SmartBus.Application.Features.Schools.Queries.GetMySchool;
 using SmartBus.Application.Features.Trips.Commands.CreateTrip;
 using SmartBus.Application.Features.Trips.Commands.CancelEmptyTrip;
 using SmartBus.Application.Features.Trips.Commands.DeleteTrip;
@@ -147,12 +150,33 @@ public class TripsController : ControllerBase
             : BadRequest(new { error = result.Error });
     }
 
-    /// <summary>Get all saved bus schedules (used by the buses grid to show schedule status).</summary>
+    /// <summary>Get all saved bus schedules (used by the buses grid and the
+    /// mobile new-trip picker). Scoped to the calling user's school.</summary>
     [HttpGet("schedules")]
     public async Task<IActionResult> GetAllSchedules(CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetAllBusSchedulesQuery(), cancellationToken);
+        var schoolId = await ResolveAdminSchoolIdAsync(cancellationToken);
+        var result = await _mediator.Send(new GetAllBusSchedulesQuery(schoolId), cancellationToken);
         return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>Admin path (email → School.AdminEmail) first, fleet fallback
+    /// (userId → Driver/Assistant) for mobile callers.</summary>
+    private async Task<Guid?> ResolveAdminSchoolIdAsync(CancellationToken cancellationToken)
+    {
+        var email  = User.FindFirstValue(ClaimTypes.Email);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!string.IsNullOrEmpty(email))
+        {
+            var school = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
+            if (school.IsSuccess) return school.Data!.Id;
+        }
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var fleetSchoolId = await _mediator.Send(new GetMyFleetSchoolQuery(userId), cancellationToken);
+            if (fleetSchoolId is not null) return fleetSchoolId;
+        }
+        return null;
     }
 
     /// <summary>Get the ذهاب/إياب schedule for a specific bus.</summary>
@@ -216,11 +240,14 @@ public class TripsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Driver,Assistant")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new DeleteTripCommand(id), cancellationToken);
-        return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
+        // Pass the caller's role so the handler can lock non-admin deletes
+        // to Scheduled trips only (they're not allowed to wipe live trips).
+        var isAdmin = User.IsInRole("Admin");
+        var result = await _mediator.Send(new DeleteTripCommand(id, AdminOverride: isAdmin), cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
 
     /// <summary>

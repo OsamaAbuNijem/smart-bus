@@ -2,9 +2,13 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using SmartBus.Application.Features.Buses.Commands.CreateBus;
+using SmartBus.Application.Features.Buses.Commands.CreateBusesBatch;
 using SmartBus.Application.Features.Buses.Commands.DeleteBus;
 using SmartBus.Application.Features.Buses.Commands.UpdateBus;
+using SmartBus.Application.Features.Schools.Queries.GetMyFleetSchool;
+using SmartBus.Application.Features.Schools.Queries.GetMySchool;
 using SmartBus.Application.Features.Buses.Commands.UpdateBusLocation;
 using SmartBus.Application.Features.Buses.Queries.GetAllBuses;
 using SmartBus.Application.Features.Buses.Queries.GetBusById;
@@ -26,7 +30,7 @@ public class BusesController : ControllerBase
     public BusesController(IMediator mediator)
         => _mediator = mediator;
 
-    /// <summary>Get all buses (paginated).</summary>
+    /// <summary>Get all buses (paginated). Filtered by the calling admin's school.</summary>
     [HttpGet]
     [ProducesResponseType(typeof(GetAllBusesQuery), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
@@ -36,8 +40,35 @@ public class BusesController : ControllerBase
         [FromQuery] string? personName = null,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetAllBusesQuery(pageNumber, pageSize, plateNumber, personName), cancellationToken);
+        var schoolId = await ResolveAdminSchoolIdAsync(cancellationToken);
+        var result = await _mediator.Send(new GetAllBusesQuery(pageNumber, pageSize, plateNumber, personName, schoolId), cancellationToken);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Resolve the school for the calling user. Tries the admin path first
+    /// (email → School.AdminEmail), then falls back to the fleet path
+    /// (userId → Driver/Assistant.UserId → SchoolId) so the mobile
+    /// driver/assistant flows see only their own school's buses. Returns
+    /// null for SuperAdmin / unauthenticated callers so the query layer
+    /// can fall back to a cross-school view.
+    /// </summary>
+    private async Task<Guid?> ResolveAdminSchoolIdAsync(CancellationToken cancellationToken)
+    {
+        var email  = User.FindFirstValue(ClaimTypes.Email);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!string.IsNullOrEmpty(email))
+        {
+            var school = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
+            if (school.IsSuccess) return school.Data!.Id;
+        }
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var fleetSchoolId = await _mediator.Send(new GetMyFleetSchoolQuery(userId), cancellationToken);
+            if (fleetSchoolId is not null) return fleetSchoolId;
+        }
+        return null;
     }
 
     /// <summary>Resolve a bus from its QR token. Used by the assistant scan flow.</summary>
@@ -107,14 +138,37 @@ public class BusesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] BusRequest request, CancellationToken cancellationToken)
     {
-        var command = new CreateBusCommand(request.PlateNumber, request.Capacity, request.Status);
+        var command = new CreateBusCommand(request.PlateNumber, request.Capacity ?? 50, request.Status ?? "Active");
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Data }, result.Data)
             : BadRequest(new { error = result.Error });
     }
 
-    /// <summary>Update a bus.</summary>
+    /// <summary>
+    /// Bulk-create N buses with auto-generated BUS-#### numbers, default
+    /// capacity, Active status, and one QR token each. Used by the admin
+    /// "add multiple buses" modal.
+    /// </summary>
+    [HttpPost("batch")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateBatch([FromBody] BusBatchRequest request, CancellationToken cancellationToken)
+    {
+        var schoolId = await ResolveAdminSchoolIdAsync(cancellationToken);
+        if (schoolId is null) return BadRequest(new { error = "School not found for this admin." });
+        var result = await _mediator.Send(new CreateBusesBatchCommand(request.Count, schoolId.Value), cancellationToken);
+        return result.IsSuccess
+            ? StatusCode(StatusCodes.Status201Created, new { created = result.Data })
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Partial update: omit fields the caller doesn't want to change. The
+    /// admin grid uses this to toggle status / rename inline without
+    /// re-sending the whole record.
+    /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -154,6 +208,8 @@ public record UpdateLocationRequest(double Latitude, double Longitude, double? S
 public record BusByQrRequest(string QrToken);
 
 public record BusRequest(
-    string PlateNumber,
-    int Capacity,
-    string Status);
+    string? PlateNumber = null,
+    int? Capacity = null,
+    string? Status = null);
+
+public record BusBatchRequest(int Count);

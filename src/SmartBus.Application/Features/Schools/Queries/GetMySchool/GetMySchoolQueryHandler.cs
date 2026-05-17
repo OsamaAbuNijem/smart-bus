@@ -14,13 +14,41 @@ public class GetMySchoolQueryHandler : IRequestHandler<GetMySchoolQuery, Result<
 
     public async Task<Result<SchoolDto>> Handle(GetMySchoolQuery request, CancellationToken cancellationToken)
     {
+        // Mirror GetAllSchools: project each school alongside its newest-by-
+        // activation subscription so the admin Settings page can show the
+        // current plan + dates without a second round-trip.
         var school = await _context.Schools
             .Where(s => !s.IsDeleted && s.AdminEmail == request.AdminEmail)
-            .Select(s => new SchoolDto(s.Id, s.Name, s.City, s.PhoneNumber,
-                s.AdminEmail, s.ContactName, s.Latitude, s.Longitude, s.LogoUrl, s.CreatedAt,
-                // School admins don't need their own subscription details
-                // through this endpoint — leave the four extra fields null.
-                null, null, null, null))
+            .Select(s => new
+            {
+                School = s,
+                LastSub = _context.Subscriptions
+                    .Where(sub => sub.SchoolId == s.Id && !sub.IsDeleted)
+                    .OrderByDescending(sub => sub.ActivationDate)
+                    .Select(sub => new
+                    {
+                        sub.SubscriptionType,
+                        sub.ActivationDate,
+                        sub.ExpirationDate,
+                        sub.IsActive,
+                        sub.MaxStudents,
+                        sub.MaxBuses,
+                        sub.Price
+                    })
+                    .FirstOrDefault()
+            })
+            .Select(x => new SchoolDto(
+                x.School.Id, x.School.Name, x.School.City,
+                x.School.PhoneNumber, x.School.AdminEmail, x.School.ContactName,
+                x.School.Latitude, x.School.Longitude, x.School.LogoUrl,
+                x.School.CreatedAt,
+                x.LastSub != null ? (DateTime?)x.LastSub.ActivationDate : null,
+                x.LastSub != null ? (DateTime?)x.LastSub.ExpirationDate : null,
+                x.LastSub != null ? (SmartBus.Domain.Enums.SubscriptionType?)x.LastSub.SubscriptionType : null,
+                x.LastSub != null ? (bool?)x.LastSub.IsActive : null,
+                x.LastSub != null ? (int?)x.LastSub.MaxStudents : null,
+                x.LastSub != null ? (int?)x.LastSub.MaxBuses : null,
+                x.LastSub != null ? (decimal?)x.LastSub.Price : null))
             .FirstOrDefaultAsync(cancellationToken);
 
         return school is not null

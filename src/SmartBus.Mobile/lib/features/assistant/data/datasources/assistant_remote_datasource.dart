@@ -113,26 +113,104 @@ class AssistantRemoteDataSource {
   }
 
   /// Create + start a new trip. Pass [skipRoster] = true to materialise an
-  /// empty trip; students get attached as their QR/NFC is scanned.
+  /// empty trip; students get attached as their QR/NFC is scanned. Pass
+  /// [manualStudentIds] (non-empty) to hand-pick the roster — the server
+  /// uses it instead of the last-trip / schedule auto-fill.
   Future<StartTripResponseDto> startTrip({
     required String busId,
     required String driverId,
     required String tripType,
     bool skipRoster = false,
+    List<String>? manualStudentIds,
+    // When true the API materialises the trip in Scheduled status and the
+    // assistant flips it to InProgress later via [activateTrip].
+    bool scheduled = false,
   }) async {
     try {
+      final data = <String, dynamic>{
+        'busId': busId,
+        'driverId': driverId,
+        'tripType': tripType,
+        'skipRoster': skipRoster,
+        'scheduled': scheduled,
+      };
+      if (manualStudentIds != null && manualStudentIds.isNotEmpty) {
+        data['manualStudentIds'] = manualStudentIds;
+      }
       final response = await _dio.post<Map<String, dynamic>>(
         '/trips/start',
-        data: {
-          'busId': busId,
-          'driverId': driverId,
-          'tripType': tripType,
-          'skipRoster': skipRoster,
-        },
+        data: data,
+      );
+      final body = response.data;
+      if (body == null) throw const FormatException('empty body');
+      return StartTripResponseDto.fromJson(body);
+    } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
+  /// Flip a Scheduled trip to InProgress (step 2 of the two-step new-trip
+  /// flow). Server-side handles Return-trip auto-boarding + driver notify.
+  Future<void> activateTrip(String tripId) async {
+    try {
+      await _dio.post<void>('/trips/$tripId/start');
+    } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
+  /// Soft-delete a Scheduled trip. Server enforces "only Scheduled" when
+  /// the caller isn't an Admin — used by the assistant's "cancel before
+  /// starting" path on trip-details.
+  Future<void> deleteScheduledTrip(String tripId) async {
+    try {
+      await _dio.delete<void>('/trips/$tripId');
+    } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
+  /// Resolve a student-QR token to the linked student (no side effects).
+  /// Returns null when the token is unknown / unregistered / its student is
+  /// soft-deleted. Used by the trip-setup screen to preview a scan before
+  /// the trip itself has been created.
+  Future<RosterStudentDto?> resolveStudentQr(String token) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '/students/resolve-qr',
+        data: {'token': token.trim()},
       );
       final data = response.data;
-      if (data == null) throw const FormatException('empty body');
-      return StartTripResponseDto.fromJson(data);
+      if (data == null) return null;
+      return RosterStudentDto.fromJson(data);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) return null; // unregistered / unknown
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
+  /// Search students by name (active subscription only — scoped to the
+  /// caller's school server-side). Used by the trip-setup manual roster.
+  Future<List<RosterStudentDto>> searchStudents(String query) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/students',
+        queryParameters: {
+          'pageSize': 20,
+          if (query.trim().isNotEmpty) 'name': query.trim(),
+        },
+      );
+      final items = (response.data?['items'] as List<dynamic>?) ?? const [];
+      return items
+          .map((e) => RosterStudentDto.fromJson({
+                // /students returns 'id' rather than 'studentId'; remap so the
+                // existing RosterStudentDto factory works without a new model.
+                'studentId': (e as Map<String, dynamic>)['id'],
+                'fullName': e['fullName'],
+                'fullNameEn': e['fullNameEn'],
+                'grade': e['grade'],
+              }))
+          .toList();
     } on DioException catch (e) {
       throw mapDioErrorToFailure(e);
     }

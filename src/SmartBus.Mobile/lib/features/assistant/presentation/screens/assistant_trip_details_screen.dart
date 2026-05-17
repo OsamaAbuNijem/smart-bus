@@ -45,7 +45,12 @@ class _TripBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groups = _groupByArea(details.students);
-    final readOnly = details.status == 'Completed';
+    final completed = details.status == 'Completed';
+    final scheduled = details.status == 'Scheduled';
+    // Scan + boarding actions only make sense once the trip is live. The
+    // existing `readOnly` gate covered the post-completion case; we widen
+    // it to cover the pre-start (Scheduled) case too.
+    final readOnly = completed || scheduled;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -85,8 +90,10 @@ class _TripBody extends ConsumerWidget {
             ),
           ),
         ),
-        if (readOnly)
+        if (completed)
           _CompletedSummaryBar(details: details, l: l)
+        else if (scheduled)
+          _StartScheduledBar(details: details, l: l)
         else
           _EndTripBar(details: details, l: l),
       ],
@@ -1966,3 +1973,151 @@ Future<String?> _promptToken(BuildContext context, String title) async {
   );
 }
 
+
+// ─── Scheduled-trip start bar ────────────────────────────────────────────
+// Step 2 of the two-step new-trip flow. The trip was already materialised
+// in Scheduled status with its roster; this bar's button flips it to
+// InProgress via /trips/{id}/start. Server handles Return-trip auto-
+// boarding + driver "trip started" push on that transition.
+class _StartScheduledBar extends ConsumerStatefulWidget {
+  const _StartScheduledBar({required this.details, required this.l});
+  final TripDetailsDto details;
+  final AppLocalizations l;
+
+  @override
+  ConsumerState<_StartScheduledBar> createState() =>
+      _StartScheduledBarState();
+}
+
+class _StartScheduledBarState
+    extends ConsumerState<_StartScheduledBar> {
+  bool _busy = false;
+
+  Future<void> _start() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('بدء الرحلة'),
+        content: Text(
+          'بدء الرحلة بـ ${widget.details.students.length} طالب الآن؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('ابدأ'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    setState(() => _busy = true);
+    try {
+      await ref.read(activateTripActionProvider)(widget.details.tripId);
+      if (!mounted) return;
+      // Re-fetch so the screen re-renders with the new status (InProgress
+      // shows the end-trip bar + boarding actions).
+      ref.invalidate(tripDetailsProvider(widget.details.tripId));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _delete() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('حذف الرحلة'),
+        content: const Text(
+          'هل تريد حذف هذه الرحلة المجدولة؟ لا يمكن التراجع.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.redDark),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('حذف'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    setState(() => _busy = true);
+    try {
+      await ref
+          .read(deleteScheduledTripActionProvider)(widget.details.tripId);
+      if (!mounted) return;
+      // Trip is gone — pop back to the home where myTodayTripsProvider
+      // (also invalidated by the action) will refetch the live list.
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.slate100)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            // Delete sits on the left so it's a deliberate reach. Fixed
+            // width avoids the Row's intrinsic-width footgun (same one
+            // that bit the trip-setup screen earlier).
+            SizedBox(
+              width: 96,
+              child: OutlinedButton.icon(
+                onPressed: _busy ? null : _delete,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.redDark,
+                  side: const BorderSide(color: AppColors.redDark),
+                ),
+                icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                label: const Text('حذف'),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: _busy ? null : _start,
+                icon: _busy
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.ink,
+                        ),
+                      )
+                    : const Icon(Icons.play_arrow_rounded, size: 18),
+                label: const Text('بدء الرحلة'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

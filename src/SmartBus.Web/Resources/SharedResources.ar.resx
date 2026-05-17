@@ -109,6 +109,18 @@
   <data name="SA_Sub_Type_Basic"     xml:space="preserve"><value>أساسي</value></data>
   <data name="SA_Sub_Type_Standard"  xml:space="preserve"><value>معياري</value></data>
   <data name="SA_Sub_Type_Premium"   xml:space="preserve"><value>مميز</value></data>
+  <data name="Admin_Settings_Plan_Current"  xml:space="preserve"><value>الباقة الحالية</value></data>
+  <data name="Admin_Settings_Plan_None"     xml:space="preserve"><value>لا يوجد اشتراك</value></data>
+  <data name="Admin_Settings_Plan_From"     xml:space="preserve"><value>من</value></data>
+  <data name="Admin_Settings_Plan_To"       xml:space="preserve"><value>إلى</value></data>
+  <data name="Admin_Settings_Plan_Live"     xml:space="preserve"><value>نشط</value></data>
+  <data name="Admin_Settings_Plan_Expired"  xml:space="preserve"><value>منتهي</value></data>
+  <data name="Admin_Settings_Plan_Future"   xml:space="preserve"><value>لم يبدأ بعد</value></data>
+  <data name="Admin_Settings_Plan_Disabled" xml:space="preserve"><value>موقوف</value></data>
+  <data name="Admin_Settings_Plan_Price"        xml:space="preserve"><value>السعر</value></data>
+  <data name="Admin_Settings_Plan_Currency"     xml:space="preserve"><value>د.أ</value></data>
+  <data name="Admin_Settings_Plan_MaxStudents"  xml:space="preserve"><value>الحد الأقصى للطلاب</value></data>
+  <data name="Admin_Settings_Plan_MaxBuses"     xml:space="preserve"><value>الحد الأقصى للباصات</value></data>
   <data name="SA_Sub_Price"          xml:space="preserve"><value>السعر</value></data>
   <data name="SA_Sub_ActivationDate" xml:space="preserve"><value>تاريخ التفعيل</value></data>
   <data name="SA_Sub_ExpirationDate" xml:space="preserve"><value>تاريخ الانتهاء</value></data>
@@ -394,7 +406,11 @@
   <!-- Driver modal labels -->
   <data name="Driver_NameAr"      xml:space="preserve"><value>الاسم بالعربية *</value></data>
   <data name="Driver_NameEn"      xml:space="preserve"><value>الاسم بالإنجليزية *</value></data>
-  <data name="Driver_Phone"       xml:space="preserve"><value>رقم الهاتف *</value></data>
+  <data name="Driver_Name"        xml:space="preserve"><value>الاسم</value></data>
+  <data name="Driver_Phone"       xml:space="preserve"><value>رقم الهاتف</value></data>
+  <data name="Driver_TypeLabel"     xml:space="preserve"><value>موظف</value></data>
+  <data name="Driver_ToggleType"    xml:space="preserve"><value>تبديل النوع (سائق / مساعد)</value></data>
+  <data name="Driver_ToggleStatus"  xml:space="preserve"><value>تفعيل / إيقاف</value></data>
   <data name="Driver_Status"      xml:space="preserve"><value>الحالة</value></data>
   <data name="Driver_Active"      xml:space="preserve"><value>نشط</value></data>
   <data name="Driver_Inactive"    xml:space="preserve"><value>غير نشط</value></data>
@@ -426,7 +442,7 @@
   <!-- Validation messages (shared) -->
   <data name="Validation_Required"      xml:space="preserve"><value>هذا الحقل مطلوب</value></data>
   <data name="Validation_DriverType"    xml:space="preserve"><value>النوع يجب أن يكون سائق أو مساعد</value></data>
-  <data name="Validation_PhoneFormat"   xml:space="preserve"><value>رقم الهاتف يجب أن يبدأ بـ 077 أو 078 أو 079 ويتكون من 10 أرقام</value></data>
+  <data name="Validation_PhoneFormat"   xml:space="preserve"><value>رقم الهاتف يجب أن يبدأ بـ 77 أو 78 أو 79 ويتكون من 9 أرقام (يُضاف +962 تلقائياً)</value></data>
   <data name="Validation_NationalNumberFormat" xml:space="preserve"><value>الرقم الوطني يجب أن يتكون من 10 أرقام</value></data>
   <data name="Validation_TimeFormat"    xml:space="preserve"><value>صيغة الوقت يجب أن تكون HH:mm</value></data>
 
@@ -501,16 +517,23 @@
   <data name="Bus_ColNumber"      xml:space="preserve"><value>#</value></data>
   <data name="Bus_TotalLabel"     xml:space="preserve"><value>إجمالي الباصات</value></data>
   <data name="Bus_Loading"        xml:space="preserve"><value>جاري التحميل...</value></data>
-  <data name="Bus_SearchNumber"   xml:space="preserve"><value>ابحث برقم الباص...</value></data>
+  <data name="Bus_SearchNumber"   xml:space="preserve"><value>ابحث برقم الباص</value></data>
   <data name="Bus_SearchPerson"   xml:space="preserve"><value>ابحث باسم السائق أو المساعد...</value></data>
   <data name="Bus_TypeLabel"      xml:space="preserve"><value>باص</value></data>
   <data name="Bus_QRTitle"        xml:space="preserve"><value>رمز QR للباص</value></data>
   <data name="Bus_QRHint"         xml:space="preserve"><value>يقوم السائق أو المساعد بمسح هذا الرمز من تطبيق الجوّال لبدء الرحلة تلقائياً.</value></data>
   <data name="Bus_QRPrint"        xml:space="preserve"><value>طباعة</value></data>
-  <data name="Bus_AddBtn"         xml:space="preserve"><value>إضافة باص</value></data>
-  <data name="Bus_AddTitle"       xml:space="preserve"><value>إضافة باص جديد</value></data>
+  <data name="Bus_AddBtn"         xml:space="preserve"><value>إضافة باصات</value></data>
+  <data name="Bus_AddTitle"       xml:space="preserve"><value>إضافة باصات جديدة</value></data>
   <data name="Bus_EditTitle"      xml:space="preserve"><value>تعديل بيانات باص</value></data>
-  <data name="Bus_Number"         xml:space="preserve"><value>رقم الباص *</value></data>
+  <data name="Bus_Batch_Title"    xml:space="preserve"><value>إضافة باصات</value></data>
+  <data name="Bus_Batch_Hint"     xml:space="preserve"><value>يتم توليد رقم كل باص تلقائياً (BUS-0001، BUS-0002، …)</value></data>
+  <data name="Bus_Batch_Count"    xml:space="preserve"><value>عدد الباصات</value></data>
+  <data name="Bus_Batch_Create"   xml:space="preserve"><value>إنشاء</value></data>
+  <data name="Bus_Batch_Created"  xml:space="preserve"><value>تم إنشاء {0} باص ✓</value></data>
+  <data name="Bus_Batch_InvalidCount" xml:space="preserve"><value>أدخل عدداً صحيحاً أكبر من صفر.</value></data>
+  <data name="Bus_ToggleStatus"   xml:space="preserve"><value>تفعيل / إيقاف</value></data>
+  <data name="Bus_Number"         xml:space="preserve"><value>رقم الباص</value></data>
   <data name="Bus_Capacity"       xml:space="preserve"><value>الطاقة الاستيعابية *</value></data>
   <data name="Bus_Status"         xml:space="preserve"><value>الحالة</value></data>
   <data name="Bus_StatusActive"   xml:space="preserve"><value>نشط</value></data>

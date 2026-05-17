@@ -1,7 +1,30 @@
-@model AdminPageViewModel
+@model SettingsPageViewModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = Model.PageTitle;
+
+    // Derive the plan label + 4-state status (live / expired / future /
+    // disabled) from the dates + IsActive flag. Mirrors the SuperAdmin
+    // schools-grid logic so admins and SA see the same picture.
+    string? planLabel = Model.SubscriptionType switch
+    {
+        SmartBus.Domain.Enums.SubscriptionType.Trial    => L["SA_Sub_Type_Trial"].Value,
+        SmartBus.Domain.Enums.SubscriptionType.Basic    => L["SA_Sub_Type_Basic"].Value,
+        SmartBus.Domain.Enums.SubscriptionType.Standard => L["SA_Sub_Type_Standard"].Value,
+        SmartBus.Domain.Enums.SubscriptionType.Premium  => L["SA_Sub_Type_Premium"].Value,
+        _ => null
+    };
+
+    string statusKey;
+    var today = DateTime.UtcNow.Date;
+    if (Model.SubscriptionType is null)                                  statusKey = "Admin_Settings_Plan_None";
+    else if (Model.SubscriptionIsActive == false)                        statusKey = "Admin_Settings_Plan_Disabled";
+    else if (Model.SubscriptionActivationDate?.Date > today)             statusKey = "Admin_Settings_Plan_Future";
+    else if (Model.SubscriptionExpirationDate?.Date < today)             statusKey = "Admin_Settings_Plan_Expired";
+    else                                                                  statusKey = "Admin_Settings_Plan_Live";
+
+    string FormatDate(DateTime? d)
+        => d?.ToString("d MMM yyyy", System.Globalization.CultureInfo.CurrentUICulture) ?? "—";
 }
 
 <div class="settings-grid">
@@ -66,13 +89,45 @@
     <div class="settings-section">
       <div class="settings-section-title">الباقة</div>
       <div class="plan-card">
-        <div class="plan-card-label">الباقة الحالية</div>
-        <div class="plan-card-name">Premium Plan</div>
-        <div class="plan-card-expiry">تنتهي 30 يونيو 2026</div>
-        <div class="plan-card-features">
-          <div class="plan-card-feature">✓ طلاب غير محدود</div>
-          <div class="plan-card-feature">✓ تتبع GPS</div>
-          <div class="plan-card-feature">✓ تقارير متقدمة</div>
+        <div class="plan-card-label">@L["Admin_Settings_Plan_Current"]</div>
+        <div class="plan-card-name">@(planLabel ?? L["Admin_Settings_Plan_None"].Value)</div>
+        @if (Model.SubscriptionActivationDate.HasValue || Model.SubscriptionExpirationDate.HasValue)
+        {
+          <div class="plan-card-dates">
+            <span class="plan-card-date-pair">
+              @L["Admin_Settings_Plan_From"] <strong>@FormatDate(Model.SubscriptionActivationDate)</strong>
+              @L["Admin_Settings_Plan_To"]   <strong>@FormatDate(Model.SubscriptionExpirationDate)</strong>
+            </span>
+          </div>
+        }
+        @if (Model.SubscriptionPrice.HasValue || Model.SubscriptionMaxStudents.HasValue || Model.SubscriptionMaxBuses.HasValue)
+        {
+          <dl class="plan-card-details">
+            @if (Model.SubscriptionPrice.HasValue)
+            {
+              <div class="plan-card-detail">
+                <dt>@L["Admin_Settings_Plan_Price"]</dt>
+                <dd>@Model.SubscriptionPrice.Value.ToString("0.##") <span class="plan-card-detail-unit">@L["Admin_Settings_Plan_Currency"]</span></dd>
+              </div>
+            }
+            @if (Model.SubscriptionMaxStudents.HasValue)
+            {
+              <div class="plan-card-detail">
+                <dt>@L["Admin_Settings_Plan_MaxStudents"]</dt>
+                <dd>@Model.SubscriptionMaxStudents.Value</dd>
+              </div>
+            }
+            @if (Model.SubscriptionMaxBuses.HasValue)
+            {
+              <div class="plan-card-detail">
+                <dt>@L["Admin_Settings_Plan_MaxBuses"]</dt>
+                <dd>@Model.SubscriptionMaxBuses.Value</dd>
+              </div>
+            }
+          </dl>
+        }
+        <div class="plan-card-status plan-status-@statusKey.Substring("Admin_Settings_Plan_".Length).ToLower()">
+          @L[statusKey]
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartBus.Application.Features.Schools.Queries.GetMyFleetSchool;
 using SmartBus.Application.Features.Schools.Queries.GetMySchool;
 using SmartBus.Application.Features.Students.Commands.BulkUpsertStudents;
 using SmartBus.Application.Features.Students.Commands.CreateStudent;
@@ -13,6 +14,7 @@ using SmartBus.Application.Features.Students.Commands.UpdateStudent;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.Students.Queries.GetStudentById;
 using SmartBus.Application.Features.Students.Queries.GetStudentRegistrationToken;
+using SmartBus.Application.Features.Students.Queries.ResolveStudentQr;
 
 namespace SmartBus.API.Controllers.v1;
 
@@ -36,17 +38,22 @@ public class StudentsController : ControllerBase
         [FromQuery] string? homeArea = null,
         CancellationToken cancellationToken = default)
     {
-        // Resolve the requesting admin's school so the query handler can
-        // scope by school + active subscription. SuperAdmin requests without
-        // a school context get an empty page; cross-school browsing should
-        // use a dedicated SuperAdmin endpoint.
+        // Resolve the requesting user's school so the handler can scope by
+        // school + active subscription. Admin path first (email →
+        // School.AdminEmail); on miss, fleet path (userId →
+        // Driver/Assistant.UserId → SchoolId) so the mobile driver/
+        // assistant flows see their own school's roster. SuperAdmin
+        // requests without a school context still get an empty page.
         Guid? schoolId = null;
-        var email = User.FindFirstValue(ClaimTypes.Email);
+        var email  = User.FindFirstValue(ClaimTypes.Email);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!string.IsNullOrEmpty(email))
         {
             var schoolResult = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
             if (schoolResult.IsSuccess) schoolId = schoolResult.Data!.Id;
         }
+        if (schoolId is null && !string.IsNullOrEmpty(userId))
+            schoolId = await _mediator.Send(new GetMyFleetSchoolQuery(userId), cancellationToken);
 
         return Ok(await _mediator.Send(
             new GetAllStudentsQuery(pageNumber, pageSize, routeId, name, grade, homeArea, schoolId),
@@ -176,6 +183,20 @@ public class StudentsController : ControllerBase
         var result = await _mediator.Send(new ScanStudentQrCommand(request.Token, request.TripId), cancellationToken);
         return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
     }
+
+    /// <summary>
+    /// Resolve a student-QR token to its linked student, side-effect free.
+    /// Used by the trip-setup screen to add a student to the pending roster
+    /// before the trip itself exists. Pass the same token to /scan once the
+    /// trip is live to actually flip boarding state.
+    /// </summary>
+    [HttpPost("resolve-qr")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> ResolveQr([FromBody] ResolveStudentQrRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new ResolveStudentQrQuery(request.Token), cancellationToken);
+        return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
+    }
 }
 
 public record CreateStudentRequest(
@@ -196,5 +217,7 @@ public record RegisterStudentFromQrRequest(
     double? Latitude, double? Longitude);
 
 public record ScanStudentQrRequest(string Token, Guid TripId);
+
+public record ResolveStudentQrRequest(string Token);
 
 public record BulkUpsertStudentsRequest(IReadOnlyList<BulkUpsertStudentRow> Rows);

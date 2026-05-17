@@ -19,19 +19,19 @@ public class UpdateDriverCommandHandler : IRequestHandler<UpdateDriverCommand, R
         if (driver is null) return Result.Failure("Driver not found.");
 
         // Phone uniqueness — reject if another driver owns this number.
-        if (!string.Equals(driver.PhoneNumber, request.PhoneNumber, StringComparison.Ordinal))
+        if (!string.IsNullOrWhiteSpace(request.PhoneNumber)
+            && !string.Equals(driver.PhoneNumber, request.PhoneNumber, StringComparison.Ordinal))
         {
             var phoneTaken = await _context.Drivers
                 .AnyAsync(d => !d.IsDeleted && d.Id != request.DriverId && d.PhoneNumber == request.PhoneNumber, cancellationToken);
             if (phoneTaken)
                 return Result.Failure($"Phone '{request.PhoneNumber}' is already used by another driver.");
+            driver.PhoneNumber = request.PhoneNumber;
         }
-
-        driver.FullName     = request.FullName;
-        driver.FullNameEn   = request.FullNameEn;
-        driver.PhoneNumber  = request.PhoneNumber;
-        driver.IsActive     = request.IsActive;
-        driver.DriverType   = request.DriverType;
+        if (!string.IsNullOrWhiteSpace(request.FullName))   driver.FullName   = request.FullName;
+        if (request.FullNameEn is not null)                  driver.FullNameEn = request.FullNameEn;
+        if (request.IsActive   is bool active)               driver.IsActive   = active;
+        if (request.DriverType is SmartBus.Domain.Enums.DriverType type) driver.DriverType = type;
 
         await _unitOfWork.Drivers.UpdateAsync(driver);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

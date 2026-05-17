@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
+using SmartBus.Application.Common.Utilities;
 using SmartBus.Domain.Entities;
 using SmartBus.Domain.Enums;
 
@@ -91,7 +92,8 @@ public class RegisterFromQrCommandHandler
                 PhoneNumber = phone,
                 UserId      = user.Id,
                 IsActive    = true,
-                DriverType  = DriverType.Driver
+                DriverType  = DriverType.Driver,
+                SchoolId    = qr.SchoolId
             };
             await _unitOfWork.Drivers.AddAsync(driver, ct);
             await _unitOfWork.SaveChangesAsync(ct);
@@ -105,7 +107,8 @@ public class RegisterFromQrCommandHandler
             {
                 FullName    = name,
                 PhoneNumber = phone,
-                UserId      = user.Id
+                UserId      = user.Id,
+                SchoolId    = qr.SchoolId
             };
             await _unitOfWork.Assistants.AddAsync(assistant, ct);
             await _unitOfWork.SaveChangesAsync(ct);
@@ -133,6 +136,8 @@ public class RegisterFromQrCommandHandler
     private static Result<RegisterFromQrResponse> Fail(string message) =>
         Result<RegisterFromQrResponse>.Failure(message);
 
-    private static string NormalizePhone(string? raw) =>
-        new string((raw ?? string.Empty).Where(char.IsDigit).ToArray());
+    // Delegate to the shared helper so this flow stores canonical "+9627XXX..."
+    // matching the rest of the app — drivers / assistants are looked up by
+    // phone elsewhere too, so the formats must agree.
+    private static string NormalizePhone(string? raw) => PhoneNumberHelper.Normalize(raw);
 }

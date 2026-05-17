@@ -288,6 +288,39 @@ tr.row-incomplete:hover { background: #FEF3C7; }
 .bus-qr-canvas { display: flex; justify-content: center; padding: 8px 0 4px; }
 .bus-qr-canvas canvas { border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
 .bus-qr-token { font-size: 10px; color: #94A3B8; margin: 12px 0 10px; word-break: break-all; font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; }
+
+/* Inline grid editing on the Buses page. The bus number is rendered as a
+   plain-looking text input that activates on focus; the status is a pill
+   button that toggles Active/Inactive on click. */
+.bus-number-edit { width: 140px; padding: 6px 8px; font-size: 13px; font-weight: 600;
+                   border: 1px solid transparent; border-radius: 6px; background: transparent;
+                   font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; }
+.bus-number-edit:focus { border-color: var(--bl, #3B82F6); background: #fff;
+                         outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+.bus-number-edit:hover:not(:focus) { background: #F1F5F9; }
+.bus-status-toggle { cursor: pointer; border: none; padding: 4px 10px; font: inherit; }
+.bus-status-toggle:hover { filter: brightness(0.95); }
+/* Inline QR thumbnail in the grid — server-rendered PNG via /Buses/Qr.
+   Clickable to open the print modal. */
+.bus-qr-cell { width: 56px; height: 56px; display: inline-block; background: #fff;
+               border: 1px solid #E2E8F0; border-radius: 8px; padding: 4px; cursor: pointer;
+               image-rendering: pixelated; }
+.bus-qr-cell:hover { border-color: #7C3AED; box-shadow: 0 0 0 3px rgba(124,58,237,.12); }
+
+/* Inline grid editing on the Drivers page. Name + phone are <input>s that
+   look like text until focus; type + status pills toggle on click. */
+.driver-inline-edit { width: 100%; max-width: 200px; padding: 6px 8px; font-size: 13px; font-weight: 600;
+                      border: 1px solid transparent; border-radius: 6px; background: transparent;
+                      box-sizing: border-box; }
+.driver-inline-edit:focus { border-color: var(--bl, #3B82F6); background: #fff;
+                            outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+.driver-inline-edit:hover:not(:focus) { background: #F1F5F9; }
+.driver-phone-edit { display: inline-flex; align-items: center; gap: 4px; }
+.driver-phone-edit .prefix-static { font-size: 12px; color: #94A3B8; font-weight: 600;
+                                    font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; }
+.driver-phone-input { width: 120px !important; font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; }
+.driver-pill { cursor: pointer; border: none; padding: 4px 10px; font: inherit; }
+.driver-pill:hover { filter: brightness(0.95); }
 .modal-header-sub { font-size: 12px; color: #64748B; margin-top: 2px; }
 
 /* Schedule state button (buses table) */

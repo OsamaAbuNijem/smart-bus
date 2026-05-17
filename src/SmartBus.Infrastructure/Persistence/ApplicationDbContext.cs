@@ -223,6 +223,31 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             .IsRequired(false)
             .OnDelete(DeleteBehavior.NoAction);
 
+        // Tenant scope: Bus / Driver / Assistant belong to a school. Nullable
+        // FK so existing rows (created before the column existed) survive
+        // the migration; new rows always have a SchoolId.
+        builder.Entity<Bus>()
+            .HasOne(b => b.School)
+            .WithMany()
+            .HasForeignKey(b => b.SchoolId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Driver>()
+            .HasOne(d => d.School)
+            .WithMany()
+            .HasForeignKey(d => d.SchoolId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Assistant>()
+            .HasOne(a => a.School)
+            .WithMany()
+            .HasForeignKey(a => a.SchoolId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Bus>()       .HasIndex(b => b.SchoolId);
+        builder.Entity<Driver>()    .HasIndex(d => d.SchoolId);
+        builder.Entity<Assistant>() .HasIndex(a => a.SchoolId);
+
         // StudentTrip composite index
         builder.Entity<StudentTrip>()
             .HasIndex(st => new { st.StudentId, st.TripId })

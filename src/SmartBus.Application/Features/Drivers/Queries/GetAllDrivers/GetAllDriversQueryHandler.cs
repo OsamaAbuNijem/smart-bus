@@ -15,6 +15,9 @@ public class GetAllDriversQueryHandler : IRequestHandler<GetAllDriversQuery, Pag
     {
         var query = _context.Drivers.Where(d => !d.IsDeleted);
 
+        if (request.SchoolId.HasValue)
+            query = query.Where(d => d.SchoolId == request.SchoolId.Value);
+
         if (request.DriverType.HasValue)
             query = query.Where(d => d.DriverType == request.DriverType.Value);
 

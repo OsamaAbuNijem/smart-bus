@@ -18,6 +18,12 @@ public class GetAllBusesQueryHandler : IRequestHandler<GetAllBusesQuery, PagedRe
             .Include(b => b.LastLocation)
             .AsQueryable();
 
+        // Tenant scope: when the caller passes a SchoolId, restrict to that
+        // school. SuperAdmin call sites that legitimately want cross-school
+        // results pass null.
+        if (request.SchoolId.HasValue)
+            baseQuery = baseQuery.Where(b => b.SchoolId == request.SchoolId.Value);
+
         // Plate-number filter (substring, case-insensitive).
         if (!string.IsNullOrWhiteSpace(request.PlateNumber))
         {
@@ -41,7 +47,10 @@ public class GetAllBusesQueryHandler : IRequestHandler<GetAllBusesQuery, PagedRe
         var totalCount = await baseQuery.CountAsync(cancellationToken);
 
         var busEntities = await baseQuery
-            .OrderByDescending(b => b.CreatedAt)
+            // Bus numbers are BUS-#### so a lexicographic sort matches the
+            // visual numeric order (zero-padded). Reverts the previous newest-
+            // first sort: the admin grid is easier to scan in serial order.
+            .OrderBy(b => b.PlateNumber)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);

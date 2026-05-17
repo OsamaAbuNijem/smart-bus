@@ -6,21 +6,19 @@
 const students = {
   _filterTimer: null,
 
-  // Read current filter state from hidden inputs (single source of truth)
+  // Read current filter state from hidden inputs (single source of truth).
+  // Grade + home-area filters have been removed from the UI; the API still
+  // accepts those query params but we no longer send them from this page.
   _state() {
     return {
-      page:     document.getElementById('students-page').value,
-      name:     document.getElementById('students-filter-name').value,
-      grade:    document.getElementById('students-filter-grade').value,
-      homeArea: document.getElementById('students-filter-area').value
+      page: document.getElementById('students-page').value,
+      name: document.getElementById('students-filter-name').value
     };
   },
 
-  _qs({ page, name, grade, homeArea }) {
+  _qs({ page, name }) {
     const qs = new URLSearchParams({ page });
-    if (name)     qs.set('name', name);
-    if (grade)    qs.set('grade', grade);
-    if (homeArea) qs.set('homeArea', homeArea);
+    if (name) qs.set('name', name);
     return qs.toString();
   },
 
@@ -54,12 +52,10 @@ const students = {
   prev()  { this.goto(parseInt(document.getElementById('students-page').value) - 1); },
   next()  { this.goto(parseInt(document.getElementById('students-page').value) + 1); },
 
-  // Filters — when any filter changes, reset to page 1 and refetch
+  // Filters — only the name search remains in the UI.
   applyFilters() {
-    document.getElementById('students-filter-name').value  = document.getElementById('students-name-input').value.trim();
-    document.getElementById('students-filter-grade').value = document.getElementById('students-grade-select').value;
-    document.getElementById('students-filter-area').value  = document.getElementById('students-area-input').value.trim();
-    document.getElementById('students-page').value         = 1;
+    document.getElementById('students-filter-name').value = document.getElementById('students-name-input').value.trim();
+    document.getElementById('students-page').value        = 1;
     this.load();
   },
 
@@ -72,9 +68,7 @@ const students = {
   exportFile() {
     const s  = this._state();
     const qs = new URLSearchParams();
-    if (s.name)     qs.set('name', s.name);
-    if (s.grade)    qs.set('grade', s.grade);
-    if (s.homeArea) qs.set('homeArea', s.homeArea);
+    if (s.name) qs.set('name', s.name);
     location.href = '/Students/Export' + (qs.toString() ? '?' + qs : '');
   },
 
@@ -94,9 +88,7 @@ const students = {
     const s     = this._state();
     const id    = form.dataset.id;
     const extra = `&page=${s.page}`
-                + (s.name     ? '&name='     + encodeURIComponent(s.name)     : '')
-                + (s.grade    ? '&grade='    + s.grade                        : '')
-                + (s.homeArea ? '&homeArea=' + encodeURIComponent(s.homeArea) : '');
+                + (s.name ? '&name=' + encodeURIComponent(s.name) : '');
     const url   = id ? `/Students/Update?id=${id}${extra}` : '/Students/Save';
     const res   = await fetch(url, {
       method: 'POST',
@@ -296,25 +288,17 @@ const students = {
 // and browser autofill), then refresh the list. Sidebar click = fresh navigation
 // = this runs = empty name/grade filters.
 function _studentsReset() {
-  const nameInput    = document.getElementById('students-name-input');
-  const gradeSelect  = document.getElementById('students-grade-select');
-  const areaInput    = document.getElementById('students-area-input');
-  const pageHidden   = document.getElementById('students-page');
-  const nameHidden   = document.getElementById('students-filter-name');
-  const gradeHidden  = document.getElementById('students-filter-grade');
-  const areaHidden   = document.getElementById('students-filter-area');
+  const nameInput  = document.getElementById('students-name-input');
+  const pageHidden = document.getElementById('students-page');
+  const nameHidden = document.getElementById('students-filter-name');
   if (nameInput) {
     nameInput.value = '';
     // Re-arm readonly — keeps the Chrome autofill trick working after modal opens
     // or any DOM mutation that causes Chrome to rescan forms.
     nameInput.setAttribute('readonly', '');
   }
-  if (areaInput)   areaInput.value   = '';
-  if (gradeSelect) gradeSelect.value = '';
-  if (pageHidden)  pageHidden.value  = '1';
-  if (nameHidden)  nameHidden.value  = '';
-  if (gradeHidden) gradeHidden.value = '';
-  if (areaHidden)  areaHidden.value  = '';
+  if (pageHidden) pageHidden.value = '1';
+  if (nameHidden) nameHidden.value = '';
 }
 
 document.addEventListener('DOMContentLoaded', () => { _studentsReset(); students.load(); });

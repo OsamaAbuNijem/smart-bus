@@ -16,12 +16,25 @@ public class GetAllBusSchedulesQueryHandler
     public async Task<Result<List<BusScheduleSummaryDto>>> Handle(
         GetAllBusSchedulesQuery request, CancellationToken cancellationToken)
     {
-        var schedules = await _context.BusSchedules
-            .Select(s => new BusScheduleSummaryDto(
-                s.BusId,
-                s.MorningTime.ToString("HH:mm"),
-                s.ReturnTime.ToString("HH:mm"),
-                s.RepeatDays))
+        // Join to Bus so we drop schedules whose parent bus has been soft-
+        // deleted (orphan rows that previously leaked into the mobile new-
+        // trip picker), and so we can scope by the caller's school. Caller-
+        // less SuperAdmin calls (SchoolId == null) still see every live row.
+        var query =
+            from s in _context.BusSchedules
+            join b in _context.Buses on s.BusId equals b.Id
+            where !b.IsDeleted
+            select new { s, b };
+
+        if (request.SchoolId.HasValue)
+            query = query.Where(x => x.b.SchoolId == request.SchoolId.Value);
+
+        var schedules = await query
+            .Select(x => new BusScheduleSummaryDto(
+                x.s.BusId,
+                x.s.MorningTime.ToString("HH:mm"),
+                x.s.ReturnTime.ToString("HH:mm"),
+                x.s.RepeatDays))
             .ToListAsync(cancellationToken);
 
         return Result<List<BusScheduleSummaryDto>>.Success(schedules);

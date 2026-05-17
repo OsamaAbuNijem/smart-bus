@@ -31,38 +31,53 @@ public class GetMyTodayTripsQueryHandler
         if (string.IsNullOrEmpty(userId))
             return Result<List<MyTodayTripDto>>.Failure("Unauthenticated.");
 
+        // Caller is either in the Drivers table (Driver/Assistant role) or
+        // the parallel Assistants table (QR-registered path). Resolve their
+        // school from whichever matches so we can still show school-wide
+        // trips when they aren't in any BusSchedule slot.
         var driver = await _context.Drivers
             .FirstOrDefaultAsync(d => d.UserId == userId, ct);
-        if (driver is null)
-            return Result<List<MyTodayTripDto>>.Success(new List<MyTodayTripDto>());
+        Guid? schoolId = driver?.SchoolId;
+        if (schoolId is null)
+        {
+            schoolId = await _context.Assistants
+                .Where(a => a.UserId == userId && !a.IsDeleted)
+                .Select(a => a.SchoolId)
+                .FirstOrDefaultAsync(ct);
+        }
 
-        var schedules = await _context.BusSchedules
-            .Where(s =>
-                s.MorningDriverId    == driver.Id ||
-                s.MorningAssistantId == driver.Id ||
-                s.ReturnDriverId     == driver.Id ||
-                s.ReturnAssistantId  == driver.Id)
-            .Select(s => new
-            {
-                s.Id,
-                s.BusId,
-                BusPlate = s.Bus!.PlateNumber,
-                s.MorningTime,
-                s.ReturnTime,
-                s.MorningDriverId,
-                s.MorningAssistantId,
-                s.ReturnDriverId,
-                s.ReturnAssistantId
-            })
-            .ToListAsync(ct);
-
-        if (schedules.Count == 0)
-            return Result<List<MyTodayTripDto>>.Success(new List<MyTodayTripDto>());
+        var scheduleBusIds = driver is null
+            ? new List<Guid>()
+            : await _context.BusSchedules
+                .Where(s =>
+                    s.MorningDriverId    == driver.Id ||
+                    s.MorningAssistantId == driver.Id ||
+                    s.ReturnDriverId     == driver.Id ||
+                    s.ReturnAssistantId  == driver.Id)
+                .Select(s => s.BusId)
+                .Distinct()
+                .ToListAsync(ct);
 
         var today     = DateTime.UtcNow.Date;
         var tomorrow  = today.AddDays(1);
         var rangeFrom = today.AddDays(-LookbackDays);
-        var busIds    = schedules.Select(s => s.BusId).Distinct().ToList();
+
+        // Visible buses = whatever the schedule says ∪ every bus in the
+        // caller's school. The school union ensures assistants who manually
+        // create trips (no schedule slot) still see them in today's list.
+        var schoolBusIds = schoolId is null
+            ? new List<Guid>()
+            : await _context.Buses
+                .Where(b => b.SchoolId == schoolId && !b.IsDeleted)
+                .Select(b => b.Id)
+                .ToListAsync(ct);
+        var busIds = scheduleBusIds.Concat(schoolBusIds).Distinct().ToList();
+        if (busIds.Count == 0)
+            return Result<List<MyTodayTripDto>>.Success(new List<MyTodayTripDto>());
+
+        var schedulesByBus = await _context.Buses
+            .Where(b => busIds.Contains(b.Id))
+            .ToDictionaryAsync(b => b.Id, b => b.PlateNumber, ct);
 
         // Real trips on those buses across the window.
         var tripsRaw = await _context.Trips
@@ -82,14 +97,12 @@ public class GetMyTodayTripsQueryHandler
                 t.StudentTrips.Count(st => st.BoardingStatus == BoardingStatus.Boarded)))
             .ToListAsync(ct);
 
-        // Show only trips the assistant actually started. No schedule-based
-        // placeholders — the home should reflect real activity.
-        var schedulesByBus = schedules.ToDictionary(s => s.BusId);
+        // Trip → plate. Live (InProgress) sorts first, then Scheduled, then
+        // anything else (Completed). Newest within each bucket.
         var result = tripsRaw
             .Select(t =>
             {
-                var sched = schedulesByBus.GetValueOrDefault(t.BusId);
-                var plate = sched?.BusPlate ?? string.Empty;
+                var plate = schedulesByBus.GetValueOrDefault(t.BusId, string.Empty);
                 return new MyTodayTripDto(
                     t.Id, t.BusId, plate,
                     t.Type.ToString(),
@@ -100,8 +113,8 @@ public class GetMyTodayTripsQueryHandler
                     t.StudentCount,
                     t.BoardedCount);
             })
-            // Live first, then completed/recent — newest first.
-            .OrderBy(r => r.Status == "InProgress" ? 0 : 1)
+            .OrderBy(r => r.Status == "InProgress" ? 0
+                          : r.Status == "Scheduled" ? 1 : 2)
             .ThenByDescending(r => r.ScheduledDeparture)
             .ToList();
 

@@ -904,6 +904,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantNfcUnavailable => 'NFC isn\'t available on this device.';
 
   @override
+  String get assistantScanQr => 'Scan QR';
+
+  @override
+  String get assistantScanNfc => 'Scan NFC';
+
+  @override
+  String get assistantSearchByName => 'Search students by name';
+
+  @override
+  String get assistantRosterHeader => 'Students on this trip';
+
+  @override
+  String get assistantRosterEmpty => 'Add at least one student before starting';
+
+  @override
+  String get assistantNoResults => 'No results';
+
+  @override
   String get assistantBoardedLabel => 'Boarded';
 
   @override

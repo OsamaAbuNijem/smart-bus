@@ -1,9 +1,14 @@
 /**
- * SmartBus Admin — Drivers page.
- * Mutations return { result, html, page }. Export / Import / Template mirror
- * the Students page.
+ * SmartBus Admin — Drivers + Assistants page.
+ *
+ * Grid: every field is inline-editable. Name + phone commit on blur/Enter;
+ * type + status are clickable pills that flip on click. The only action
+ * column button is delete. New drivers come in through the slim form
+ * modal (name / phone / type). Status defaults to Active server-side.
+ *
+ * Phone is shown as a 9-digit local part next to a "+962" chip; the
+ * server still stores "0XXXXXXXXX" so we prepend "0" on every submit.
  */
-
 const drivers = {
 
   async load() {
@@ -41,28 +46,22 @@ const drivers = {
     this.load();
   },
 
-  goto(page) {
-    document.getElementById('drivers-page').value = page;
-    this.load();
-  },
+  goto(page) { document.getElementById('drivers-page').value = page; this.load(); },
   prev() { this.goto(parseInt(document.getElementById('drivers-page').value) - 1); },
   next() { this.goto(parseInt(document.getElementById('drivers-page').value) + 1); },
 
-  async openForm(id) {
-    const url = id ? `/Drivers/Form?id=${id}` : '/Drivers/Form';
-    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+  // ── Add form (single-row create) ────────────────────────────────────────
+  async openForm() {
+    const res = await fetch('/Drivers/Form', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
     document.getElementById('driver-form-container').innerHTML = await res.text();
     SB.openModal('modal-driver');
   },
 
   async submit(form) {
-    const id     = form.dataset.id;
-    const page   = document.getElementById('drivers-page').value;
-    const filter = document.getElementById('drivers-filter').value;
-    const url    = id
-      ? `/Drivers/Update?id=${id}&page=${page}${filter ? '&driverType=' + filter : ''}`
-      : '/Drivers/Save';
-    const res    = await fetch(url, {
+    // Phone input carries the 9-digit local part next to the "+962" chip.
+    // No normalisation: the server validates the raw 9 digits (and also
+    // accepts the legacy "0…" / canonical "+962…" shapes for round-trips).
+    const res = await fetch('/Drivers/Save', {
       method: 'POST',
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
       body: new FormData(form)
@@ -81,6 +80,60 @@ const drivers = {
     }
   },
 
+  // ── Inline grid edits ───────────────────────────────────────────────────
+  commit(input) {
+    const id       = input.dataset.id;
+    const field    = input.dataset.field;
+    const original = input.dataset.original || '';
+    let   value    = (input.value || '').trim();
+    if (!id || !field || value === original) { input.value = original; return; }
+    if (!value) { input.value = original; return; }
+    // Phone is the raw 9-digit local part (the "+962" chip is purely visual).
+    const payload = { [field]: value };
+    this._patch(id, payload, () => { input.dataset.original = value; });
+  },
+
+  onKey(e) {
+    if (e.key === 'Enter')  { e.preventDefault(); e.target.blur(); }
+    if (e.key === 'Escape') { e.target.value = e.target.dataset.original || ''; e.target.blur(); }
+  },
+
+  toggleStatus(btn) {
+    const id      = btn.dataset.id;
+    const current = btn.dataset.current === 'true';
+    this._patch(id, { isActive: !current });
+  },
+
+  toggleType(btn) {
+    const id   = btn.dataset.id;
+    const next = btn.dataset.current === 'Assistant' ? 'Driver' : 'Assistant';
+    this._patch(id, { driverType: next });
+  },
+
+  async _patch(id, body, onSuccess) {
+    const page   = document.getElementById('drivers-page').value;
+    const filter = document.getElementById('drivers-filter').value;
+    const fd = new FormData();
+    Object.entries(body).forEach(([k, v]) => fd.append(k, v));
+    const url = `/Drivers/UpdateField?id=${id}&page=${page}${filter ? '&typeFilter=' + filter : ''}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: fd
+    });
+    if (res.ok) {
+      const { result, html } = await res.json();
+      if (html)   this._renderList(html);
+      if (result) SB.ShowMessage(result);
+      onSuccess?.();
+    } else {
+      const { result } = await res.json().catch(() => ({}));
+      SB.ShowMessage(result || 'Update failed');
+      this.load(); // refresh to revert visual state on conflict
+    }
+  },
+
+  // ── Delete ──────────────────────────────────────────────────────────────
   askDelete(btn) {
     document.getElementById('del-item-name').textContent = btn.dataset.name;
     document.getElementById('del-item-type').textContent = btn.dataset.type;
@@ -104,14 +157,13 @@ const drivers = {
     }
   },
 
-  // ── Export / Template ────────────────────────────────────────────────────
+  // ── Export / Template / Import ──────────────────────────────────────────
   exportFile() {
     const filter = document.getElementById('drivers-filter').value;
     location.href = '/Drivers/Export' + (filter ? '?driverType=' + filter : '');
   },
   downloadTemplate() { location.href = '/Drivers/Template'; },
 
-  // ── Import ───────────────────────────────────────────────────────────────
   openImport() {
     document.getElementById('drivers-import-file').value = '';
     SB.openModal('modal-drivers-import');

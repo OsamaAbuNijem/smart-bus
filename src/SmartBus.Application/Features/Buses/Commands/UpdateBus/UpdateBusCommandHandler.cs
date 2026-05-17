@@ -19,11 +19,22 @@ public class UpdateBusCommandHandler : IRequestHandler<UpdateBusCommand, Result>
         var bus = await _unitOfWork.Buses.GetByIdAsync(request.BusId, cancellationToken);
         if (bus is null) return Result.Failure("Bus not found.");
 
-        var status = Enum.TryParse<BusStatus>(request.Status, out var s) ? s : bus.Status;
-
-        bus.PlateNumber = request.PlateNumber;
-        bus.Capacity    = request.Capacity;
-        bus.Status      = status;
+        if (!string.IsNullOrWhiteSpace(request.PlateNumber))
+        {
+            var newPlate = request.PlateNumber.Trim();
+            if (!string.Equals(bus.PlateNumber, newPlate, StringComparison.Ordinal))
+            {
+                var clash = await _unitOfWork.Buses.GetByPlateNumberAsync(newPlate, cancellationToken);
+                if (clash is not null && clash.Id != bus.Id)
+                    return Result.Failure($"Bus number '{newPlate}' is already in use.");
+                bus.PlateNumber = newPlate;
+            }
+        }
+        if (request.Capacity is int cap)
+            bus.Capacity = cap;
+        if (!string.IsNullOrWhiteSpace(request.Status)
+            && Enum.TryParse<BusStatus>(request.Status, true, out var s))
+            bus.Status = s;
 
         await _unitOfWork.Buses.UpdateAsync(bus);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

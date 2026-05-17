@@ -2,9 +2,11 @@ namespace SmartBus.Application.Common.Utilities;
 
 /// <summary>
 /// Canonicalises Jordanian mobile numbers so DB writes and lookups are
-/// consistent regardless of which format the operator typed. Canonical form
-/// is the international "+9627XXXXXXXX". Accepted inputs include:
-///   07XXXXXXXX     (legacy local, 10 digits)
+/// consistent regardless of which format the operator typed. The 9-digit
+/// local part is always "7XXXXXXXX" — first digit is 7 (mobile range) and
+/// the second digit is 7, 8, or 9 (077 / 078 / 079 carrier prefixes).
+/// Canonical form is the international "+9627XXXXXXXX". Accepted inputs:
+///   07XXXXXXXX     (legacy local, 10 digits, prefix 077/078/079)
 ///   7XXXXXXXX      (9 digits, no leading 0)
 ///   +9627XXXXXXXX  (already canonical — passes through)
 ///   9627XXXXXXXX   (canonical without +)
@@ -39,13 +41,17 @@ public static class PhoneNumberHelper
         if (s.StartsWith("00962")) s = "+" + s[2..];
         // 9627XXXXXXXX → +9627XXXXXXXX
         else if (s.StartsWith("962") && !s.StartsWith("+962")) s = "+" + s;
-        // 07XXXXXXXX → +9627XXXXXXXX
-        else if (s.Length == 10 && s.StartsWith("07")) s = CountryDial + s[1..];
-        // 7XXXXXXXX  → +9627XXXXXXXX
-        else if (s.Length == 9 && s.StartsWith("7")) s = CountryDial + s;
+        // 07XXXXXXXX → +9627XXXXXXXX (legacy local form, prefix 077/078/079)
+        else if (s.Length == 10 && s.StartsWith("07") && IsValidSecondDigit(s[2])) s = CountryDial + s[1..];
+        // 7XXXXXXXX  → +9627XXXXXXXX (9 digits, prefix 77/78/79)
+        else if (s.Length == 9 && s.StartsWith("7") && IsValidSecondDigit(s[1])) s = CountryDial + s;
 
         return s;
     }
+
+    /// <summary>Second digit of the local part must be 7, 8, or 9 (the
+    /// 077 / 078 / 079 carrier prefixes for Jordan mobiles).</summary>
+    private static bool IsValidSecondDigit(char c) => c is '7' or '8' or '9';
 
     /// <summary>
     /// Given a canonical "+9627XXXXXXXX", returns the legacy local "07XXXXXXXX"

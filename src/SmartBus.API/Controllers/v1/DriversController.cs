@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,8 @@ using SmartBus.Application.Features.Drivers.Commands.UpdateDriver;
 using SmartBus.Application.Features.Drivers.Commands.UpdateMyProfile;
 using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Drivers.Queries.GetDriverById;
+using SmartBus.Application.Features.Schools.Queries.GetMyFleetSchool;
+using SmartBus.Application.Features.Schools.Queries.GetMySchool;
 using SmartBus.Domain.Enums;
 
 namespace SmartBus.API.Controllers.v1;
@@ -44,7 +47,33 @@ public class DriversController : ControllerBase
         [FromQuery] int pageSize = 10,
         [FromQuery] DriverType? driverType = null,
         CancellationToken cancellationToken = default)
-        => Ok(await _mediator.Send(new GetAllDriversQuery(pageNumber, pageSize, driverType), cancellationToken));
+    {
+        var schoolId = await ResolveAdminSchoolIdAsync(cancellationToken);
+        return Ok(await _mediator.Send(new GetAllDriversQuery(pageNumber, pageSize, driverType, schoolId), cancellationToken));
+    }
+
+    /// <summary>
+    /// Resolve the school for the calling user. Admin path first (email →
+    /// School.AdminEmail); on miss, fleet path (userId → Driver/Assistant.UserId).
+    /// Returns null for SA / unauthenticated callers.
+    /// </summary>
+    private async Task<Guid?> ResolveAdminSchoolIdAsync(CancellationToken cancellationToken)
+    {
+        var email  = User.FindFirstValue(ClaimTypes.Email);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!string.IsNullOrEmpty(email))
+        {
+            var school = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
+            if (school.IsSuccess) return school.Data!.Id;
+        }
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var fleetSchoolId = await _mediator.Send(new GetMyFleetSchoolQuery(userId), cancellationToken);
+            if (fleetSchoolId is not null) return fleetSchoolId;
+        }
+        return null;
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
@@ -57,7 +86,13 @@ public class DriversController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateDriverCommand command, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
+        // Stamp the calling admin's school onto the new row regardless of
+        // what (if anything) the client sent — Driver/Assistant must belong
+        // to the admin's tenant.
+        var schoolId = await ResolveAdminSchoolIdAsync(cancellationToken);
+        if (schoolId is null) return BadRequest(new { error = "School not found for this admin." });
+        var scoped = command with { SchoolId = schoolId };
+        var result = await _mediator.Send(scoped, cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Data }, result.Data)
             : BadRequest(new { error = result.Error });
@@ -83,9 +118,9 @@ public class DriversController : ControllerBase
 }
 
 public record UpdateDriverRequest(
-    string FullName,
-    string? FullNameEn,
-    string PhoneNumber,
-    bool IsActive = true,
-    DriverType DriverType = DriverType.Driver
+    string? FullName = null,
+    string? FullNameEn = null,
+    string? PhoneNumber = null,
+    bool? IsActive = null,
+    DriverType? DriverType = null
 );

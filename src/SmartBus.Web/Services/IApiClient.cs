@@ -35,6 +35,9 @@ public interface IApiClient
     Task<DriverDto?> GetDriverByIdAsync(Guid id);
     Task<(bool Ok, string? Error)> CreateDriverAsync(DriverInput input);
     Task<(bool Ok, string? Error)> UpdateDriverAsync(Guid id, DriverInput input);
+    /// <summary>Partial driver update for inline-grid editing.</summary>
+    Task<(bool Ok, string? Error)> UpdateDriverFieldAsync(Guid id,
+        string? fullName = null, string? phoneNumber = null, bool? isActive = null, string? driverType = null);
     Task<bool> DeleteDriverAsync(Guid id);
 
     // Students
@@ -53,6 +56,10 @@ public interface IApiClient
     Task<BusDto?> GetBusByIdAsync(Guid busId);
     Task<(bool Ok, string? Error)> CreateBusAsync(BusInput input);
     Task<(bool Ok, string? Error)> UpdateBusAsync(Guid id, BusInput input);
+    Task<(bool Ok, string? Error)> CreateBusesBatchAsync(int count);
+    /// <summary>Partial bus update used by the inline-edit grid: any field
+    /// left null is preserved server-side.</summary>
+    Task<(bool Ok, string? Error)> UpdateBusFieldAsync(Guid id, string? plateNumber = null, string? status = null);
     Task<bool> DeleteBusAsync(Guid id);
 
     // Trips

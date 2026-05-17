@@ -16,16 +16,19 @@ final myTodayTripsProvider = FutureProvider.autoDispose<List<MyTodayTripDto>>(
   },
 );
 
-/// Buses dropdown (manual setup).
-final busesListProvider = FutureProvider<List<BusSummaryDto>>(
+/// Buses dropdown (manual setup). autoDispose so the list refetches on each
+/// new-trip entry instead of caching stale rows across login sessions —
+/// otherwise a soft-deleted bus or a school swap leaks into the picker.
+final busesListProvider = FutureProvider.autoDispose<List<BusSummaryDto>>(
   (ref) async {
     final ds = ref.watch(assistantRemoteDataSourceProvider);
     return ds.getBuses();
   },
 );
 
-/// Drivers dropdown (DriverType=Driver only).
-final driversListProvider = FutureProvider<List<DriverSummaryDto>>(
+/// Drivers dropdown (DriverType=Driver only). autoDispose for the same
+/// reason as [busesListProvider] — stale rows must not survive logout.
+final driversListProvider = FutureProvider.autoDispose<List<DriverSummaryDto>>(
   (ref) async {
     final ds = ref.watch(assistantRemoteDataSourceProvider);
     return ds.getDrivers();
@@ -85,12 +88,16 @@ final startTripActionProvider = Provider<
       required String driverId,
       required String tripType,
       bool skipRoster,
+      List<String>? manualStudentIds,
+      bool scheduled,
     })>((ref) {
   return ({
     required String busId,
     required String driverId,
     required String tripType,
     bool skipRoster = false,
+    List<String>? manualStudentIds,
+    bool scheduled = false,
   }) async {
     final ds = ref.read(assistantRemoteDataSourceProvider);
     final result = await ds.startTrip(
@@ -98,10 +105,43 @@ final startTripActionProvider = Provider<
       driverId: driverId,
       tripType: tripType,
       skipRoster: skipRoster,
+      manualStudentIds: manualStudentIds,
+      scheduled: scheduled,
     );
     ref.invalidate(myTodayTripsProvider);
     return result;
   };
+});
+
+/// Step-2 "go live" action — flip a Scheduled trip to InProgress.
+final activateTripActionProvider =
+    Provider<Future<void> Function(String tripId)>((ref) {
+  return (String tripId) async {
+    final ds = ref.read(assistantRemoteDataSourceProvider);
+    await ds.activateTrip(tripId);
+    ref.invalidate(myTodayTripsProvider);
+  };
+});
+
+/// Cancel a Scheduled trip from the assistant. Server rejects this for
+/// non-Scheduled statuses — assistants can't wipe live or completed trips.
+final deleteScheduledTripActionProvider =
+    Provider<Future<void> Function(String tripId)>((ref) {
+  return (String tripId) async {
+    final ds = ref.read(assistantRemoteDataSourceProvider);
+    await ds.deleteScheduledTrip(tripId);
+    ref.invalidate(myTodayTripsProvider);
+  };
+});
+
+/// Student-name search (debounced live filter for the manual-roster picker).
+/// autoDispose so the cache turns over when the user leaves the screen.
+final studentSearchProvider = FutureProvider.autoDispose
+    .family<List<RosterStudentDto>, String>((ref, query) async {
+  // Empty query short-circuits to "show some" rather than a noisy full list.
+  if (query.trim().isEmpty) return const [];
+  final ds = ref.watch(assistantRemoteDataSourceProvider);
+  return ds.searchStudents(query);
 });
 
 /// Roster for a given trip id (used after Start trip).

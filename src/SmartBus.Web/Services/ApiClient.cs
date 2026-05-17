@@ -147,6 +147,10 @@ public class ApiClient : IApiClient
     public Task<(bool Ok, string? Error)> UpdateDriverAsync(Guid id, DriverInput input)
         => SendAsync(HttpMethod.Put, $"api/v1/drivers/{id}", input);
 
+    public Task<(bool Ok, string? Error)> UpdateDriverFieldAsync(Guid id,
+        string? fullName = null, string? phoneNumber = null, bool? isActive = null, string? driverType = null)
+        => SendAsync(HttpMethod.Put, $"api/v1/drivers/{id}", new { fullName, phoneNumber, isActive, driverType });
+
     public Task<bool> DeleteDriverAsync(Guid id) => DeleteAsync($"api/v1/drivers/{id}");
 
     // ── Students ───────────────────────────────────────────────────────────
@@ -207,6 +211,12 @@ public class ApiClient : IApiClient
 
     public Task<(bool Ok, string? Error)> UpdateBusAsync(Guid id, BusInput input)
         => SendAsync(HttpMethod.Put, $"api/v1/buses/{id}", input);
+
+    public Task<(bool Ok, string? Error)> CreateBusesBatchAsync(int count)
+        => SendAsync(HttpMethod.Post, "api/v1/buses/batch", new { count });
+
+    public Task<(bool Ok, string? Error)> UpdateBusFieldAsync(Guid id, string? plateNumber = null, string? status = null)
+        => SendAsync(HttpMethod.Put, $"api/v1/buses/{id}", new { plateNumber, status });
 
     public Task<bool> DeleteBusAsync(Guid id) => DeleteAsync($"api/v1/buses/{id}");
 

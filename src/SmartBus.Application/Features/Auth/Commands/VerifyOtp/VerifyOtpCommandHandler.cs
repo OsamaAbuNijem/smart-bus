@@ -1,6 +1,7 @@
 using MediatR;
 using SmartBus.Application.Common.Interfaces;
 using SmartBus.Application.Common.Models;
+using SmartBus.Application.Common.Utilities;
 using SmartBus.Application.Features.Auth.Commands.RequestOtp;
 using SmartBus.Domain.Entities;
 
@@ -212,8 +213,13 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
 
     private static string PhoneToEmail(string phone)
     {
-        // Strip non-digits for a stable synthetic email
-        var digits = new string(phone.Where(char.IsDigit).ToArray());
+        // Canonicalise first so the synthetic email is stable across input
+        // shapes: "793333333", "0793333333" and "+962793333333" all produce
+        // the same "mob_962793333333@smartbus.local" address. Without this
+        // step the OTP-verify creates a fresh AspNetUsers row per shape and
+        // Drivers.UserId drifts out of sync with the JWT subject.
+        var canonical = PhoneNumberHelper.Normalize(phone);
+        var digits    = new string(canonical.Where(char.IsDigit).ToArray());
         return $"mob_{digits}@smartbus.local";
     }
 }

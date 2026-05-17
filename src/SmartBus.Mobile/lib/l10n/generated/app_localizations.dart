@@ -1808,6 +1808,42 @@ abstract class AppLocalizations {
   /// **'NFC isn\'t available on this device.'**
   String get assistantNfcUnavailable;
 
+  /// No description provided for @assistantScanQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get assistantScanQr;
+
+  /// No description provided for @assistantScanNfc.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan NFC'**
+  String get assistantScanNfc;
+
+  /// No description provided for @assistantSearchByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Search students by name'**
+  String get assistantSearchByName;
+
+  /// No description provided for @assistantRosterHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Students on this trip'**
+  String get assistantRosterHeader;
+
+  /// No description provided for @assistantRosterEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one student before starting'**
+  String get assistantRosterEmpty;
+
+  /// No description provided for @assistantNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get assistantNoResults;
+
   /// No description provided for @assistantBoardedLabel.
   ///
   /// In en, this message translates to:
