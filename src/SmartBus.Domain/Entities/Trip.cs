@@ -10,6 +10,17 @@ public class Trip : BaseEntity
     public TripType Type { get; set; }
     public Guid BusId { get; set; }
     public Bus Bus { get; set; } = default!;
+    // Denormalized from Bus.SchoolId to pin the trip to its school at
+    // creation time (survives a future bus-transfer feature, simpler tenant
+    // queries).
+    public Guid? SchoolId { get; set; }
+    public School? School { get; set; }
+    public Guid? DriverId { get; set; }
+    public Driver? Driver { get; set; }
+    // Assistants are stored in Drivers with DriverType.Assistant; this FK
+    // records who actually ran the trip (vs. BusSchedule's scheduled one).
+    public Guid? AssistantId { get; set; }
+    public Driver? Assistant { get; set; }
     public Guid? RouteId { get; set; }
     public Route? Route { get; set; }
     public DateTime ScheduledDeparture { get; set; }

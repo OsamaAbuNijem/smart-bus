@@ -1610,6 +1610,12 @@ abstract class AppLocalizations {
   /// **'Started'**
   String get assistantStartedAt;
 
+  /// No description provided for @assistantCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get assistantCreatedAt;
+
   /// No description provided for @assistantBoarded.
   ///
   /// In en, this message translates to:
@@ -1823,7 +1829,7 @@ abstract class AppLocalizations {
   /// No description provided for @assistantSearchByName.
   ///
   /// In en, this message translates to:
-  /// **'Search students by name'**
+  /// **'Search by name'**
   String get assistantSearchByName;
 
   /// No description provided for @assistantRosterHeader.
@@ -1933,6 +1939,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open the app.'**
   String get assistantOpenFailed;
+
+  /// No description provided for @assistantStartTripBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Start trip with {count} students now?'**
+  String assistantStartTripBody(int count);
+
+  /// No description provided for @assistantStartTripYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get assistantStartTripYes;
+
+  /// No description provided for @assistantDeleteScheduledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete trip'**
+  String get assistantDeleteScheduledTitle;
+
+  /// No description provided for @assistantDeleteScheduledBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this scheduled trip? This cannot be undone.'**
+  String get assistantDeleteScheduledBody;
+
+  /// No description provided for @assistantDeleteScheduledYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get assistantDeleteScheduledYes;
+
+  /// No description provided for @assistantSaveTripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save trip'**
+  String get assistantSaveTripTitle;
+
+  /// No description provided for @assistantSaveTripBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Save trip with {count} students? You can start the trip later from the details screen.'**
+  String assistantSaveTripBody(int count);
+
+  /// No description provided for @assistantSaveTripCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Save trip'**
+  String get assistantSaveTripCta;
 
   /// No description provided for @assistantEndTrip.
   ///
@@ -2225,7 +2279,7 @@ abstract class AppLocalizations {
   /// No description provided for @assistantStatusDropped.
   ///
   /// In en, this message translates to:
-  /// **'Dropped'**
+  /// **'Arrived'**
   String get assistantStatusDropped;
 
   /// No description provided for @assistantArrivedSchool.

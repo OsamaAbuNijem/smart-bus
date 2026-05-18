@@ -24,13 +24,18 @@ public class GetTripDetailsQueryHandler
         if (trip is null)
             return Result<TripDetailsDto>.Failure("Trip not found.");
 
-        // Driver name resolved via the bus schedule slot matching this trip type.
-        var schedule = await _context.BusSchedules
-            .FirstOrDefaultAsync(s => s.BusId == trip.BusId, ct);
-
-        Guid? driverId = trip.Type == TripType.Morning
-            ? schedule?.MorningDriverId
-            : schedule?.ReturnDriverId;
+        // Prefer the driver stamped on the trip itself; fall back to the
+        // bus schedule's morning/return slot for legacy trips that pre-date
+        // Trip.DriverId.
+        Guid? driverId = trip.DriverId;
+        if (driverId is null)
+        {
+            var schedule = await _context.BusSchedules
+                .FirstOrDefaultAsync(s => s.BusId == trip.BusId, ct);
+            driverId = trip.Type == TripType.Morning
+                ? schedule?.MorningDriverId
+                : schedule?.ReturnDriverId;
+        }
 
         string? driverName = null;
         if (driverId is not null)
@@ -150,7 +155,9 @@ public class GetTripDetailsQueryHandler
             trip.Id,
             trip.Type.ToString(),
             trip.Status.ToString(),
+            trip.BusId,
             trip.Bus!.PlateNumber,
+            driverId,
             driverName,
             trip.ScheduledDeparture,
             trip.ActualDeparture,

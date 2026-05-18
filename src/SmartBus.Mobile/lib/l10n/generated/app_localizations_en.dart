@@ -801,6 +801,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantStartedAt => 'Started';
 
   @override
+  String get assistantCreatedAt => 'Created';
+
+  @override
   String get assistantBoarded => 'boarded';
 
   @override
@@ -910,7 +913,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantScanNfc => 'Scan NFC';
 
   @override
-  String get assistantSearchByName => 'Search students by name';
+  String get assistantSearchByName => 'Search by name';
 
   @override
   String get assistantRosterHeader => 'Students on this trip';
@@ -965,6 +968,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistantOpenFailed => 'Could not open the app.';
+
+  @override
+  String assistantStartTripBody(int count) {
+    return 'Start trip with $count students now?';
+  }
+
+  @override
+  String get assistantStartTripYes => 'Start';
+
+  @override
+  String get assistantDeleteScheduledTitle => 'Delete trip';
+
+  @override
+  String get assistantDeleteScheduledBody =>
+      'Delete this scheduled trip? This cannot be undone.';
+
+  @override
+  String get assistantDeleteScheduledYes => 'Delete';
+
+  @override
+  String get assistantSaveTripTitle => 'Save trip';
+
+  @override
+  String assistantSaveTripBody(int count) {
+    return 'Save trip with $count students? You can start the trip later from the details screen.';
+  }
+
+  @override
+  String get assistantSaveTripCta => 'Save trip';
 
   @override
   String get assistantEndTrip => 'End trip';
@@ -1126,7 +1158,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantDroppedAt => 'Dropped';
 
   @override
-  String get assistantStatusDropped => 'Dropped';
+  String get assistantStatusDropped => 'Arrived';
 
   @override
   String get assistantArrivedSchool => 'Arrived at school';

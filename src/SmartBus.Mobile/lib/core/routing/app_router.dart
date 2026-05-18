@@ -50,6 +50,12 @@ abstract class AppRoute {
 
   static String assistantTripDetailsFor(String tripId) =>
       '/assistant/trips/$tripId';
+
+  /// Trip-setup screen in edit mode — preloads the existing scheduled
+  /// trip's bus/driver/students; saving replaces the old trip with the
+  /// updated one.
+  static String assistantTripSetupForEdit(String tripId) =>
+      '/assistant/trip-setup?editTripId=$tripId';
   static const studentInfo = '/students/:studentId';
   static const studentEdit = '/students/:studentId/edit';
   static const studentTrips = '/students/:studentId/trips';
@@ -166,7 +172,9 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: AppRoute.assistantTripSetup,
-        builder: (_, _) => const AssistantTripSetupScreen(),
+        builder: (_, state) => AssistantTripSetupScreen(
+          editTripId: state.uri.queryParameters['editTripId'],
+        ),
       ),
       GoRoute(
         path: AppRoute.assistantManualSetup,

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartBus.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using SmartBus.Infrastructure.Persistence;
 namespace SmartBus.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260518084656_AddDriverToTrip")]
+    partial class AddDriverToTrip
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1236,9 +1239,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("ActualDeparture")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("AssistantId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("BusId")
                         .HasColumnType("uuid");
 
@@ -1270,9 +1270,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("ScheduledDeparture")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("SchoolId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -1284,15 +1281,11 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssistantId");
-
                     b.HasIndex("BusId");
 
                     b.HasIndex("DriverId");
 
                     b.HasIndex("RouteId");
-
-                    b.HasIndex("SchoolId");
 
                     b.HasIndex("IsDeleted", "ScheduledDeparture");
 
@@ -1748,10 +1741,6 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("SmartBus.Domain.Entities.Trip", b =>
                 {
-                    b.HasOne("SmartBus.Domain.Entities.Driver", "Assistant")
-                        .WithMany()
-                        .HasForeignKey("AssistantId");
-
                     b.HasOne("SmartBus.Domain.Entities.Bus", "Bus")
                         .WithMany("Trips")
                         .HasForeignKey("BusId")
@@ -1766,19 +1755,11 @@ namespace SmartBus.Infrastructure.Persistence.Migrations
                         .WithMany("Trips")
                         .HasForeignKey("RouteId");
 
-                    b.HasOne("SmartBus.Domain.Entities.School", "School")
-                        .WithMany()
-                        .HasForeignKey("SchoolId");
-
-                    b.Navigation("Assistant");
-
                     b.Navigation("Bus");
 
                     b.Navigation("Driver");
 
                     b.Navigation("Route");
-
-                    b.Navigation("School");
                 });
 
             modelBuilder.Entity("SmartBus.Domain.Entities.Bus", b =>

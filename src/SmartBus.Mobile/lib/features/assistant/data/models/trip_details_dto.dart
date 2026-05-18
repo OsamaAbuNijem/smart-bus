@@ -4,7 +4,9 @@ class TripDetailsDto {
     required this.tripId,
     required this.tripType,
     required this.status,
+    required this.busId,
     required this.busPlateNumber,
+    required this.driverId,
     required this.driverName,
     required this.scheduledDeparture,
     required this.actualDeparture,
@@ -22,7 +24,9 @@ class TripDetailsDto {
         tripId: json['tripId'] as String,
         tripType: json['tripType'] as String,
         status: json['status'] as String,
+        busId: json['busId'] as String,
         busPlateNumber: json['busPlateNumber'] as String,
+        driverId: json['driverId'] as String?,
         driverName: json['driverName'] as String?,
         scheduledDeparture:
             DateTime.parse(json['scheduledDeparture'] as String),
@@ -47,7 +51,9 @@ class TripDetailsDto {
   final String tripId;
   final String tripType;
   final String status;
+  final String busId;
   final String busPlateNumber;
+  final String? driverId;
   final String? driverName;
   final DateTime scheduledDeparture;
   final DateTime? actualDeparture;

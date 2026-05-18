@@ -134,14 +134,19 @@ final deleteScheduledTripActionProvider =
   };
 });
 
+/// Key for [studentSearchProvider] — bundling locale so the provider
+/// caches per (query, lang) and the server can scope the LIKE to the
+/// matching name field.
+typedef StudentSearchKey = ({String query, String lang});
+
 /// Student-name search (debounced live filter for the manual-roster picker).
 /// autoDispose so the cache turns over when the user leaves the screen.
 final studentSearchProvider = FutureProvider.autoDispose
-    .family<List<RosterStudentDto>, String>((ref, query) async {
+    .family<List<RosterStudentDto>, StudentSearchKey>((ref, key) async {
   // Empty query short-circuits to "show some" rather than a noisy full list.
-  if (query.trim().isEmpty) return const [];
+  if (key.query.trim().isEmpty) return const [];
   final ds = ref.watch(assistantRemoteDataSourceProvider);
-  return ds.searchStudents(query);
+  return ds.searchStudents(key.query, lang: key.lang);
 });
 
 /// Roster for a given trip id (used after Start trip).

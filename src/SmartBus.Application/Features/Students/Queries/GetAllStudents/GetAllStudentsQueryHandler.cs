@@ -45,9 +45,25 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
             var term = request.Name.Trim();
-            query = query.Where(s =>
-                EF.Functions.Like(s.FullName, $"%{term}%") ||
-                (s.FullNameEn != null && EF.Functions.Like(s.FullNameEn, $"%{term}%")));
+            var lang = request.Lang?.Trim().ToLowerInvariant();
+            // Locale-scoped search: English UI searches only FullNameEn,
+            // Arabic UI searches only FullName. When Lang is null (legacy
+            // admin grid) we keep the original "either field" behavior.
+            // Lowercase both sides so the match is case-insensitive — EF
+            // translates ToLower() to SQL LOWER(); harmless on Arabic where
+            // case doesn't apply.
+            var termLower = term.ToLowerInvariant();
+            query = lang switch
+            {
+                "en" => query.Where(s =>
+                    s.FullNameEn != null &&
+                    s.FullNameEn.ToLower().Contains(termLower)),
+                "ar" => query.Where(s =>
+                    s.FullName.ToLower().Contains(termLower)),
+                _    => query.Where(s =>
+                    s.FullName.ToLower().Contains(termLower) ||
+                    (s.FullNameEn != null && s.FullNameEn.ToLower().Contains(termLower))),
+            };
         }
 
         if (!string.IsNullOrWhiteSpace(request.Grade))
@@ -60,8 +76,13 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
         }
 
         var total = await query.CountAsync(cancellationToken);
-        var items = await query
-            .OrderBy(s => s.FullName)
+        var orderLang = request.Lang?.Trim().ToLowerInvariant();
+        var ordered = orderLang == "en"
+            // FullNameEn is nullable — fall back to FullName so rows without
+            // an English name still appear in a deterministic spot.
+            ? query.OrderBy(s => s.FullNameEn ?? s.FullName)
+            : query.OrderBy(s => s.FullName);
+        var items = await ordered
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(s => new StudentDto(

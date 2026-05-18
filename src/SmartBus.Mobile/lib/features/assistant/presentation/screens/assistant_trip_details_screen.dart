@@ -82,6 +82,7 @@ class _TripBody extends ConsumerWidget {
                     tripId: details.tripId,
                     isMorning: details.isMorning,
                     readOnly: readOnly,
+                    scheduled: scheduled,
                     l: l,
                   ),
                   const SizedBox(height: 12),
@@ -104,9 +105,9 @@ class _TripBody extends ConsumerWidget {
       List<TripStudentDetailDto> students) {
     final map = <String, List<TripStudentDetailDto>>{};
     for (final s in students) {
-      final key = (s.homeArea?.trim().isNotEmpty ?? false)
-          ? s.homeArea!.trim()
-          : 'Unassigned';
+      // Empty string is a real key here — the matching _StopGroup hides its
+      // header when the area name is empty (no "Unassigned" placeholder).
+      final key = s.homeArea?.trim() ?? '';
       (map[key] ??= []).add(s);
     }
     return map;
@@ -156,13 +157,24 @@ class _Header extends StatelessWidget {
     final absentCount =
         details.students.where((s) => s.isAbsent).length;
     final expected = details.studentCount - absentCount;
-    final progressNumerator = details.isMorning
-        ? details.boardedCount
-        : details.droppedOffCount;
+    // Live morning trips show pickups (Boarded); live return trips show
+    // drop-offs at home (DroppedOff). On completion, UpdateTripStatus
+    // flips every Boarded morning student to DroppedOff — using
+    // boardedCount here would render 0/N. Once completed, both legs
+    // measure the same thing: students delivered.
+    final int progressNumerator;
+    if (completed) {
+      progressNumerator = details.droppedOffCount;
+    } else if (details.isMorning) {
+      progressNumerator = details.boardedCount;
+    } else {
+      progressNumerator = details.droppedOffCount;
+    }
     final progress =
         expected <= 0 ? 0.0 : progressNumerator / expected;
 
     final subtitle = StringBuffer();
+    final scheduledStatus = details.status == 'Scheduled';
     if (completed && details.actualArrival != null) {
       // Trip recap. Use the longer "MMM d · h:mm" format so the date is
       // legible in case the user is reviewing a trip from a previous day.
@@ -170,6 +182,12 @@ class _Header extends StatelessWidget {
         ..write('${l.assistantStartedAt} ${fmt.format(start.toLocal())}  ·  ')
         ..write(
             '${l.assistantEndedAt} ${fmtTime.format(details.actualArrival!.toLocal())}');
+    } else if (scheduledStatus) {
+      // Pre-start trips have no ActualDeparture yet — show the creation
+      // time (ScheduledDeparture is stamped at StartTripCommand time) so
+      // the assistant knows when this draft was set up.
+      subtitle.write(
+          '${l.assistantCreatedAt} ${fmtTime.format(start.toLocal())}');
     } else {
       subtitle.write('${l.assistantStartedAt} ${fmtTime.format(start.toLocal())}');
     }
@@ -230,17 +248,21 @@ class _Header extends StatelessWidget {
                   ),
                 ),
                 if (details.status == 'InProgress') _LivePill(l: l),
-                if (completed) _CompletedPill(l: l),
               ],
             ),
-            const SizedBox(height: 12),
-            _ProgressRow(
-              boarded: progressNumerator,
-              total: expected,
-              progress: progress,
-              isMorning: details.isMorning,
-              l: l,
-            ),
+            // Pre-start (Scheduled) trips have nothing to measure yet, so
+            // the progress row is dead weight — hide it until the trip is
+            // live or completed.
+            if (details.status != 'Scheduled') ...[
+              const SizedBox(height: 12),
+              _ProgressRow(
+                boarded: progressNumerator,
+                total: expected,
+                progress: progress,
+                isMorning: details.isMorning,
+                l: l,
+              ),
+            ],
           ],
         ),
       ),
@@ -582,6 +604,7 @@ class _StopGroup extends StatelessWidget {
     required this.tripId,
     required this.isMorning,
     required this.readOnly,
+    required this.scheduled,
     required this.l,
   });
   final int stopNumber;
@@ -590,56 +613,64 @@ class _StopGroup extends StatelessWidget {
   final String tripId;
   final bool isMorning;
   final bool readOnly;
+  // Scheduled trips show a roster-only view (no status badges, no stop
+  // header) — distinct from "readOnly" which also covers Completed.
+  final bool scheduled;
   final AppLocalizations l;
 
   @override
   Widget build(BuildContext context) {
+    // Skip the stop-name row entirely when the area is empty (no
+    // "Unassigned" placeholder) — the student tiles read fine on their own.
+    final showHeader = stopName.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 22,
-              height: 22,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.ink,
-                borderRadius: BorderRadius.circular(7),
-              ),
-              child: Text(
-                '$stopNumber',
-                style: const TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.yellow,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                stopName,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
+        if (showHeader) ...[
+          Row(
+            children: [
+              Container(
+                width: 22,
+                height: 22,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
                   color: AppColors.ink,
-                  letterSpacing: -0.2,
+                  borderRadius: BorderRadius.circular(7),
                 ),
-                overflow: TextOverflow.ellipsis,
+                child: Text(
+                  '$stopNumber',
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.yellow,
+                  ),
+                ),
               ),
-            ),
-            Text(
-              '${students.length} ${l.assistantStudents}',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.slate500,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  stopName,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: -0.2,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
+              Text(
+                '${students.length} ${l.assistantStudents}',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.slate500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
         for (var i = 0; i < students.length; i++) ...[
           _StudentRow(
             student: students[i],
@@ -647,6 +678,7 @@ class _StopGroup extends StatelessWidget {
             tripId: tripId,
             isMorning: isMorning,
             readOnly: readOnly,
+            scheduled: scheduled,
             l: l,
           ),
           if (i < students.length - 1) const SizedBox(height: 6),
@@ -665,6 +697,7 @@ class _StudentRow extends ConsumerStatefulWidget {
     required this.tripId,
     required this.isMorning,
     required this.readOnly,
+    required this.scheduled,
     required this.l,
   });
   final TripStudentDetailDto student;
@@ -672,6 +705,9 @@ class _StudentRow extends ConsumerStatefulWidget {
   final String tripId;
   final bool isMorning;
   final bool readOnly;
+  // Scheduled = no trailing widgets (no outcome badge / absence info /
+  // pickup toggle) — the roster is for review only at this stage.
+  final bool scheduled;
   final AppLocalizations l;
 
   @override
@@ -691,6 +727,16 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
   ];
 
   bool _busy = false;
+
+  /// Pick the right name field for the current UI locale — Arabic shows
+  /// FullName, English prefers FullNameEn when present and falls back to
+  /// FullName otherwise. Mirrors the helper in the trip-setup screen.
+  String _displayName(TripStudentDetailDto s) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    if (isAr) return s.fullName;
+    final en = s.fullNameEn;
+    return (en != null && en.trim().isNotEmpty) ? en : s.fullName;
+  }
 
   Future<void> _toggleBoarded() async {
     final s = widget.student;
@@ -785,7 +831,7 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
       builder: (context) => AlertDialog(
         title: Text(l.assistantMarkAbsentTitle),
         content: Text(
-          l.assistantMarkAbsentBody(widget.student.fullName),
+          l.assistantMarkAbsentBody(_displayName(widget.student)),
         ),
         actions: [
           TextButton(
@@ -866,7 +912,7 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
         child: Row(
           children: [
             _Avatar(
-              text: _initials(s.fullName),
+              text: _initials(_displayName(s)),
               bg1: palette[0],
               bg2: palette[1],
               fg: palette[2],
@@ -877,7 +923,7 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    s.fullName,
+                    _displayName(s),
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
@@ -886,22 +932,55 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _meta(s, l),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.slate500,
-                      fontFeatures: [FontFeature.tabularFigures()],
+                  // Scheduled trips show only the student's home area
+                  // (with a pin) instead of the boarding meta — the trip
+                  // hasn't started so there's no status to surface yet.
+                  if (widget.scheduled) ...[
+                    if ((s.homeArea ?? '').trim().isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on_outlined,
+                            size: 12,
+                            color: AppColors.slate500,
+                          ),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              s.homeArea!.trim(),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.slate500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ] else ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      _meta(s, l),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.slate500,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            if (widget.readOnly) ...[
+            if (widget.scheduled) ...[
+              // Scheduled trips show name + meta only — no status badges
+              // and no actions until the assistant taps Start.
+            ] else if (widget.readOnly) ...[
               _OutcomeBadge(student: s, l: l),
               if (absent && _hasAbsenceDetail(s)) ...[
                 const SizedBox(width: 6),
@@ -989,6 +1068,9 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
         ? s.grade
         : '${s.grade}-${s.className}';
     parts.add(grade);
+    // Scheduled trips show grade only — no boarding/absence status, since
+    // nothing has happened yet (the trip hasn't started).
+    if (widget.scheduled) return parts.join(' · ');
     final fmt = DateFormat('h:mm a');
     if (s.isAbsent) {
       parts.add(l.assistantAbsenceReported);
@@ -1107,10 +1189,10 @@ class _OutcomeBadge extends StatelessWidget {
     if (student.isAbsent) return _AbsentBadge(l: l);
     if (student.isDroppedOff) {
       return _Pill(
-        bg: AppColors.blueSoft,
-        border: AppColors.blue.withValues(alpha: 0.3),
-        fg: AppColors.blueDark,
-        icon: Icons.flag_rounded,
+        bg: AppColors.emeraldSoft,
+        border: const Color(0xFFA7F3D0),
+        fg: AppColors.emerald,
+        icon: Icons.check_rounded,
         label: l.assistantStatusDropped,
       );
     }
@@ -1165,38 +1247,6 @@ class _Pill extends StatelessWidget {
               fontSize: 10.5,
               fontWeight: FontWeight.w800,
               color: fg,
-              letterSpacing: -0.05,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CompletedPill extends StatelessWidget {
-  const _CompletedPill({required this.l});
-  final AppLocalizations l;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: AppColors.emeraldSoft,
-        borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: const Color(0xFFA7F3D0)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.check_rounded, size: 10, color: AppColors.emerald),
-          const SizedBox(width: 5),
-          Text(
-            l.assistantStatusDone,
-            style: const TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w800,
-              color: AppColors.emerald,
               letterSpacing: -0.05,
             ),
           ),
@@ -1848,6 +1898,12 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
     final progressLabel = widget.details.isMorning
         ? widget.l.assistantBoardedLabel
         : widget.l.driverProgressLabel;
+    // Gate End Trip on a full progress bar — the assistant can only end
+    // the trip once every non-absent student has boarded (Morning) or
+    // been dropped off (Return). Empty trips bypass this since they
+    // short-circuit to a delete.
+    final progressComplete =
+        _isEmpty || (expected > 0 && progressNumerator >= expected);
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
       decoration: const BoxDecoration(
@@ -1857,8 +1913,11 @@ class _EndTripBarState extends ConsumerState<_EndTripBar> {
       child: SafeArea(
         top: false,
         child: FilledButton(
-          onPressed:
-              _busy || widget.details.status == 'Completed' ? null : _end,
+          onPressed: _busy ||
+                  widget.details.status == 'Completed' ||
+                  !progressComplete
+              ? null
+              : _end,
           style: _isEmpty
               ? FilledButton.styleFrom(
                   backgroundColor: AppColors.red,
@@ -1994,21 +2053,21 @@ class _StartScheduledBarState
   bool _busy = false;
 
   Future<void> _start() async {
+    final l = widget.l;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('بدء الرحلة'),
-        content: Text(
-          'بدء الرحلة بـ ${widget.details.students.length} طالب الآن؟',
-        ),
+        title: Text(l.assistantStartTrip),
+        content:
+            Text(l.assistantStartTripBody(widget.details.students.length)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('إلغاء'),
+            child: Text(l.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('ابدأ'),
+            child: Text(l.assistantStartTripYes),
           ),
         ],
       ),
@@ -2032,22 +2091,21 @@ class _StartScheduledBarState
   }
 
   Future<void> _delete() async {
+    final l = widget.l;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('حذف الرحلة'),
-        content: const Text(
-          'هل تريد حذف هذه الرحلة المجدولة؟ لا يمكن التراجع.',
-        ),
+        title: Text(l.assistantDeleteScheduledTitle),
+        content: Text(l.assistantDeleteScheduledBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('إلغاء'),
+            child: Text(l.commonCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.redDark),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('حذف'),
+            child: Text(l.assistantDeleteScheduledYes),
           ),
         ],
       ),
@@ -2073,6 +2131,7 @@ class _StartScheduledBarState
 
   @override
   Widget build(BuildContext context) {
+    final l = widget.l;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
       decoration: const BoxDecoration(
@@ -2083,22 +2142,40 @@ class _StartScheduledBarState
         top: false,
         child: Row(
           children: [
-            // Delete sits on the left so it's a deliberate reach. Fixed
-            // width avoids the Row's intrinsic-width footgun (same one
-            // that bit the trip-setup screen earlier).
+            // Delete + Edit sit on the left; Start fills the rest. Fixed
+            // widths avoid the Row's intrinsic-width footgun.
             SizedBox(
-              width: 96,
-              child: OutlinedButton.icon(
+              width: 72,
+              child: OutlinedButton(
                 onPressed: _busy ? null : _delete,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.redDark,
                   side: const BorderSide(color: AppColors.redDark),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                 ),
-                icon: const Icon(Icons.delete_outline_rounded, size: 16),
-                label: const Text('حذف'),
+                child: const Icon(Icons.delete_outline_rounded, size: 18),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 88,
+              child: OutlinedButton.icon(
+                onPressed: _busy
+                    ? null
+                    : () => context.push(
+                          AppRoute.assistantTripSetupForEdit(
+                              widget.details.tripId),
+                        ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.ink,
+                  side: const BorderSide(color: AppColors.slate200),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                ),
+                icon: const Icon(Icons.edit_outlined, size: 16),
+                label: Text(l.commonEdit),
+              ),
+            ),
+            const SizedBox(width: 8),
             Expanded(
               child: FilledButton.icon(
                 onPressed: _busy ? null : _start,
@@ -2112,7 +2189,7 @@ class _StartScheduledBarState
                         ),
                       )
                     : const Icon(Icons.play_arrow_rounded, size: 18),
-                label: const Text('بدء الرحلة'),
+                label: Text(l.assistantStartTrip),
               ),
             ),
           ],

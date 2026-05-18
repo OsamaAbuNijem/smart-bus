@@ -304,6 +304,7 @@
   "assistantMorningPickup": "Morning Pickup",
   "assistantAfternoonDropoff": "Afternoon Drop-off",
   "assistantStartedAt": "Started",
+  "assistantCreatedAt": "Created",
   "assistantBoarded": "boarded",
   "assistantStudents": "students",
   "assistantStatusLive": "Live",
@@ -339,7 +340,7 @@
   "assistantNfcUnavailable": "NFC isn't available on this device.",
   "assistantScanQr": "Scan QR",
   "assistantScanNfc": "Scan NFC",
-  "assistantSearchByName": "Search students by name",
+  "assistantSearchByName": "Search by name",
   "assistantRosterHeader": "Students on this trip",
   "assistantRosterEmpty": "Add at least one student before starting",
   "assistantNoResults": "No results",
@@ -358,6 +359,21 @@
   "assistantNotifyArrivedOk": "Parent notified.",
   "assistantNoParentPhone": "No parent phone on file.",
   "assistantOpenFailed": "Could not open the app.",
+  "assistantStartTrip": "Start trip",
+  "assistantStartTripBody": "Start trip with {count} students now?",
+  "@assistantStartTripBody": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "assistantStartTripYes": "Start",
+  "assistantDeleteScheduledTitle": "Delete trip",
+  "assistantDeleteScheduledBody": "Delete this scheduled trip? This cannot be undone.",
+  "assistantDeleteScheduledYes": "Delete",
+  "assistantSaveTripTitle": "Save trip",
+  "assistantSaveTripBody": "Save trip with {count} students? You can start the trip later from the details screen.",
+  "@assistantSaveTripBody": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "assistantSaveTripCta": "Save trip",
   "assistantEndTrip": "End trip",
   "assistantEndTripConfirmTitle": "End this trip?",
   "assistantEndTripConfirmBody": "All boarding actions will be saved and the trip will be marked as completed.",
@@ -409,7 +425,7 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "assistantDroppedAt": "Dropped",
-  "assistantStatusDropped": "Dropped",
+  "assistantStatusDropped": "Arrived",
   "assistantArrivedSchool": "Arrived at school",
   "assistantArrivedHome": "Arrived home",
   "assistantOnBus": "On bus",

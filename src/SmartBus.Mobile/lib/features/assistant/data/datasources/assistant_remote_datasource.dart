@@ -191,13 +191,19 @@ class AssistantRemoteDataSource {
 
   /// Search students by name (active subscription only — scoped to the
   /// caller's school server-side). Used by the trip-setup manual roster.
-  Future<List<RosterStudentDto>> searchStudents(String query) async {
+  /// [lang] scopes the LIKE filter to one name field: "en" → FullNameEn,
+  /// "ar" → FullName. Omit for the legacy "either field" admin behavior.
+  Future<List<RosterStudentDto>> searchStudents(
+    String query, {
+    String? lang,
+  }) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '/students',
         queryParameters: {
           'pageSize': 20,
           if (query.trim().isNotEmpty) 'name': query.trim(),
+          if (lang != null && lang.isNotEmpty) 'lang': lang,
         },
       );
       final items = (response.data?['items'] as List<dynamic>?) ?? const [];

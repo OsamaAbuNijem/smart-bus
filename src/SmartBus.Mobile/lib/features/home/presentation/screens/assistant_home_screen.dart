@@ -321,94 +321,59 @@ class _StartCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Primary CTA — yellow gradient hero with a single icon, headline,
-        // and supporting line. Tap anywhere on the card to scan.
+        // Primary CTA — a single flat yellow tile. One icon, one headline,
+        // one supporting line, and a plain chevron. No nested icon-in-icon,
+        // no glow shadow — the colour alone carries the affordance.
         GestureDetector(
           onTap: onScan,
           child: Container(
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 22),
+            padding: const EdgeInsets.fromLTRB(18, 18, 16, 18),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              gradient: const LinearGradient(
-                colors: [AppColors.yellow, AppColors.yellowDeep],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x66F5C518),
-                  blurRadius: 24,
-                  offset: Offset(0, 10),
-                ),
-              ],
+              color: AppColors.yellow,
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.ink,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x330F172A),
-                            blurRadius: 14,
-                            offset: Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.qr_code_scanner_rounded,
-                        color: AppColors.yellow,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l.assistantScanBusQr,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.ink,
-                              letterSpacing: -0.4,
-                              height: 1.1,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            l.assistantScanBusQrSub,
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.ink.withValues(alpha: 0.6),
-                              height: 1.3,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: 28,
-                      height: 28,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.ink.withValues(alpha: 0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.chevron_right_rounded,
-                        size: 18,
-                        color: AppColors.ink,
-                      ),
-                    ),
-                  ],
+                const Icon(
+                  Icons.qr_code_scanner_rounded,
+                  color: AppColors.ink,
+                  size: 26,
                 ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.assistantScanBusQr,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.ink,
+                          letterSpacing: -0.3,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l.assistantScanBusQrSub,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ink.withValues(alpha: 0.65),
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: AppColors.ink,
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 10),

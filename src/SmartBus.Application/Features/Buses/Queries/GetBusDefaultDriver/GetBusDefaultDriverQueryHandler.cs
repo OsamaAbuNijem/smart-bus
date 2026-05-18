@@ -17,14 +17,25 @@ public class GetBusDefaultDriverQueryHandler
     public async Task<Result<DefaultDriverDto?>> Handle(
         GetBusDefaultDriverQuery request, CancellationToken ct)
     {
-        // The BusSchedule row holds the assigned driver for each leg —
-        // morning vs. return — picked when the admin set up the schedule.
-        var driver = await _context.BusSchedules
-            .Where(s => s.BusId == request.BusId)
-            .Select(s => request.TripType == TripType.Morning
-                ? s.MorningDriver
-                : s.ReturnDriver)
+        // Prefer the driver from the most recent trip on (bus, type) so the
+        // assistant sees the same person they used last time. Falls back to
+        // the BusSchedule assignment when no prior trip exists.
+        var lastTripDriver = await _context.Trips
+            .Where(t => !t.IsTemplate
+                        && t.BusId    == request.BusId
+                        && t.Type     == request.TripType
+                        && t.DriverId != null)
+            .OrderByDescending(t => t.ScheduledDeparture)
+            .Select(t => t.Driver)
             .FirstOrDefaultAsync(ct);
+
+        var driver = lastTripDriver
+            ?? await _context.BusSchedules
+                .Where(s => s.BusId == request.BusId)
+                .Select(s => request.TripType == TripType.Morning
+                    ? s.MorningDriver
+                    : s.ReturnDriver)
+                .FirstOrDefaultAsync(ct);
 
         if (driver is null || driver.DriverType != DriverType.Driver)
             return Result<DefaultDriverDto?>.Success(null);

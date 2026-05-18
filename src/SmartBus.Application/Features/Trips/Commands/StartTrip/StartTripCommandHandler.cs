@@ -47,39 +47,48 @@ public class StartTripCommandHandler
         if (driver is null || driver.DriverType != DriverType.Driver)
             return Result<StartTripResponse>.Failure("Driver not found.");
 
+        // Resolve the caller's Driver row once — used both for the
+        // "one pending trip per assistant" guard below and to stamp the
+        // trip's AssistantId when the caller is an Assistant.
+        var callerUserId = _currentUser.UserId;
+        Driver? caller = null;
+        if (!string.IsNullOrEmpty(callerUserId))
+        {
+            caller = await _context.Drivers
+                .FirstOrDefaultAsync(d => d.UserId == callerUserId, ct);
+        }
+
         // Block opening a second trip while the assistant already has one
         // pending or live on any bus in their school. The assistant must
         // either start the Scheduled trip and finish it, or delete it,
         // before creating a new one. Drivers and admins bypass this check.
-        var callerUserId = _currentUser.UserId;
-        if (!string.IsNullOrEmpty(callerUserId))
+        if (caller is not null && caller.DriverType == DriverType.Assistant)
         {
-            var caller = await _context.Drivers
-                .FirstOrDefaultAsync(d => d.UserId == callerUserId, ct);
-            if (caller is not null && caller.DriverType == DriverType.Assistant)
-            {
-                var schoolBusIds = caller.SchoolId is null
-                    ? new List<Guid>()
-                    : await _context.Buses
-                        .Where(b => b.SchoolId == caller.SchoolId && !b.IsDeleted)
-                        .Select(b => b.Id)
-                        .ToListAsync(ct);
+            var schoolBusIds = caller.SchoolId is null
+                ? new List<Guid>()
+                : await _context.Buses
+                    .Where(b => b.SchoolId == caller.SchoolId && !b.IsDeleted)
+                    .Select(b => b.Id)
+                    .ToListAsync(ct);
 
-                if (schoolBusIds.Count > 0)
+            if (schoolBusIds.Count > 0)
+            {
+                var hasPending = await _context.Trips.AnyAsync(t =>
+                    !t.IsTemplate
+                    && (t.Status == TripStatus.Scheduled ||
+                        t.Status == TripStatus.InProgress)
+                    && schoolBusIds.Contains(t.BusId), ct);
+                if (hasPending)
                 {
-                    var hasPending = await _context.Trips.AnyAsync(t =>
-                        !t.IsTemplate
-                        && (t.Status == TripStatus.Scheduled ||
-                            t.Status == TripStatus.InProgress)
-                        && schoolBusIds.Contains(t.BusId), ct);
-                    if (hasPending)
-                    {
-                        return Result<StartTripResponse>.Failure(
-                            "You already have a pending or active trip. Start or delete it before creating a new one.");
-                    }
+                    return Result<StartTripResponse>.Failure(
+                        "You already have a pending or active trip. Start or delete it before creating a new one.");
                 }
             }
         }
+
+        var assistantId = caller is { DriverType: DriverType.Assistant }
+            ? caller.Id
+            : (Guid?)null;
 
         // Idempotency: if a non-completed trip exists today for (bus, type),
         // reuse it instead of creating a duplicate.
@@ -112,6 +121,9 @@ public class StartTripCommandHandler
         var trip = new Trip
         {
             BusId              = bus.Id,
+            SchoolId           = bus.SchoolId,
+            DriverId           = driver.Id,
+            AssistantId        = assistantId,
             Type               = request.TripType,
             Name               = $"{bus.PlateNumber} — {typeLabel} — {today:dd/MM/yyyy}",
             ScheduledDeparture = now,

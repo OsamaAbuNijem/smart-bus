@@ -10,6 +10,7 @@ import 'package:smart_bus/features/assistant/data/models/bus_summary_dto.dart';
 import 'package:smart_bus/features/assistant/data/models/driver_summary_dto.dart';
 import 'package:smart_bus/features/assistant/data/models/roster_student_dto.dart';
 import 'package:smart_bus/features/assistant/presentation/providers/assistant_controllers.dart';
+import 'package:smart_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
 import 'package:smart_bus/l10n/generated/app_localizations.dart';
 
 /// State 2 (post-QR) and State 3 (manual) trip-setup screen.
@@ -17,8 +18,12 @@ import 'package:smart_bus/l10n/generated/app_localizations.dart';
 /// a chip with "From QR"). In manual mode, the bus is selectable.
 /// In both modes the assistant picks driver + trip type, and the students
 /// are pulled live from the last trip on (bus, type).
+/// When [editTripId] is non-null the screen is in "edit" mode: it preloads
+/// the existing trip's bus / driver / tripType / roster and, on save,
+/// deletes the old scheduled trip and creates a new one in its place.
 class AssistantTripSetupScreen extends ConsumerStatefulWidget {
-  const AssistantTripSetupScreen({super.key});
+  const AssistantTripSetupScreen({super.key, this.editTripId});
+  final String? editTripId;
 
   @override
   ConsumerState<AssistantTripSetupScreen> createState() =>
@@ -41,9 +46,23 @@ class _AssistantTripSetupScreenState
   // user's edits don't get wiped when the screen rebuilds.
   String? _seededKey;
 
+  // Edit mode: when the user came from the scheduled-trip details screen
+  // via the Edit button, we preload the trip's bus/driver/tripType/roster
+  // and replace the trip on save. Pure boolean derived from widget — the
+  // _editLoaded flag prevents double-loading on hot reload / rebuild.
+  bool get _isEditMode => widget.editTripId != null;
+  bool _editLoaded = false;
+
   @override
   void initState() {
     super.initState();
+    // Edit mode wins over QR mode — they're mutually exclusive entry paths.
+    if (_isEditMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _preloadFromTrip(widget.editTripId!);
+      });
+      return;
+    }
     // In QR mode the bus is already in the controller — pick it up here so
     // the user can't change it. In manual mode it stays null until the user
     // picks one from the dropdown.
@@ -60,6 +79,50 @@ class _AssistantTripSetupScreenState
 
   bool get _isQrMode => ref.read(scannedBusControllerProvider).valueOrNull != null;
 
+  /// Fetch the trip details + the bus/driver lookup tables, then seed the
+  /// form so the assistant sees the existing trip exactly as it was saved.
+  /// Best-effort — if any fetch fails we leave the form blank and surface a
+  /// snackbar, since a partial preload would be worse than a fresh start.
+  Future<void> _preloadFromTrip(String tripId) async {
+    if (_editLoaded) return;
+    _editLoaded = true;
+    try {
+      final ds = ref.read(assistantRemoteDataSourceProvider);
+      final details = await ds.getTripDetails(tripId);
+      final buses = await ref.read(busesListProvider.future);
+      final drivers = await ref.read(driversListProvider.future);
+      if (!mounted) return;
+      final bus = buses.where((b) => b.id == details.busId).cast<BusSummaryDto?>().firstOrNull;
+      final driver = details.driverId == null
+          ? null
+          : drivers.where((d) => d.id == details.driverId).cast<DriverSummaryDto?>().firstOrNull;
+      setState(() {
+        _selectedBus = bus;
+        _selectedDriver = driver;
+        _tripType = details.tripType;
+        // Mark this (bus, type) as "already seeded" so history fetch
+        // doesn't overwrite the edit-mode roster with the last trip's.
+        _seededKey = bus == null ? null : '${bus.id}|$_tripType';
+        _roster
+          ..clear()
+          ..addEntries(details.students.map((s) => MapEntry(
+                s.studentId,
+                RosterStudentDto(
+                  studentId: s.studentId,
+                  fullName: s.fullName,
+                  fullNameEn: s.fullNameEn,
+                  grade: s.grade,
+                ),
+              )));
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e is Failure ? e.message : '$e')),
+      );
+    }
+  }
+
   bool get _canStart =>
       !_starting &&
       _selectedBus != null &&
@@ -72,6 +135,13 @@ class _AssistantTripSetupScreenState
     if (confirmed != true) return;
     setState(() => _starting = true);
     try {
+      // Edit flow: delete the existing scheduled trip first so the
+      // "one pending trip per assistant" server lock doesn't block the
+      // replacement. The old roster's boarding state is irrelevant — a
+      // scheduled trip has no boarding history yet.
+      if (_isEditMode) {
+        await ref.read(deleteScheduledTripActionProvider)(widget.editTripId!);
+      }
       // Step 1 of the two-step new-trip flow: materialise the trip in
       // Scheduled status. The assistant flips it to InProgress later from
       // the trip-details screen (server-side handles Return-trip auto-
@@ -127,21 +197,20 @@ class _AssistantTripSetupScreenState
   }
 
   Future<bool?> _confirmStart() {
+    final l = AppLocalizations.of(context);
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('حفظ الرحلة'),
-        content: Text(
-          'حفظ الرحلة مع ${_roster.length} طالب؟ ستبدأ الرحلة لاحقاً من شاشة التفاصيل.',
-        ),
+        title: Text(l.assistantSaveTripTitle),
+        content: Text(l.assistantSaveTripBody(_roster.length)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('إلغاء'),
+            child: Text(l.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('حفظ'),
+            child: Text(l.commonSave),
           ),
         ],
       ),
@@ -162,7 +231,7 @@ class _AssistantTripSetupScreenState
             context.pop();
           },
         ),
-        title: Text(l.assistantTripSetupTitle),
+        title: Text(_isEditMode ? l.commonEdit : l.assistantTripSetupTitle),
       ),
       body: SafeArea(
         child: Column(
@@ -187,6 +256,10 @@ class _AssistantTripSetupScreenState
                           if (!mounted) return;
                           setState(() {
                             _selectedBus = b;
+                            // Clear the previously-picked driver so the
+                            // auto-picker re-fires for the new bus's last
+                            // trip; the user can still override after.
+                            _selectedDriver = null;
                             _seededKey = null;
                             _roster.clear();
                           });
@@ -203,6 +276,9 @@ class _AssistantTripSetupScreenState
                     onChanged: (t) {
                       setState(() {
                         _tripType = t;
+                        // Different trip type → different last-trip driver,
+                        // so reset and let the auto-picker re-resolve.
+                        _selectedDriver = null;
                         _seededKey = null;
                         _roster.clear();
                       });
@@ -799,7 +875,14 @@ class _RosterEditorState extends ConsumerState<_RosterEditor> {
   Widget build(BuildContext context) {
     final l = widget.l;
     final rosterIds = widget.roster.map((e) => e.studentId).toSet();
-    final searchAsync = ref.watch(studentSearchProvider(_query));
+    // Pass the current UI locale so the server scopes the LIKE to either
+    // FullName (ar) or FullNameEn (en) — see GetAllStudentsQueryHandler.
+    final lang = Localizations.localeOf(context).languageCode == 'ar'
+        ? 'ar'
+        : 'en';
+    final searchAsync = ref.watch(
+      studentSearchProvider((query: _query, lang: lang)),
+    );
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -850,38 +933,6 @@ class _RosterEditorState extends ConsumerState<_RosterEditor> {
             ],
           ),
           const SizedBox(height: 12),
-          // Search by name — full-width input. Server-side LIKE matches
-          // both FullName (Arabic) and FullNameEn so the same query works
-          // for either UI language; the result row picks the right field
-          // to display.
-          TextField(
-            controller: _searchCtrl,
-            onChanged: (v) => setState(() => _query = v),
-            decoration: InputDecoration(
-              hintText: l.assistantSearchByName,
-              prefixIcon: const Icon(Icons.search_rounded, size: 18),
-              suffixIcon: _query.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 16),
-                      onPressed: () {
-                        _searchCtrl.clear();
-                        setState(() => _query = '');
-                      },
-                    )
-                  : null,
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide:
-                    const BorderSide(color: AppColors.slate200),
-              ),
-            ),
-            style: const TextStyle(
-                fontSize: 13, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 10),
           // Two tap-to-scan cards: QR opens the existing paste dialog (on
           // a real device this would invoke the camera scanner with the
           // same callback shape). NFC is wired to a "coming soon" message
@@ -912,6 +963,38 @@ class _RosterEditorState extends ConsumerState<_RosterEditor> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 10),
+          // Search by name — full-width input. Server-side LIKE matches
+          // both FullName (Arabic) and FullNameEn so the same query works
+          // for either UI language; the result row picks the right field
+          // to display.
+          TextField(
+            controller: _searchCtrl,
+            onChanged: (v) => setState(() => _query = v),
+            decoration: InputDecoration(
+              hintText: l.assistantSearchByName,
+              prefixIcon: const Icon(Icons.search_rounded, size: 18),
+              suffixIcon: _query.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 16),
+                      onPressed: () {
+                        _searchCtrl.clear();
+                        setState(() => _query = '');
+                      },
+                    )
+                  : null,
+              isDense: true,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide:
+                    const BorderSide(color: AppColors.slate200),
+              ),
+            ),
+            style: const TextStyle(
+                fontSize: 13, fontWeight: FontWeight.w600),
           ),
           if (_query.trim().isNotEmpty) ...[
             const SizedBox(height: 6),
@@ -1101,7 +1184,7 @@ class _SheetBar extends StatelessWidget {
               : const Icon(Icons.save_rounded, size: 18),
           // Step 1 of the two-step flow saves the trip in Scheduled status;
           // the assistant taps Start later on the trip-details screen.
-          label: const Text('حفظ الرحلة'),
+          label: Text(l.assistantSaveTripCta),
         ),
       ),
     );

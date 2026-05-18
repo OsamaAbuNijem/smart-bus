@@ -11,12 +11,16 @@ public record GetAllStudentsQuery(
     string? Name = null,
     string? Grade = null,
     string? HomeArea = null,
-    Guid? SchoolId = null
+    Guid? SchoolId = null,
+    // "ar" → match/order by FullName only; "en" → match/order by FullNameEn
+    // only. null (default) keeps the original behavior of matching both,
+    // which the admin grid still relies on.
+    string? Lang = null
 ) : IRequest<PagedResult<StudentDto>>, ICacheableQuery
 {
-    // School scope is part of the cache key so each tenant's pages don't bleed
-    // into each other.
-    public string CacheKey => $"students:page:{PageNumber}:size:{PageSize}:route:{RouteId?.ToString() ?? "_"}:name:{Name ?? "_"}:grade:{Grade ?? "_"}:area:{HomeArea ?? "_"}:school:{SchoolId?.ToString() ?? "_"}";
+    // School + lang are part of the cache key so each tenant / locale's
+    // pages don't bleed into each other.
+    public string CacheKey => $"students:page:{PageNumber}:size:{PageSize}:route:{RouteId?.ToString() ?? "_"}:name:{Name ?? "_"}:grade:{Grade ?? "_"}:area:{HomeArea ?? "_"}:school:{SchoolId?.ToString() ?? "_"}:lang:{Lang ?? "_"}";
     public TimeSpan? CacheExpiry => TimeSpan.FromMinutes(2);
 }
 

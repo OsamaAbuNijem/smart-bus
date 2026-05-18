@@ -794,6 +794,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantStartedAt => 'بدأت';
 
   @override
+  String get assistantCreatedAt => 'أُنشئت';
+
+  @override
   String get assistantBoarded => 'صعدوا';
 
   @override
@@ -847,7 +850,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantRosterSheetTitle => 'الطلاب المُحمَّلون تلقائيًا';
 
   @override
-  String get assistantStartTrip => 'ابدأ الرحلة';
+  String get assistantStartTrip => 'بدء الرحلة';
 
   @override
   String get assistantBusLabel => 'الحافلة';
@@ -903,7 +906,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantScanNfc => 'مسح NFC';
 
   @override
-  String get assistantSearchByName => 'ابحث عن الطالب بالاسم';
+  String get assistantSearchByName => 'ابحث بالاسم';
 
   @override
   String get assistantRosterHeader => 'طلاب الرحلة';
@@ -959,6 +962,35 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get assistantOpenFailed => 'تعذّر فتح التطبيق.';
+
+  @override
+  String assistantStartTripBody(int count) {
+    return 'بدء الرحلة بـ $count طالب الآن؟';
+  }
+
+  @override
+  String get assistantStartTripYes => 'ابدأ';
+
+  @override
+  String get assistantDeleteScheduledTitle => 'حذف الرحلة';
+
+  @override
+  String get assistantDeleteScheduledBody =>
+      'هل تريد حذف هذه الرحلة المجدولة؟ لا يمكن التراجع.';
+
+  @override
+  String get assistantDeleteScheduledYes => 'حذف';
+
+  @override
+  String get assistantSaveTripTitle => 'حفظ الرحلة';
+
+  @override
+  String assistantSaveTripBody(int count) {
+    return 'حفظ الرحلة مع $count طالب؟ ستبدأ الرحلة لاحقاً من شاشة التفاصيل.';
+  }
+
+  @override
+  String get assistantSaveTripCta => 'حفظ الرحلة';
 
   @override
   String get assistantEndTrip => 'إنهاء الرحلة';
@@ -1123,7 +1155,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantDroppedAt => 'تم التوصيل';
 
   @override
-  String get assistantStatusDropped => 'تم التوصيل';
+  String get assistantStatusDropped => 'وصل';
 
   @override
   String get assistantArrivedSchool => 'وصل إلى المدرسة';

@@ -15,7 +15,9 @@ public record TripDetailsDto(
     Guid TripId,
     string TripType,        // "Morning" | "Return"
     string Status,          // "InProgress" | "Completed" | ...
+    Guid BusId,
     string BusPlateNumber,
+    Guid? DriverId,
     string? DriverName,
     DateTime ScheduledDeparture,
     DateTime? ActualDeparture,

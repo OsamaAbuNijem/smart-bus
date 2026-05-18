@@ -36,6 +36,7 @@ public class StudentsController : ControllerBase
         [FromQuery] string? name = null,
         [FromQuery] string? grade = null,
         [FromQuery] string? homeArea = null,
+        [FromQuery] string? lang = null,
         CancellationToken cancellationToken = default)
     {
         // Resolve the requesting user's school so the handler can scope by
@@ -56,7 +57,7 @@ public class StudentsController : ControllerBase
             schoolId = await _mediator.Send(new GetMyFleetSchoolQuery(userId), cancellationToken);
 
         return Ok(await _mediator.Send(
-            new GetAllStudentsQuery(pageNumber, pageSize, routeId, name, grade, homeArea, schoolId),
+            new GetAllStudentsQuery(pageNumber, pageSize, routeId, name, grade, homeArea, schoolId, lang),
             cancellationToken));
     }
 
