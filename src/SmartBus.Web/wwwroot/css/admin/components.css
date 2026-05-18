@@ -345,6 +345,7 @@ tr.row-incomplete:hover { background: #FEF3C7; }
 .status-pill { border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
 .status-pill.waiting { background: #EFF6FF; color: #1E40AF; }
 .status-pill.boarded { background: #F0FDF4; color: #15803D; }
+.status-pill.arrived { background: #ECFDF5; color: #047857; }
 .status-pill.absent  { background: #FEF2F2; color: #B91C1C; }
 
 /* ══ Form sections (student form, etc.) ═══════════════════════════════ */
@@ -403,58 +404,48 @@ tr.row-incomplete:hover { background: #FEF3C7; }
 #student-form-container .map-canvas { height: 160px; }
 
 /* ══ Trip-students modal ═══════════════════════════════════════════════ */
-.trip-students-summary {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  padding: 14px 16px 6px;
+.ts-summary {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 12px 16px 8px;
 }
-.ts-stat {
-  border-radius: 12px;
-  padding: 10px 14px;
-  border: 1.5px solid transparent;
-  background: #F8FAFC;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.ts-stat-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .3px; }
-.ts-stat-value { font-size: 22px; font-weight: 800; line-height: 1; color: var(--text); }
-.ts-stat-total   { background: #EFF6FF; border-color: #BFDBFE; }
-.ts-stat-total   .ts-stat-label, .ts-stat-total   .ts-stat-value { color: #1E40AF; }
-.ts-stat-boarded { background: #F0FDF4; border-color: #BBF7D0; }
-.ts-stat-boarded .ts-stat-label, .ts-stat-boarded .ts-stat-value { color: #15803D; }
-.ts-stat-waiting { background: #FFFBEB; border-color: #FDE68A; }
-.ts-stat-waiting .ts-stat-label, .ts-stat-waiting .ts-stat-value { color: #B45309; }
-.ts-stat-absent  { background: #FEF2F2; border-color: #FECACA; }
-.ts-stat-absent  .ts-stat-label, .ts-stat-absent  .ts-stat-value { color: #B91C1C; }
-
-.trip-students-table-wrap { padding: 4px 8px 12px; }
-.trip-students-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-.trip-students-table thead th {
-  position: sticky; top: 0;
-  background: #F8FAFC;
-  font-size: 11px;
-  font-weight: 700;
+.ts-chip {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #F1F5F9;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text2);
-  text-transform: uppercase;
-  letter-spacing: .3px;
-  padding: 10px 12px;
-  border-bottom: 1.5px solid var(--border);
-  text-align: inherit;
 }
-.trip-students-table tbody td {
+.ts-chip-num   { font-size: 13px; font-weight: 800; color: var(--text); }
+.ts-chip-label { letter-spacing: .1px; }
+.ts-chip-total   { background: #EFF6FF; }
+.ts-chip-total   .ts-chip-num, .ts-chip-total   .ts-chip-label { color: #1E40AF; }
+.ts-chip-arrived { background: #ECFDF5; }
+.ts-chip-arrived .ts-chip-num, .ts-chip-arrived .ts-chip-label { color: #047857; }
+.ts-chip-waiting { background: #FFFBEB; }
+.ts-chip-waiting .ts-chip-num, .ts-chip-waiting .ts-chip-label { color: #B45309; }
+.ts-chip-absent  { background: #FEF2F2; }
+.ts-chip-absent  .ts-chip-num, .ts-chip-absent  .ts-chip-label { color: #B91C1C; }
+
+.ts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 8px 12px;
+}
+.ts-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
   padding: 10px 12px;
   border-bottom: 1px solid #F1F5F9;
-  vertical-align: middle;
-  font-size: 13px;
 }
-.trip-students-table tbody tr:hover { background: #F8FAFC; }
-.trip-students-table .col-num   { width: 44px; text-align: center; color: var(--text3); font-weight: 600; }
-.trip-students-table .col-name  { font-weight: 600; color: var(--text); }
-.trip-students-table .col-area  { color: var(--text2); }
-.trip-students-table .col-time  { color: var(--text3); font-variant-numeric: tabular-nums; width: 72px; }
+.ts-row:last-child { border-bottom: none; }
+.ts-row-main      { min-width: 0; }
+.ts-row-name      { font-size: 13px; font-weight: 700; color: var(--text); }
+.ts-row-meta      { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: 12px; color: var(--text3); }
+.ts-row-area      { color: var(--text3); }
+.ts-row-status    { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.ts-row-time      { font-size: 11px; color: var(--text3); font-variant-numeric: tabular-nums; }
 
 .grade-chip {
   display: inline-block;

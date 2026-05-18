@@ -31,6 +31,14 @@
            data-form-type="other"
            oninput="trips.debouncedSearch()"/>
 
+    <input type="search"
+           id="trip-filter-bus"
+           class="form-input"
+           placeholder="@L["Trip_FilterBus"]"
+           value=""
+           autocomplete="off"
+           oninput="trips.debouncedSearch()"/>
+
     <input id="trip-filter-date"
            type="date"
            class="form-input"

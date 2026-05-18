@@ -563,6 +563,7 @@
   <data name="Trip_ColTime"          xml:space="preserve"><value>الوقت</value></data>
   <data name="Trip_ColStatus"        xml:space="preserve"><value>الحالة</value></data>
   <data name="Trip_SearchPerson"     xml:space="preserve"><value>ابحث بالسائق أو المساعد...</value></data>
+  <data name="Trip_FilterBus"        xml:space="preserve"><value>رقم الحافلة...</value></data>
   <data name="Trip_FilterDate"       xml:space="preserve"><value>التاريخ</value></data>
   <data name="Trip_FilterStatus"     xml:space="preserve"><value>الحالة</value></data>
   <data name="Trip_ClearFilter"      xml:space="preserve"><value>مسح</value></data>
@@ -578,6 +579,7 @@
   <data name="Trip_BoardingWaiting"  xml:space="preserve"><value>في الانتظار</value></data>
   <data name="Trip_BoardingBoarded"  xml:space="preserve"><value>ركب</value></data>
   <data name="Trip_BoardingAbsent"   xml:space="preserve"><value>غائب</value></data>
+  <data name="Trip_BoardingArrived"  xml:space="preserve"><value>وصل</value></data>
   <data name="JS_TripStarted"     xml:space="preserve"><value>تم بدء الرحلة ✓</value></data>
   <data name="JS_TripCompleted"   xml:space="preserve"><value>تم إتمام الرحلة ✓</value></data>
   <data name="JS_ConfirmStartTrip"    xml:space="preserve"><value>هل تريد بدء هذه الرحلة؟</value></data>

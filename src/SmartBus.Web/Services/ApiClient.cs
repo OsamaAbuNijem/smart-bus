@@ -222,12 +222,14 @@ public class ApiClient : IApiClient
 
     // ── Trips ──────────────────────────────────────────────────────────────
     public Task<PagedResult<TripDto>?> GetTripsAsync(int pageNumber = 1, int pageSize = 10,
-        string? personName = null, DateOnly? date = null, string? status = null)
+        string? personName = null, DateOnly? date = null, string? status = null,
+        string? busPlateNumber = null)
     {
         var url = $"api/v1/trips?pageNumber={pageNumber}&pageSize={pageSize}";
-        if (!string.IsNullOrEmpty(personName)) url += $"&personName={Uri.EscapeDataString(personName)}";
-        if (date.HasValue)                     url += $"&date={date.Value:yyyy-MM-dd}";
-        if (!string.IsNullOrEmpty(status))     url += $"&status={status}";
+        if (!string.IsNullOrEmpty(personName))     url += $"&personName={Uri.EscapeDataString(personName)}";
+        if (date.HasValue)                         url += $"&date={date.Value:yyyy-MM-dd}";
+        if (!string.IsNullOrEmpty(status))         url += $"&status={status}";
+        if (!string.IsNullOrEmpty(busPlateNumber)) url += $"&busPlateNumber={Uri.EscapeDataString(busPlateNumber)}";
         return GetAsync<PagedResult<TripDto>>(url);
     }
 

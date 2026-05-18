@@ -100,11 +100,12 @@ public class TripsController : ControllerBase
         [FromQuery] string? personName = null,
         [FromQuery] string? date = null,
         [FromQuery] string? status = null,
+        [FromQuery] string? busPlateNumber = null,
         CancellationToken cancellationToken = default)
     {
         DateOnly? parsedDate = DateOnly.TryParse(date, out var d) ? d : null;
         var result = await _mediator.Send(
-            new GetAllTripsQuery(pageNumber, pageSize, personName, parsedDate, status),
+            new GetAllTripsQuery(pageNumber, pageSize, personName, parsedDate, status, busPlateNumber),
             cancellationToken);
         return Ok(result);
     }

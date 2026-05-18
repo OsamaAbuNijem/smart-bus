@@ -563,6 +563,7 @@
   <data name="Trip_ColTime"          xml:space="preserve"><value>Time</value></data>
   <data name="Trip_ColStatus"        xml:space="preserve"><value>Status</value></data>
   <data name="Trip_SearchPerson"     xml:space="preserve"><value>Search by driver or assistant...</value></data>
+  <data name="Trip_FilterBus"        xml:space="preserve"><value>Bus number...</value></data>
   <data name="Trip_FilterDate"       xml:space="preserve"><value>Date</value></data>
   <data name="Trip_FilterStatus"     xml:space="preserve"><value>Status</value></data>
   <data name="Trip_ClearFilter"      xml:space="preserve"><value>Clear</value></data>
@@ -578,6 +579,7 @@
   <data name="Trip_BoardingWaiting"  xml:space="preserve"><value>Waiting</value></data>
   <data name="Trip_BoardingBoarded"  xml:space="preserve"><value>Boarded</value></data>
   <data name="Trip_BoardingAbsent"   xml:space="preserve"><value>Absent</value></data>
+  <data name="Trip_BoardingArrived"  xml:space="preserve"><value>Arrived</value></data>
   <data name="JS_TripStarted"     xml:space="preserve"><value>Trip started ✓</value></data>
   <data name="JS_TripCompleted"   xml:space="preserve"><value>Trip completed ✓</value></data>
   <data name="JS_ConfirmStartTrip"    xml:space="preserve"><value>Start this trip?</value></data>

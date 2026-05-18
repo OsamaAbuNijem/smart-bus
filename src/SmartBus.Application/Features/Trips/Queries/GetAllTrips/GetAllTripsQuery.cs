@@ -9,10 +9,11 @@ public record GetAllTripsQuery(
     int PageSize = 10,
     string? PersonName = null,
     DateOnly? Date = null,
-    string? Status = null
+    string? Status = null,
+    string? BusPlateNumber = null
 ) : IRequest<PagedResult<TripDto>>, ICacheableQuery
 {
-    public string CacheKey => $"trips:page:{PageNumber}:size:{PageSize}:p:{PersonName ?? "_"}:d:{Date?.ToString("yyyy-MM-dd") ?? "_"}:s:{Status ?? "_"}";
+    public string CacheKey => $"trips:page:{PageNumber}:size:{PageSize}:p:{PersonName ?? "_"}:d:{Date?.ToString("yyyy-MM-dd") ?? "_"}:s:{Status ?? "_"}:b:{BusPlateNumber ?? "_"}";
     // Trips change state often (start/complete); keep TTL short.
     public TimeSpan? CacheExpiry => TimeSpan.FromSeconds(30);
 }

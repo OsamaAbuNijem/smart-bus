@@ -17,10 +17,10 @@ public class TripsController : AdminControllerBase
         => View(await PopulateAsync(new AdminPageViewModel(), "trips", _l["Nav_Trips"]));
 
     [HttpGet]
-    public async Task<IActionResult> List(int page = 1, string? personName = null, string? date = null, string? status = null)
+    public async Task<IActionResult> List(int page = 1, string? personName = null, string? date = null, string? status = null, string? busPlateNumber = null)
     {
         DateOnly? parsedDate = DateOnly.TryParse(date, out var d) ? d : null;
-        return PartialView("_List", await ApiClient.GetTripsAsync(page, 10, personName, parsedDate, status));
+        return PartialView("_List", await ApiClient.GetTripsAsync(page, 10, personName, parsedDate, status, busPlateNumber));
     }
 
     [HttpGet]

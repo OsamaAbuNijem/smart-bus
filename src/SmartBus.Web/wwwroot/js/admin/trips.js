@@ -10,10 +10,12 @@ const trips = {
     if (page !== undefined) document.getElementById('trips-page').value = page;
     const p      = document.getElementById('trips-page').value;
     const name   = document.getElementById('trip-filter-name').value.trim();
+    const bus    = document.getElementById('trip-filter-bus').value.trim();
     const date   = document.getElementById('trip-filter-date').value;
     const status = document.getElementById('trip-filter-status').value;
     const qs = new URLSearchParams({ page: p });
     if (name)   qs.set('personName', name);
+    if (bus)    qs.set('busPlateNumber', bus);
     if (date)   qs.set('date', date);
     if (status) qs.set('status', status);
     qs.set('_t', Date.now());
@@ -44,7 +46,7 @@ const trips = {
     this._searchDebounce = setTimeout(() => this.load(1), 350);
   },
   clearFilter() {
-    ['trip-filter-name','trip-filter-date','trip-filter-status'].forEach(id => document.getElementById(id).value = '');
+    ['trip-filter-name','trip-filter-bus','trip-filter-date','trip-filter-status'].forEach(id => document.getElementById(id).value = '');
     this.load(1);
   },
 

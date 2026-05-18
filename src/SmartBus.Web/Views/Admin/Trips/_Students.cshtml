@@ -12,65 +12,69 @@
 }
 else
 {
+    // Counts: Boarded + DroppedOff both mean "on the trip / made it" once
+    // the trip ends (Morning completion flips Boarded → DroppedOff). We
+    // surface the combined arrived count alongside waiting + absent so the
+    // summary stays accurate at every stage of the trip.
+    var arrivedCount = Model.Count(s => s.BoardingStatus == "Boarded" || s.BoardingStatus == "DroppedOff");
     var waitingCount = Model.Count(s => s.BoardingStatus == "Waiting");
-    var boardedCount = Model.Count(s => s.BoardingStatus == "Boarded");
     var absentCount  = Model.Count(s => s.BoardingStatus == "Absent");
 
-    <div class="trip-students-summary">
-      <div class="ts-stat ts-stat-total">
-        <div class="ts-stat-label">@L["Trip_StudentsTotal"]</div>
-        <div class="ts-stat-value">@Model.Count</div>
-      </div>
-      <div class="ts-stat ts-stat-boarded">
-        <div class="ts-stat-label">@L["Trip_BoardingBoarded"]</div>
-        <div class="ts-stat-value">@boardedCount</div>
-      </div>
-      <div class="ts-stat ts-stat-waiting">
-        <div class="ts-stat-label">@L["Trip_BoardingWaiting"]</div>
-        <div class="ts-stat-value">@waitingCount</div>
-      </div>
-      <div class="ts-stat ts-stat-absent">
-        <div class="ts-stat-label">@L["Trip_BoardingAbsent"]</div>
-        <div class="ts-stat-value">@absentCount</div>
-      </div>
+    <div class="ts-summary">
+      <span class="ts-chip ts-chip-total">
+        <span class="ts-chip-num">@Model.Count</span>
+        <span class="ts-chip-label">@L["Trip_StudentsTotal"]</span>
+      </span>
+      <span class="ts-chip ts-chip-arrived">
+        <span class="ts-chip-num">@arrivedCount</span>
+        <span class="ts-chip-label">@L["Trip_BoardingArrived"]</span>
+      </span>
+      <span class="ts-chip ts-chip-waiting">
+        <span class="ts-chip-num">@waitingCount</span>
+        <span class="ts-chip-label">@L["Trip_BoardingWaiting"]</span>
+      </span>
+      <span class="ts-chip ts-chip-absent">
+        <span class="ts-chip-num">@absentCount</span>
+        <span class="ts-chip-label">@L["Trip_BoardingAbsent"]</span>
+      </span>
     </div>
 
-    <div class="trip-students-table-wrap">
-      <table class="table trip-students-table">
-        <thead>
-          <tr>
-            <th scope="col" class="col-num">@L["Trip_ColNumber"]</th>
-            <th scope="col">@L["Trip_StudentsColName"]</th>
-            <th scope="col">@L["Trip_StudentsColGrade"]</th>
-            <th scope="col">@L["Trip_StudentsColArea"]</th>
-            <th scope="col">@L["Trip_StudentsColBoarding"]</th>
-            <th scope="col">@L["Trip_StudentsColBoardTime"]</th>
-            <th scope="col">@L["Trip_StudentsColDropTime"]</th>
-          </tr>
-        </thead>
-        <tbody>
-          @{ var i = 0; }
-          @foreach (var s in Model)
+    <ul class="ts-list">
+      @foreach (var s in Model)
+      {
+          var (cls, label) = s.BoardingStatus switch
           {
-              i++;
-              var (cls, label) = s.BoardingStatus switch
+              "Waiting"    => ("waiting", L["Trip_BoardingWaiting"].Value),
+              "Boarded"    => ("boarded", L["Trip_BoardingBoarded"].Value),
+              // Both Morning (post-completion) and Return (drop-off at home)
+              // end up here — read as "Arrived" in both cases.
+              "DroppedOff" => ("arrived", L["Trip_BoardingArrived"].Value),
+              "Absent"     => ("absent",  L["Trip_BoardingAbsent"].Value),
+              _            => ("",        s.BoardingStatus)
+          };
+          // Prefer the most recent timestamp the row has: drop-off when the
+          // student arrived, otherwise the board time.
+          var time = (s.DropoffTime ?? s.BoardingTime)?.ToString("HH:mm");
+
+          <li class="ts-row">
+            <div class="ts-row-main">
+              <div class="ts-row-name">@s.FullName</div>
+              <div class="ts-row-meta">
+                <span class="grade-chip">@L["Std_Grade" + s.Grade]</span>
+                @if (!string.IsNullOrEmpty(s.HomeArea))
+                {
+                    <span class="ts-row-area">· @s.HomeArea</span>
+                }
+              </div>
+            </div>
+            <div class="ts-row-status">
+              <span class="status-pill @cls"><span class="status-dot"></span>@label</span>
+              @if (time != null)
               {
-                  "Waiting" => ("waiting", L["Trip_BoardingWaiting"].Value),
-                  "Boarded" => ("boarded", L["Trip_BoardingBoarded"].Value),
-                  "Absent"  => ("absent",  L["Trip_BoardingAbsent"].Value),
-                  _         => ("",        s.BoardingStatus)
-              };
-              <tr>
-                <td class="col-num">@i</td>
-                <td class="col-name">@s.FullName</td>
-                <td><span class="grade-chip">@L["Std_Grade" + s.Grade]</span></td>
-                <td class="col-area">@(string.IsNullOrEmpty(s.HomeArea) ? "—" : s.HomeArea)</td>
-                <td><span class="status-pill @cls"><span class="status-dot"></span>@label</span></td>
-                <td class="col-time">@(s.BoardingTime?.ToString("HH:mm") ?? "—")</td>
-                <td class="col-time">@(s.DropoffTime?.ToString("HH:mm")  ?? "—")</td>
-              </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+                  <span class="ts-row-time">@time</span>
+              }
+            </div>
+          </li>
+      }
+    </ul>
 }

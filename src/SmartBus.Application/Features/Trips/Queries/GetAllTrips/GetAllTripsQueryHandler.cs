@@ -15,8 +15,10 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
 
     public async Task<PagedResult<TripDto>> Handle(GetAllTripsQuery request, CancellationToken cancellationToken)
     {
-        // Join trip → schedule (per-bus). Driver/assistant names are taken from the schedule
-        // side matching the trip type (Morning/Return).
+        // Prefer driver/assistant stamped on the trip itself (set when the
+        // assistant materialises the trip in the mobile flow). Fall back to
+        // the bus schedule's morning/return slot for legacy trips that
+        // pre-date Trip.DriverId / Trip.AssistantId.
         // Exclude trips whose Bus has been soft-deleted — otherwise the count (which
         // doesn't traverse the nav) won't match the rendered rows (where the Bus
         // query filter hides soft-deleted buses and their trips become orphans).
@@ -24,19 +26,25 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
             from t in _context.Trips
             where !t.IsDeleted && !t.IsTemplate && t.Bus != null
             from sched in _context.BusSchedules.Where(s => s.BusId == t.BusId).DefaultIfEmpty()
+            from tripDriver       in _context.Drivers.Where(d => d.Id == t.DriverId).DefaultIfEmpty()
+            from tripAssistant    in _context.Drivers.Where(d => d.Id == t.AssistantId).DefaultIfEmpty()
             from morningDriver    in _context.Drivers.Where(d => sched != null && d.Id == sched.MorningDriverId).DefaultIfEmpty()
             from morningAssistant in _context.Drivers.Where(d => sched != null && d.Id == sched.MorningAssistantId).DefaultIfEmpty()
             from returnDriver     in _context.Drivers.Where(d => sched != null && d.Id == sched.ReturnDriverId).DefaultIfEmpty()
             from returnAssistant  in _context.Drivers.Where(d => sched != null && d.Id == sched.ReturnAssistantId).DefaultIfEmpty()
+            let scheduleDriverName    = t.Type == TripType.Morning
+                ? (morningDriver    != null ? morningDriver.FullName    : null)
+                : (returnDriver     != null ? returnDriver.FullName     : null)
+            let scheduleAssistantName = t.Type == TripType.Morning
+                ? (morningAssistant != null ? morningAssistant.FullName : null)
+                : (returnAssistant  != null ? returnAssistant.FullName  : null)
             select new
             {
-                Trip              = t,
-                Bus               = t.Bus,
-                Route             = t.Route,
-                MorningDriverName    = morningDriver    != null ? morningDriver.FullName    : null,
-                MorningAssistantName = morningAssistant != null ? morningAssistant.FullName : null,
-                ReturnDriverName     = returnDriver     != null ? returnDriver.FullName     : null,
-                ReturnAssistantName  = returnAssistant  != null ? returnAssistant.FullName  : null
+                Trip          = t,
+                Bus           = t.Bus,
+                Route         = t.Route,
+                DriverName    = tripDriver    != null ? tripDriver.FullName    : scheduleDriverName,
+                AssistantName = tripAssistant != null ? tripAssistant.FullName : scheduleAssistantName,
             };
 
         // Filter by driver or assistant name
@@ -44,10 +52,15 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
         {
             var name = request.PersonName.Trim();
             query = query.Where(x =>
-                (x.MorningDriverName    != null && x.MorningDriverName.Contains(name)) ||
-                (x.MorningAssistantName != null && x.MorningAssistantName.Contains(name)) ||
-                (x.ReturnDriverName     != null && x.ReturnDriverName.Contains(name))    ||
-                (x.ReturnAssistantName  != null && x.ReturnAssistantName.Contains(name)));
+                (x.DriverName    != null && x.DriverName.Contains(name)) ||
+                (x.AssistantName != null && x.AssistantName.Contains(name)));
+        }
+
+        // Filter by bus plate number (partial match, case-insensitive via LOWER).
+        if (!string.IsNullOrWhiteSpace(request.BusPlateNumber))
+        {
+            var plate = request.BusPlateNumber.Trim().ToLower();
+            query = query.Where(x => x.Bus.PlateNumber.ToLower().Contains(plate));
         }
 
         // Filter by date
@@ -82,8 +95,8 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
                 x.Trip.ActualArrival,
                 x.Trip.Status.ToString(),
                 x.Trip.RepeatDays,
-                x.Trip.Type == TripType.Morning ? x.MorningDriverName    : x.ReturnDriverName,
-                x.Trip.Type == TripType.Morning ? x.MorningAssistantName : x.ReturnAssistantName))
+                x.DriverName,
+                x.AssistantName))
             .ToListAsync(cancellationToken);
 
         return PagedResult<TripDto>.Create(trips, totalCount, request.PageNumber, request.PageSize);
