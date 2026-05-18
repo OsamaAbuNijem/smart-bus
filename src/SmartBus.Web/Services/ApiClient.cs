@@ -8,6 +8,8 @@ using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.SuperAdmin.Commands.ImpersonateSchoolAdmin;
+using SmartBus.Application.Features.Dashboard.Queries.GetAdminDashboardStats;
+using SmartBus.Application.Features.Dashboard.Queries.GetLiveDashboardStats;
 using SmartBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
@@ -115,6 +117,13 @@ public class ApiClient : IApiClient
     // ── SuperAdmin dashboard ───────────────────────────────────────────────
     public Task<DashboardStatsDto?> GetSuperAdminDashboardStatsAsync()
         => GetAsync<DashboardStatsDto>("api/v1/superadmin/dashboard");
+
+    // ── School-admin dashboard ─────────────────────────────────────────────
+    public Task<AdminDashboardStatsDto?> GetAdminDashboardStatsAsync()
+        => GetAsync<AdminDashboardStatsDto>("api/v1/dashboard/admin-stats");
+
+    public Task<LiveDashboardStatsDto?> GetLiveDashboardStatsAsync()
+        => GetAsync<LiveDashboardStatsDto>("api/v1/dashboard/live");
 
     public async Task<(ImpersonateResultDto? Data, string? Error)> ImpersonateSchoolAdminAsync(Guid schoolId)
     {

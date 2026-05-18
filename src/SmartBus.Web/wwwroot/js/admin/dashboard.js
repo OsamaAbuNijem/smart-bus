@@ -1,223 +1,217 @@
 /**
  * SmartBus Admin — Dashboard page.
- * Renders Chart.js charts from /Dashboard/Stats plus two server-rendered widgets.
+ * Hero refresh + Latest Alerts strip + live in-progress trips poller.
  */
 
 const dashboard = {
-  _charts: {},
+  _livePollTimer: null,
+  _liveTickTimer: null,
+  // Difference between client clock and server clock, in ms. Re-measured on
+  // each /Live response so the countdown stays accurate even if the user's
+  // laptop clock drifts.
+  _liveServerSkewMs: 0,
+  _liveI18n: {},
 
   init() {
     const btn = document.getElementById('dash-refresh');
-    if (btn) btn.addEventListener('click', () => this.load(btn));
-    this.load();
+    if (btn) btn.addEventListener('click', () => this.refresh(btn));
+    // One-time hydration on page load: alerts strip + live section. The
+    // KPI numbers + Today buckets are already server-rendered, so we don't
+    // re-fetch them here.
+    this._loadAlerts();
+    this._initLive();
   },
 
-  async load(refreshBtn) {
+  // Refresh button: pulls a fresh snapshot of the headline KPIs and the
+  // Today buckets only. The Live section already auto-polls every 15s and
+  // is intentionally left alone here so its own ticker stays smooth.
+  async refresh(refreshBtn) {
     if (refreshBtn) refreshBtn.classList.add('spin');
+    // Guarantee at least one full rotation of the icon so a fast network
+    // doesn't make the button feel like "nothing happened".
+    const minSpinMs = 800;
+    const startedAt = Date.now();
     try {
-      const [stats, tripsHtml, alertsHtml] = await Promise.all([
-        this._fetchJson('/Dashboard/Stats'),
-        this._fetchHtml('/Dashboard/TodayTrips'),
-        this._fetchHtml('/Dashboard/RecentAlerts')
-      ]);
-
-      document.getElementById('today-trips-list').innerHTML = tripsHtml;
-      document.getElementById('dashboard-alerts').innerHTML = alertsHtml;
-
-      const tripsTotal  = document.getElementById('dashboard-trips-total')?.textContent  || '0';
-      const tripsSub    = document.getElementById('today-trips-sub');
-      if (tripsSub) tripsSub.textContent = `${tripsTotal} ${SB.t.dashTripsCount || 'رحلة'}`;
-
-      if (stats) this._renderCharts(stats);
+      const stats = await this._fetchJson('/Dashboard/Stats');
+      if (stats) this._applyStats(stats, /*flash=*/true);
     } finally {
-      if (refreshBtn) setTimeout(() => refreshBtn.classList.remove('spin'), 300);
+      if (refreshBtn) {
+        const remaining = Math.max(0, minSpinMs - (Date.now() - startedAt));
+        setTimeout(() => refreshBtn.classList.remove('spin'), remaining);
+      }
     }
   },
 
-  _renderCharts(stats) {
-    const statusData = stats.todayByStatus || {};
-    const typeData   = stats.todayByType   || {};
-    const weekly     = stats.weekly        || [];
+  async _loadAlerts() {
+    const html = await this._fetchHtml('/Dashboard/RecentAlerts');
+    const el = document.getElementById('dashboard-alerts');
+    if (el && typeof html === 'string') el.innerHTML = html;
+  },
 
-    const tToday = SB.t.dashTripsToday || 'رحلة لليوم';
-    const tWeek  = SB.t.dashTripsWeek  || 'رحلة خلال 7 أيام';
+  _applyStats(stats, flash) {
+    const set = (id, v) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = String(v ?? 0);
+      // When the user explicitly clicked Refresh, flash every cell so the
+      // action is unmistakable — even if the underlying number didn't
+      // actually change.
+      if (flash) this._flash(el);
+    };
+    const t = stats.totals || {};
+    set('stat-students',   t.students);
+    set('stat-buses',      t.buses);
+    set('stat-drivers',    t.drivers);
+    set('stat-assistants', t.assistants);
+    set('stat-trips',      t.trips);
 
-    const totalToday = (statusData.Scheduled || 0) + (statusData.InProgress || 0) + (statusData.Completed || 0);
-    const subStatus = document.getElementById('status-chart-sub');
-    if (subStatus) subStatus.textContent = `${totalToday} ${tToday}`;
-
-    const totalType = (typeData.Morning || 0) + (typeData.Return || 0);
-    const subType = document.getElementById('type-chart-sub');
-    if (subType) subType.textContent = `${totalType} ${tToday}`;
-
-    const weeklyTotal = weekly.reduce((acc, w) => acc + (w.count || 0), 0);
-    const subWeekly = document.getElementById('weekly-chart-sub');
-    if (subWeekly) subWeekly.textContent = `${weeklyTotal} ${tWeek}`;
-
-    const centerLabel = SB.t.dashTotal || 'إجمالي';
-
-    this._drawDonut('chart-trip-status', {
-      labels: [SB.t.dashStatusScheduled || 'قادمة', SB.t.dashStatusInProgress || 'جارية', SB.t.dashStatusCompleted || 'مكتملة'],
-      values: [statusData.Scheduled || 0, statusData.InProgress || 0, statusData.Completed || 0],
-      colors: ['#3B82F6', '#F59E0B', '#22C55E'],
-      centerLabel,
-      legendTarget: 'legend-status'
-    });
-
-    this._drawDonut('chart-trip-type', {
-      labels: [SB.t.dashTypeMorning || 'ذهاب', SB.t.dashTypeReturn || 'إياب'],
-      values: [typeData.Morning || 0, typeData.Return || 0],
-      colors: ['#FFD700', '#3B82F6'],
-      centerLabel,
-      legendTarget: 'legend-type'
-    });
-
-    this._drawBar('chart-weekly', {
-      labels: weekly.map(w => w.label),
-      values: weekly.map(w => w.count || 0)
+    ['today', 'morning', 'return'].forEach(k => {
+      const b = stats[k] || {};
+      set(`today-${k}-trips`,    b.trips);
+      set(`today-${k}-students`, b.students);
+      set(`today-${k}-absent`,   b.absent);
     });
   },
 
-  _centerTextPlugin: {
-    id: 'centerText',
-    afterDraw(chart, args, opts) {
-      const { ctx, chartArea } = chart;
-      if (!chartArea) return;
-      const total = (opts.total ?? 0);
-      const label = opts.label || '';
-      const cx = (chartArea.left + chartArea.right) / 2;
-      const cy = (chartArea.top + chartArea.bottom) / 2;
-      ctx.save();
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#111111';
-      ctx.font = "800 26px Cairo, sans-serif";
-      ctx.fillText(String(total), cx, cy - 6);
-      ctx.fillStyle = '#94A3B8';
-      ctx.font = "600 11px Cairo, sans-serif";
-      ctx.fillText(label, cx, cy + 16);
-      ctx.restore();
-    }
+  _flash(el) {
+    // Re-trigger the animation by removing the class then re-adding it on
+    // the next frame, otherwise back-to-back refreshes show the flash only
+    // once.
+    el.classList.remove('stat-flash');
+    void el.offsetWidth;
+    el.classList.add('stat-flash');
   },
 
-  _renderLegend(targetId, labels, values, colors) {
-    const el = document.getElementById(targetId);
-    if (!el) return;
-    el.innerHTML = labels.map((lbl, i) => `
-      <span class="legend-pill">
-        <span class="legend-pill-dot" style="background:${colors[i]}"></span>
-        <span>${lbl}</span>
-        <span class="legend-pill-count">${values[i]}</span>
-      </span>
-    `).join('');
-  },
+  // ── Live section (polling + countdown) ──────────────────────────────────
+  _initLive() {
+    const i = document.getElementById('live-i18n');
+    if (i) this._liveI18n = { ...i.dataset };
 
-  _drawDonut(canvasId, { labels, values, colors, centerLabel, legendTarget }) {
-    const el = document.getElementById(canvasId);
-    if (!el || typeof Chart === 'undefined') return;
-    if (this._charts[canvasId]) this._charts[canvasId].destroy();
+    this._loadLive();
+    this._startLivePoll();
+    this._liveTickTimer = setInterval(() => this._tickLive(), 1000);
 
-    const total = values.reduce((a, b) => a + b, 0);
-    if (legendTarget) this._renderLegend(legendTarget, labels, values, colors);
-
-    this._charts[canvasId] = new Chart(el, {
-      type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{
-          data: values,
-          backgroundColor: colors,
-          borderColor: '#FFFFFF',
-          borderWidth: 3,
-          hoverOffset: 8,
-          spacing: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '72%',
-        animation: { animateRotate: true, animateScale: false, duration: 700, easing: 'easeOutQuart' },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            rtl: true,
-            backgroundColor: 'rgba(17,17,17,.92)',
-            padding: 10,
-            cornerRadius: 8,
-            bodyFont: { family: 'Cairo', size: 12 },
-            titleFont: { family: 'Cairo', size: 12, weight: '700' },
-            displayColors: false,
-            callbacks: {
-              label: ctx => {
-                const v = ctx.parsed;
-                const pct = total > 0 ? Math.round((v / total) * 100) : 0;
-                return ` ${ctx.label}: ${v} (${pct}%)`;
-              }
-            }
-          },
-          centerText: { total, label: centerLabel || '' }
-        }
-      },
-      plugins: [this._centerTextPlugin]
-    });
-  },
-
-  _drawBar(canvasId, { labels, values }) {
-    const el = document.getElementById(canvasId);
-    if (!el || typeof Chart === 'undefined') return;
-    if (this._charts[canvasId]) this._charts[canvasId].destroy();
-
-    const ctx = el.getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, el.height || 280);
-    gradient.addColorStop(0, '#3B82F6');
-    gradient.addColorStop(1, '#93C5FD');
-
-    this._charts[canvasId] = new Chart(el, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: SB.t.dashChartLabelTrips || 'رحلات',
-          data: values,
-          backgroundColor: gradient,
-          hoverBackgroundColor: '#1E40AF',
-          borderRadius: 10,
-          borderSkipped: false,
-          maxBarThickness: 40
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 650, easing: 'easeOutQuart' },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            rtl: true,
-            backgroundColor: 'rgba(17,17,17,.92)',
-            padding: 10,
-            cornerRadius: 8,
-            bodyFont: { family: 'Cairo', size: 12 },
-            titleFont: { family: 'Cairo', size: 12, weight: '700' },
-            displayColors: false,
-            callbacks: { label: ctx => ` ${ctx.parsed.y} ${SB.t.dashTripsCount || 'رحلة'}` }
-          }
-        },
-        scales: {
-          x: {
-            grid: { display: false, drawBorder: false },
-            ticks: { font: { family: 'Cairo', size: 11 }, color: '#64748B' }
-          },
-          y: {
-            beginAtZero: true,
-            border: { display: false },
-            ticks: { font: { family: 'Cairo', size: 11 }, color: '#94A3B8', precision: 0, padding: 6 },
-            grid: { color: 'rgba(148,163,184,.12)', drawBorder: false, tickLength: 0 }
-          }
-        }
+    // Pause polling when the tab is hidden — no point hammering the server
+    // when the user isn't looking. Resume + refresh on visibility.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this._stopLivePoll();
+      } else {
+        this._loadLive();
+        this._startLivePoll();
       }
     });
+  },
+
+  _startLivePoll() {
+    this._stopLivePoll();
+    this._livePollTimer = setInterval(() => this._loadLive(), 15000);
+  },
+
+  _stopLivePoll() {
+    if (this._livePollTimer) { clearInterval(this._livePollTimer); this._livePollTimer = null; }
+  },
+
+  async _loadLive() {
+    const data = await this._fetchJson('/Dashboard/Live');
+    if (!data) return;
+    // Skew = clientNow - serverNow. Subtract when computing remaining ms.
+    if (data.serverNowUtc) {
+      this._liveServerSkewMs = Date.now() - new Date(data.serverNowUtc).getTime();
+    }
+    this._renderLive(data);
+  },
+
+  _renderLive(data) {
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = String(v ?? 0); };
+    set('live-overall-trips',    data?.overall?.trips);
+    set('live-overall-students', data?.overall?.students);
+    set('live-morning-trips',    data?.morning?.trips);
+    set('live-morning-students', data?.morning?.students);
+    set('live-return-trips',     data?.return?.trips);
+    set('live-return-students',  data?.return?.students);
+
+    const list = document.getElementById('live-trips-list');
+    if (!list) return;
+    const trips = Array.isArray(data?.trips) ? data.trips : [];
+    if (trips.length === 0) {
+      list.innerHTML = `<div class="u-empty-state">${this._liveI18n.none || 'No trips currently in progress'}</div>`;
+      return;
+    }
+    list.innerHTML = trips.map(t => this._renderLiveTripRow(t)).join('');
+  },
+
+  _renderLiveTripRow(t) {
+    const typeLabel = t.tripType === 'Morning'
+      ? (this._liveI18n.morning || 'Morning')
+      : (this._liveI18n.return  || 'Return');
+    const typeClass = t.tripType === 'Morning' ? 'morning' : 'return';
+    const expectedMs = new Date(t.expectedEndUtc).getTime();
+    const departedMs = new Date(t.actualDepartureUtc).getTime();
+    const driver = t.driverName ? `<span class="live-trip-meta-item">${this._escape(t.driverName)}</span>` : '';
+    const assistant = t.assistantName ? `<span class="live-trip-meta-item">${this._escape(t.assistantName)}</span>` : '';
+    return `
+      <div class="live-trip" data-expected-ms="${expectedMs}" data-departed-ms="${departedMs}">
+        <div class="live-trip-main">
+          <div class="live-trip-head">
+            <span class="live-trip-plate">${this._escape(t.busPlateNumber || '')}</span>
+            <span class="trip-type-pill ${typeClass}">${typeLabel}</span>
+          </div>
+          <div class="live-trip-meta">
+            ${driver}${assistant}
+            <span class="live-trip-meta-item">${t.boarded}/${t.roster} ${this._liveI18n.onboard || 'onboard'}</span>
+          </div>
+        </div>
+        <div class="live-trip-times">
+          <div class="live-trip-countdown" data-countdown>
+            <span class="live-trip-countdown-label">${this._liveI18n.endsin || 'Ends in'}</span>
+            <span class="live-trip-countdown-val">--:--</span>
+          </div>
+          <div class="live-trip-departed">${this._liveI18n.departed || 'Departed'} ${this._fmtTime(t.actualDepartureUtc)}</div>
+        </div>
+      </div>`;
+  },
+
+  _tickLive() {
+    const now = Date.now() - this._liveServerSkewMs;
+    document.querySelectorAll('#live-trips-list .live-trip').forEach(row => {
+      const expected = parseInt(row.dataset.expectedMs, 10);
+      if (!expected) return;
+      const diff = expected - now;
+      const cd = row.querySelector('[data-countdown]');
+      if (!cd) return;
+      const lbl = cd.querySelector('.live-trip-countdown-label');
+      const val = cd.querySelector('.live-trip-countdown-val');
+      if (diff <= 0) {
+        cd.classList.add('overdue');
+        if (lbl) lbl.textContent = this._liveI18n.overdue || 'Overdue';
+        if (val) val.textContent = this._fmtMs(-diff);
+      } else {
+        cd.classList.remove('overdue');
+        if (lbl) lbl.textContent = this._liveI18n.endsin || 'Ends in';
+        if (val) val.textContent = this._fmtMs(diff);
+      }
+    });
+  },
+
+  _fmtMs(ms) {
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    const pad = n => n.toString().padStart(2, '0');
+    return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+  },
+
+  _fmtTime(iso) {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch { return ''; }
+  },
+
+  _escape(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
   },
 
   async _fetchJson(url) {

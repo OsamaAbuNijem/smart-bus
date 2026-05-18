@@ -46,9 +46,10 @@ public class AccountController : Controller
             return Redirect("/SuperAdmin/Dashboard");
 
         // Cache the admin's school once so every page doesn't re-hit /schools/current.
+        // The subscription snapshot lives alongside the name/city so the
+        // sidebar plan card can render without an extra roundtrip.
         var school = await _apiClient.GetMySchoolAsync();
-        HttpContext.Session.SetString("SchoolName", school?.Name ?? string.Empty);
-        HttpContext.Session.SetString("SchoolCity", school?.City ?? string.Empty);
+        AdminSessionCache.StashSchoolInSession(HttpContext.Session, school);
 
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);

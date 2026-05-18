@@ -34,6 +34,10 @@ try
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
 
+    // Strongly-typed options
+    builder.Services.Configure<SmartBus.Application.Common.Options.TripDurationOptions>(
+        builder.Configuration.GetSection(SmartBus.Application.Common.Options.TripDurationOptions.SectionName));
+
     // Register SignalR notification service (needs BusTrackingHub from this layer)
     builder.Services.AddScoped<SmartBus.Application.Common.Interfaces.ISignalRNotificationService,
         SmartBus.API.Services.SignalRNotificationService>();

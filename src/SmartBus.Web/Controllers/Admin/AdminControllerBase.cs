@@ -15,9 +15,10 @@ public abstract class AdminControllerBase : Controller
 
     protected AdminControllerBase(IApiClient apiClient) => ApiClient = apiClient;
 
-    /// <summary>Hydrates the common sidebar fields (school name + city) on a view model.
-    /// Reads the cached values stashed in session at login; falls back to the API once
-    /// if the session is empty (e.g. the admin logged in before the cache was introduced).</summary>
+    /// <summary>Hydrates the common sidebar fields (school name + city +
+    /// subscription snapshot) on a view model. Reads the cached values stashed
+    /// in session at login; falls back to the API once if the session is empty
+    /// (e.g. the admin logged in before the cache was introduced).</summary>
     protected async Task<T> PopulateAsync<T>(T vm, string activePage, string pageTitle)
         where T : AdminPageViewModel
     {
@@ -25,19 +26,21 @@ public abstract class AdminControllerBase : Controller
         vm.PageTitle  = pageTitle;
 
         var name = HttpContext.Session.GetString("SchoolName");
-        var city = HttpContext.Session.GetString("SchoolCity");
+        var sub  = AdminSessionCache.ReadSubscription(HttpContext.Session);
 
-        if (name is null)
+        // Cache miss — fetch the school once and stash the full snapshot
+        // (name + city + subscription) so subsequent renders are free.
+        if (name is null || sub is null)
         {
             var school = await ApiClient.GetMySchoolAsync();
+            AdminSessionCache.StashSchoolInSession(HttpContext.Session, school);
             name = school?.Name ?? string.Empty;
-            city = school?.City ?? string.Empty;
-            HttpContext.Session.SetString("SchoolName", name);
-            HttpContext.Session.SetString("SchoolCity", city);
+            sub  = AdminSessionCache.ReadSubscription(HttpContext.Session);
         }
 
         vm.SchoolName = name ?? string.Empty;
-        vm.SchoolCity = city ?? string.Empty;
+        vm.SchoolCity = HttpContext.Session.GetString("SchoolCity") ?? string.Empty;
+        AdminSessionCache.ApplySubscription(vm, sub);
         return vm;
     }
 

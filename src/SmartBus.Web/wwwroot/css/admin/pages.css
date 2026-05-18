@@ -4,49 +4,55 @@
 .dash-fade { animation: dashFade .45s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes dashFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* Hero banner */
+/* Hero strip — compact: school name + meta line + icon-only refresh */
 .dash-hero {
-  background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 45%, #0EA5E9 100%);
-  border-radius: 18px;
-  padding: 22px 26px;
-  margin-bottom: 20px;
-  color: #fff;
-  box-shadow: 0 6px 24px rgba(30,58,138,.18);
-  position: relative;
-  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  color: var(--text);
+  box-shadow: var(--shadow);
 }
-.dash-hero::before {
-  content: ''; position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at 85% -20%, rgba(255,215,0,.25), transparent 50%),
-    radial-gradient(ellipse at 15% 120%, rgba(255,255,255,.14), transparent 55%);
-  pointer-events: none;
+.dash-hero-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.dash-hero-left  { min-width: 0; }
+.dash-hero-title {
+  font-size: 14px; font-weight: 800; color: var(--text);
+  line-height: 1.2; letter-spacing: -.005em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.dash-hero-inner { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.dash-hero-left  { min-width: 220px; }
-.dash-hero-greet { font-size: 13px; font-weight: 600; opacity: .85; margin-bottom: 4px; }
-.dash-hero-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; letter-spacing: -.01em; }
-.dash-hero-sub   { font-size: 12px; opacity: .85; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.dash-hero-sub   {
+  font-size: 11px; color: var(--text3);
+  display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-top: 2px;
+}
 .dash-hero-dot   { opacity: .55; }
-.dash-hero-right { display: flex; align-items: center; gap: 10px; }
-.dash-hero-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,.15); backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: 999px; padding: 7px 14px;
-  font-size: 12px; font-weight: 600; color: #fff;
-}
 .dash-hero-refresh {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: #FFD700; color: #111;
-  border: none; border-radius: 999px; padding: 8px 16px;
-  font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700;
-  cursor: pointer; transition: transform .15s, box-shadow .15s;
-  box-shadow: 0 2px 8px rgba(255,215,0,.45);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  background: var(--bg); color: var(--text2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer; transition: background .15s, color .15s, transform .15s;
+  flex-shrink: 0;
 }
-.dash-hero-refresh:hover  { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,215,0,.55); }
-.dash-hero-refresh.spin svg { animation: spin 1s linear infinite; }
+.dash-hero-refresh:hover  { background: #F1F5F9; color: var(--text); }
+.dash-hero-refresh:active { transform: scale(.94); }
+.dash-hero-refresh.spin svg { animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Brief highlight on KPI numbers right after a refresh — gives the click
+   a visible payoff even when the underlying figure didn't change. */
+.stat-flash { animation: stat-flash 600ms ease-out; }
+@keyframes stat-flash {
+  0%   { background-color: rgba(59, 130, 246, .18); }
+  100% { background-color: transparent; }
+}
+.stat-num.stat-flash, .today-row-num.stat-flash, .live-kpi-num.stat-flash {
+  border-radius: 4px;
+  padding-inline: 4px;
+  margin-inline: -4px;
+}
 
 /* Section labels */
 .section-head {

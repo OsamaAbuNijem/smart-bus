@@ -5,6 +5,8 @@ using SmartBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using SmartBus.Application.Features.Schools.Queries.GetAllSchools;
 using SmartBus.Application.Features.Students.Queries.GetAllStudents;
 using SmartBus.Application.Features.SuperAdmin.Commands.ImpersonateSchoolAdmin;
+using SmartBus.Application.Features.Dashboard.Queries.GetAdminDashboardStats;
+using SmartBus.Application.Features.Dashboard.Queries.GetLiveDashboardStats;
 using SmartBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
 using SmartBus.Application.Features.Trips.Queries.GetAllTrips;
 using SmartBus.Application.Features.Trips.Queries.GetBusSchedule;
@@ -22,6 +24,13 @@ public interface IApiClient
     // Super-admin dashboard aggregate (schools / buses / drivers / students /
     // active users by role / today's trips by status). Single roundtrip.
     Task<DashboardStatsDto?> GetSuperAdminDashboardStatsAsync();
+
+    // School-admin dashboard aggregate (students / buses / drivers / assistants
+    // / trips + today/morning/return trip+student+absent counts).
+    Task<AdminDashboardStatsDto?> GetAdminDashboardStatsAsync();
+
+    // Live (in-progress trips) view for the dashboard polling section.
+    Task<LiveDashboardStatsDto?> GetLiveDashboardStatsAsync();
 
     /// <summary>
     /// SuperAdmin operation — mints a JWT for the given school's admin so

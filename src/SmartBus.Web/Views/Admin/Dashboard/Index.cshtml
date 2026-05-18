@@ -14,9 +14,10 @@
 <div class="dash-hero">
   <div class="dash-hero-inner">
     <div class="dash-hero-left">
-      <div class="dash-hero-greet">@greeting، @L["Dash_AdminUser"]</div>
       <div class="dash-hero-title">@(string.IsNullOrWhiteSpace(Model.SchoolName) ? L["Dash_FallbackTitle"].Value : Model.SchoolName)</div>
       <div class="dash-hero-sub">
+        <span>@greeting، @L["Dash_AdminUser"]</span>
+        <span class="dash-hero-dot">•</span>
         @if (!string.IsNullOrWhiteSpace(Model.SchoolCity))
         {
           <span>@Model.SchoolCity</span>
@@ -25,22 +26,15 @@
         <span>@today.ToString(dateFmt, culture)</span>
       </div>
     </div>
-    <div class="dash-hero-right">
-      <div class="dash-hero-chip">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span>@today.ToString("dd/MM/yyyy")</span>
-      </div>
-      <button class="dash-hero-refresh" id="dash-refresh" aria-label="@L["Dash_Refresh"]">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        <span>@L["Dash_Refresh"]</span>
-      </button>
-    </div>
+    <button class="dash-hero-refresh" id="dash-refresh" title="@L["Dash_Refresh"]" aria-label="@L["Dash_Refresh"]">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
   </div>
 </div>
 
 <div class="section-head"><span>@L["Dash_SectionKPI"]</span></div>
 
-<div class="stats-grid">
+<div class="stats-grid stats-grid-5">
   @await Component.InvokeAsync("StatCard", new {
       color   = "blue",
       iconSvg = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#3B82F6\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M23 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg>",
@@ -54,74 +48,140 @@
       change  = L["Dash_Stat_BusesSub"].Value, changeDir = "up", numberId = "stat-buses"
   })
   @await Component.InvokeAsync("StatCard", new {
+      color   = "purple",
+      iconSvg = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#8B5CF6\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21a8 8 0 0 1 16 0\"/></svg>",
+      iconBgClass = "icon-bg-purple", number = Model.TotalDrivers, label = L["Dash_Stat_Drivers"].Value,
+      change  = L["Dash_Stat_DriversSub"].Value, changeDir = "up", numberId = "stat-drivers"
+  })
+  @await Component.InvokeAsync("StatCard", new {
+      color   = "orange",
+      iconSvg = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#F97316\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M1 21a8 8 0 0 1 16 0\"/><circle cx=\"18\" cy=\"5\" r=\"3\"/></svg>",
+      iconBgClass = "icon-bg-orange", number = Model.TotalAssistants, label = L["Dash_Stat_Assistants"].Value,
+      change  = L["Dash_Stat_AssistantsSub"].Value, changeDir = "up", numberId = "stat-assistants"
+  })
+  @await Component.InvokeAsync("StatCard", new {
       color   = "yellow",
       iconSvg = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#B8960C\" stroke-width=\"2\" stroke-linecap=\"round\"><rect x=\"1\" y=\"3\" width=\"15\" height=\"13\" rx=\"2\"/><path d=\"M16 8h4l3 3v5h-7V8z\"/><circle cx=\"5.5\" cy=\"18.5\" r=\"2.5\"/><circle cx=\"18.5\" cy=\"18.5\" r=\"2.5\"/></svg>",
       iconBgClass = "icon-bg-yellow", number = Model.TotalTrips, label = L["Dash_Stat_Trips"].Value,
       change  = L["Dash_Stat_TripsSub"].Value, changeDir = "up", numberId = "stat-trips"
   })
-  @await Component.InvokeAsync("StatCard", new {
-      color   = "red",
-      iconSvg = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#EF4444\" stroke-width=\"2\" stroke-linecap=\"round\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"/></svg>",
-      iconBgClass = "icon-bg-red", number = Model.PendingAlerts, label = L["Dash_Stat_Alerts"].Value,
-      change  = L["Dash_Stat_AlertsSub"].Value, changeDir = "down", numberId = "stat-alerts"
-  })
 </div>
 
-<div class="section-head"><span>@L["Dash_SectionPerf"]</span></div>
+<div class="section-head live-section-head">
+  <span>@L["Dash_SectionLive"]</span>
+  <span class="live-dot" aria-hidden="true"></span>
+  <span class="live-section-label">@L["Dash_Live_LiveLabel"]</span>
+</div>
 
-<div class="grid-3">
-  <div class="card card-hover">
-    <div class="card-header">
-      <div>
-        <div class="card-title">@L["Dash_Card_Weekly"]</div>
-        <div class="card-sub" id="weekly-chart-sub">@L["Dash_Loading"]</div>
-      </div>
+<div class="live-grid">
+  <div class="live-kpi live-kpi-blue">
+    <div class="live-kpi-ico">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
     </div>
-    <div class="card-body">
-      <div class="chart-wrap chart-wrap-bar"><canvas id="chart-weekly"></canvas></div>
+    <div class="live-kpi-body">
+      <div class="live-kpi-label">@L["Dash_Live_Trips"]</div>
+      <div class="live-kpi-num" id="live-overall-trips">0</div>
+      <div class="live-kpi-foot"><span id="live-overall-students">0</span> @L["Dash_Live_Onboard"]</div>
     </div>
   </div>
-
-  <div class="card card-hover">
-    <div class="card-header">
-      <div>
-        <div class="card-title">@L["Dash_Card_TodayStatus"]</div>
-        <div class="card-sub" id="status-chart-sub">@L["Dash_Loading"]</div>
-      </div>
+  <div class="live-kpi live-kpi-yellow">
+    <div class="live-kpi-ico">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     </div>
-    <div class="card-body">
-      <div class="chart-wrap"><canvas id="chart-trip-status"></canvas></div>
-      <div class="legend-strip" id="legend-status"></div>
+    <div class="live-kpi-body">
+      <div class="live-kpi-label">@L["Dash_Live_MorningTrips"]</div>
+      <div class="live-kpi-num" id="live-morning-trips">0</div>
+      <div class="live-kpi-foot"><span id="live-morning-students">0</span> @L["Dash_Live_Onboard"]</div>
+    </div>
+  </div>
+  <div class="live-kpi live-kpi-purple">
+    <div class="live-kpi-ico">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M12 3l9 9-9 9"/></svg>
+    </div>
+    <div class="live-kpi-body">
+      <div class="live-kpi-label">@L["Dash_Live_ReturnTrips"]</div>
+      <div class="live-kpi-num" id="live-return-trips">0</div>
+      <div class="live-kpi-foot"><span id="live-return-students">0</span> @L["Dash_Live_Onboard"]</div>
     </div>
   </div>
 </div>
 
-<div class="grid-3">
-  <div class="card card-hover">
-    <div class="card-header">
-      <div>
-        <div class="card-title">@L["Dash_Card_TodayTrips"]</div>
-        <div class="card-sub" id="today-trips-sub">@L["Dash_Loading"]</div>
-      </div>
-      <a class="card-action" href="/Trips">@L["Dash_ViewAll"]</a>
+<div class="card card-hover live-card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">@L["Dash_Live_TripsCard"]</div>
+      <div class="card-sub">@L["Dash_Live_TripsSub"]</div>
     </div>
-    <div class="card-body card-body-flush" id="today-trips-list">
-      <div class="u-loading-state">@L["Dash_LoadingTrips"]</div>
-    </div>
+    <span class="live-badge" aria-live="polite">
+      <span class="live-dot"></span>@L["Dash_Live_LiveLabel"]
+    </span>
   </div>
+  <div class="card-body card-body-flush" id="live-trips-list">
+    <div class="u-loading-state">@L["Dash_Loading"]</div>
+  </div>
+</div>
 
-  <div class="card card-hover">
-    <div class="card-header">
-      <div>
-        <div class="card-title">@L["Dash_Card_TypeDonut"]</div>
-        <div class="card-sub" id="type-chart-sub">@L["Dash_Loading"]</div>
+@{
+  // i18n strings consumed by the live-section JS. Stashed on a data-* div so
+  // the script doesn't need its own resource fetch.
+  var liveI18nMorning  = L["TripType_Morning"].Value;
+  var liveI18nReturn   = L["TripType_Return"].Value;
+  var liveI18nEndsIn   = L["Dash_Live_EndsIn"].Value;
+  var liveI18nOverdue  = L["Dash_Live_Overdue"].Value;
+  var liveI18nDeparted = L["Dash_Live_Departed"].Value;
+  var liveI18nNone     = L["Dash_Live_None"].Value;
+  var liveI18nOnboard  = L["Dash_Live_Onboard"].Value;
+}
+<div id="live-i18n"
+     class="u-hidden"
+     data-morning="@liveI18nMorning"
+     data-return="@liveI18nReturn"
+     data-endsin="@liveI18nEndsIn"
+     data-overdue="@liveI18nOverdue"
+     data-departed="@liveI18nDeparted"
+     data-none="@liveI18nNone"
+     data-onboard="@liveI18nOnboard"></div>
+
+<div class="section-head"><span>@L["Dash_SectionToday"]</span></div>
+
+<div class="today-grid">
+  @{ var todayCards = new[] {
+      ("today",   "blue",   L["Dash_Today_AllCard"].Value,     L["Dash_Today_AllSub"].Value,     Model.Today),
+      ("morning", "yellow", L["Dash_Today_MorningCard"].Value, L["Dash_Today_MorningSub"].Value, Model.Morning),
+      ("return",  "purple", L["Dash_Today_ReturnCard"].Value,  L["Dash_Today_ReturnSub"].Value,  Model.Return),
+  }; }
+  @foreach (var (slug, accent, title, sub, b) in todayCards)
+  {
+    <div class="today-card today-card-@accent">
+      <div class="today-card-head">
+        <div class="today-card-title">@title</div>
+        <div class="today-card-sub">@sub</div>
+      </div>
+      <div class="today-card-rows">
+        <div class="today-row">
+          <div class="today-row-ico" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div class="today-row-label">@L["Dash_Today_Trips"]</div>
+          <div class="today-row-num" id="today-@slug-trips">@b.Trips</div>
+        </div>
+        <div class="today-row">
+          <div class="today-row-ico" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="today-row-label">@L["Dash_Today_Students"]</div>
+          <div class="today-row-num" id="today-@slug-students">@b.Students</div>
+        </div>
+        <div class="today-row">
+          <div class="today-row-ico" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <div class="today-row-label">@L["Dash_Today_Absent"]</div>
+          <div class="today-row-num today-row-num-absent" id="today-@slug-absent">@b.Absent</div>
+        </div>
       </div>
     </div>
-    <div class="card-body">
-      <div class="chart-wrap"><canvas id="chart-trip-type"></canvas></div>
-      <div class="legend-strip" id="legend-type"></div>
-    </div>
-  </div>
+  }
 </div>
 
 <div class="section-head"><span>@L["Dash_SectionAlerts"]</span></div>
@@ -142,6 +202,5 @@
 </div>
 
 @section Scripts {
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="~/js/admin/dashboard.js" asp-append-version="true"></script>
 }

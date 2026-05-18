@@ -66,22 +66,63 @@
 
   </div>
 
-  <div class="sidebar-bottom">
-    <div class="user-row">
-      <div class="user-av">@(isRtl ? "أد" : "AD")</div>
-      <div class="u-flex-1">
-        <div class="user-name">@(isRtl ? "المدير" : "Administrator")</div>
-        <div class="user-role">@(isRtl ? "مدير النظام" : "System Admin")</div>
-      </div>
-      <form asp-controller="Account" asp-action="Logout" method="post" class="logout-form">
-        @Html.AntiForgeryToken()
-        <button type="submit" class="logout-btn" title="@(isRtl ? "تسجيل الخروج" : "Sign out")" aria-label="@(isRtl ? "تسجيل الخروج" : "Sign out")">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-        </button>
-      </form>
+  @{
+    string? sbPlanLabel = Model.SubscriptionType switch
+    {
+        SmartBus.Domain.Enums.SubscriptionType.Trial    => L["SA_Sub_Type_Trial"].Value,
+        SmartBus.Domain.Enums.SubscriptionType.Basic    => L["SA_Sub_Type_Basic"].Value,
+        SmartBus.Domain.Enums.SubscriptionType.Standard => L["SA_Sub_Type_Standard"].Value,
+        SmartBus.Domain.Enums.SubscriptionType.Premium  => L["SA_Sub_Type_Premium"].Value,
+        _ => null
+    };
+    var sbToday = DateTime.UtcNow.Date;
+    string sbStatusKey;
+    if (Model.SubscriptionType is null)                                  sbStatusKey = "Admin_Settings_Plan_None";
+    else if (Model.SubscriptionIsActive == false)                        sbStatusKey = "Admin_Settings_Plan_Disabled";
+    else if (Model.SubscriptionActivationDate?.Date > sbToday)           sbStatusKey = "Admin_Settings_Plan_Future";
+    else if (Model.SubscriptionExpirationDate?.Date < sbToday)           sbStatusKey = "Admin_Settings_Plan_Expired";
+    else                                                                  sbStatusKey = "Admin_Settings_Plan_Live";
+    string sbStatusClass = "plan-status-" + sbStatusKey.Substring("Admin_Settings_Plan_".Length).ToLower();
+    string sbFmt(DateTime? d) => d?.ToString("d MMM yyyy", System.Globalization.CultureInfo.CurrentUICulture) ?? "—";
+  }
+  <div class="sidebar-plan">
+    <div class="sidebar-plan-head">
+      <span class="sidebar-plan-label">@L["Admin_Settings_Plan_Current"]</span>
+      <span class="sidebar-plan-status @sbStatusClass">@L[sbStatusKey]</span>
     </div>
+    <div class="sidebar-plan-name">@(sbPlanLabel ?? L["Admin_Settings_Plan_None"].Value)</div>
+    @if (Model.SubscriptionExpirationDate.HasValue)
+    {
+      <div class="sidebar-plan-meta">
+        @L["Admin_Settings_Plan_To"] <strong>@sbFmt(Model.SubscriptionExpirationDate)</strong>
+      </div>
+    }
+    @if (Model.SubscriptionMaxStudents.HasValue || Model.SubscriptionMaxBuses.HasValue || Model.SubscriptionPrice.HasValue)
+    {
+      <div class="sidebar-plan-stats">
+        @if (Model.SubscriptionMaxStudents.HasValue)
+        {
+          <div class="sidebar-plan-stat">
+            <span class="sidebar-plan-stat-num">@Model.SubscriptionMaxStudents.Value</span>
+            <span class="sidebar-plan-stat-lbl">@L["Admin_Settings_Plan_MaxStudents"]</span>
+          </div>
+        }
+        @if (Model.SubscriptionMaxBuses.HasValue)
+        {
+          <div class="sidebar-plan-stat">
+            <span class="sidebar-plan-stat-num">@Model.SubscriptionMaxBuses.Value</span>
+            <span class="sidebar-plan-stat-lbl">@L["Admin_Settings_Plan_MaxBuses"]</span>
+          </div>
+        }
+        @if (Model.SubscriptionPrice.HasValue)
+        {
+          <div class="sidebar-plan-stat">
+            <span class="sidebar-plan-stat-num">@Model.SubscriptionPrice.Value.ToString("0.##")</span>
+            <span class="sidebar-plan-stat-lbl">@L["Admin_Settings_Plan_Currency"]</span>
+          </div>
+        }
+      </div>
+    }
   </div>
+
 </div>

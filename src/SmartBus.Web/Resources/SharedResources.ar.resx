@@ -18,6 +18,8 @@
   <data name="Nav_Buses"      xml:space="preserve"><value>الباصات</value></data>
   <data name="Nav_Alerts"     xml:space="preserve"><value>التنبيهات</value></data>
   <data name="Nav_Settings"   xml:space="preserve"><value>الإعدادات</value></data>
+  <data name="Admin_ChangePassword" xml:space="preserve"><value>تغيير كلمة المرور</value></data>
+  <data name="Logout"               xml:space="preserve"><value>تسجيل الخروج</value></data>
 
   <!-- Super-admin sidebar nav -->
   <data name="Nav_Overview"   xml:space="preserve"><value>نظرة عامة</value></data>
@@ -657,8 +659,39 @@
   <data name="Dash_Stat_BusesSub"      xml:space="preserve"><value>باصات في الأسطول</value></data>
   <data name="Dash_Stat_Trips"         xml:space="preserve"><value>الرحلات المسجلة</value></data>
   <data name="Dash_Stat_TripsSub"      xml:space="preserve"><value>رحلات في النظام</value></data>
+  <data name="Dash_Stat_Drivers"       xml:space="preserve"><value>إجمالي السائقين</value></data>
+  <data name="Dash_Stat_DriversSub"    xml:space="preserve"><value>سائقو الأسطول</value></data>
+  <data name="Dash_Stat_Assistants"    xml:space="preserve"><value>إجمالي المرافقين</value></data>
+  <data name="Dash_Stat_AssistantsSub" xml:space="preserve"><value>مرافقو الرحلات</value></data>
   <data name="Dash_Stat_Alerts"        xml:space="preserve"><value>تنبيهات معلقة</value></data>
   <data name="Dash_Stat_AlertsSub"     xml:space="preserve"><value>تحتاج مراجعة</value></data>
+  <data name="Dash_SectionToday"       xml:space="preserve"><value>عمليات اليوم</value></data>
+  <data name="Dash_Today_AllCard"      xml:space="preserve"><value>اليوم</value></data>
+  <data name="Dash_Today_MorningCard"  xml:space="preserve"><value>الصباحية</value></data>
+  <data name="Dash_Today_ReturnCard"   xml:space="preserve"><value>العودة</value></data>
+  <data name="Dash_Today_AllSub"       xml:space="preserve"><value>كل رحلات اليوم</value></data>
+  <data name="Dash_Today_MorningSub"   xml:space="preserve"><value>الانطلاق من المنازل</value></data>
+  <data name="Dash_Today_ReturnSub"    xml:space="preserve"><value>العودة من المدرسة</value></data>
+  <data name="Dash_Today_Trips"        xml:space="preserve"><value>الرحلات</value></data>
+  <data name="Dash_Today_Students"     xml:space="preserve"><value>الطلاب</value></data>
+  <data name="Dash_Today_Absent"       xml:space="preserve"><value>الغياب</value></data>
+  <data name="Dash_SectionLive"        xml:space="preserve"><value>مباشر الآن</value></data>
+  <data name="Dash_Live_LiveLabel"     xml:space="preserve"><value>مباشر</value></data>
+  <data name="Dash_Live_Trips"         xml:space="preserve"><value>الرحلات الجارية</value></data>
+  <data name="Dash_Live_Students"      xml:space="preserve"><value>الطلاب على الباص</value></data>
+  <data name="Dash_Live_MorningTrips"  xml:space="preserve"><value>رحلات الذهاب</value></data>
+  <data name="Dash_Live_ReturnTrips"   xml:space="preserve"><value>رحلات العودة</value></data>
+  <data name="Dash_Live_MorningOnboard" xml:space="preserve"><value>على باص الذهاب</value></data>
+  <data name="Dash_Live_ReturnOnboard"  xml:space="preserve"><value>على باص العودة</value></data>
+  <data name="Dash_Live_TripsCard"     xml:space="preserve"><value>الرحلات الجارية الآن</value></data>
+  <data name="Dash_Live_TripsSub"      xml:space="preserve"><value>يتحدّث العدّ التنازلي كل ثانية</value></data>
+  <data name="Dash_Live_None"          xml:space="preserve"><value>لا توجد رحلات قيد التنفيذ حالياً</value></data>
+  <data name="Dash_Live_Departed"      xml:space="preserve"><value>انطلقت</value></data>
+  <data name="Dash_Live_EndsIn"        xml:space="preserve"><value>تنتهي خلال</value></data>
+  <data name="Dash_Live_Overdue"       xml:space="preserve"><value>متأخرة</value></data>
+  <data name="Dash_Live_Onboard"       xml:space="preserve"><value>على الباص</value></data>
+  <data name="TripType_Morning"        xml:space="preserve"><value>ذهاب</value></data>
+  <data name="TripType_Return"         xml:space="preserve"><value>إياب</value></data>
   <data name="Dash_Card_Weekly"        xml:space="preserve"><value>رحلات آخر 7 أيام</value></data>
   <data name="Dash_Card_TodayStatus"   xml:space="preserve"><value>حالة رحلات اليوم</value></data>
   <data name="Dash_Card_TodayTrips"    xml:space="preserve"><value>رحلات اليوم</value></data>

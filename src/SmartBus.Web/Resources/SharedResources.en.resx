@@ -18,6 +18,8 @@
   <data name="Nav_Buses"      xml:space="preserve"><value>Buses</value></data>
   <data name="Nav_Alerts"     xml:space="preserve"><value>Alerts</value></data>
   <data name="Nav_Settings"   xml:space="preserve"><value>Settings</value></data>
+  <data name="Admin_ChangePassword" xml:space="preserve"><value>Change password</value></data>
+  <data name="Logout"               xml:space="preserve"><value>Sign out</value></data>
 
   <!-- Super-admin sidebar nav -->
   <data name="Nav_Overview"   xml:space="preserve"><value>Overview</value></data>
@@ -657,8 +659,39 @@
   <data name="Dash_Stat_BusesSub"      xml:space="preserve"><value>Buses in fleet</value></data>
   <data name="Dash_Stat_Trips"         xml:space="preserve"><value>Registered Trips</value></data>
   <data name="Dash_Stat_TripsSub"      xml:space="preserve"><value>Trips in system</value></data>
+  <data name="Dash_Stat_Drivers"       xml:space="preserve"><value>Total Drivers</value></data>
+  <data name="Dash_Stat_DriversSub"    xml:space="preserve"><value>Active fleet drivers</value></data>
+  <data name="Dash_Stat_Assistants"    xml:space="preserve"><value>Total Assistants</value></data>
+  <data name="Dash_Stat_AssistantsSub" xml:space="preserve"><value>Trip assistants on staff</value></data>
   <data name="Dash_Stat_Alerts"        xml:space="preserve"><value>Pending Alerts</value></data>
   <data name="Dash_Stat_AlertsSub"     xml:space="preserve"><value>Needs review</value></data>
+  <data name="Dash_SectionToday"       xml:space="preserve"><value>TODAY'S OPERATIONS</value></data>
+  <data name="Dash_Today_AllCard"      xml:space="preserve"><value>Today</value></data>
+  <data name="Dash_Today_MorningCard"  xml:space="preserve"><value>Morning</value></data>
+  <data name="Dash_Today_ReturnCard"   xml:space="preserve"><value>Return</value></data>
+  <data name="Dash_Today_AllSub"       xml:space="preserve"><value>All trips today</value></data>
+  <data name="Dash_Today_MorningSub"   xml:space="preserve"><value>Pickups from home</value></data>
+  <data name="Dash_Today_ReturnSub"    xml:space="preserve"><value>Drop-offs from school</value></data>
+  <data name="Dash_Today_Trips"        xml:space="preserve"><value>Trips</value></data>
+  <data name="Dash_Today_Students"     xml:space="preserve"><value>Students</value></data>
+  <data name="Dash_Today_Absent"       xml:space="preserve"><value>Absent</value></data>
+  <data name="Dash_SectionLive"        xml:space="preserve"><value>LIVE NOW</value></data>
+  <data name="Dash_Live_LiveLabel"     xml:space="preserve"><value>Live</value></data>
+  <data name="Dash_Live_Trips"         xml:space="preserve"><value>Trips running</value></data>
+  <data name="Dash_Live_Students"      xml:space="preserve"><value>Students onboard</value></data>
+  <data name="Dash_Live_MorningTrips"  xml:space="preserve"><value>Morning trips</value></data>
+  <data name="Dash_Live_ReturnTrips"   xml:space="preserve"><value>Return trips</value></data>
+  <data name="Dash_Live_MorningOnboard" xml:space="preserve"><value>Morning onboard</value></data>
+  <data name="Dash_Live_ReturnOnboard"  xml:space="preserve"><value>Return onboard</value></data>
+  <data name="Dash_Live_TripsCard"     xml:space="preserve"><value>In-progress trips</value></data>
+  <data name="Dash_Live_TripsSub"      xml:space="preserve"><value>Live countdown updates every second</value></data>
+  <data name="Dash_Live_None"          xml:space="preserve"><value>No trips currently in progress</value></data>
+  <data name="Dash_Live_Departed"      xml:space="preserve"><value>Departed</value></data>
+  <data name="Dash_Live_EndsIn"        xml:space="preserve"><value>Ends in</value></data>
+  <data name="Dash_Live_Overdue"       xml:space="preserve"><value>Overdue</value></data>
+  <data name="Dash_Live_Onboard"       xml:space="preserve"><value>onboard</value></data>
+  <data name="TripType_Morning"        xml:space="preserve"><value>Morning</value></data>
+  <data name="TripType_Return"         xml:space="preserve"><value>Return</value></data>
   <data name="Dash_Card_Weekly"        xml:space="preserve"><value>Last 7 days trips</value></data>
   <data name="Dash_Card_TodayStatus"   xml:space="preserve"><value>Today's trip status</value></data>
   <data name="Dash_Card_TodayTrips"    xml:space="preserve"><value>Today's Trips</value></data>

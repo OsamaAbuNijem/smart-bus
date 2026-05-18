@@ -39,7 +39,7 @@ else
       </span>
     </div>
 
-    <ul class="ts-list">
+    <div class="ts-grid">
       @foreach (var s in Model)
       {
           var (cls, label) = s.BoardingStatus switch
@@ -52,29 +52,39 @@ else
               "Absent"     => ("absent",  L["Trip_BoardingAbsent"].Value),
               _            => ("",        s.BoardingStatus)
           };
-          // Prefer the most recent timestamp the row has: drop-off when the
-          // student arrived, otherwise the board time.
-          var time = (s.DropoffTime ?? s.BoardingTime)?.ToString("HH:mm");
+          var boardTime = s.BoardingTime?.ToString("HH:mm");
+          var dropTime  = s.DropoffTime?.ToString("HH:mm");
 
-          <li class="ts-row">
-            <div class="ts-row-main">
-              <div class="ts-row-name">@s.FullName</div>
-              <div class="ts-row-meta">
-                <span class="grade-chip">@L["Std_Grade" + s.Grade]</span>
-                @if (!string.IsNullOrEmpty(s.HomeArea))
-                {
-                    <span class="ts-row-area">· @s.HomeArea</span>
-                }
+          <div class="ts-card ts-card--@cls">
+            <div class="ts-card-top">
+              <div class="ts-card-ident">
+                <div class="ts-card-name">@s.FullName</div>
+                <div class="ts-card-meta">
+                  <span class="grade-chip">@L["Std_Grade" + s.Grade]</span>
+                  @if (!string.IsNullOrEmpty(s.HomeArea))
+                  {
+                      <span class="ts-card-area">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        @s.HomeArea
+                      </span>
+                  }
+                </div>
+              </div>
+              <span class="status-pill @cls"><span class="status-dot"></span>@label</span>
+            </div>
+            <div class="ts-card-times">
+              <div class="ts-time">
+                <span class="ts-time-label">@L["Trip_StudentsColBoardTime"]</span>
+                <span class="ts-time-val @(boardTime == null ? "muted" : "")">@(boardTime ?? "—")</span>
+              </div>
+              <div class="ts-time">
+                <span class="ts-time-label">@L["Trip_StudentsColDropTime"]</span>
+                <span class="ts-time-val @(dropTime == null ? "muted" : "")">@(dropTime ?? "—")</span>
               </div>
             </div>
-            <div class="ts-row-status">
-              <span class="status-pill @cls"><span class="status-dot"></span>@label</span>
-              @if (time != null)
-              {
-                  <span class="ts-row-time">@time</span>
-              }
-            </div>
-          </li>
+          </div>
       }
-    </ul>
+    </div>
 }
