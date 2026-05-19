@@ -1,0 +1,76 @@
+@model AdminPageViewModel
+@{
+    var isRtl   = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var dir     = isRtl ? "rtl" : "ltr";
+    var culture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}
+<!DOCTYPE html>
+<html lang="@culture" dir="@dir">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@Model.PageTitle - TilmezBus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="~/css/admin/base.css"       asp-append-version="true"/>
+  <link rel="stylesheet" href="~/css/admin/layout.css"     asp-append-version="true"/>
+  <link rel="stylesheet" href="~/css/admin/components.css" asp-append-version="true"/>
+  <link rel="stylesheet" href="~/css/admin/pages.css"      asp-append-version="true"/>
+  <link rel="stylesheet" href="~/css/admin/utilities.css"  asp-append-version="true"/>
+</head>
+@{
+    // SuperAdmin "log in as" — when ImpersonatedAs is in the session the
+    // SA is operating the admin dashboard on behalf of a school. The banner
+    // pins to the very top of the viewport (above sidebar + topbar) and a
+    // body class shifts the layout chrome down so nothing overlaps it.
+    var _impersonatedAs = Context.Session.GetString("ImpersonatedAs");
+    var _bodyClass = !string.IsNullOrEmpty(_impersonatedAs) ? "has-impersonate-banner" : "";
+}
+<body class="@_bodyClass">
+
+@if (!string.IsNullOrEmpty(_impersonatedAs))
+{
+    <div class="impersonate-banner">
+        <span class="impersonate-banner-icon">⚡</span>
+        <span class="impersonate-banner-text">
+            @string.Format(L["Impersonate_BannerFormat"].Value, _impersonatedAs)
+        </span>
+        <a href="/SuperAdmin/StopImpersonate" class="impersonate-banner-exit">@L["Impersonate_Exit"]</a>
+    </div>
+}
+
+@await Html.PartialAsync("_AdminSidebar", Model)
+
+<div class="main">
+  @await Html.PartialAsync("_AdminTopbar", Model)
+  <div class="content">
+    @RenderBody()
+  </div>
+</div>
+
+@* Shared modals *@
+@await Html.PartialAsync("Modals/_ModalStudent")
+@await Html.PartialAsync("Modals/_ModalDriver")
+@await Html.PartialAsync("Modals/_ModalBus")
+@await Html.PartialAsync("Modals/_ModalBusSchedule")
+@await Html.PartialAsync("Modals/_ModalTrip")
+@await Html.PartialAsync("Modals/_ModalTripStudents")
+@await Html.PartialAsync("Modals/_ModalDelete")
+@await Html.PartialAsync("Modals/_ModalConfirm")
+@await Html.PartialAsync("Modals/_ModalChangePassword")
+
+@* Expose school info for JS (translations come from /api/translations/admin) *@
+<script>
+  window.SB = window.SB || {};
+  window.SB.ctx = { schoolName: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SchoolName)),
+                    schoolCity: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SchoolCity)) };
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="~/js/admin/api.js"      asp-append-version="true"></script>
+<script src="~/js/admin/utils.js"    asp-append-version="true"></script>
+<script src="~/js/admin/schedule.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

@@ -1,0 +1,824 @@
+@{
+    var _isRtl  = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var _dir    = _isRtl ? "rtl" : "ltr";
+    var _culture        = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var _toggleCulture  = _isRtl ? "en" : "ar";
+    var _returnUrl      = Context.Request.Path + Context.Request.QueryString;
+}
+<!DOCTYPE html>
+<html lang="@_culture" dir="@_dir">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>@ViewData["Title"] - TilmezBus Super Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="~/css/superadmin/base.css"       asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/superadmin/layout.css"     asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/superadmin/components.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/superadmin/pages.css"      asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/superadmin/utilities.css"  asp-append-version="true"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg width="22" height="15" viewBox="0 0 24 16" fill="none">
+          <rect x="1" y="1" width="22" height="11" rx="3" fill="rgba(0,0,0,.15)"/>
+          <circle cx="6" cy="14" r="2.5" fill="rgba(0,0,0,.25)"/>
+          <circle cx="18" cy="14" r="2.5" fill="rgba(0,0,0,.25)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">TilmezBus</div>
+        <div class="logo-sub">⚡ SUPER ADMIN</div>
+      </div>
+    </div>
+  </div>
+  <div class="sa-badge">
+    <div class="sa-badge-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div><div class="sa-badge-title">@L["SA_Badge_Title"]</div><div class="sa-badge-sub">@L["SA_Badge_Sub"]</div></div>
+  </div>
+  @{
+    // Every super-admin page has its own /SuperAdmin/{Page} URL now.
+    // Active sidebar item is computed from the current request path so a hard
+    // refresh / direct deep-link always lands with the right item highlighted.
+    var _saPath = Context.Request.Path.Value ?? string.Empty;
+    bool SaOn(string segment) =>
+        _saPath.StartsWith($"/SuperAdmin/{segment}", StringComparison.OrdinalIgnoreCase);
+    bool _saOnDashboard = SaOn("Dashboard") ||
+        _saPath.Equals("/SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
+        _saPath.Equals("/SuperAdmin/", StringComparison.OrdinalIgnoreCase);
+    string SaClass(bool on) => on ? "nav-item active" : "nav-item";
+  }
+  <div class="sidebar-nav">
+    <div class="nav-section">OVERVIEW</div>
+    <a class="@SaClass(_saOnDashboard)" href="/SuperAdmin/Dashboard">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span class="nav-label">@L["Nav_Overview"]</span>
+    </a>
+    <div class="nav-section">MANAGEMENT</div>
+    <a class="@SaClass(SaOn("Schools"))" href="/SuperAdmin/Schools">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="nav-label">@L["Nav_Schools"]</span>
+    </a>
+    <div class="nav-section">SYSTEM</div>
+    <a class="@SaClass(SaOn("Subscriptions"))" href="/SuperAdmin/Subscriptions">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="nav-label">@L["Nav_Plans"]</span>
+    </a>
+    <a class="@SaClass(SaOn("Notifications"))" href="/SuperAdmin/Notifications">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="nav-label">@L["Nav_Notifications"]</span>
+    </a>
+    <a class="@SaClass(SaOn("Settings"))" href="/SuperAdmin/Settings">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="nav-label">@L["Nav_Settings"]</span>
+    </a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-row">
+      <div class="user-av">S</div>
+      <div><div class="user-name">Super Admin</div><div class="user-role">superadmin@smartbus.com</div></div>
+      <form asp-controller="Account" asp-action="Logout" method="post" class="u-m-0">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="logout-btn" title="@L["SA_TopBar_Logout"]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="sa-page-title">@L["Nav_Overview"]</div>
+      <div class="tb-search u-hidden" id="topbar-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="schools-search-input" placeholder="@L["SearchShort"]" oninput="if (window.schools) schools.onSearchInput(this.value)"/>
+        <button type="button" onclick="schools.clearSearch()" id="search-clear" class="search-clear-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-icon-btn u-hidden" id="btn-export" onclick="exportCSV()" title="@L["SA_TopBar_ExportCSV"]">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)" title="@L["LangName"]">@L["SwitchLang"]</a>
+      <div class="tb-chip">⚡ Super Admin</div>
+      <div id="sa-date-chip" class="tb-date-chip"></div>
+    </div>
+  </div>
+  <div class="content">@RenderBody()</div>
+</div>
+
+<!-- SCHOOL DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="schools.closeDrawer()"></div>
+<div class="drawer" id="school-drawer">
+  <div class="drawer-head">
+    <div class="drawer-head-row">
+      <div id="drw-avatar" class="drawer-avatar"></div>
+      <div>
+        <div id="drw-name" class="drawer-name"></div>
+        <div id="drw-city" class="drawer-city"></div>
+      </div>
+    </div>
+    <button type="button" class="drawer-close" onclick="schools.closeDrawer()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <!-- Active subscription — full details + "Update" button. Populated on
+         drawer open by schools._loadActiveSub(). The "Update" button opens
+         the shared subscription modal; on save, the drawer refreshes. -->
+    <div class="drawer-section">
+      <div class="drawer-section-title">
+        <span>@L["SA_Drawer_Sub_Title"]</span>
+        <span id="drw-plan-badge" class="sub-pill"></span>
+      </div>
+      <div id="drw-sub-fields" class="drawer-sub-fields"></div>
+      <div class="drawer-date-row" id="drw-date"></div>
+      <button type="button" class="btn-pu u-mt-12" id="drw-sub-update-btn" onclick="schools.updateSubscriptionFromDrawer()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+        <span id="drw-sub-update-label">@L["SA_Drawer_Sub_Update"]</span>
+      </button>
+    </div>
+    <!-- Contact info -->
+    <div class="drawer-section">
+      <div class="drawer-section-title">@L["SA_Drawer_ContactInfo"]</div>
+      <div class="drawer-field u-hidden" id="drw-contact-name-row">
+        <div class="df-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="df-label">@L["SA_School_ContactName"]</div><div class="df-value" id="drw-contact-name"></div></div>
+      </div>
+      <div class="drawer-field">
+        <div class="df-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.56 3.59 2 2 0 0 1 3.54 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        <div><div class="df-label">@L["SA_School_Phone"]</div><div class="df-value" id="drw-phone" dir="ltr"></div></div>
+      </div>
+      <div class="drawer-field">
+        <div class="df-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="df-label">@L["SA_School_Admin"]</div><div class="df-value" id="drw-admin" dir="ltr"></div></div>
+      </div>
+      @* Anti-forgery token used by the programmatic POST in
+         schools.openAdminDashboard(). One shared token per page covers
+         every "Open admin" click since the SA session is the same. *@
+      <form id="sa-csrf-form" class="u-hidden">@Html.AntiForgeryToken()</form>
+    </div>
+    <!-- Location (shown when school has lat/lng set) -->
+    <div class="drawer-section u-hidden" id="drw-location-section">
+      <div class="drawer-section-title">@L["SA_School_Map_Section"]</div>
+      <div class="drawer-field">
+        <div class="df-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div><div class="df-label">@L["SA_School_Map_Coords"]</div><div class="df-value" id="drw-coords" dir="ltr"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button type="button" class="btn-pu" onclick="schools.editFromDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+      @L["SA_Common_Edit"]
+    </button>
+    <button type="button" class="btn-danger u-mr-auto" onclick="schools.deleteFromDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+      @L["SA_Common_Delete"]
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: SCHOOL FORM -->
+<div class="modal-overlay" id="modal-school"
+     data-title-create="@L["SA_School_Add"]"
+     data-title-edit="@L["SA_School_Edit"]">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-purple">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        </div>
+        <div class="modal-header-title" id="school-modal-title">@L["SA_School_Add"]</div>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal('modal-school')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="sch-id"/>
+      <!-- Logo upload — optional. <input type="file"> stays hidden behind the
+           preview tile; clicking the tile triggers the file picker. The picker
+           uploads via /api-proxy/schools/upload-logo and stores the returned
+           URL in sch-logo-url so save() can include it in the body. -->
+      <div class="form-row full">
+        <div class="form-group">
+          <label class="form-label">@L["SA_School_Logo"]</label>
+          <div class="logo-upload">
+            <button type="button" id="sch-logo-tile" class="logo-tile" onclick="schools.pickLogo()">
+              <img id="sch-logo-preview" class="logo-preview u-hidden" alt=""/>
+              <span id="sch-logo-placeholder" class="logo-placeholder">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </span>
+            </button>
+            <div class="logo-upload-body">
+              <div class="logo-upload-hint">@L["SA_School_Logo_Hint"]</div>
+              <div class="u-flex u-gap-8 u-mt-8">
+                <button type="button" class="btn-secondary btn-sm" onclick="schools.pickLogo()">@L["SA_School_Logo_Choose"]</button>
+                <button type="button" id="sch-logo-clear-btn" class="btn-secondary btn-sm u-hidden" onclick="schools.clearLogo()">@L["SA_School_Logo_Remove"]</button>
+              </div>
+            </div>
+          </div>
+          <input type="file" id="sch-logo-file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" class="u-hidden" onchange="schools.onLogoFile(event)"/>
+          <input type="hidden" id="sch-logo-url"/>
+          <span class="form-err" id="err-sch-logo">@L["SA_School_Logo_UploadFailed"]</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_School_Name"] *</label>
+          <input type="text" id="sch-name" class="form-control" placeholder="@L["SA_School_Name_PH"]"/>
+          <span class="form-err" id="err-sch-name">@L["SA_School_Name_Required"]</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["Std_City"] *</label>
+          <select id="sch-city" class="form-control">
+            <option value="">—</option>
+            <option value="Amman">@L["City_Amman"]</option>
+            <option value="Zarqa">@L["City_Zarqa"]</option>
+            <option value="Irbid">@L["City_Irbid"]</option>
+            <option value="Aqaba">@L["City_Aqaba"]</option>
+            <option value="Salt">@L["City_Salt"]</option>
+            <option value="Madaba">@L["City_Madaba"]</option>
+            <option value="Karak">@L["City_Karak"]</option>
+            <option value="Jerash">@L["City_Jerash"]</option>
+            <option value="Ajloun">@L["City_Ajloun"]</option>
+            <option value="Mafraq">@L["City_Mafraq"]</option>
+            <option value="Tafilah">@L["City_Tafilah"]</option>
+            <option value="Maan">@L["City_Maan"]</option>
+            <option value="Russeifa">@L["City_Russeifa"]</option>
+            <option value="Ramtha">@L["City_Ramtha"]</option>
+            <option value="WadiMusa">@L["City_WadiMusa"]</option>
+          </select>
+          <span class="form-err" id="err-sch-city">@L["Std_City"]</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_School_ContactName"]</label>
+          <input type="text" id="sch-contact-name" class="form-control" placeholder="@L["SA_School_ContactName_PH"]"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_School_Phone"] *</label>
+          <div class="form-input-group" id="grp-sch-phone" dir="ltr">
+            <span class="prefix">+962</span>
+            <input type="tel" id="sch-phone" inputmode="numeric" maxlength="9" placeholder="@L["SA_School_Phone_PH"]"/>
+          </div>
+          <span class="form-err" id="err-sch-phone">@L["SA_School_Phone_Required"]</span>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label class="form-label">@L["SA_School_Admin"] *</label>
+          <div class="form-input-group" id="grp-sch-admin" dir="ltr">
+            <span class="prefix" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <input type="email" id="sch-admin" placeholder="@L["SA_School_Admin_PH"]"/>
+          </div>
+          <span class="form-err" id="err-sch-admin">@L["SA_School_Admin_Required"]</span>
+        </div>
+      </div>
+      <div class="form-row full" id="sch-password-group">
+        <div class="form-group">
+          <label class="form-label">@L["SA_School_Password"]</label>
+          <input type="text" id="sch-password" class="form-control" placeholder="Admin@123456"/>
+          <span class="form-hint">@L["SA_School_Password_Hint"]</span>
+        </div>
+      </div>
+      @* Subscription section — shown only when creating a school. The initial *@
+      @* subscription is created in the same transaction; later renewals are    *@
+      @* managed from the subscriptions page (per-school).                      *@
+      <div id="sch-subscription-section">
+        <div class="form-row full">
+          <div class="form-group u-mt-6">
+            <div class="sub-section-title">@L["SA_Sub_Section"]</div>
+            <div class="sub-section-hint">@L["SA_Sub_Section_Hint"]</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Type"]</label>
+            <select id="sch-sub-type" class="form-control">
+              <option value="0">@L["SA_Sub_Type_Trial"]</option>
+              <option value="1">@L["SA_Sub_Type_Basic"]</option>
+              <option value="2">@L["SA_Sub_Type_Standard"]</option>
+              <option value="3">@L["SA_Sub_Type_Premium"]</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Page_MaxStudents"]</label>
+            <input type="number" id="sch-sub-max-students" class="form-control" placeholder="500" min="0"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_ActivationDate"]</label>
+            <input type="date" id="sch-sub-activation" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_ExpirationDate"]</label>
+            <input type="date" id="sch-sub-expiration" class="form-control"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Price"]</label>
+            <div class="form-input-group" dir="ltr">
+              <input type="number" id="sch-sub-price" placeholder="0" min="0" step="0.01"/>
+              <span class="suffix">@L["SA_Currency_JD"]</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Remaining"]</label>
+            <div class="form-input-group is-readonly" dir="ltr" title="@L["SA_Sub_Remaining_AutoHint"]">
+              <input type="number" id="sch-sub-remaining" placeholder="0" min="0" step="0.01" readonly/>
+              <span class="suffix">@L["SA_Currency_JD"]</span>
+            </div>
+            <span class="form-hint">@L["SA_Sub_Remaining_AutoHint"]</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Paid"]</label>
+            <select id="sch-sub-paid" class="form-control is-readonly" disabled title="@L["SA_Sub_Paid_AutoHint"]">
+              <option value="0">@L["SA_Sub_Paid_No"]</option>
+              <option value="1">@L["SA_Sub_Paid_Partial"]</option>
+              <option value="2">@L["SA_Sub_Paid_Yes"]</option>
+            </select>
+            <span class="form-hint">@L["SA_Sub_Paid_AutoHint"]</span>
+          </div>
+          <div class="form-group"></div>
+        </div>
+      </div>
+      <!-- Map picker — optional lat/lng. The Leaflet map is initialised by
+           schools.js when this modal opens, and click / search-result selection
+           writes into sch-lat / sch-lng. -->
+      <div class="form-row full">
+        <div class="form-group u-mt-6">
+          <div class="sub-section-title">@L["SA_School_Map_Section"]</div>
+          <div class="sub-section-hint">@L["SA_School_Map_Hint"]</div>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <div class="form-input-group" dir="ltr">
+            <span class="prefix" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" id="sch-map-search" placeholder="@L["SA_School_Map_Search"]" autocomplete="off"/>
+          </div>
+          <div id="sch-map-search-results" class="map-search-results"></div>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <div id="sch-map" class="sa-map-canvas"></div>
+          <div class="form-hint" id="sch-map-coords-label">@L["SA_School_Map_NoPin"]</div>
+          <input type="hidden" id="sch-lat"/>
+          <input type="hidden" id="sch-lng"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-primary" id="btn-save-school" onclick="schools.save()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        @L["SA_School_Save"]
+      </button>
+      <button class="btn-secondary" onclick="closeModal('modal-school')">@L["SA_School_Cancel"]</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EMPLOYEE QR TOKENS -->
+<div class="modal-overlay" id="modal-school-qr">
+  <div class="modal-box lg">
+    <div class="modal-header">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-purple">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="17"/><line x1="17" y1="14" x2="21" y2="14"/></svg>
+        </div>
+        <div>
+          <div class="modal-header-title" id="qr-tokens-title">@L["SA_QrEmployees_Title"]</div>
+          <div class="modal-header-sub" id="qr-tokens-sub"></div>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal('modal-school-qr')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="qr-tokens-body">
+      <div class="u-empty-state" id="qr-tokens-loading">@L["SA_Common_Loading"]</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="qr-tokens-print" onclick="printAllQrTokens()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        @L["SA_Common_PrintAll"]
+      </button>
+      <button class="btn-secondary" onclick="closeModal('modal-school-qr')">@L["SA_Common_Close"]</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: STUDENT QR TOKENS -->
+<div class="modal-overlay" id="modal-school-students-qr">
+  <div class="modal-box lg">
+    <div class="modal-header">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-green">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><rect x="14" y="11" width="7" height="7" rx="1"/></svg>
+        </div>
+        <div>
+          <div class="modal-header-title" id="qr-students-title">@L["SA_QrStudents_Title"]</div>
+          <div class="modal-header-sub" id="qr-students-sub"></div>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal('modal-school-students-qr')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="qr-students-body">
+      <div class="u-empty-state" id="qr-students-loading">@L["SA_Common_Loading"]</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="qr-students-print" onclick="printAllStudentQrTokens()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        @L["SA_Common_PrintAll"]
+      </button>
+      <button class="btn-secondary" onclick="closeModal('modal-school-students-qr')">@L["SA_Common_Close"]</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DELETE CONFIRM -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header">
+      <div class="modal-header-title u-text-danger">@L["SA_Delete_Title"]</div>
+      <button class="modal-close-btn" onclick="closeModal('modal-delete')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body modal-body-center">
+      <div class="delete-icon-wrap">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      </div>
+      <div class="delete-heading">@L["SA_Delete_Heading"]</div>
+      <div class="delete-body">
+        @L["SA_Delete_WillDelete"] <strong id="del-count-label">@L["SA_Delete_DefaultLabel"]</strong><br/>
+        "<span id="del-school-name" class="delete-target"></span>"<br/>
+        <span class="delete-irrev">@L["SA_Delete_Irreversible"]</span>
+      </div>
+    </div>
+    <div class="modal-footer modal-footer-center">
+      <button class="btn-danger" id="del-confirm-btn">@L["SA_Delete_Confirm"]</button>
+      <button class="btn-secondary" onclick="closeModal('modal-delete')">@L["SA_Common_Cancel"]</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CHANGE PASSWORD -->
+<div class="modal-overlay" id="modal-change-password">
+  <div class="modal-box modal-box-md">
+    <div class="modal-header">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-purple">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="modal-header-title">@L["SA_ChangePwd_Title"]</div>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal('modal-change-password')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body modal-body-stack">
+      <!-- Password fields use the same .form-input-group + lock-icon prefix
+           pattern as the school form's email/phone inputs, so the modal
+           visually matches the rest of the SA forms. -->
+      <div class="form-group">
+        <label class="form-label">@L["SA_ChangePwd_Current"]</label>
+        <div class="form-input-group" id="grp-cp-current" dir="ltr">
+          <span class="prefix" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" id="cp-current" placeholder="••••••••" autocomplete="current-password"/>
+        </div>
+        <span class="form-err" id="err-cp-current">@L["SA_ChangePwd_RequiredErr"]</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["SA_ChangePwd_New"]</label>
+        <div class="form-input-group" id="grp-cp-new" dir="ltr">
+          <span class="prefix" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" id="cp-new" placeholder="@L["SA_ChangePwd_NewPH"]" autocomplete="new-password"/>
+        </div>
+        <span class="form-err" id="err-cp-new">@L["SA_ChangePwd_MinLenErr"]</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["SA_ChangePwd_Confirm"]</label>
+        <div class="form-input-group" id="grp-cp-confirm" dir="ltr">
+          <span class="prefix" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" id="cp-confirm" placeholder="••••••••" autocomplete="new-password"/>
+        </div>
+        <span class="form-err" id="err-cp-confirm">@L["SA_ChangePwd_MismatchErr"]</span>
+      </div>
+      <div id="cp-server-err" class="modal-server-err u-hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-primary" id="btn-save-password" onclick="settings.savePassword()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        @L["SA_ChangePwd_Save"]
+      </button>
+      <button class="btn-secondary" onclick="closeModal('modal-change-password')">@L["SA_Common_Cancel"]</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: RESET SCHOOL ADMIN PASSWORD (SuperAdmin force-reset, opened
+     from the school drawer's admin row). Single new-password input — no
+     "current password" since the SuperAdmin doesn't have it. -->
+<div class="modal-overlay" id="modal-reset-admin-password">
+  <div class="modal-box modal-box-md">
+    <div class="modal-header">
+      <div class="modal-header-row">
+        <div class="modal-header-icon bg-purple">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div>
+          <div class="modal-header-title">@L["SA_ResetPwd_Title"]</div>
+          <div class="modal-header-sub" id="rap-target-email"></div>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal('modal-reset-admin-password')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body modal-body-stack">
+      <div class="form-group">
+        <label class="form-label">@L["SA_ResetPwd_New"]</label>
+        <div class="form-input-group" id="grp-rap-new" dir="ltr">
+          <span class="prefix" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" id="rap-new" placeholder="@L["SA_ResetPwd_NewPH"]" autocomplete="new-password"/>
+        </div>
+        <span class="form-err" id="err-rap-new">@L["SA_ResetPwd_MinLenErr"]</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["SA_ResetPwd_Confirm"]</label>
+        <div class="form-input-group" id="grp-rap-confirm" dir="ltr">
+          <span class="prefix" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" id="rap-confirm" placeholder="••••••••" autocomplete="new-password"/>
+        </div>
+        <span class="form-err" id="err-rap-confirm">@L["SA_ResetPwd_MismatchErr"]</span>
+      </div>
+      <div id="rap-server-err" class="modal-server-err u-hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-primary" id="btn-rap-save" onclick="schools.resetAdminPassword()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        @L["SA_ResetPwd_Save"]
+      </button>
+      <button class="btn-secondary" onclick="closeModal('modal-reset-admin-password')">@L["SA_Common_Cancel"]</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SUBSCRIPTION (lives in the layout so any SA page can open it:
+     the Subscriptions list page binds the school dropdown + grid here, and
+     the Schools drawer reuses the same modal to edit a school's active sub.) -->
+<div class="modal-overlay" id="modal-subscription"
+     data-title-create="@L["SA_Sub_Page_AddTitle"]"
+     data-title-edit="@L["SA_Sub_Page_EditTitle"]">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-header-title" id="sub-modal-title">@L["SA_Sub_Page_AddTitle"]</div>
+      <button class="modal-close-btn" id="sub-close-btn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="sub-id"/>
+      <input type="hidden" id="sub-target-school"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Type"]</label>
+          <select id="sub-type" class="form-control">
+            <option value="0">@L["SA_Sub_Type_Trial"]</option>
+            <option value="1">@L["SA_Sub_Type_Basic"]</option>
+            <option value="2">@L["SA_Sub_Type_Standard"]</option>
+            <option value="3">@L["SA_Sub_Type_Premium"]</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Page_StatusActive"]</label>
+          <select id="sub-active" class="form-control">
+            <option value="true">@L["SA_Sub_Page_StatusActive_On"]</option>
+            <option value="false">@L["SA_Sub_Page_StatusActive_Off"]</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_ActivationDate"]</label>
+          <input type="date" id="sub-activation" class="form-control"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_ExpirationDate"]</label>
+          <input type="date" id="sub-expiration" class="form-control"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Page_MaxStudents"]</label>
+          <input type="number" id="sub-max-students" class="form-control" min="0"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Page_MaxBuses"]</label>
+          <input type="number" id="sub-max-buses" class="form-control" min="0"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Price"]</label>
+          <div class="form-input-group" dir="ltr">
+            <input type="number" id="sub-price" placeholder="0" min="0" step="0.01"/>
+            <span class="suffix">@L["SA_Currency_JD"]</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Remaining"]</label>
+          <div class="form-input-group is-readonly" dir="ltr" title="@L["SA_Sub_Remaining_AutoHint"]">
+            <input type="number" id="sub-remaining" placeholder="0" min="0" step="0.01" readonly/>
+            <span class="suffix">@L["SA_Currency_JD"]</span>
+          </div>
+          <span class="form-hint">@L["SA_Sub_Remaining_AutoHint"]</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">@L["SA_Sub_Paid"]</label>
+          <select id="sub-paid" class="form-control is-readonly" disabled title="@L["SA_Sub_Paid_AutoHint"]">
+            <option value="0">@L["SA_Sub_Paid_No"]</option>
+            <option value="1">@L["SA_Sub_Paid_Partial"]</option>
+            <option value="2">@L["SA_Sub_Paid_Yes"]</option>
+          </select>
+          <span class="form-hint">@L["SA_Sub_Paid_AutoHint"]</span>
+        </div>
+        <div class="form-group"></div>
+      </div>
+      @* Payments section — visible only when editing an existing sub. Lists
+         every recorded payment instalment and offers an inline add form. *@
+      <div id="sub-payments-section" class="u-hidden">
+        <div class="form-row full">
+          <div class="form-group u-mt-12">
+            <div class="sub-section-title">@L["SA_Sub_Payments_Title"]</div>
+            <div class="sub-section-hint">@L["SA_Sub_Payments_Hint"]</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Payments_Date"]</label>
+            <input type="date" id="sub-pay-date" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Payments_Amount"]</label>
+            <div class="form-input-group" dir="ltr">
+              <input type="number" id="sub-pay-amount" placeholder="0" min="0" step="0.01"/>
+              <span class="suffix">@L["SA_Currency_JD"]</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">@L["SA_Sub_Payments_Method"]</label>
+            <select id="sub-pay-method" class="form-control">
+              <option value="0">@L["SA_Pay_Method_Cash"]</option>
+              <option value="1">@L["SA_Pay_Method_Transfer"]</option>
+              <option value="2">@L["SA_Pay_Method_Cheque"]</option>
+            </select>
+          </div>
+          <div class="form-group u-flex u-items-end">
+            <button type="button" class="btn-pu" id="sub-pay-add-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              @L["SA_Sub_Payments_Add"]
+            </button>
+          </div>
+        </div>
+        <div id="sub-pay-error" class="modal-form-err u-hidden"></div>
+        <div class="card-table-wrap u-mt-12">
+          <table class="table">
+            <thead><tr>
+              <th>@L["SA_Sub_Payments_Date"]</th>
+              <th>@L["SA_Sub_Payments_Amount"]</th>
+              <th>@L["SA_Sub_Payments_Method"]</th>
+            </tr></thead>
+            <tbody id="sub-pay-tbody">
+              <tr><td colspan="3" class="td-empty">@L["SA_Sub_Payments_Empty"]</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="sub-error" class="modal-form-err u-hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="sub-save-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        @L["SA_School_Save"]
+      </button>
+      <button class="btn-secondary" id="sub-cancel-btn">@L["SA_School_Cancel"]</button>
+    </div>
+  </div>
+</div>
+<div id="sub-strings"
+     data-pick-school="@L["SA_Sub_Page_PickSchool"]"
+     data-no-subs="@L["SA_Sub_Page_NoSubs"]"
+     data-failed="@L["SA_Sub_Page_Failed"]"
+     data-saving="@L["SA_Sub_Page_Saving"]"
+     data-saved="@L["SA_Sub_Page_Saved"]"
+     data-required-err="@L["SA_Sub_Page_RequiredErr"]"
+     data-paid-yes="@L["SA_Sub_Paid_Yes"]"
+     data-paid-partial="@L["SA_Sub_Paid_Partial"]"
+     data-pay-method-cash="@L["SA_Pay_Method_Cash"]"
+     data-pay-method-transfer="@L["SA_Pay_Method_Transfer"]"
+     data-pay-method-cheque="@L["SA_Pay_Method_Cheque"]"
+     data-pay-empty="@L["SA_Sub_Payments_Empty"]"
+     data-pay-load-failed="@L["SA_Sub_Payments_LoadFailed"]"
+     data-pay-fully-paid="@L["SA_Sub_Payments_FullyPaid"]"
+     data-pay-exceeds-remaining="@L["SA_Sub_Payments_Exceeds"]"
+     data-paid-no="@L["SA_Sub_Paid_No"]"
+     data-edit="@L["SA_Sub_Page_Edit"]"
+     data-status-live="@L["SA_Sub_Page_Status_Live"]"
+     data-status-expired="@L["SA_Sub_Page_Status_Expired"]"
+     data-status-future="@L["SA_Sub_Page_Status_Future"]"
+     data-status-off="@L["SA_Sub_Page_Status_Off"]"
+     data-type-0="@L["SA_Sub_Type_Trial"]"
+     data-type-1="@L["SA_Sub_Type_Basic"]"
+     data-type-2="@L["SA_Sub_Type_Standard"]"
+     data-type-3="@L["SA_Sub_Type_Premium"]"
+     class="modal-strings-bag"></div>
+
+<script>
+window.T = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+    schoolSaved        = L["JS_SchoolSaved"].Value,
+    schoolUpdated      = L["JS_SchoolUpdated"].Value,
+    schoolDeleted      = L["JS_SchoolDeleted"].Value,
+    schoolDeleteFailed = L["JS_SchoolDeleteFailed"].Value,
+    statusActivated    = L["JS_StatusActivated"].Value,
+    statusDeactivated  = L["JS_StatusDeactivated"].Value,
+    statusFailed       = L["JS_StatusFailed"].Value,
+    planChanged        = L["JS_PlanChanged"].Value,
+    planFailed         = L["JS_PlanFailed"].Value,
+    exportNoData       = L["JS_ExportNoData"].Value,
+    exportDone         = L["JS_ExportDone"].Value,
+    exportCSV          = L["JS_ExportCSV"].Value,
+    passwordChanged    = L["JS_PasswordChanged"].Value,
+    deletedSuccess     = L["JS_DeletedSuccess"].Value,
+    saveFailed         = L["JS_SaveFailed"].Value,
+    saving             = L["JS_Saving"].Value,
+    saveSchoolBtn      = L["JS_SaveSchoolBtn"].Value,
+    pageOverview       = L["JS_PageOverview"].Value,
+    pageSchools        = L["JS_PageSchools"].Value,
+    pageAdmins         = L["JS_PageAdmins"].Value,
+    pagePlans          = L["JS_PagePlans"].Value,
+    pageSettings       = L["JS_PageSettings"].Value,
+    isRtl = _isRtl,
+    dir   = _dir,
+}));
+</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="~/js/superadmin/api.js"           asp-append-version="true"></script>
+<script src="~/js/superadmin/utils.js"         asp-append-version="true"></script>
+<script src="~/js/superadmin/schools.js"       asp-append-version="true"></script>
+<script src="~/js/superadmin/subscriptions.js" asp-append-version="true"></script>
+<script>
+  // Wire the shared subscription modal on every SA page (the modal lives in
+  // the layout so the Schools drawer can also open it). Subscriptions page
+  // additionally calls subscriptions.init() to wire its grid + dropdown.
+  document.addEventListener('DOMContentLoaded', async () => {
+    try { await SB.translationsReady; } catch {}
+    if (typeof subscriptions === 'object') subscriptions.initModal();
+  });
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,70 @@
+@using TilmezBus.Application.Common.Models
+@using TilmezBus.Application.Features.Trips.Queries.GetAllTrips
+@model PagedResult<TripDto>
+
+@if (Model is null || !Model.Items.Any())
+{
+    <tr><td colspan="9" class="u-empty-state">@L["Trip_None"]</td></tr>
+}
+else
+{
+    var rowIndex = ((Model.PageNumber - 1) * Model.PageSize);
+    foreach (var t in Model.Items)
+    {
+        rowIndex++;
+        var statusKey = $"Trip_Status{t.Status}";
+        var statusCls = t.Status switch
+        {
+            "InProgress" => "badge-green",
+            "Completed"  => "badge-gray",
+            _            => "badge-blue"
+        };
+        var (typeLabel, typeCls) = string.Equals(t.TripType, "morning", StringComparison.OrdinalIgnoreCase)
+            ? (L["Trip_Morning"].Value, "pill-morning")
+            : (L["Trip_Return"].Value,  "pill-return");
+        var canStart    = t.Status == "Scheduled";
+        var canComplete = t.Status == "InProgress";
+
+        <tr>
+            <td class="td-rownum">@rowIndex</td>
+            <td><div class="td-sub">@(string.IsNullOrEmpty(t.DriverName) ? "—" : t.DriverName)</div></td>
+            <td><div class="td-sub">@(string.IsNullOrEmpty(t.AssistantDriverName) ? "—" : t.AssistantDriverName)</div></td>
+            <td><span class="badge badge-blue">@t.BusPlateNumber</span></td>
+            <td><span class="pill @typeCls">@typeLabel</span></td>
+            <td class="u-text-12 u-text-sub">@t.ScheduledDeparture.ToString("dd/MM/yyyy")</td>
+            <td class="u-weight-600">@t.ScheduledDeparture.ToString("HH:mm")</td>
+            <td><span class="badge @statusCls">@L[statusKey]</span></td>
+            <td>
+                <div class="tbl-actions">
+                    <button class="tbl-btn view" onclick="trips.openStudents('@t.Id', '@t.BusPlateNumber', '@typeLabel', '@t.ScheduledDeparture.ToString("dd/MM/yyyy")')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    </button>
+                    @if (canStart)
+                    {
+                        <button class="tbl-btn start" onclick="trips.start('@t.Id')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        </button>
+                    }
+                    @if (canComplete)
+                    {
+                        <button class="tbl-btn complete" onclick="trips.complete('@t.Id')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </button>
+                    }
+                    <button class="tbl-btn tbl-del"
+                            onclick="trips.askDelete(this)"
+                            data-id="@t.Id" data-name="@t.BusPlateNumber" data-type="@L["Trip_TypeLabel"]">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+}
+
+<tr class="u-hidden">
+    <td data-pager-info="@L["Trip_PagerInfo", Model?.Items.Count() ?? 0, Model?.TotalCount ?? 0, Model?.PageNumber ?? 1, Model?.TotalPages ?? 1]"
+        data-total-pages="@(Model?.TotalPages ?? 1)"
+        data-total-count="@(Model?.TotalCount ?? 0)"
+        data-page="@(Model?.PageNumber ?? 1)"></td>
+</tr>

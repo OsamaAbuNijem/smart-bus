@@ -48,5 +48,5 @@ Thumbs.db
 
 ## User-uploaded assets — keep the folder structure (.gitkeep) but not the
 ## actual files dropped at runtime.
-src/SmartBus.Web/wwwroot/uploads/schools/*
-!src/SmartBus.Web/wwwroot/uploads/schools/.gitkeep
+src/TilmezBus.Web/wwwroot/uploads/schools/*
+!src/TilmezBus.Web/wwwroot/uploads/schools/.gitkeep

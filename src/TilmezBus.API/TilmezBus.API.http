@@ -1,0 +1,6 @@
+@TilmezBus.API_HostAddress = http://localhost:5285
+
+GET {{TilmezBus.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

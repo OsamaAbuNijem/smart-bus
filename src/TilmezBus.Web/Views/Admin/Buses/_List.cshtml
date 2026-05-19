@@ -1,0 +1,63 @@
+@using TilmezBus.Application.Common.Models
+@using TilmezBus.Application.Features.Buses.Queries.GetAllBuses
+@model PagedResult<BusDto>
+
+@if (Model is null || !Model.Items.Any())
+{
+    <tr><td colspan="4" class="u-empty-state">@L["Bus_None"]</td></tr>
+}
+else
+{
+    foreach (var b in Model.Items)
+    {
+        var (statusCls, statusLabel) = b.Status == "Active"
+            ? ("badge-green", L["Bus_StatusActive"].Value)
+            : ("badge-gray",  L["Bus_StatusInactive"].Value);
+        <tr>
+            <td>
+                <input type="text"
+                       class="bus-number-edit"
+                       value="@b.PlateNumber"
+                       data-id="@b.Id"
+                       data-original="@b.PlateNumber"
+                       onblur="buses.commitNumber(this)"
+                       onkeydown="buses.onNumberKey(event)"
+                       maxlength="32"
+                       autocomplete="off"/>
+            </td>
+            <td>
+                <button type="button"
+                        class="badge @statusCls bus-status-toggle"
+                        data-id="@b.Id" data-status="@b.Status"
+                        title="@L["Bus_ToggleStatus"]"
+                        onclick="buses.toggleStatus(this)">
+                    @statusLabel
+                </button>
+            </td>
+            <td>
+                <img class="bus-qr-cell"
+                     src="/Buses/Qr?token=@Uri.EscapeDataString(b.QrToken ?? string.Empty)&amp;size=4"
+                     alt="QR"
+                     data-qr="@b.QrToken" data-plate="@b.PlateNumber"
+                     title="@L["Bus_QRTitle"]"
+                     onclick="buses.openQr(this)"/>
+            </td>
+            <td>
+                <div class="tbl-actions">
+                    <button class="tbl-btn tbl-del"
+                            onclick="buses.askDelete(this)"
+                            data-id="@b.Id" data-name="@b.PlateNumber" data-type="@L["Bus_TypeLabel"]">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+}
+
+<tr class="u-hidden">
+    <td data-pager-info="@L["Bus_PagerInfo", Model?.Items.Count() ?? 0, Model?.TotalCount ?? 0, Model?.PageNumber ?? 1, Model?.TotalPages ?? 1]"
+        data-total-pages="@(Model?.TotalPages ?? 1)"
+        data-total-count="@(Model?.TotalCount ?? 0)"
+        data-page="@(Model?.PageNumber ?? 1)"></td>
+</tr>

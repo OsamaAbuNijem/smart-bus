@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TilmezBus.API/TilmezBus.API.csproj" />
+    <Project Path="src/TilmezBus.Application/TilmezBus.Application.csproj" />
+    <Project Path="src/TilmezBus.Domain/TilmezBus.Domain.csproj" />
+    <Project Path="src/TilmezBus.Infrastructure/TilmezBus.Infrastructure.csproj" />
+    <Project Path="src/TilmezBus.Web/TilmezBus.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TilmezBus.Application.Tests/TilmezBus.Application.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,81 @@
+@using TilmezBus.Application.Features.Buses.Queries.GetAllBuses
+@model BusDto
+@{
+    ViewData["Title"] = $"Bus {Model.PlateNumber}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm me-2">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+        <h4 class="d-inline fw-bold"><i class="bi bi-bus-front-fill text-primary me-2"></i>@Model.PlateNumber</h4>
+    </div>
+    <span class="badge @(Model.Status == "Active" ? "bg-success" : "bg-secondary") fs-6">
+        @Model.Status
+    </span>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h6 class="fw-bold">Bus Information</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-5 text-muted">Plate Number</dt>
+                    <dd class="col-7 fw-semibold">@Model.PlateNumber</dd>
+                    <dt class="col-5 text-muted">Students</dt>
+                    <dd class="col-7">@Model.StudentCount</dd>
+                    <dt class="col-5 text-muted">Capacity</dt>
+                    <dd class="col-7">@Model.Capacity seats</dd>
+                    <dt class="col-5 text-muted">Driver</dt>
+                    <dd class="col-7">@(Model.DriverName ?? "Unassigned")</dd>
+                    <dt class="col-5 text-muted">Created</dt>
+                    <dd class="col-7">@Model.CreatedAt.ToString("MMM dd, yyyy")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h6 class="fw-bold"><i class="bi bi-geo-alt-fill text-primary me-1"></i>Last Known Location</h6>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.LastLatitude.HasValue)
+                {
+                    <div id="bus-detail-map" style="height: 350px; border-radius: 0 0 1rem 1rem;"
+                         data-lat="@Model.LastLatitude" data-lng="@Model.LastLongitude"></div>
+                }
+                else
+                {
+                    <div class="d-flex align-items-center justify-content-center" style="height:200px;">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-geo-alt fs-1 d-block mb-2"></i>
+                            No location data available
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const mapEl = document.getElementById('bus-detail-map');
+    if (mapEl) {
+        const lat = parseFloat(mapEl.dataset.lat);
+        const lng = parseFloat(mapEl.dataset.lng);
+        const map = L.map('bus-detail-map').setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup('<b>@Model.PlateNumber</b><br/>Last known location')
+            .openPopup();
+    }
+</script>
+}

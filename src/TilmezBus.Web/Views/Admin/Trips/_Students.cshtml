@@ -1,0 +1,90 @@
+@using TilmezBus.Application.Features.Trips.Queries.GetTripStudents
+@model List<TripStudentDto>
+
+@if (Model is null || !Model.Any())
+{
+    <div class="trip-students-empty">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <div class="trip-students-empty-text">@L["Trip_StudentsNone"]</div>
+    </div>
+}
+else
+{
+    // Counts: Boarded + DroppedOff both mean "on the trip / made it" once
+    // the trip ends (Morning completion flips Boarded → DroppedOff). We
+    // surface the combined arrived count alongside waiting + absent so the
+    // summary stays accurate at every stage of the trip.
+    var arrivedCount = Model.Count(s => s.BoardingStatus == "Boarded" || s.BoardingStatus == "DroppedOff");
+    var waitingCount = Model.Count(s => s.BoardingStatus == "Waiting");
+    var absentCount  = Model.Count(s => s.BoardingStatus == "Absent");
+
+    <div class="ts-summary">
+      <span class="ts-chip ts-chip-total">
+        <span class="ts-chip-num">@Model.Count</span>
+        <span class="ts-chip-label">@L["Trip_StudentsTotal"]</span>
+      </span>
+      <span class="ts-chip ts-chip-arrived">
+        <span class="ts-chip-num">@arrivedCount</span>
+        <span class="ts-chip-label">@L["Trip_BoardingArrived"]</span>
+      </span>
+      <span class="ts-chip ts-chip-waiting">
+        <span class="ts-chip-num">@waitingCount</span>
+        <span class="ts-chip-label">@L["Trip_BoardingWaiting"]</span>
+      </span>
+      <span class="ts-chip ts-chip-absent">
+        <span class="ts-chip-num">@absentCount</span>
+        <span class="ts-chip-label">@L["Trip_BoardingAbsent"]</span>
+      </span>
+    </div>
+
+    <div class="ts-grid">
+      @foreach (var s in Model)
+      {
+          var (cls, label) = s.BoardingStatus switch
+          {
+              "Waiting"    => ("waiting", L["Trip_BoardingWaiting"].Value),
+              "Boarded"    => ("boarded", L["Trip_BoardingBoarded"].Value),
+              // Both Morning (post-completion) and Return (drop-off at home)
+              // end up here — read as "Arrived" in both cases.
+              "DroppedOff" => ("arrived", L["Trip_BoardingArrived"].Value),
+              "Absent"     => ("absent",  L["Trip_BoardingAbsent"].Value),
+              _            => ("",        s.BoardingStatus)
+          };
+          var boardTime = s.BoardingTime?.ToString("HH:mm");
+          var dropTime  = s.DropoffTime?.ToString("HH:mm");
+
+          <div class="ts-card ts-card--@cls">
+            <div class="ts-card-top">
+              <div class="ts-card-ident">
+                <div class="ts-card-name">@s.FullName</div>
+                <div class="ts-card-meta">
+                  <span class="grade-chip">@L["Std_Grade" + s.Grade]</span>
+                  @if (!string.IsNullOrEmpty(s.HomeArea))
+                  {
+                      <span class="ts-card-area">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        @s.HomeArea
+                      </span>
+                  }
+                </div>
+              </div>
+              <span class="status-pill @cls"><span class="status-dot"></span>@label</span>
+            </div>
+            <div class="ts-card-times">
+              <div class="ts-time">
+                <span class="ts-time-label">@L["Trip_StudentsColBoardTime"]</span>
+                <span class="ts-time-val @(boardTime == null ? "muted" : "")">@(boardTime ?? "—")</span>
+              </div>
+              <div class="ts-time">
+                <span class="ts-time-label">@L["Trip_StudentsColDropTime"]</span>
+                <span class="ts-time-val @(dropTime == null ? "muted" : "")">@(dropTime ?? "—")</span>
+              </div>
+            </div>
+          </div>
+      }
+    </div>
+}

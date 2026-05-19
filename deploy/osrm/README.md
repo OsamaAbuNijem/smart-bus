@@ -1,4 +1,4 @@
-# Self-hosted OSRM routing for SmartBus
+# Self-hosted OSRM routing for TilmezBus
 
 One-time setup of an OSRM routing server that the Flutter app calls to draw
 street-following polylines between the bus and each parent's home.
@@ -30,7 +30,7 @@ curl 'https://routing.smartbus.app/route/v1/driving/35.895,31.886;35.890,31.882?
 ```
 
 ## Wire up the mobile app
-In `src/SmartBus.Mobile/lib/features/parent/presentation/providers/route_provider.dart`,
+In `src/TilmezBus.Mobile/lib/features/parent/presentation/providers/route_provider.dart`,
 change the OSRM URL from `router.project-osrm.org` to your domain:
 
 ```dart

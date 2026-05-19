@@ -1,0 +1,26 @@
+@using TilmezBus.Application.Common.Models
+@using TilmezBus.Application.Features.Alerts.Queries.GetAllAlerts
+@using TilmezBus.Domain.Enums
+@model PagedResult<AlertDto>
+
+@if (Model is null || !Model.Items.Any())
+{
+    <div class="u-empty-state">@L["Alert_None"]</div>
+}
+else
+{
+    foreach (var a in Model.Items)
+    {
+        var sevBg = a.Severity == AlertSeverity.Urgent ? "#FEF2F2" : "#EFF6FF";
+        <div class="alert-item">
+            <div class="alert-icon" style="background:@sevBg;">!</div>
+            <div class="u-flex-1">
+                <div class="alert-title">@a.Title</div>
+                <div class="alert-body">@a.Message</div>
+                <div class="alert-time">@a.CreatedAt.ToString("dd MMM HH:mm")</div>
+            </div>
+        </div>
+    }
+}
+
+<span id="dashboard-alerts-total" class="u-hidden">@(Model?.TotalCount ?? 0)</span>

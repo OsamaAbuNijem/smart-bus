@@ -1,0 +1,60 @@
+@model TilmezBus.Web.Models.BusFormViewModel
+@{
+    var isRtl  = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var isEdit = Model.BusId is not null;
+    var errors = ViewData.ModelState;
+}
+
+<form id="bus-form"
+      data-id="@Model.BusId"
+      onsubmit="event.preventDefault(); buses.submit(this);">
+
+  <div class="modal-header">
+    <div class="modal-header-title">@(isEdit ? L["Bus_EditTitle"] : L["Bus_AddTitle"])</div>
+    <button type="button" class="modal-close-btn" onclick="SB.closeModal('modal-bus')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    @if (errors.ErrorCount > 0)
+    {
+        <div class="form-server-err" style="display:block; margin-bottom:14px;">
+            @foreach (var state in errors)
+            {
+                foreach (var err in state.Value.Errors)
+                {
+                    <div>@(string.IsNullOrEmpty(state.Key) ? "" : state.Key + ": ")@err.ErrorMessage</div>
+                }
+            }
+        </div>
+    }
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">@L["Bus_Number"]</label>
+        <input type="text" name="PlateNumber" class="form-input" dir="ltr" value="@Model.Input.PlateNumber"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">@L["Bus_Capacity"]</label>
+        <input type="number" name="Capacity" class="form-input" min="1" max="100" value="@(Model.Input.Capacity > 0 ? Model.Input.Capacity.ToString() : "")"/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">@L["Bus_Status"]</label>
+        <select name="Status" class="form-input">
+          <option value="Active"   selected="@(Model.Input.Status == "Active")">@L["Bus_StatusActive"]</option>
+          <option value="Inactive" selected="@(Model.Input.Status == "Inactive")">@L["Bus_StatusInactive"]</option>
+        </select>
+      </div>
+      <div class="form-group"></div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="submit" class="btn-primary">@L["Bus_SaveBtn"]</button>
+    <button type="button" class="btn-secondary" onclick="SB.closeModal('modal-bus')">@L["Del_Cancel"]</button>
+  </div>
+</form>

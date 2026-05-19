@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+
+  <!-- Language switcher -->
+  <data name="SwitchLang"  xml:space="preserve"><value>ع</value></data>
+  <data name="LangName"    xml:space="preserve"><value>English</value></data>
+  <data name="SearchShort" xml:space="preserve"><value>Search...</value></data>
+
+  <!-- Admin sidebar nav -->
+  <data name="Nav_Main"       xml:space="preserve"><value>MAIN</value></data>
+  <data name="Nav_Mgmt"       xml:space="preserve"><value>MANAGEMENT</value></data>
+  <data name="Nav_Dashboard"  xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Nav_Trips"      xml:space="preserve"><value>Trips</value></data>
+  <data name="Nav_Students"   xml:space="preserve"><value>Students</value></data>
+  <data name="Nav_Drivers"    xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
+  <data name="Nav_Buses"      xml:space="preserve"><value>Buses</value></data>
+  <data name="Nav_Alerts"     xml:space="preserve"><value>Alerts</value></data>
+  <data name="Nav_Settings"   xml:space="preserve"><value>Settings</value></data>
+  <data name="Admin_ChangePassword" xml:space="preserve"><value>Change password</value></data>
+  <data name="Logout"               xml:space="preserve"><value>Sign out</value></data>
+
+  <!-- Super-admin sidebar nav -->
+  <data name="Nav_Overview"   xml:space="preserve"><value>Overview</value></data>
+  <data name="Nav_Schools"    xml:space="preserve"><value>Schools</value></data>
+  <data name="Nav_Admins"     xml:space="preserve"><value>Admins</value></data>
+  <data name="Nav_Plans"      xml:space="preserve"><value>Subscription Plans</value></data>
+  <data name="Nav_Notifications" xml:space="preserve"><value>Notifications</value></data>
+  <data name="SA_Badge_Title" xml:space="preserve"><value>Super Admin</value></data>
+  <data name="SA_Badge_Sub"   xml:space="preserve"><value>Full platform access</value></data>
+
+  <!-- Login pages -->
+  <data name="Login_Email"    xml:space="preserve"><value>Email</value></data>
+  <data name="Login_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Login_Submit"   xml:space="preserve"><value>Sign In</value></data>
+  <data name="Login_SchoolSub" xml:space="preserve"><value>School Bus Tracking System</value></data>
+  <data name="Login_Or"       xml:space="preserve"><value>or</value></data>
+  <data name="Login_SALink"   xml:space="preserve"><value>Super Admin Login</value></data>
+  <data name="Login_SASub"    xml:space="preserve"><value>Super Admin Portal</value></data>
+  <data name="Login_SABack"   xml:space="preserve"><value>Back to school login</value></data>
+  <data name="Login_SASubmit" xml:space="preserve"><value>Super Admin Login</value></data>
+
+  <!-- Login — school admin (redesigned split layout) -->
+  <data name="Login_BrandTagline" xml:space="preserve"><value>Smart school transport</value></data>
+  <data name="Login_BrandLead"    xml:space="preserve"><value>Track every trip in real time and run your fleet from a single dashboard.</value></data>
+  <data name="Login_Feature1"     xml:space="preserve"><value>Real-time trip &amp; bus tracking</value></data>
+  <data name="Login_Feature2"     xml:space="preserve"><value>End-to-end driver &amp; student management</value></data>
+  <data name="Login_Feature3"     xml:space="preserve"><value>Instant notifications for parents</value></data>
+  <data name="Login_WelcomeBack"  xml:space="preserve"><value>Welcome back</value></data>
+  <data name="Login_WelcomeSub"   xml:space="preserve"><value>Sign in to your account to continue managing your school.</value></data>
+  <data name="Login_RememberMe"   xml:space="preserve"><value>Remember me</value></data>
+  <data name="Login_ForgotPwd"    xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Login_EmailPH"      xml:space="preserve"><value>name@school.com</value></data>
+  <data name="Login_PasswordPH"   xml:space="preserve"><value>••••••••</value></data>
+  <data name="Login_FooterRights" xml:space="preserve"><value>All rights reserved</value></data>
+  <data name="Login_FooterPowered" xml:space="preserve"><value>Powered by</value></data>
+  <data name="Login_BrandName"    xml:space="preserve"><value>Tilmez Bus Platform</value></data>
+  <data name="Login_BrandShort"   xml:space="preserve"><value>Tilmez</value></data>
+  <data name="Login_PageTitle"    xml:space="preserve"><value>Tilmez — Sign In</value></data>
+  <data name="Login_DemoLiveTrip" xml:space="preserve"><value>Live Trip</value></data>
+  <data name="Login_DemoRoute"    xml:space="preserve"><value>Route #3</value></data>
+  <data name="Login_DemoOnTime"   xml:space="preserve"><value>On time</value></data>
+  <data name="Login_DemoBoarded"  xml:space="preserve"><value>12/12</value></data>
+  <data name="Login_DemoEta"      xml:space="preserve"><value>ETA 8 min</value></data>
+  <data name="Login_DemoDistance" xml:space="preserve"><value>2.4 km</value></data>
+  <data name="Login_DemoSpeed"    xml:space="preserve"><value>38 km/h</value></data>
+  <data name="Login_DemoOnOff"    xml:space="preserve"><value>12 · 0</value></data>
+
+  <!-- Super-admin school modal -->
+  <data name="SA_School_Add"            xml:space="preserve"><value>Add new school</value></data>
+  <data name="SA_School_Edit"           xml:space="preserve"><value>Edit school</value></data>
+  <data name="SA_School_Name"           xml:space="preserve"><value>School name</value></data>
+  <data name="SA_School_Name_PH"        xml:space="preserve"><value>e.g. Al-Noor Primary School</value></data>
+  <data name="SA_School_Name_Required"  xml:space="preserve"><value>Name is required</value></data>
+  <data name="SA_School_ContactName"     xml:space="preserve"><value>Contact name</value></data>
+  <data name="SA_School_ContactName_PH"  xml:space="preserve"><value>e.g. Sarah — school registrar</value></data>
+  <data name="SA_Currency_JD"            xml:space="preserve"><value>JD</value></data>
+  <data name="SA_Status_Active"          xml:space="preserve"><value>Active</value></data>
+  <data name="SA_Status_Inactive"        xml:space="preserve"><value>Inactive</value></data>
+  <data name="SA_School_Logo"           xml:space="preserve"><value>School logo</value></data>
+  <data name="SA_School_Logo_Hint"      xml:space="preserve"><value>PNG, JPG, WebP, GIF or SVG up to 4 MB.</value></data>
+  <data name="SA_School_Logo_Choose"    xml:space="preserve"><value>Choose file</value></data>
+  <data name="SA_School_Logo_Remove"    xml:space="preserve"><value>Remove</value></data>
+  <data name="SA_School_Logo_UploadFailed" xml:space="preserve"><value>Upload failed. Try a different image.</value></data>
+  <data name="SA_Drawer_Sub_Title"      xml:space="preserve"><value>Active subscription</value></data>
+  <data name="SA_Drawer_Sub_Update"     xml:space="preserve"><value>Update subscription</value></data>
+  <data name="SA_Drawer_Sub_Create"     xml:space="preserve"><value>Add subscription</value></data>
+  <data name="SA_Drawer_Sub_None"       xml:space="preserve"><value>No active subscription.</value></data>
+  <data name="SA_School_Map_Section"    xml:space="preserve"><value>School location</value></data>
+  <data name="SA_School_Map_Hint"       xml:space="preserve"><value>Search for an address or click the map to drop a pin. Used by driver routes as the trip start/end.</value></data>
+  <data name="SA_School_Map_Search"     xml:space="preserve"><value>Search address or place…</value></data>
+  <data name="SA_School_Map_NoPin"      xml:space="preserve"><value>No location selected.</value></data>
+  <data name="SA_School_Map_Coords"     xml:space="preserve"><value>Coordinates</value></data>
+  <data name="SA_School_Phone"          xml:space="preserve"><value>Phone number</value></data>
+  <data name="SA_School_Phone_PH"       xml:space="preserve"><value>79XXXXXXX</value></data>
+  <data name="SA_School_Phone_Required" xml:space="preserve"><value>Phone number is required</value></data>
+  <data name="SA_School_Admin"          xml:space="preserve"><value>Admin email</value></data>
+  <data name="SA_School_Admin_PH"       xml:space="preserve"><value>admin@school.edu</value></data>
+  <data name="SA_School_Admin_Required" xml:space="preserve"><value>Admin email is required</value></data>
+  <data name="SA_School_Password"       xml:space="preserve"><value>Admin password</value></data>
+  <data name="SA_School_Password_Hint"  xml:space="preserve"><value>Used only when creating the account.</value></data>
+  <data name="SA_School_Save"           xml:space="preserve"><value>Save school</value></data>
+  <data name="SA_School_Cancel"         xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- Super-admin subscription block (initial subscription created with the school) -->
+  <data name="SA_Sub_Section"        xml:space="preserve"><value>Initial subscription</value></data>
+  <data name="SA_Sub_Section_Hint"   xml:space="preserve"><value>Created with the school. Details can be edited later.</value></data>
+  <data name="SA_Sub_Type"           xml:space="preserve"><value>Subscription type</value></data>
+  <data name="SA_Sub_Type_Trial"     xml:space="preserve"><value>Trial</value></data>
+  <data name="SA_Sub_Type_Basic"     xml:space="preserve"><value>Basic</value></data>
+  <data name="SA_Sub_Type_Standard"  xml:space="preserve"><value>Standard</value></data>
+  <data name="SA_Sub_Type_Premium"   xml:space="preserve"><value>Premium</value></data>
+  <data name="Admin_Settings_Plan_Current"  xml:space="preserve"><value>Current plan</value></data>
+  <data name="Admin_Settings_Plan_None"     xml:space="preserve"><value>No subscription</value></data>
+  <data name="Admin_Settings_Plan_From"     xml:space="preserve"><value>From</value></data>
+  <data name="Admin_Settings_Plan_To"       xml:space="preserve"><value>to</value></data>
+  <data name="Admin_Settings_Plan_Live"     xml:space="preserve"><value>Active</value></data>
+  <data name="Admin_Settings_Plan_Expired"  xml:space="preserve"><value>Expired</value></data>
+  <data name="Admin_Settings_Plan_Future"   xml:space="preserve"><value>Not started yet</value></data>
+  <data name="Admin_Settings_Plan_Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="Admin_Settings_Plan_Price"        xml:space="preserve"><value>Price</value></data>
+  <data name="Admin_Settings_Plan_Currency"     xml:space="preserve"><value>JD</value></data>
+  <data name="Admin_Settings_Plan_MaxStudents"  xml:space="preserve"><value>Max students</value></data>
+  <data name="Admin_Settings_Plan_MaxBuses"     xml:space="preserve"><value>Max buses</value></data>
+  <data name="SA_Sub_Price"          xml:space="preserve"><value>Price</value></data>
+  <data name="SA_Sub_ActivationDate" xml:space="preserve"><value>Activation date</value></data>
+  <data name="SA_Sub_ExpirationDate" xml:space="preserve"><value>Expiration date</value></data>
+  <data name="SA_Sub_Paid"           xml:space="preserve"><value>Payment status</value></data>
+  <data name="SA_Sub_Paid_Yes"       xml:space="preserve"><value>Paid</value></data>
+  <data name="SA_Sub_Paid_Partial"   xml:space="preserve"><value>Paid partially</value></data>
+  <data name="SA_Sub_Payments_Title"      xml:space="preserve"><value>Payments</value></data>
+  <data name="SA_Sub_Payments_Hint"       xml:space="preserve"><value>Record each instalment as the school pays. The list below shows every payment captured for this subscription.</value></data>
+  <data name="SA_Sub_Payments_Date"       xml:space="preserve"><value>Payment date</value></data>
+  <data name="SA_Sub_Payments_Amount"     xml:space="preserve"><value>Amount</value></data>
+  <data name="SA_Sub_Payments_Method"     xml:space="preserve"><value>Payment method</value></data>
+  <data name="SA_Sub_Payments_Add"        xml:space="preserve"><value>Add payment</value></data>
+  <data name="SA_Sub_Payments_Empty"      xml:space="preserve"><value>No payments recorded yet.</value></data>
+  <data name="SA_Sub_Payments_LoadFailed" xml:space="preserve"><value>Failed to load payments.</value></data>
+  <data name="SA_Sub_Payments_FullyPaid"  xml:space="preserve"><value>Subscription is fully paid — no further payments accepted.</value></data>
+  <data name="SA_Sub_Payments_Exceeds"    xml:space="preserve"><value>Payment exceeds the remaining amount ({0}).</value></data>
+  <data name="SA_Pay_Method_Cash"         xml:space="preserve"><value>Cash</value></data>
+  <data name="SA_Pay_Method_Transfer"     xml:space="preserve"><value>Bank transfer</value></data>
+  <data name="SA_Pay_Method_Cheque"       xml:space="preserve"><value>Cheque</value></data>
+  <data name="SA_Sub_Paid_AutoHint"       xml:space="preserve"><value>Auto-derived from the total of recorded payments versus the price.</value></data>
+  <data name="SA_Sub_Paid_No"        xml:space="preserve"><value>Unpaid</value></data>
+  <data name="SA_Sub_Remaining"      xml:space="preserve"><value>Remaining amount</value></data>
+  <data name="SA_Sub_Remaining_AutoHint" xml:space="preserve"><value>Auto-computed from price minus the sum of recorded payments.</value></data>
+
+  <!-- Super-admin subscriptions page (per school) -->
+  <data name="SA_Sub_Page_Title"          xml:space="preserve"><value>Subscriptions</value></data>
+  <data name="SA_Sub_Page_Sub"            xml:space="preserve"><value>Manage each school's subscription history. Only one subscription can be active per school.</value></data>
+  <data name="SA_Sub_Page_School"         xml:space="preserve"><value>School</value></data>
+  <data name="SA_Sub_Page_Add"            xml:space="preserve"><value>Add subscription</value></data>
+  <data name="SA_Sub_Page_Edit"           xml:space="preserve"><value>Edit</value></data>
+  <data name="SA_Sub_Page_AddTitle"       xml:space="preserve"><value>New subscription</value></data>
+  <data name="SA_Sub_Page_EditTitle"      xml:space="preserve"><value>Edit subscription</value></data>
+  <data name="SA_Sub_Page_Status"         xml:space="preserve"><value>Status</value></data>
+  <data name="SA_Sub_Page_StatusActive"   xml:space="preserve"><value>Active flag</value></data>
+  <data name="SA_Sub_Page_StatusActive_On"  xml:space="preserve"><value>Active</value></data>
+  <data name="SA_Sub_Page_StatusActive_Off" xml:space="preserve"><value>Inactive</value></data>
+  <data name="SA_Sub_Page_Status_Live"    xml:space="preserve"><value>Active</value></data>
+  <data name="SA_Sub_Page_Status_Expired" xml:space="preserve"><value>Expired</value></data>
+  <data name="SA_Sub_Page_Status_Future"  xml:space="preserve"><value>Future</value></data>
+  <data name="SA_Sub_Page_Status_Off"     xml:space="preserve"><value>Disabled</value></data>
+  <data name="SA_Sub_Page_MaxStudents"    xml:space="preserve"><value>Max students</value></data>
+  <data name="SA_Sub_Page_MaxBuses"       xml:space="preserve"><value>Max buses</value></data>
+  <data name="SA_Sub_Page_Actions"        xml:space="preserve"><value>Actions</value></data>
+  <data name="SA_Sub_Page_PickSchool"     xml:space="preserve"><value>Pick a school from the dropdown to view its subscriptions.</value></data>
+  <data name="SA_Sub_Page_NoSubs"         xml:space="preserve"><value>No subscriptions for this school yet.</value></data>
+  <data name="SA_Sub_Page_Failed"         xml:space="preserve"><value>Failed to load subscriptions. Try refreshing or signing in again.</value></data>
+  <data name="SA_Sub_Page_Saving"         xml:space="preserve"><value>Saving…</value></data>
+  <data name="SA_Sub_Page_Saved"          xml:space="preserve"><value>Saved ✓</value></data>
+  <data name="SA_Sub_Page_RequiredErr"    xml:space="preserve"><value>School and dates are required.</value></data>
+
+  <!-- Super-admin layout: drawer + modals + topbar -->
+  <data name="SA_TopBar_Logout"        xml:space="preserve"><value>Sign out</value></data>
+  <data name="SA_TopBar_ExportCSV"     xml:space="preserve"><value>Export CSV</value></data>
+  <data name="SA_Drawer_ContactInfo"   xml:space="preserve"><value>Contact info</value></data>
+  <data name="SA_Common_Edit"          xml:space="preserve"><value>Edit</value></data>
+  <data name="SA_Common_Delete"        xml:space="preserve"><value>Delete</value></data>
+  <data name="SA_Common_Loading"       xml:space="preserve"><value>Loading…</value></data>
+  <data name="SA_Schools_Action_Impersonate" xml:space="preserve"><value>Open admin</value></data>
+  <data name="SA_Schools_Action_ResetPwd"    xml:space="preserve"><value>Reset admin password</value></data>
+  <data name="SA_Common_Close"         xml:space="preserve"><value>Close</value></data>
+  <data name="SA_Common_Cancel"        xml:space="preserve"><value>Cancel</value></data>
+  <data name="SA_Common_PrintAll"      xml:space="preserve"><value>Print all</value></data>
+  <data name="SA_QrEmployees_Title"    xml:space="preserve"><value>Employee QR codes</value></data>
+  <data name="SA_QrStudents_Title"     xml:space="preserve"><value>Student QR codes</value></data>
+  <data name="SA_Delete_Title"         xml:space="preserve"><value>⚠️ Confirm deletion</value></data>
+  <data name="SA_Delete_Heading"       xml:space="preserve"><value>Are you absolutely sure?</value></data>
+  <data name="SA_Delete_WillDelete"    xml:space="preserve"><value>Will delete</value></data>
+  <data name="SA_Delete_DefaultLabel"  xml:space="preserve"><value>the school</value></data>
+  <data name="SA_Delete_Irreversible"  xml:space="preserve"><value>This action cannot be undone.</value></data>
+  <data name="SA_Delete_Confirm"       xml:space="preserve"><value>🗑️ Yes, delete permanently</value></data>
+  <data name="SA_ChangePwd_Title"      xml:space="preserve"><value>Change password</value></data>
+  <data name="SA_ChangePwd_Current"    xml:space="preserve"><value>Current password</value></data>
+  <data name="SA_ChangePwd_New"        xml:space="preserve"><value>New password</value></data>
+  <data name="SA_ChangePwd_NewPH"      xml:space="preserve"><value>At least 8 characters</value></data>
+  <data name="SA_ChangePwd_Confirm"    xml:space="preserve"><value>Confirm password</value></data>
+  <data name="SA_ChangePwd_RequiredErr" xml:space="preserve"><value>This field is required</value></data>
+  <data name="SA_ChangePwd_MinLenErr"  xml:space="preserve"><value>At least 8 characters</value></data>
+  <data name="SA_ChangePwd_MismatchErr" xml:space="preserve"><value>Passwords do not match</value></data>
+  <data name="SA_ChangePwd_Save"       xml:space="preserve"><value>Save password</value></data>
+  <data name="SA_ResetPwd_Title"       xml:space="preserve"><value>Reset admin password</value></data>
+  <data name="SA_ResetPwd_Button"      xml:space="preserve"><value>Reset password</value></data>
+  <data name="SA_ResetPwd_New"         xml:space="preserve"><value>New password</value></data>
+  <data name="SA_ResetPwd_NewPH"       xml:space="preserve"><value>At least 8 characters</value></data>
+  <data name="SA_ResetPwd_Confirm"     xml:space="preserve"><value>Confirm new password</value></data>
+  <data name="SA_ResetPwd_MinLenErr"   xml:space="preserve"><value>Password must be at least 8 characters.</value></data>
+  <data name="SA_ResetPwd_MismatchErr" xml:space="preserve"><value>Passwords don't match.</value></data>
+  <data name="SA_ResetPwd_Save"        xml:space="preserve"><value>Reset password</value></data>
+  <data name="SA_ResetPwd_Success"     xml:space="preserve"><value>Admin password reset ✓</value></data>
+  <data name="SA_ResetPwd_Failed"      xml:space="preserve"><value>Failed to reset admin password.</value></data>
+  <data name="SA_Impersonate_Title"    xml:space="preserve"><value>Open this school's admin dashboard with SuperAdmin privileges.</value></data>
+  <data name="SA_Impersonate_Button"   xml:space="preserve"><value>Open admin</value></data>
+  <data name="Impersonate_BannerFormat" xml:space="preserve"><value>You are signed in on behalf of {0}.</value></data>
+  <data name="Impersonate_Exit"        xml:space="preserve"><value>Exit impersonation</value></data>
+
+  <!-- Super-admin dashboard (overview) -->
+  <data name="SA_Dash_PageTitle"       xml:space="preserve"><value>Super-admin dashboard</value></data>
+  <data name="SA_Dash_Welcome"         xml:space="preserve"><value>Welcome back, Super Admin 👋</value></data>
+  <data name="SA_Dash_Subtitle"        xml:space="preserve"><value>Full management of every school subscribed to the TilmezBus platform.</value></data>
+  <data name="SA_Dash_TotalSchools"    xml:space="preserve"><value>Total schools</value></data>
+  <data name="SA_Dash_ActiveSuffix"    xml:space="preserve"><value>active</value></data>
+  <data name="SA_Dash_PremiumSubs"     xml:space="preserve"><value>Premium subscriptions</value></data>
+  <data name="SA_Dash_PremiumNote"     xml:space="preserve"><value>Premium plan</value></data>
+  <data name="SA_Dash_TotalBuses"      xml:space="preserve"><value>Total buses</value></data>
+  <data name="SA_Dash_AcrossAll"       xml:space="preserve"><value>Across all schools</value></data>
+  <data name="SA_Dash_SchoolAdmins"    xml:space="preserve"><value>School admins</value></data>
+  <data name="SA_Dash_ActiveAccounts"  xml:space="preserve"><value>Active accounts</value></data>
+  <data name="SA_Dash_Col_Buses"       xml:space="preserve"><value>Buses</value></data>
+  <data name="SA_Dash_Col_Drivers"     xml:space="preserve"><value>Drivers</value></data>
+  <data name="SA_Dash_Col_Assistants"  xml:space="preserve"><value>Assistants</value></data>
+  <data name="SA_Dash_Col_Students"    xml:space="preserve"><value>Students</value></data>
+  <data name="SA_Dash_Col_Status"      xml:space="preserve"><value>Status</value></data>
+  <data name="SA_Dash_RecentTitle"     xml:space="preserve"><value>Recently added schools</value></data>
+  <data name="SA_Dash_RecentSub"       xml:space="preserve"><value>Latest 5 schools on the platform</value></data>
+  <data name="SA_Dash_ViewAll"         xml:space="preserve"><value>View all</value></data>
+  <data name="SA_Dash_EmptyTitle"      xml:space="preserve"><value>No schools yet</value></data>
+  <data name="SA_Dash_EmptyHint"       xml:space="preserve"><value>Start by adding the first school to the platform</value></data>
+  <data name="SA_Dash_TotalStudents"        xml:space="preserve"><value>Total students</value></data>
+  <data name="SA_Dash_Drivers_Assistants"   xml:space="preserve"><value>Drivers + assistants</value></data>
+  <data name="SA_Dash_ActiveUsers"          xml:space="preserve"><value>Active users by role</value></data>
+  <data name="SA_Dash_ActiveUsers_Sub"      xml:space="preserve"><value>Accounts currently enabled, grouped by role</value></data>
+  <data name="SA_Dash_TodayUsers"           xml:space="preserve"><value>Today's user activity</value></data>
+  <data name="SA_Dash_TodayUsers_Sub"       xml:space="preserve"><value>Users who signed in at least once today, by role</value></data>
+  <data name="SA_Dash_Role_Parent"          xml:space="preserve"><value>Parents</value></data>
+  <data name="SA_Dash_Role_Driver"          xml:space="preserve"><value>Drivers</value></data>
+  <data name="SA_Dash_Role_Assistant"       xml:space="preserve"><value>Assistants</value></data>
+  <data name="SA_Dash_TodayTrips"           xml:space="preserve"><value>Today's trips</value></data>
+  <data name="SA_Dash_TodayTrips_Sub"       xml:space="preserve"><value>Counts grouped by trip status</value></data>
+  <data name="SA_Dash_Trip_Created"         xml:space="preserve"><value>Created</value></data>
+  <data name="SA_Dash_Trip_InProgress"      xml:space="preserve"><value>In progress</value></data>
+  <data name="SA_Dash_Trip_Ended"           xml:space="preserve"><value>Ended</value></data>
+  <data name="SA_Dash_SchoolsActiveSub"     xml:space="preserve"><value>{0} active subscription(s)</value></data>
+  <data name="SA_Dash_DriversBreakdown"     xml:space="preserve"><value>{0} drivers · {1} assistants</value></data>
+
+  <!-- Super-admin schools page -->
+  <data name="SA_Schools_PageTitle"    xml:space="preserve"><value>Schools</value></data>
+  <data name="SA_Schools_AddBtn"       xml:space="preserve"><value>Add school</value></data>
+  <data name="SA_Schools_ListTitle"    xml:space="preserve"><value>Schools list</value></data>
+  <data name="SA_Schools_Col_School"   xml:space="preserve"><value>School</value></data>
+  <data name="SA_Schools_Col_City"     xml:space="preserve"><value>City</value></data>
+  <data name="SA_Schools_Col_Admin"    xml:space="preserve"><value>Admin email</value></data>
+  <data name="SA_Schools_Col_Activation" xml:space="preserve"><value>Activation date</value></data>
+  <data name="SA_Schools_Col_Plan"     xml:space="preserve"><value>Subscription plan</value></data>
+  <data name="SA_Schools_Col_Status"   xml:space="preserve"><value>Activation status</value></data>
+  <data name="SA_Schools_Col_Actions"  xml:space="preserve"><value>Actions</value></data>
+  <data name="SA_Schools_Filter_Name"   xml:space="preserve"><value>Search by name…</value></data>
+  <data name="SA_Schools_Filter_AllCities"   xml:space="preserve"><value>All cities</value></data>
+  <data name="SA_Schools_Filter_AllPlans"    xml:space="preserve"><value>All plans</value></data>
+  <data name="SA_Schools_Filter_AllStatuses" xml:space="preserve"><value>All statuses</value></data>
+  <data name="SA_Schools_Filter_Reset"  xml:space="preserve"><value>Reset</value></data>
+  <data name="SA_Schools_Filter_Empty"  xml:space="preserve"><value>No schools match the current filters.</value></data>
+  <data name="SA_Schools_PrevPage"     xml:space="preserve"><value>Previous</value></data>
+  <data name="SA_Schools_NextPage"     xml:space="preserve"><value>Next</value></data>
+  <data name="SA_Schools_LoadFailed"   xml:space="preserve"><value>Failed to load data</value></data>
+  <data name="SA_Schools_CountInfo"    xml:space="preserve"><value>Showing {0} of {1} schools</value></data>
+  <data name="SA_Schools_Updated"      xml:space="preserve"><value>School updated ✓</value></data>
+  <data name="SA_Schools_Created"      xml:space="preserve"><value>School added successfully ✓</value></data>
+  <data name="SA_Schools_SaveFailed"   xml:space="preserve"><value>Save failed. Check the form data.</value></data>
+  <data name="SA_Schools_ConfirmDelete" xml:space="preserve"><value>Are you sure you want to delete the school "{0}"?</value></data>
+  <data name="SA_Schools_Deleted"      xml:space="preserve"><value>School deleted successfully</value></data>
+  <data name="SA_Schools_DeleteFailed" xml:space="preserve"><value>Delete failed. Please try again.</value></data>
+  <data name="SA_Schools_CreatedAt"    xml:space="preserve"><value>Created {0}</value></data>
+  <data name="SA_Schools_NoResults"    xml:space="preserve"><value>No results</value></data>
+  <data name="SA_Schools_NoSchools"    xml:space="preserve"><value>No schools yet</value></data>
+  <data name="SA_Schools_NoSearchMatch" xml:space="preserve"><value>No schools match "{0}"</value></data>
+  <data name="SA_Schools_EmptyHint"    xml:space="preserve"><value>Start by adding the first school to the platform</value></data>
+  <data name="SA_Schools_ClearSearch"  xml:space="preserve"><value>Clear search</value></data>
+
+  <!-- Super-admin subscriptions page (page title) -->
+  <data name="SA_Sub_PageTitle"        xml:space="preserve"><value>Subscriptions</value></data>
+
+  <!-- Super-admin settings page -->
+  <data name="SA_Settings_PageTitle"   xml:space="preserve"><value>Settings</value></data>
+
+  <!-- SuperAdmin notifications tab -->
+  <data name="SA_Notifs_PageTitle"           xml:space="preserve"><value>Notifications</value></data>
+  <data name="SA_Notifs_ComposerTitle"       xml:space="preserve"><value>Send a push notification</value></data>
+  <data name="SA_Notifs_ComposerSub"         xml:space="preserve"><value>Compose a broadcast and pick its audience.</value></data>
+  <data name="SA_Notifs_Title"               xml:space="preserve"><value>Title</value></data>
+  <data name="SA_Notifs_Title_PH"            xml:space="preserve"><value>e.g. Scheduled maintenance tonight</value></data>
+  <data name="SA_Notifs_Title_Required"      xml:space="preserve"><value>Title is required</value></data>
+  <data name="SA_Notifs_Message"             xml:space="preserve"><value>Message</value></data>
+  <data name="SA_Notifs_Message_PH"          xml:space="preserve"><value>Body of the push notification</value></data>
+  <data name="SA_Notifs_Message_Required"    xml:space="preserve"><value>Message is required</value></data>
+  <data name="SA_Notifs_Target"              xml:space="preserve"><value>Audience</value></data>
+  <data name="SA_Notifs_Target_All"          xml:space="preserve"><value>All users</value></data>
+  <data name="SA_Notifs_Target_SchoolUsers"  xml:space="preserve"><value>Selected schools' users</value></data>
+  <data name="SA_Notifs_Target_Admins"       xml:space="preserve"><value>School admins</value></data>
+  <data name="SA_Notifs_Schools"             xml:space="preserve"><value>Schools</value></data>
+  <data name="SA_Notifs_Schools_Hint"        xml:space="preserve"><value>Hold Cmd / Ctrl to pick multiple. Leave empty for "all" when targeting admins.</value></data>
+  <data name="SA_Notifs_PickSchools"         xml:space="preserve"><value>Pick at least one school.</value></data>
+  <data name="SA_Notifs_Send"                xml:space="preserve"><value>Send broadcast</value></data>
+  <data name="SA_Notifs_SentFormat"          xml:space="preserve"><value>Sent to {0} users · {1} devices</value></data>
+  <data name="SA_Notifs_HistoryTitle"        xml:space="preserve"><value>Broadcast history</value></data>
+  <data name="SA_Notifs_HistorySub"          xml:space="preserve"><value>Most recent platform-wide pushes (newest first).</value></data>
+  <data name="SA_Notifs_HistoryEmpty"        xml:space="preserve"><value>No broadcasts sent yet.</value></data>
+  <data name="SA_Notifs_LoadFailed"          xml:space="preserve"><value>Failed to load broadcast history.</value></data>
+  <data name="SA_Notifs_Col_Date"            xml:space="preserve"><value>Date</value></data>
+  <data name="SA_Notifs_Col_Title"           xml:space="preserve"><value>Title</value></data>
+  <data name="SA_Notifs_Col_Target"          xml:space="preserve"><value>Audience</value></data>
+  <data name="SA_Notifs_Col_Recipients"      xml:space="preserve"><value>Recipients</value></data>
+  <data name="SA_Notifs_Col_Delivered"       xml:space="preserve"><value>Delivered</value></data>
+  <data name="SA_Settings_Section"     xml:space="preserve"><value>System settings</value></data>
+  <data name="SA_Settings_Version"     xml:space="preserve"><value>Platform version</value></data>
+  <data name="SA_Settings_VersionValue" xml:space="preserve"><value>TilmezBus Platform v2.0</value></data>
+  <data name="SA_Settings_ServiceStatus" xml:space="preserve"><value>Service status</value></data>
+  <data name="SA_Settings_ServiceOk"   xml:space="preserve"><value>All systems operational ✓</value></data>
+  <data name="SA_Settings_DefaultCreds" xml:space="preserve"><value>Default credentials</value></data>
+  <data name="SA_Settings_PwdSuccess"  xml:space="preserve"><value>Password updated successfully ✓</value></data>
+  <data name="SA_Settings_PwdFailed"   xml:space="preserve"><value>Failed to change password.</value></data>
+  <data name="SA_Settings_ChangePwdSub" xml:space="preserve"><value>Update super-admin sign-in credentials</value></data>
+
+  <!-- Super-admin login page extras -->
+  <data name="SA_Login_PageTitle"      xml:space="preserve"><value>Super Admin — Sign in</value></data>
+  <data name="SA_Login_Footer"         xml:space="preserve"><value>For authorized super-admins only</value></data>
+
+  <!-- Student modal labels -->
+  <data name="Std_AddTitle"     xml:space="preserve"><value>Add New Student</value></data>
+  <data name="Std_EditTitle"    xml:space="preserve"><value>Edit Student</value></data>
+  <data name="Std_Name"         xml:space="preserve"><value>Student Name (Arabic)</value></data>
+  <data name="Std_NameEn"       xml:space="preserve"><value>Student Name (English)</value></data>
+  <data name="Std_NationalNumber" xml:space="preserve"><value>National Number</value></data>
+  <data name="Std_Grade"        xml:space="preserve"><value>Grade</value></data>
+  <data name="Std_Grade1"       xml:space="preserve"><value>Grade 1</value></data>
+  <data name="Std_Grade2"       xml:space="preserve"><value>Grade 2</value></data>
+  <data name="Std_Grade3"       xml:space="preserve"><value>Grade 3</value></data>
+  <data name="Std_Grade4"       xml:space="preserve"><value>Grade 4</value></data>
+  <data name="Std_Grade5"       xml:space="preserve"><value>Grade 5</value></data>
+  <data name="Std_Grade6"       xml:space="preserve"><value>Grade 6</value></data>
+  <data name="Std_Grade7"       xml:space="preserve"><value>Grade 7</value></data>
+  <data name="Std_Grade8"       xml:space="preserve"><value>Grade 8</value></data>
+  <data name="Std_Grade9"       xml:space="preserve"><value>Grade 9</value></data>
+  <data name="Std_Grade10"      xml:space="preserve"><value>Grade 10</value></data>
+  <data name="Std_Grade11"      xml:space="preserve"><value>Grade 11</value></data>
+  <data name="Std_Grade12"      xml:space="preserve"><value>Grade 12</value></data>
+  <data name="Std_GradeKG1"     xml:space="preserve"><value>KG 1</value></data>
+  <data name="Std_GradeKG2"     xml:space="preserve"><value>KG 2</value></data>
+  <data name="Std_Filter_AllGrades" xml:space="preserve"><value>All grades</value></data>
+  <data name="Std_City"         xml:space="preserve"><value>City</value></data>
+  <data name="City_Amman"      xml:space="preserve"><value>Amman</value></data>
+  <data name="City_Zarqa"      xml:space="preserve"><value>Zarqa</value></data>
+  <data name="City_Irbid"      xml:space="preserve"><value>Irbid</value></data>
+  <data name="City_Aqaba"      xml:space="preserve"><value>Aqaba</value></data>
+  <data name="City_Salt"       xml:space="preserve"><value>Salt</value></data>
+  <data name="City_Madaba"     xml:space="preserve"><value>Madaba</value></data>
+  <data name="City_Karak"      xml:space="preserve"><value>Karak</value></data>
+  <data name="City_Jerash"     xml:space="preserve"><value>Jerash</value></data>
+  <data name="City_Ajloun"     xml:space="preserve"><value>Ajloun</value></data>
+  <data name="City_Mafraq"     xml:space="preserve"><value>Mafraq</value></data>
+  <data name="City_Tafilah"    xml:space="preserve"><value>Tafilah</value></data>
+  <data name="City_Maan"       xml:space="preserve"><value>Ma'an</value></data>
+  <data name="City_Russeifa"   xml:space="preserve"><value>Russeifa</value></data>
+  <data name="City_Ramtha"     xml:space="preserve"><value>Ramtha</value></data>
+  <data name="City_WadiMusa"   xml:space="preserve"><value>Wadi Musa</value></data>
+  <data name="Std_Address"      xml:space="preserve"><value>Address</value></data>
+  <data name="Std_Parent"       xml:space="preserve"><value>Parent Name</value></data>
+  <data name="Std_Building"     xml:space="preserve"><value>Building No.</value></data>
+  <data name="Std_SectionStudent"     xml:space="preserve"><value>Student Information</value></data>
+  <data name="Std_SectionStudent_Sub" xml:space="preserve"><value>Name, national number, and grade</value></data>
+  <data name="Std_SectionParent"      xml:space="preserve"><value>Parent Information</value></data>
+  <data name="Std_SectionParent_Sub"  xml:space="preserve"><value>Name and phone — an account is created automatically</value></data>
+  <data name="Std_SectionHome"        xml:space="preserve"><value>Home Address</value></data>
+  <data name="Std_SectionHome_Sub"    xml:space="preserve"><value>Pick the location on the map</value></data>
+  <data name="Std_BuildingHint" xml:space="preserve"><value>e.g. 12 / B</value></data>
+  <data name="Std_MapSearch"    xml:space="preserve"><value>Search location...</value></data>
+  <data name="Std_Phone"        xml:space="preserve"><value>Phone Number</value></data>
+  <data name="Std_MapTitle"     xml:space="preserve"><value>Home Location on Map</value></data>
+  <data name="Std_MapHint"      xml:space="preserve"><value>Click on the map to set the home location</value></data>
+  <data name="Std_MapArea"      xml:space="preserve"><value>Area / Neighbourhood</value></data>
+  <data name="Std_MapStreet"    xml:space="preserve"><value>Street</value></data>
+  <data name="Std_MapLoading"   xml:space="preserve"><value>Detecting address...</value></data>
+  <data name="Std_MapNoResult"  xml:space="preserve"><value>Could not detect address</value></data>
+  <data name="Std_SaveBtn"      xml:space="preserve"><value>💾 Save Student</value></data>
+  <data name="Std_Cancel"       xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- Delete confirmation modal -->
+  <data name="Del_Title"       xml:space="preserve"><value>Confirm Delete</value></data>
+  <data name="Del_Heading"     xml:space="preserve"><value>Are you sure?</value></data>
+  <data name="Del_Body"        xml:space="preserve"><value>The</value></data>
+  <data name="Del_BodySuffix"  xml:space="preserve"><value>will be permanently deleted and this action cannot be undone.</value></data>
+  <data name="Del_Confirm"     xml:space="preserve"><value>🗑️ Yes, Delete</value></data>
+  <data name="Del_Cancel"      xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- Driver modal labels -->
+  <data name="Driver_NameAr"      xml:space="preserve"><value>Name in Arabic *</value></data>
+  <data name="Driver_NameEn"      xml:space="preserve"><value>Name in English *</value></data>
+  <data name="Driver_Name"        xml:space="preserve"><value>Name</value></data>
+  <data name="Driver_Phone"       xml:space="preserve"><value>Phone number</value></data>
+  <data name="Driver_TypeLabel"     xml:space="preserve"><value>Staff</value></data>
+  <data name="Driver_ToggleType"    xml:space="preserve"><value>Toggle type (driver / assistant)</value></data>
+  <data name="Driver_ToggleStatus"  xml:space="preserve"><value>Toggle status</value></data>
+  <data name="Driver_Status"      xml:space="preserve"><value>Status</value></data>
+  <data name="Driver_Active"      xml:space="preserve"><value>Active</value></data>
+  <data name="Driver_Inactive"    xml:space="preserve"><value>Inactive</value></data>
+  <data name="Driver_Type"        xml:space="preserve"><value>Employee Type</value></data>
+  <data name="Driver_TypeDriver"  xml:space="preserve"><value>Driver</value></data>
+  <data name="Driver_TypeAssist"  xml:space="preserve"><value>Assistant Driver</value></data>
+  <data name="Driver_SaveBtn"     xml:space="preserve"><value>Save Driver</value></data>
+  <data name="Driver_Cancel"      xml:space="preserve"><value>Cancel</value></data>
+  <data name="Driver_AddTitle"    xml:space="preserve"><value>Add New Driver</value></data>
+  <data name="Driver_EditTitle"   xml:space="preserve"><value>Edit Driver</value></data>
+  <data name="Driver_PageTitle"   xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
+  <data name="Driver_None"        xml:space="preserve"><value>No drivers registered</value></data>
+  <data name="Driver_PagerInfo"   xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Driver_TotalLabel"  xml:space="preserve"><value>Total staff</value></data>
+  <data name="Driver_ColNumber"   xml:space="preserve"><value>#</value></data>
+  <data name="Driver_ColName"     xml:space="preserve"><value>Employee</value></data>
+  <data name="Driver_ColRole"     xml:space="preserve"><value>Role</value></data>
+  <data name="Driver_ColPhone"    xml:space="preserve"><value>Phone</value></data>
+  <data name="Driver_ColStatus"   xml:space="preserve"><value>Status</value></data>
+  <data name="Driver_Loading"     xml:space="preserve"><value>Loading...</value></data>
+  <data name="Driver_Export"      xml:space="preserve"><value>Export Excel</value></data>
+  <data name="Driver_Import"      xml:space="preserve"><value>Import Excel</value></data>
+  <data name="Driver_Template"    xml:space="preserve"><value>Download Template</value></data>
+  <data name="Driver_ImportTitle" xml:space="preserve"><value>Import Staff from Excel</value></data>
+  <data name="Driver_ImportHint"  xml:space="preserve"><value>File must contain columns: FullName, PhoneNumber, DriverType</value></data>
+  <data name="Driver_ImportResult" xml:space="preserve"><value>Imported {0} — {1} failed</value></data>
+  <data name="Driver_ImportNoFile" xml:space="preserve"><value>Please choose a file</value></data>
+
+  <!-- Validation messages (shared) -->
+  <data name="Validation_Required"      xml:space="preserve"><value>This field is required</value></data>
+  <data name="Validation_DriverType"    xml:space="preserve"><value>Type must be Driver or Assistant</value></data>
+  <data name="Validation_PhoneFormat"   xml:space="preserve"><value>Phone must start with 77, 78 or 79 and be 9 digits long (+962 is added automatically)</value></data>
+  <data name="Validation_NationalNumberFormat" xml:space="preserve"><value>National number must be 10 digits</value></data>
+  <data name="Validation_TimeFormat"    xml:space="preserve"><value>Time must be in HH:mm format</value></data>
+
+  <!-- Bus schedule modal -->
+  <data name="BusSchedule_Title"    xml:space="preserve"><value>Trip Schedule</value></data>
+  <data name="BusSchedule_Morning"  xml:space="preserve"><value>Morning trip (to school)</value></data>
+  <data name="BusSchedule_Return"   xml:space="preserve"><value>Return trip (home)</value></data>
+  <data name="BusSchedule_Time"     xml:space="preserve"><value>Time</value></data>
+  <data name="BusSchedule_Days"     xml:space="preserve"><value>Repeat days</value></data>
+  <data name="BusSchedule_Students" xml:space="preserve"><value>Students on this trip</value></data>
+  <data name="BusSchedule_Saved"    xml:space="preserve"><value>Schedule saved ✓</value></data>
+  <data name="BusSchedule_Incomplete" xml:space="preserve"><value>Missing driver/assistant/students</value></data>
+  <data name="BusSchedule_ReturnAfterMorning" xml:space="preserve"><value>Return time must be after the morning time</value></data>
+  <data name="BusSchedule_StudentsSelected" xml:space="preserve"><value>students selected</value></data>
+  <data name="Day_Sun" xml:space="preserve"><value>Sun</value></data>
+  <data name="Day_Mon" xml:space="preserve"><value>Mon</value></data>
+  <data name="Day_Tue" xml:space="preserve"><value>Tue</value></data>
+  <data name="Day_Wed" xml:space="preserve"><value>Wed</value></data>
+  <data name="Day_Thu" xml:space="preserve"><value>Thu</value></data>
+  <data name="Day_Fri" xml:space="preserve"><value>Fri</value></data>
+  <data name="Day_Sat" xml:space="preserve"><value>Sat</value></data>
+
+  <!-- Students page -->
+  <data name="Student_PageTitle"   xml:space="preserve"><value>Students</value></data>
+  <data name="Student_None"        xml:space="preserve"><value>No students registered</value></data>
+  <data name="Student_PagerInfo"   xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Student_TypeLabel"   xml:space="preserve"><value>student</value></data>
+  <data name="Student_AddBtn"      xml:space="preserve"><value>Add Student</value></data>
+  <data name="Student_Loading"     xml:space="preserve"><value>Loading...</value></data>
+  <data name="Student_ColNumber"   xml:space="preserve"><value>#</value></data>
+  <data name="Student_ColStudent"  xml:space="preserve"><value>Student</value></data>
+  <data name="Student_ColGrade"    xml:space="preserve"><value>Grade</value></data>
+  <data name="Student_ColParent"   xml:space="preserve"><value>Parent</value></data>
+  <data name="Student_ColPhone"    xml:space="preserve"><value>Phone</value></data>
+  <data name="Student_ColCreated"  xml:space="preserve"><value>Registered</value></data>
+  <data name="Student_ColHomeArea" xml:space="preserve"><value>Home area</value></data>
+  <data name="Student_FilterAreaPlaceholder" xml:space="preserve"><value>Filter by area</value></data>
+  <data name="Student_ColActions"  xml:space="preserve"><value>Actions</value></data>
+  <data name="Student_AriaEdit"    xml:space="preserve"><value>Edit student {0}</value></data>
+  <data name="Student_AriaDelete"  xml:space="preserve"><value>Delete student {0}</value></data>
+  <data name="Student_AriaSendPush" xml:space="preserve"><value>Send push to {0}'s parent</value></data>
+  <data name="Push_ModalTitle"      xml:space="preserve"><value>Send Push Notification</value></data>
+  <data name="Push_ModalSub"        xml:space="preserve"><value>Recipient: {0}'s parent</value></data>
+  <data name="Push_TitleLabel"      xml:space="preserve"><value>Title</value></data>
+  <data name="Push_BodyLabel"       xml:space="preserve"><value>Message</value></data>
+  <data name="Push_TitlePlaceholder" xml:space="preserve"><value>e.g. Bus is approaching</value></data>
+  <data name="Push_BodyPlaceholder" xml:space="preserve"><value>Type the message body...</value></data>
+  <data name="Push_SendBtn"         xml:space="preserve"><value>Send</value></data>
+  <data name="Push_TitleBodyRequired" xml:space="preserve"><value>Title and message are required.</value></data>
+  <data name="Push_Sent"            xml:space="preserve"><value>Push delivered to {0} device(s).</value></data>
+  <data name="Push_SentNoDevices"   xml:space="preserve"><value>Sent — but the parent has no registered devices.</value></data>
+  <data name="Push_Failed"          xml:space="preserve"><value>Failed to send push.</value></data>
+  <data name="Student_AriaAdd"     xml:space="preserve"><value>Add new student</value></data>
+  <data name="Student_AriaTable"   xml:space="preserve"><value>Students table</value></data>
+  <data name="Student_Export"      xml:space="preserve"><value>Export Excel</value></data>
+  <data name="Student_Import"      xml:space="preserve"><value>Import Excel</value></data>
+  <data name="Student_ImportTitle" xml:space="preserve"><value>Import Students from Excel</value></data>
+  <data name="Student_ImportHint"  xml:space="preserve"><value>First row must contain columns: FullName, Grade, ParentName, ParentPhone</value></data>
+  <data name="Student_ImportResult" xml:space="preserve"><value>Imported {0} students — {1} failed</value></data>
+  <data name="Student_ImportNoFile" xml:space="preserve"><value>Please choose a file</value></data>
+  <data name="Student_Template"     xml:space="preserve"><value>Download Template</value></data>
+  <data name="Student_TemplateHint" xml:space="preserve"><value>An empty Excel template with the columns required for import</value></data>
+  <data name="Student_TotalLabel"   xml:space="preserve"><value>Total records</value></data>
+  <data name="Pager_Prev"          xml:space="preserve"><value>‹ Prev</value></data>
+  <data name="Pager_Next"          xml:space="preserve"><value>Next ›</value></data>
+  <data name="Pager_All"           xml:space="preserve"><value>All</value></data>
+
+  <!-- Buses page -->
+  <data name="Bus_PageTitle"      xml:space="preserve"><value>Buses</value></data>
+  <data name="Bus_None"           xml:space="preserve"><value>No buses registered</value></data>
+  <data name="Bus_PagerInfo"      xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Bus_ColNumber"      xml:space="preserve"><value>#</value></data>
+  <data name="Bus_TotalLabel"     xml:space="preserve"><value>Total Buses</value></data>
+  <data name="Bus_Loading"        xml:space="preserve"><value>Loading...</value></data>
+  <data name="Bus_SearchNumber"   xml:space="preserve"><value>Search by bus number</value></data>
+  <data name="Bus_SearchPerson"   xml:space="preserve"><value>Search by driver or assistant name...</value></data>
+  <data name="Bus_TypeLabel"      xml:space="preserve"><value>bus</value></data>
+  <data name="Bus_QRTitle"        xml:space="preserve"><value>Bus QR Code</value></data>
+  <data name="Bus_QRHint"         xml:space="preserve"><value>The driver or assistant scans this code from the mobile app to start the trip automatically.</value></data>
+  <data name="Bus_QRPrint"        xml:space="preserve"><value>Print</value></data>
+  <data name="Bus_AddBtn"         xml:space="preserve"><value>Add buses</value></data>
+  <data name="Bus_AddTitle"       xml:space="preserve"><value>Add new buses</value></data>
+  <data name="Bus_Batch_Title"    xml:space="preserve"><value>Add buses</value></data>
+  <data name="Bus_Batch_Hint"     xml:space="preserve"><value>Each bus number is generated automatically (BUS-0001, BUS-0002, …)</value></data>
+  <data name="Bus_Batch_Count"    xml:space="preserve"><value>How many buses?</value></data>
+  <data name="Bus_Batch_Create"   xml:space="preserve"><value>Create</value></data>
+  <data name="Bus_Batch_Created"  xml:space="preserve"><value>{0} bus(es) created ✓</value></data>
+  <data name="Bus_Batch_InvalidCount" xml:space="preserve"><value>Enter a positive number.</value></data>
+  <data name="Bus_ToggleStatus"   xml:space="preserve"><value>Activate / deactivate</value></data>
+  <data name="Bus_EditTitle"      xml:space="preserve"><value>Edit Bus</value></data>
+  <data name="Bus_Number"         xml:space="preserve"><value>Bus number</value></data>
+  <data name="Bus_Capacity"       xml:space="preserve"><value>Capacity *</value></data>
+  <data name="Bus_Status"         xml:space="preserve"><value>Status</value></data>
+  <data name="Bus_StatusActive"   xml:space="preserve"><value>Active</value></data>
+  <data name="Bus_StatusInactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="Bus_Driver"         xml:space="preserve"><value>Driver</value></data>
+  <data name="Bus_Assistant"      xml:space="preserve"><value>Assistant</value></data>
+  <data name="Bus_NoneSelected"   xml:space="preserve"><value>— Select —</value></data>
+  <data name="Bus_SaveBtn"        xml:space="preserve"><value>💾 Save Bus</value></data>
+
+  <!-- Trips page -->
+  <data name="Trip_None"          xml:space="preserve"><value>No trips</value></data>
+  <data name="Trip_PagerInfo"     xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Trip_TypeLabel"     xml:space="preserve"><value>trip</value></data>
+  <data name="Trip_StudentsTitle" xml:space="preserve"><value>Trip Students</value></data>
+  <data name="Trip_StudentsNone"  xml:space="preserve"><value>No students on this trip</value></data>
+  <data name="Trip_Morning"       xml:space="preserve"><value>Morning</value></data>
+  <data name="Trip_Return"        xml:space="preserve"><value>Return</value></data>
+  <data name="Trip_StatusScheduled"  xml:space="preserve"><value>Scheduled</value></data>
+  <data name="Trip_StatusInProgress" xml:space="preserve"><value>In Progress</value></data>
+  <data name="Trip_StatusCompleted"  xml:space="preserve"><value>Completed</value></data>
+  <data name="Trip_ColNumber"        xml:space="preserve"><value>#</value></data>
+  <data name="Trip_ColDriver"        xml:space="preserve"><value>Driver</value></data>
+  <data name="Trip_ColAssistant"     xml:space="preserve"><value>Assistant</value></data>
+  <data name="Trip_ColBus"           xml:space="preserve"><value>Bus</value></data>
+  <data name="Trip_ColType"          xml:space="preserve"><value>Type</value></data>
+  <data name="Trip_ColDate"          xml:space="preserve"><value>Date</value></data>
+  <data name="Trip_ColTime"          xml:space="preserve"><value>Time</value></data>
+  <data name="Trip_ColStatus"        xml:space="preserve"><value>Status</value></data>
+  <data name="Trip_SearchPerson"     xml:space="preserve"><value>Search by driver or assistant...</value></data>
+  <data name="Trip_FilterBus"        xml:space="preserve"><value>Bus number...</value></data>
+  <data name="Trip_FilterDate"       xml:space="preserve"><value>Date</value></data>
+  <data name="Trip_FilterStatus"     xml:space="preserve"><value>Status</value></data>
+  <data name="Trip_ClearFilter"      xml:space="preserve"><value>Clear</value></data>
+  <data name="Trip_Loading"          xml:space="preserve"><value>Loading...</value></data>
+  <data name="Trip_TotalLabel"       xml:space="preserve"><value>Total Trips</value></data>
+  <data name="Trip_StudentsTotal"    xml:space="preserve"><value>Total Students</value></data>
+  <data name="Trip_StudentsColName"    xml:space="preserve"><value>Student</value></data>
+  <data name="Trip_StudentsColGrade"   xml:space="preserve"><value>Grade</value></data>
+  <data name="Trip_StudentsColArea"    xml:space="preserve"><value>Area</value></data>
+  <data name="Trip_StudentsColBoarding" xml:space="preserve"><value>Boarding</value></data>
+  <data name="Trip_StudentsColBoardTime" xml:space="preserve"><value>Board Time</value></data>
+  <data name="Trip_StudentsColDropTime" xml:space="preserve"><value>Drop Time</value></data>
+  <data name="Trip_BoardingWaiting"  xml:space="preserve"><value>Waiting</value></data>
+  <data name="Trip_BoardingBoarded"  xml:space="preserve"><value>Boarded</value></data>
+  <data name="Trip_BoardingAbsent"   xml:space="preserve"><value>Absent</value></data>
+  <data name="Trip_BoardingArrived"  xml:space="preserve"><value>Arrived</value></data>
+  <data name="JS_TripStarted"     xml:space="preserve"><value>Trip started ✓</value></data>
+  <data name="JS_TripCompleted"   xml:space="preserve"><value>Trip completed ✓</value></data>
+  <data name="JS_ConfirmStartTrip"    xml:space="preserve"><value>Start this trip?</value></data>
+  <data name="JS_ConfirmCompleteTrip" xml:space="preserve"><value>Mark this trip as completed?</value></data>
+  <data name="Confirm_Title"          xml:space="preserve"><value>Confirm</value></data>
+  <data name="Confirm_Heading"        xml:space="preserve"><value>Please confirm</value></data>
+  <data name="Confirm_Confirm"        xml:space="preserve"><value>Confirm</value></data>
+  <data name="Confirm_Cancel"         xml:space="preserve"><value>Cancel</value></data>
+  <data name="JS_ConfirmStartTripTitle"    xml:space="preserve"><value>Start trip</value></data>
+  <data name="JS_ConfirmCompleteTripTitle" xml:space="preserve"><value>Complete trip</value></data>
+  <data name="JS_StartAction"    xml:space="preserve"><value>Start</value></data>
+  <data name="JS_CompleteAction" xml:space="preserve"><value>Complete</value></data>
+
+  <!-- Alerts page -->
+  <data name="Alert_PageTitle"    xml:space="preserve"><value>Alerts</value></data>
+  <data name="Alert_None"         xml:space="preserve"><value>No alerts</value></data>
+  <data name="Alert_Count"        xml:space="preserve"><value>{0} alerts</value></data>
+  <data name="Alert_Resolve"      xml:space="preserve"><value>Resolve</value></data>
+  <data name="Alert_Ignore"       xml:space="preserve"><value>Ignore</value></data>
+
+  <!-- JS toast messages (admin dashboard) -->
+  <data name="JS_StudentSaved"    xml:space="preserve"><value>Student saved ✓</value></data>
+  <data name="JS_DriverSaved"     xml:space="preserve"><value>Driver saved ✓</value></data>
+  <data name="JS_TripSaved"       xml:space="preserve"><value>Trip saved ✓</value></data>
+  <data name="JS_BusSaved"        xml:space="preserve"><value>Bus saved ✓</value></data>
+  <data name="JS_AlertResolved"   xml:space="preserve"><value>Alert resolved ✓</value></data>
+  <data name="JS_AlertDismissed"  xml:space="preserve"><value>Alert dismissed</value></data>
+  <data name="JS_DeletedSuccess"  xml:space="preserve"><value>Deleted successfully</value></data>
+  <data name="JS_PasswordChanged" xml:space="preserve"><value>Password changed ✓</value></data>
+  <data name="JS_SaveFailed"      xml:space="preserve"><value>Save failed. Check the data.</value></data>
+  <data name="JS_Saving"          xml:space="preserve"><value>Saving...</value></data>
+
+  <!-- JS toast messages (superadmin dashboard) -->
+  <data name="JS_SchoolSaved"       xml:space="preserve"><value>School added ✓</value></data>
+  <data name="JS_SchoolUpdated"     xml:space="preserve"><value>School updated ✓</value></data>
+  <data name="JS_SchoolDeleted"     xml:space="preserve"><value>School deleted</value></data>
+  <data name="JS_SchoolDeleteFailed" xml:space="preserve"><value>Delete failed. Try again.</value></data>
+  <data name="JS_StatusActivated"   xml:space="preserve"><value>School activated</value></data>
+  <data name="JS_StatusDeactivated" xml:space="preserve"><value>School deactivated</value></data>
+  <data name="JS_StatusFailed"      xml:space="preserve"><value>Status change failed</value></data>
+  <data name="JS_PlanChanged"       xml:space="preserve"><value>Plan changed to</value></data>
+  <data name="JS_PlanFailed"        xml:space="preserve"><value>Plan change failed</value></data>
+  <data name="JS_ExportNoData"      xml:space="preserve"><value>No data to export</value></data>
+  <data name="JS_ExportDone"        xml:space="preserve"><value>Exported</value></data>
+  <data name="JS_ExportCSV"         xml:space="preserve"><value>schools as CSV</value></data>
+  <data name="JS_SaveSchoolBtn"     xml:space="preserve"><value>Save School</value></data>
+
+  <!-- JS page names -->
+  <data name="JS_PageDashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="JS_PageTrips"     xml:space="preserve"><value>Trips</value></data>
+  <data name="JS_PageStudents"  xml:space="preserve"><value>Students</value></data>
+  <data name="JS_PageDrivers"   xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
+  <data name="JS_PageBuses"     xml:space="preserve"><value>Buses</value></data>
+  <data name="JS_PageReports"   xml:space="preserve"><value>Reports</value></data>
+  <data name="JS_PageAlerts"    xml:space="preserve"><value>Alerts</value></data>
+  <data name="JS_PageSettings"  xml:space="preserve"><value>Settings</value></data>
+  <data name="JS_PageOverview"  xml:space="preserve"><value>Overview</value></data>
+  <data name="JS_PageSchools"   xml:space="preserve"><value>Schools Management</value></data>
+  <data name="JS_PageAdmins"    xml:space="preserve"><value>Admins</value></data>
+  <data name="JS_PagePlans"     xml:space="preserve"><value>Subscription Plans</value></data>
+
+  <!-- Dashboard page -->
+  <data name="Dash_GreetMorning"       xml:space="preserve"><value>Good morning</value></data>
+  <data name="Dash_GreetAfternoon"     xml:space="preserve"><value>Good afternoon</value></data>
+  <data name="Dash_GreetEvening"       xml:space="preserve"><value>Good evening</value></data>
+  <data name="Dash_AdminUser"          xml:space="preserve"><value>Administrator</value></data>
+  <data name="Dash_FallbackTitle"      xml:space="preserve"><value>TilmezBus Control Panel</value></data>
+  <data name="Dash_Refresh"            xml:space="preserve"><value>Refresh</value></data>
+  <data name="Dash_SectionKPI"         xml:space="preserve"><value>KEY METRICS</value></data>
+  <data name="Dash_SectionPerf"        xml:space="preserve"><value>TRIP PERFORMANCE</value></data>
+  <data name="Dash_SectionAlerts"      xml:space="preserve"><value>LATEST ALERTS</value></data>
+  <data name="Dash_Stat_Students"      xml:space="preserve"><value>Total Students</value></data>
+  <data name="Dash_Stat_StudentsSub"   xml:space="preserve"><value>Registered in system</value></data>
+  <data name="Dash_Stat_Buses"         xml:space="preserve"><value>Total Buses</value></data>
+  <data name="Dash_Stat_BusesSub"      xml:space="preserve"><value>Buses in fleet</value></data>
+  <data name="Dash_Stat_Trips"         xml:space="preserve"><value>Registered Trips</value></data>
+  <data name="Dash_Stat_TripsSub"      xml:space="preserve"><value>Trips in system</value></data>
+  <data name="Dash_Stat_Drivers"       xml:space="preserve"><value>Total Drivers</value></data>
+  <data name="Dash_Stat_DriversSub"    xml:space="preserve"><value>Active fleet drivers</value></data>
+  <data name="Dash_Stat_Assistants"    xml:space="preserve"><value>Total Assistants</value></data>
+  <data name="Dash_Stat_AssistantsSub" xml:space="preserve"><value>Trip assistants on staff</value></data>
+  <data name="Dash_Stat_Alerts"        xml:space="preserve"><value>Pending Alerts</value></data>
+  <data name="Dash_Stat_AlertsSub"     xml:space="preserve"><value>Needs review</value></data>
+  <data name="Dash_SectionToday"       xml:space="preserve"><value>TODAY'S OPERATIONS</value></data>
+  <data name="Dash_Today_AllCard"      xml:space="preserve"><value>Today</value></data>
+  <data name="Dash_Today_MorningCard"  xml:space="preserve"><value>Morning</value></data>
+  <data name="Dash_Today_ReturnCard"   xml:space="preserve"><value>Return</value></data>
+  <data name="Dash_Today_AllSub"       xml:space="preserve"><value>All trips today</value></data>
+  <data name="Dash_Today_MorningSub"   xml:space="preserve"><value>Pickups from home</value></data>
+  <data name="Dash_Today_ReturnSub"    xml:space="preserve"><value>Drop-offs from school</value></data>
+  <data name="Dash_Today_Trips"        xml:space="preserve"><value>Trips</value></data>
+  <data name="Dash_Today_Students"     xml:space="preserve"><value>Students</value></data>
+  <data name="Dash_Today_Absent"       xml:space="preserve"><value>Absent</value></data>
+  <data name="Dash_SectionLive"        xml:space="preserve"><value>LIVE NOW</value></data>
+  <data name="Dash_Live_LiveLabel"     xml:space="preserve"><value>Live</value></data>
+  <data name="Dash_Live_Trips"         xml:space="preserve"><value>Trips running</value></data>
+  <data name="Dash_Live_Students"      xml:space="preserve"><value>Students onboard</value></data>
+  <data name="Dash_Live_MorningTrips"  xml:space="preserve"><value>Morning trips</value></data>
+  <data name="Dash_Live_ReturnTrips"   xml:space="preserve"><value>Return trips</value></data>
+  <data name="Dash_Live_MorningOnboard" xml:space="preserve"><value>Morning onboard</value></data>
+  <data name="Dash_Live_ReturnOnboard"  xml:space="preserve"><value>Return onboard</value></data>
+  <data name="Dash_Live_TripsCard"     xml:space="preserve"><value>In-progress trips</value></data>
+  <data name="Dash_Live_TripsSub"      xml:space="preserve"><value>Live countdown updates every second</value></data>
+  <data name="Dash_Live_None"          xml:space="preserve"><value>No trips currently in progress</value></data>
+  <data name="Dash_Live_Departed"      xml:space="preserve"><value>Departed</value></data>
+  <data name="Dash_Live_EndsIn"        xml:space="preserve"><value>Ends in</value></data>
+  <data name="Dash_Live_Overdue"       xml:space="preserve"><value>Overdue</value></data>
+  <data name="Dash_Live_Onboard"       xml:space="preserve"><value>onboard</value></data>
+  <data name="TripType_Morning"        xml:space="preserve"><value>Morning</value></data>
+  <data name="TripType_Return"         xml:space="preserve"><value>Return</value></data>
+  <data name="Dash_Card_Weekly"        xml:space="preserve"><value>Last 7 days trips</value></data>
+  <data name="Dash_Card_TodayStatus"   xml:space="preserve"><value>Today's trip status</value></data>
+  <data name="Dash_Card_TodayTrips"    xml:space="preserve"><value>Today's Trips</value></data>
+  <data name="Dash_Card_TypeDonut"     xml:space="preserve"><value>Morning vs Return</value></data>
+  <data name="Dash_Card_RecentAlerts"  xml:space="preserve"><value>Recent Alerts</value></data>
+  <data name="Dash_Card_RecentAlertsSub" xml:space="preserve"><value>Latest {0} alerts needing review</value></data>
+  <data name="Dash_ViewAll"            xml:space="preserve"><value>View all</value></data>
+  <data name="Dash_Loading"            xml:space="preserve"><value>Loading...</value></data>
+  <data name="Dash_LoadingTrips"       xml:space="preserve"><value>Loading trips...</value></data>
+  <data name="Dash_LoadingAlerts"      xml:space="preserve"><value>Loading alerts...</value></data>
+  <data name="Dash_TripsCount"         xml:space="preserve"><value>trip(s)</value></data>
+  <data name="Dash_TripsToday"         xml:space="preserve"><value>trip(s) today</value></data>
+  <data name="Dash_TripsWeek"          xml:space="preserve"><value>trips over 7 days</value></data>
+  <data name="Dash_ChartLabelTrips"    xml:space="preserve"><value>Trips</value></data>
+  <data name="Dash_Total"              xml:space="preserve"><value>Total</value></data>
+</root>

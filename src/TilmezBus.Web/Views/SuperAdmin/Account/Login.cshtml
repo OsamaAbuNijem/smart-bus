@@ -1,0 +1,181 @@
+@model TilmezBus.Web.Models.SuperAdminLoginViewModel
+@{
+    ViewData["Title"] = L["SA_Login_PageTitle"];
+    Layout = null;
+    var _isRtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var _dir   = _isRtl ? "rtl" : "ltr";
+    var _culture       = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var _toggleCulture = _isRtl ? "en" : "ar";
+    var _returnUrl     = Context.Request.Path + Context.Request.QueryString;
+}
+<!DOCTYPE html>
+<html lang="@_culture" dir="@_dir">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TilmezBus — Super Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --y:#FFD700;--yd:#B8960C;
+  --pu:#8B5CF6;--pud:#6D28D9;--pul:#F5F3FF;
+  --bg:#0A0B14;--card:#12131F;--card2:#1A1B2E;
+  --border:#1E2033;--text:#F1F5F9;--text2:#94A3B8;--text3:#475569;
+  --input:#0E0F1A;--input-border:#252840;
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+
+/* bg */
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(139,92,246,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.04) 1px,transparent 1px);background-size:40px 40px;z-index:0;}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;}
+.bg-orb.o1{width:600px;height:600px;background:rgba(139,92,246,.12);top:-200px;right:-200px;}
+.bg-orb.o2{width:400px;height:400px;background:rgba(255,215,0,.06);bottom:-100px;left:-100px;}
+.bg-orb.o3{width:300px;height:300px;background:rgba(236,72,153,.07);top:50%;left:30%;transform:translate(-50%,-50%);}
+
+/* particles */
+.particle{position:fixed;width:3px;height:3px;border-radius:50%;background:rgba(255,215,0,.3);pointer-events:none;z-index:0;animation:float linear infinite;}
+.particle.p1{left:10%;animation-duration:8s;animation-delay:0s;}
+.particle.p2{left:25%;animation-duration:10s;animation-delay:2s;width:4px;height:4px;}
+.particle.p3{left:50%;animation-duration:7s;animation-delay:4s;}
+.particle.p4{left:75%;animation-duration:12s;animation-delay:1s;width:2px;height:2px;}
+.particle.p5{left:88%;animation-duration:9s;animation-delay:3s;}
+@@keyframes float{0%{transform:translateY(100vh) rotate(0deg);opacity:0;}10%{opacity:1;}90%{opacity:.5;}100%{transform:translateY(-100px) rotate(720deg);opacity:0;}}
+
+.login-wrap{position:relative;z-index:1;width:100%;max-width:460px;padding:24px 16px;}
+
+/* logo */
+.login-logo{text-align:center;margin-bottom:32px;}
+.logo-shield{width:80px;height:80px;margin:0 auto 14px;position:relative;}
+.logo-shield-bg{width:80px;height:80px;background:linear-gradient(135deg,var(--pu) 0%,#EC4899 100%);border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(139,92,246,.5);}
+.logo-shield-bg svg{width:40px;height:40px;}
+.logo-shield::after{content:'';position:absolute;inset:-4px;border-radius:26px;border:1px solid rgba(139,92,246,.3);animation:pulse-ring 2s ease-in-out infinite;}
+@@keyframes pulse-ring{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.03);}}
+.login-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
+.login-sub{font-size:13px;color:var(--text2);margin-top:4px;}
+.sa-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#A78BFA;margin-top:10px;}
+
+/* card */
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:34px;box-shadow:0 32px 80px rgba(0,0,0,.6);}
+.card-top-bar{height:3px;background:linear-gradient(135deg,var(--pu) 0%,#EC4899 50%,var(--y) 100%);border-radius:3px 3px 0 0;margin:-34px -34px 28px;}
+
+/* fields */
+.field{margin-bottom:20px;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;}
+.field-wrap{position:relative;}
+.field-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text3);}
+.field input{width:100%;background:var(--input);border:1.5px solid var(--input-border);border-radius:12px;padding:13px 44px 13px 14px;font-size:14px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;}
+.field input::placeholder{color:var(--text3);}
+.field input:focus{border-color:var(--pu);box-shadow:0 0 0 3px rgba(139,92,246,.18);}
+.field-err{font-size:12px;color:#EF4444;margin-top:6px;}
+
+/* error */
+.err-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#FCA5A5;}
+
+/* btn */
+.btn-login{width:100%;background:linear-gradient(135deg,var(--pu) 0%,#EC4899 100%);border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:800;font-family:'Cairo',sans-serif;color:#fff;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(139,92,246,.5);}
+.btn-login:active{transform:translateY(0);}
+
+/* back link */
+.back-link{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;font-size:13px;color:var(--text3);text-decoration:none;transition:color .2s;}
+.back-link:hover{color:var(--y);}
+
+/* footer */
+.login-footer{text-align:center;margin-top:24px;font-size:12px;color:var(--text3);}
+.login-footer strong{color:var(--pu);}
+
+.field-validation-error{font-size:12px;color:#EF4444;margin-top:5px;display:block;}
+/* Language button */
+.lang-btn{position:fixed;top:16px;left:16px;height:32px;min-width:36px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:rgba(255,255,255,.7);cursor:pointer;padding:0 10px;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;z-index:100;}
+.lang-btn:hover{background:var(--pu);border-color:var(--pu);color:#fff;}
+[dir="ltr"] .lang-btn{left:auto;right:16px;}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-orb o1"></div>
+<div class="bg-orb o2"></div>
+<div class="bg-orb o3"></div>
+<a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)">@L["SwitchLang"]</a>
+<div class="particle p1"></div>
+<div class="particle p2"></div>
+<div class="particle p3"></div>
+<div class="particle p4"></div>
+<div class="particle p5"></div>
+
+<div class="login-wrap">
+  <div class="login-logo">
+    <div class="logo-shield">
+      <div class="logo-shield-bg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <polyline points="9 12 11 14 15 10"/>
+        </svg>
+      </div>
+    </div>
+    <div class="login-title">TilmezBus Platform</div>
+    <div class="login-sub">@L["Login_SASub"]</div>
+    <div><span class="sa-pill">⚡ Super Admin Access</span></div>
+  </div>
+
+  <div class="login-card">
+    <div class="card-top-bar"></div>
+
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey(string.Empty))
+    {
+      <div class="err-box">
+        @foreach (var err in ViewData.ModelState[string.Empty]!.Errors)
+        {
+          <div>@err.ErrorMessage</div>
+        }
+      </div>
+    }
+
+    <form asp-controller="SuperAdminAccount" asp-action="Login" method="post" autocomplete="off">
+      @Html.AntiForgeryToken()
+
+      <div class="field">
+        <label>@L["Login_Email"]</label>
+        <div class="field-wrap">
+          <span class="field-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+          <input asp-for="Email" type="email" placeholder="superadmin@smartbus.com" autocomplete="username"/>
+        </div>
+        <span asp-validation-for="Email" class="field-validation-error"></span>
+      </div>
+
+      <div class="field">
+        <label>@L["Login_Password"]</label>
+        <div class="field-wrap">
+          <span class="field-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input asp-for="Password" type="password" placeholder="••••••••" autocomplete="current-password"/>
+        </div>
+        <span asp-validation-for="Password" class="field-validation-error"></span>
+      </div>
+
+      <button type="submit" class="btn-login">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        @L["Login_SASubmit"]
+      </button>
+    </form>
+
+    <a href="/Account/Login" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      @L["Login_SABack"]
+    </a>
+  </div>
+
+  <div class="login-footer">
+    @L["SA_Login_Footer"] — <strong>TilmezBus</strong> © @DateTime.Now.Year
+  </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>
