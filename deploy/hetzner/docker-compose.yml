@@ -57,8 +57,11 @@ services:
       Jwt__Key:     ${JWT_KEY}
       Jwt__Issuer:  "TilmezBus.API"
       Jwt__Audience: "TilmezBus.Clients"
-      AllowedOrigins__0: "https://admin.${DOMAIN}"
-      AllowedOrigins__1: "https://api.${DOMAIN}"
+      # Single-domain layout: the admin UI, public site, and API all sit on
+      # https://${DOMAIN}. Mobile clients are same-origin too. CORS still
+      # has to include the apex because the admin's /api-proxy hits the API.
+      AllowedOrigins__0: "https://${DOMAIN}"
+      AllowedOrigins__1: "https://www.${DOMAIN}"
       Seq__ServerUrl: "http://seq:5341"
       Firebase__CredentialsJson: ${FIREBASE_CREDENTIALS_JSON}
     healthcheck:

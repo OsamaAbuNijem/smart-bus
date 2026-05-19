@@ -1,29 +1,37 @@
 # Deploying TilmezBus to a Hetzner Cloud VPS
 
-Target: **CPX31** (4 vCPU, 8 GB RAM), **Ubuntu 24.04 LTS**, with `api.tilmezbus.com`
-and `admin.tilmezbus.com` resolving to the box.
+Single-domain layout: **`tilmezbus.com`** serves the public landing page,
+the admin UI, and the API on one host. Path-based routing in nginx splits
+traffic between the Web and API containers.
 
-This stack runs entirely via Docker Compose: API + Web + Postgres + Redis +
-Seq + nginx. TLS certificates are issued on the host with certbot and bind-mounted
-into the nginx container.
+| Path                | Container | Purpose                                       |
+|---------------------|-----------|-----------------------------------------------|
+| `/`                 | Web       | Public landing + admin login + SuperAdmin UI  |
+| `/SuperAdmin/...`   | Web       | SuperAdmin pages                              |
+| `/api/translations` | Web       | Admin i18n JSON used by `wwwroot/js`          |
+| `/api-proxy/...`    | Web       | Admin's server-side API relay                 |
+| `/api/v1/...`       | API       | The REST API consumed by mobile + admin       |
+| `/hubs/...`         | API       | SignalR (WebSocket)                           |
+| `/hangfire`         | API       | Job dashboard (IP-allowlisted)                |
+| `/health`           | API       | Uptime probe                                  |
 
-OSRM (street routing) is **not** included here — the mobile app keeps using the
-public demo for now. Add it later via `deploy/osrm/setup-osrm.sh` on a separate
-small VPS, then point the app via `--dart-define=OSRM_BASE_URL=…`.
+Target: Hetzner Cloud **CPX31** (4 vCPU, 8 GB RAM), **Ubuntu 24.04 LTS**.
+
+OSRM is **not** included — the mobile app keeps using the public demo. Add
+it later on a separate small VPS via `deploy/osrm/setup-osrm.sh` and point
+the app via `--dart-define=OSRM_BASE_URL=…`.
 
 ---
 
 ## 0. Prerequisites (one-time, on the server)
 
 ```bash
-# SSH in as root
-ssh root@<vps-ip>
+ssh root@91.98.42.151
 
-# Update + install Docker, Compose, certbot, nginx tools
 apt update && apt -y upgrade
 apt -y install ca-certificates curl gnupg ufw certbot jq git
 
-# Docker official install (https://docs.docker.com/engine/install/ubuntu/)
+# Docker install
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 chmod a+r /etc/apt/keyrings/docker.gpg
@@ -42,15 +50,24 @@ ufw --force enable
 
 ## 1. DNS
 
-In your registrar's DNS panel, create two **A records** pointing at the VPS IP:
+In your registrar for `tilmezbus.com`, create two A records pointing at
+**91.98.42.151**:
 
-| Host                  | Type | Value          |
-|-----------------------|------|----------------|
-| `api.tilmezbus.com`   | A    | <your-vps-ip>  |
-| `admin.tilmezbus.com` | A    | <your-vps-ip>  |
+| Host  | Type | Value           | TTL |
+|-------|------|-----------------|-----|
+| `@`   | A    | `91.98.42.151`  | 300 |
+| `www` | A    | `91.98.42.151`  | 300 |
 
-TTL 300 is fine. Wait until `dig +short api.tilmezbus.com` returns the right
-IP before continuing — certbot will fail if DNS hasn't propagated.
+(`@` means the apex, i.e. `tilmezbus.com` itself.)
+
+Verify from your laptop before continuing — certbot fails if DNS hasn't
+propagated:
+
+```bash
+dig +short tilmezbus.com
+dig +short www.tilmezbus.com
+# Both should print 91.98.42.151
+```
 
 ## 2. Clone the repo and configure secrets
 
@@ -59,57 +76,55 @@ cd /opt
 git clone https://github.com/OsamaAbuNijem/smart-bus.git tilmezbus
 cd tilmezbus/deploy/hetzner
 
-# Copy and edit secrets
 cp .env.example .env
 nano .env
 ```
 
 In `.env`:
 
-- `DOMAIN=tilmezbus.com` (no `https://`, no slashes)
-- `POSTGRES_PASSWORD` → strong password
-- `JWT_KEY` → run `openssl rand -base64 64` and paste the output
-- `FIREBASE_CREDENTIALS_JSON` → upload the service-account JSON to the box first,
-  then paste its single-line form:
+- `DOMAIN=tilmezbus.com` (no `https://`, no trailing slash)
+- `POSTGRES_PASSWORD` → strong password (e.g. `openssl rand -base64 24`)
+- `JWT_KEY` → run `openssl rand -base64 64` and paste the entire output
+- `FIREBASE_CREDENTIALS_JSON` → the service-account JSON as a single line:
 
   ```bash
-  # On your laptop, encode the file as a single line:
+  # On your laptop:
   jq -c . firbase/smart-bus-firebase-firebase-adminsdk-fbsvc-XXX.json
-  # Copy the entire output, paste it as the value of FIREBASE_CREDENTIALS_JSON.
   ```
 
-Verify the file is not world-readable: `chmod 600 .env`.
-
-## 3. Issue TLS certificates (one-time)
-
-Certbot needs port 80 free. Use the **standalone** plugin for the first
-issue, then renewal happens via the webroot mounted into nginx.
+  Paste the resulting one-liner as the value (no surrounding quotes).
 
 ```bash
-# Get certs for both subdomains
-certbot certonly --standalone \
-  -d api.tilmezbus.com \
-  -d admin.tilmezbus.com \
-  --email you@example.com --agree-tos --no-eff-email
-
-# Auto-renewal: certbot installs a systemd timer that runs twice a day.
-# Renewals will use webroot (no downtime) because we'll bind-mount
-# /var/www/certbot into nginx in the next step.
-mkdir -p /var/www/certbot
+chmod 600 .env
 ```
 
-> If `certbot` says "another instance running" or "port 80 in use", make sure
-> no nginx/apache is already running: `systemctl stop nginx apache2 2>/dev/null`.
+## 3. Issue the TLS certificate
+
+Both subdomains share one cert. Port 80 must be free at this moment:
+
+```bash
+systemctl stop nginx apache2 2>/dev/null
+mkdir -p /var/www/certbot
+
+certbot certonly --standalone \
+  -d tilmezbus.com \
+  -d www.tilmezbus.com \
+  --email you@example.com --agree-tos --no-eff-email
+```
+
+Cert lands in `/etc/letsencrypt/live/tilmezbus.com/`. Renewal happens
+automatically every ~60 days via the certbot systemd timer (no downtime
+because we use the webroot path that's mounted into the nginx container).
 
 ## 4. Set your Hangfire IP allowlist
 
 ```bash
-# Find the WAN IP you'll administer from (your home/office):
-curl ifconfig.me   # run on YOUR LAPTOP, not the server
+# Find the WAN IP you'll administer from (run on YOUR LAPTOP):
+curl ifconfig.me
 
-# Then on the server, edit nginx/tilmezbus.conf and replace 1.2.3.4
-# with that IP. Save the file.
+# Then on the server, replace 1.2.3.4 in the nginx config:
 nano /opt/tilmezbus/deploy/hetzner/nginx/tilmezbus.conf
+# Edit the `allow 1.2.3.4;` line, save.
 ```
 
 ## 5. Bring it up
@@ -119,51 +134,43 @@ cd /opt/tilmezbus
 docker compose -f deploy/hetzner/docker-compose.yml --env-file deploy/hetzner/.env up -d --build
 ```
 
-First build takes ~3 minutes (pulling SDK image + restoring NuGet packages).
-The API container does `db.Database.MigrateAsync()` on startup, so the
-Postgres schema is created automatically on first run.
+First build takes ~3 minutes. The API container runs
+`db.Database.MigrateAsync()` on boot, so the empty Postgres gets the schema
+on the first start. Re-running is idempotent.
 
-Check the state:
+Check state:
 
 ```bash
 docker compose -f deploy/hetzner/docker-compose.yml ps
 docker compose -f deploy/hetzner/docker-compose.yml logs -f api
 ```
 
-Healthy looks like:
-
-```
-NAME          STATUS                     PORTS
-tilmezbus-api-1     Up (healthy)
-tilmezbus-postgres-1 Up (healthy)
-tilmezbus-redis-1    Up (healthy)
-tilmezbus-nginx-1    Up                  0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp
-tilmezbus-seq-1      Up
-tilmezbus-web-1      Up
-```
-
 ## 6. Verify
 
 ```bash
-curl -fsS https://api.tilmezbus.com/health
+curl -fsS https://tilmezbus.com/health
 # Expect:  Healthy
 
-curl -fsS -o /dev/null -w "%{http_code}\n" https://admin.tilmezbus.com/
-# Expect:  200 (admin login page)
+curl -fsS -o /dev/null -w "%{http_code}\n" https://tilmezbus.com/
+# Expect:  200 (public landing page)
+
+curl -fsS -o /dev/null -w "%{http_code}\n" https://tilmezbus.com/api/v1/auth/otp/request \
+  -X POST -H "Content-Type: application/json" -d '{"phoneNumber":"+962793333333"}'
+# Expect:  200 (OTP request)
+
+curl -I https://www.tilmezbus.com/
+# Expect:  HTTP/2 301, location: https://tilmezbus.com/
 ```
 
 If you get `502 Bad Gateway`, the API container probably failed health checks.
-`docker compose logs api` will show why (usually wrong DB password or missing
-Firebase JSON).
+`docker compose logs api` will show why.
 
 ## 7. Point the mobile app
 
-In your Flutter run command (or build args for a release APK/IPA):
-
 ```bash
-flutter run --dart-define=API_BASE_URL=https://api.tilmezbus.com
-# Or, for a release build:
-flutter build apk --release --dart-define=API_BASE_URL=https://api.tilmezbus.com
+flutter build apk --release --dart-define=API_BASE_URL=https://tilmezbus.com
+# Or for live testing:
+flutter run --dart-define=API_BASE_URL=https://tilmezbus.com
 ```
 
 ## 8. Day-2 operations
@@ -176,7 +183,7 @@ git pull
 docker compose -f deploy/hetzner/docker-compose.yml --env-file deploy/hetzner/.env up -d --build
 ```
 
-EF migrations run automatically on every API boot (idempotent).
+EF migrations run automatically on every API boot.
 
 ### Logs
 
@@ -184,44 +191,46 @@ EF migrations run automatically on every API boot (idempotent).
 # Tail one service
 docker compose -f deploy/hetzner/docker-compose.yml logs -f api
 
-# Structured logs (Seq) — not exposed publicly; SSH tunnel to view:
-ssh -L 5341:localhost:5341 root@<vps-ip>
+# Seq UI (not exposed publicly): SSH tunnel
+ssh -L 5341:localhost:5341 root@91.98.42.151
 # Then open http://localhost:5341 on your laptop
 ```
 
 ### Database
 
 ```bash
-# Connect with psql
+# Connect with psql inside the container
 docker compose -f deploy/hetzner/docker-compose.yml exec postgres \
   psql -U tilmezbus -d tilmezbus
 
-# Backup (run daily via cron)
-docker compose -f deploy/hetzner/docker-compose.yml exec -T postgres \
+# Daily backup (add to root's crontab)
+mkdir -p /opt/tilmezbus-backups
+docker compose -f /opt/tilmezbus/deploy/hetzner/docker-compose.yml exec -T postgres \
   pg_dump -U tilmezbus tilmezbus | gzip > /opt/tilmezbus-backups/db-$(date +%F).sql.gz
 ```
 
-### TLS renewal
+### Cert renewal nginx reload
 
-Certbot's systemd timer renews automatically. After a renewal, nginx needs
-a reload to pick up the new cert:
+Certbot's systemd timer renews automatically but nginx needs a reload
+to load the new cert. Add to root's crontab (`crontab -e`):
 
-```bash
-# Add to root's crontab (`crontab -e`):
+```cron
 0 3 * * * docker compose -f /opt/tilmezbus/deploy/hetzner/docker-compose.yml exec nginx nginx -s reload >/dev/null 2>&1
 ```
 
 ## Common gotchas
 
-- **502 Bad Gateway on api.tilmezbus.com** → API container down or unhealthy.
-  Check `docker compose logs api` for "Unable to connect to Postgres" (wrong
-  password) or "Could not load Firebase credentials".
-- **WebSocket disconnects on the mobile app** → SignalR can't upgrade.
-  Verify the `/hubs/` block in nginx exists (it does in `tilmezbus.conf`)
-  and that Hetzner Cloud Firewall (if you enabled one in the UI) allows
-  inbound 443.
-- **OTP comes back as the *demo* code 1234** → only the mobile app's
-  `DEMO_MODE=true` override does that. In Production, the real 4-digit code
-  is logged to Seq under "OTP] Phone:".
-- **Hangfire dashboard 403** → your office IP rotates (DHCP). Update the
-  `allow` line in `nginx/tilmezbus.conf` and `docker compose exec nginx nginx -s reload`.
+- **502 Bad Gateway** → an upstream container is down or unhealthy.
+  `docker compose logs api` / `docker compose logs web` will show why
+  (wrong DB password, missing Firebase JSON, port collision).
+- **Admin's /api-proxy 500s but mobile /api/v1 works** → nginx may have
+  matched `/api/` too broadly. The config here uses `location /api/v1/`
+  exactly so `/api/translations` and `/api-proxy/` stay on the Web container.
+  Don't change that prefix.
+- **WebSockets disconnect** → check the `/hubs/` block stays first; check
+  the Hetzner Cloud Firewall (in the Hetzner Console UI) allows inbound 443.
+- **OTP shows `1234` works** → only when the mobile app builds with
+  `DEMO_MODE=true`. In production, the real 4-digit code is logged to Seq
+  under `[OTP] Phone: +962… — Code: ####`.
+- **Hangfire 403** → your office IP changed. Edit `nginx/tilmezbus.conf`
+  and run `docker compose exec nginx nginx -s reload`.
