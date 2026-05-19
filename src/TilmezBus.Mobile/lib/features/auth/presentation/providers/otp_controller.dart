@@ -3,11 +3,11 @@ import 'dart:math' as math;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/config/env.dart';
-import 'package:smart_bus/core/storage/secure_storage.dart';
-import 'package:smart_bus/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:smart_bus/features/auth/domain/entities/user.dart';
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/core/config/env.dart';
+import 'package:tilmez_bus/core/storage/secure_storage.dart';
+import 'package:tilmez_bus/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:tilmez_bus/features/auth/domain/entities/user.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
 
 part 'otp_controller.freezed.dart';
 part 'otp_controller.g.dart';

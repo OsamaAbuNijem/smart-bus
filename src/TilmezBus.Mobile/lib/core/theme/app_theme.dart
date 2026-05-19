@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Mirrors the SmartBus mobile template
+/// Mirrors the TilmezBus mobile template
 /// (Template/login-en (3).html) and the web admin palette.
 class AppColors {
   AppColors._();

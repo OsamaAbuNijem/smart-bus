@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:smart_bus/features/auth/domain/entities/user.dart';
+import 'package:tilmez_bus/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:tilmez_bus/features/auth/domain/entities/user.dart';
 
 part 'auth_controller.g.dart';
 

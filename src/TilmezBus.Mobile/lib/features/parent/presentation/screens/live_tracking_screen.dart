@@ -6,11 +6,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/parent/domain/entities/live_tracking.dart';
-import 'package:smart_bus/features/parent/presentation/providers/live_tracking_controller.dart';
-import 'package:smart_bus/features/parent/presentation/providers/route_provider.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/live_tracking.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/live_tracking_controller.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/route_provider.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LiveTrackingScreen extends ConsumerWidget {
@@ -405,7 +405,7 @@ class _Map extends ConsumerWidget {
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.smartbus.smart_bus',
+          userAgentPackageName: 'com.smartbus.tilmez_bus',
           maxNativeZoom: 19,
         ),
         if (linePoints.length >= 2)

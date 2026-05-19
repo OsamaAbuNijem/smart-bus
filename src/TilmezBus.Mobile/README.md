@@ -1,6 +1,6 @@
-# smart_bus
+# tilmez_bus
 
-SmartBus mobile companion app
+TilmezBus mobile companion app
 
 ## Getting Started
 

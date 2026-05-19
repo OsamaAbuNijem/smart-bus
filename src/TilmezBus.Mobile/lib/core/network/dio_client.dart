@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/config/env.dart';
-import 'package:smart_bus/core/network/auth_interceptor.dart';
-import 'package:smart_bus/core/storage/secure_storage.dart';
+import 'package:tilmez_bus/core/config/env.dart';
+import 'package:tilmez_bus/core/network/auth_interceptor.dart';
+import 'package:tilmez_bus/core/storage/secure_storage.dart';
 
 part 'dio_client.g.dart';
 

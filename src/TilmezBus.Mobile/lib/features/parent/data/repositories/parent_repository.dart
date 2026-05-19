@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/features/parent/data/datasources/parent_remote_datasource.dart';
-import 'package:smart_bus/features/parent/domain/entities/absence_request_item.dart';
-import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
-import 'package:smart_bus/features/parent/domain/entities/live_tracking.dart';
-import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
-import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
+import 'package:tilmez_bus/features/parent/data/datasources/parent_remote_datasource.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/absence_request_item.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/child_trip.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/live_tracking.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/parent_child.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/student_info.dart';
 
 part 'parent_repository.g.dart';
 

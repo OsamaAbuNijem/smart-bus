@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:smart_bus/app.dart';
+import 'package:tilmez_bus/app.dart';
 
 void main() {
   testWidgets('App boots without throwing', (tester) async {
     await tester.pumpWidget(
-      const ProviderScope(child: SmartBusApp()),
+      const ProviderScope(child: TilmezBusApp()),
     );
     await tester.pump();
-    expect(find.byType(SmartBusApp), findsOneWidget);
+    expect(find.byType(TilmezBusApp), findsOneWidget);
   });
 }

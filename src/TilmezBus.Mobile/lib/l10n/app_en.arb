@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "SmartBus",
+  "appTitle": "TilmezBus",
 
   "loginAppName": "School Bus Tracker",
   "loginAppSubtitle": "Keep your child safe on every ride",
@@ -36,7 +36,7 @@
     "placeholders": { "time": { "type": "String" } }
   },
   "otpInvalid": "Invalid or expired code",
-  "otpFooter": "Never share this code — SmartBus will never ask for it",
+  "otpFooter": "Never share this code — TilmezBus will never ask for it",
   "otpBack": "Back",
 
   "scanTitle": "Register",

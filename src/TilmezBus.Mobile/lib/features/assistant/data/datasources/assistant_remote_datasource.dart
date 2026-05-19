@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:smart_bus/core/network/api_exception.dart';
-import 'package:smart_bus/core/network/dio_client.dart';
-import 'package:smart_bus/features/assistant/data/models/bus_summary_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/driver_summary_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/my_today_trip_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/roster_student_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/start_trip_response_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/trip_details_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/trip_student_dto.dart';
+import 'package:tilmez_bus/core/network/api_exception.dart';
+import 'package:tilmez_bus/core/network/dio_client.dart';
+import 'package:tilmez_bus/features/assistant/data/models/bus_summary_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/driver_summary_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/my_today_trip_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/roster_student_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/start_trip_response_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/trip_details_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/trip_student_dto.dart';
 
 class AssistantRemoteDataSource {
   AssistantRemoteDataSource(this._dio);

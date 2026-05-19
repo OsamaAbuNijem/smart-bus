@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/notifications/push_notification_service.dart';
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/features/notifications/data/repositories/notifications_repository.dart';
-import 'package:smart_bus/features/notifications/domain/entities/notification_item.dart';
+import 'package:tilmez_bus/core/notifications/push_notification_service.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/features/notifications/data/repositories/notifications_repository.dart';
+import 'package:tilmez_bus/features/notifications/domain/entities/notification_item.dart';
 
 part 'notifications_controller.g.dart';
 

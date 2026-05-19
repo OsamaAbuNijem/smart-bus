@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:smart_bus/core/routing/app_router.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/core/routing/app_router.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
 
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/features/notifications/presentation/providers/notifications_controller.dart';
-import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
-import 'package:smart_bus/features/parent/domain/entities/live_tracking.dart';
-import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
-import 'package:smart_bus/features/parent/presentation/providers/live_tracking_controller.dart';
-import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/features/notifications/presentation/providers/notifications_controller.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/child_trip.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/live_tracking.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/parent_child.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/live_tracking_controller.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/parent_controllers.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 class ParentHomeScreen extends ConsumerWidget {
   const ParentHomeScreen({super.key});
@@ -511,7 +511,7 @@ class _TripHero extends ConsumerWidget {
             children: [
               // Whichever side of the route is the school we render as a
               // generic "School" instead of the verbose admin name (e.g.
-              // "SmartBus Demo School") so it never gets truncated.
+              // "TilmezBus Demo School") so it never gets truncated.
               _Stop(
                 label: l.parentTripPickup,
                 name: trip.tripType == 'Return'

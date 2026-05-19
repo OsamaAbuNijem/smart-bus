@@ -2,9 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:smart_bus/app.dart';
-import 'package:smart_bus/core/notifications/device_token_registrar.dart';
-import 'package:smart_bus/core/notifications/push_notification_service.dart';
+import 'package:tilmez_bus/app.dart';
+import 'package:tilmez_bus/core/notifications/device_token_registrar.dart';
+import 'package:tilmez_bus/core/notifications/push_notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +24,7 @@ Future<void> main() async {
   runApp(
     UncontrolledProviderScope(
       container: container,
-      child: const SmartBusApp(),
+      child: const TilmezBusApp(),
     ),
   );
 }

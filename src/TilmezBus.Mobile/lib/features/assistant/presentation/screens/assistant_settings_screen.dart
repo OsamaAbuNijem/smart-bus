@@ -3,14 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:smart_bus/core/errors/failures.dart';
-import 'package:smart_bus/core/locale/locale_controller.dart';
-import 'package:smart_bus/core/storage/secure_storage.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
-import 'package:smart_bus/features/auth/domain/entities/user.dart';
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/errors/failures.dart';
+import 'package:tilmez_bus/core/locale/locale_controller.dart';
+import 'package:tilmez_bus/core/storage/secure_storage.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:tilmez_bus/features/auth/domain/entities/user.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 class AssistantSettingsScreen extends ConsumerStatefulWidget {
   const AssistantSettingsScreen({super.key});

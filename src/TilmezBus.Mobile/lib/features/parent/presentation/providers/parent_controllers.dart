@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/features/parent/data/repositories/parent_repository.dart';
-import 'package:smart_bus/features/parent/domain/entities/absence_request_item.dart';
-import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
-import 'package:smart_bus/features/parent/domain/entities/parent_child.dart';
-import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/features/parent/data/repositories/parent_repository.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/absence_request_item.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/child_trip.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/parent_child.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/student_info.dart';
 
 part 'parent_controllers.g.dart';
 

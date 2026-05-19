@@ -28,7 +28,7 @@ class PushNotificationService {
 
   static const _channel = AndroidNotificationChannel(
     'smartbus_default',
-    'SmartBus Notifications',
+    'TilmezBus Notifications',
     description: 'Trip updates, bus arrival, and absence replies.',
     importance: Importance.high,
   );

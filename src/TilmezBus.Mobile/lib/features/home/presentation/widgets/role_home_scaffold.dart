@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 /// Shared scaffold for the per-role home screens. Lets each role render its
 /// own body via [child] while sharing the app bar + sign-out action.

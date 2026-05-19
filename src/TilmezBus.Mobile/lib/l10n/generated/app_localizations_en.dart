@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'SmartBus';
+  String get appTitle => 'TilmezBus';
 
   @override
   String get loginAppName => 'School Bus Tracker';
@@ -107,7 +107,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get otpFooter =>
-      'Never share this code — SmartBus will never ask for it';
+      'Never share this code — TilmezBus will never ask for it';
 
   @override
   String get otpBack => 'Back';

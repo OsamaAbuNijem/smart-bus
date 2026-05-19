@@ -5,14 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:smart_bus/core/errors/failures.dart';
-import 'package:smart_bus/core/routing/app_router.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
-import 'package:smart_bus/features/assistant/data/models/trip_details_dto.dart';
-import 'package:smart_bus/features/assistant/presentation/providers/assistant_controllers.dart';
-import 'package:smart_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/errors/failures.dart';
+import 'package:tilmez_bus/core/routing/app_router.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:tilmez_bus/features/assistant/data/models/trip_details_dto.dart';
+import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
+import 'package:tilmez_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 class AssistantTripDetailsScreen extends ConsumerWidget {
   const AssistantTripDetailsScreen({super.key, required this.tripId});

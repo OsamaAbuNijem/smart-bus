@@ -1,5 +1,5 @@
-name: smart_bus
-description: "SmartBus mobile companion app"
+name: tilmez_bus
+description: "TilmezBus mobile companion app"
 publish_to: 'none'
 version: 1.0.0+1
 

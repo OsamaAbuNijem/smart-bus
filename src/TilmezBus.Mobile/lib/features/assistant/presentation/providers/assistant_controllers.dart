@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:smart_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
-import 'package:smart_bus/features/assistant/data/models/bus_summary_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/driver_summary_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/my_today_trip_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/roster_student_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/start_trip_response_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/trip_student_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:tilmez_bus/features/assistant/data/models/bus_summary_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/driver_summary_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/my_today_trip_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/roster_student_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/start_trip_response_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/trip_student_dto.dart';
 
 /// Today's trips for the current driver/assistant.
 final myTodayTripsProvider = FutureProvider.autoDispose<List<MyTodayTripDto>>(

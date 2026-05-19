@@ -2,12 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/network/api_exception.dart';
-import 'package:smart_bus/core/network/dio_client.dart';
-import 'package:smart_bus/features/auth/data/models/otp_login_response.dart';
-import 'package:smart_bus/features/auth/data/models/otp_request_request.dart';
-import 'package:smart_bus/features/auth/data/models/otp_request_response.dart';
-import 'package:smart_bus/features/auth/data/models/otp_verify_request.dart';
+import 'package:tilmez_bus/core/network/api_exception.dart';
+import 'package:tilmez_bus/core/network/dio_client.dart';
+import 'package:tilmez_bus/features/auth/data/models/otp_login_response.dart';
+import 'package:tilmez_bus/features/auth/data/models/otp_request_request.dart';
+import 'package:tilmez_bus/features/auth/data/models/otp_request_response.dart';
+import 'package:tilmez_bus/features/auth/data/models/otp_verify_request.dart';
 
 part 'auth_remote_datasource.g.dart';
 

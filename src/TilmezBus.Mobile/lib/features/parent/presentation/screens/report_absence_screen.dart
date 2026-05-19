@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_bus/core/errors/failures.dart';
-import 'package:smart_bus/core/routing/app_router.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/parent/data/repositories/parent_repository.dart';
-import 'package:smart_bus/features/parent/domain/entities/absence_request_item.dart';
-import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
-import 'package:smart_bus/features/parent/presentation/providers/absence_controller.dart';
-import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/errors/failures.dart';
+import 'package:tilmez_bus/core/routing/app_router.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/parent/data/repositories/parent_repository.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/absence_request_item.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/student_info.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/absence_controller.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/parent_controllers.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 /// Lists the student's current-week absence requests with cancel support.
 /// The actual create-request form lives in [CreateAbsenceScreen] now; tapping

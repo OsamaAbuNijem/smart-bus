@@ -5,9 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/network/dio_client.dart';
-import 'package:smart_bus/core/notifications/push_notification_service.dart';
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/core/network/dio_client.dart';
+import 'package:tilmez_bus/core/notifications/push_notification_service.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
 
 part 'device_token_registrar.g.dart';
 

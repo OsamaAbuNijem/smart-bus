@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appTitle => 'سمارت باص';
+  String get appTitle => 'باص التلميذ';
 
   @override
   String get loginAppName => 'متعقّب الباص المدرسي';
@@ -106,7 +106,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get otpInvalid => 'الرمز غير صحيح أو منتهي الصلاحية';
 
   @override
-  String get otpFooter => 'لا تشارك هذا الرمز — لن يطلبه منك سمارت باص أبداً';
+  String get otpFooter => 'لا تشارك هذا الرمز — لن يطلبه منك باص التلميذ أبداً';
 
   @override
   String get otpBack => 'رجوع';

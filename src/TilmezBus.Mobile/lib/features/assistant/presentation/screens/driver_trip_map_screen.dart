@@ -11,11 +11,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
-import 'package:smart_bus/core/errors/failures.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/assistant/data/models/trip_details_dto.dart';
-import 'package:smart_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/errors/failures.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/assistant/data/models/trip_details_dto.dart';
+import 'package:tilmez_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 /// Last-resort school anchor when the Schools row has no coords configured
 /// yet. Roughly the centre of Amman. The real coordinate comes from the
@@ -311,7 +311,7 @@ class _RoutedMapState extends State<_RoutedMap> {
       final dio = Dio(BaseOptions(
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 15),
-        headers: {'User-Agent': 'SmartBusMobile/1.0'},
+        headers: {'User-Agent': 'TilmezBusMobile/1.0'},
       ));
       final res = await dio.getUri<dynamic>(uri);
       final body = res.data is Map<String, dynamic>

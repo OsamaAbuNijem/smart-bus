@@ -2,12 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/network/api_exception.dart';
-import 'package:smart_bus/core/network/dio_client.dart';
-import 'package:smart_bus/features/parent/data/models/child_trip_dto.dart';
-import 'package:smart_bus/features/parent/data/models/live_tracking_dto.dart';
-import 'package:smart_bus/features/parent/data/models/parent_detail_dto.dart';
-import 'package:smart_bus/features/parent/data/models/student_info_dto.dart';
+import 'package:tilmez_bus/core/network/api_exception.dart';
+import 'package:tilmez_bus/core/network/dio_client.dart';
+import 'package:tilmez_bus/features/parent/data/models/child_trip_dto.dart';
+import 'package:tilmez_bus/features/parent/data/models/live_tracking_dto.dart';
+import 'package:tilmez_bus/features/parent/data/models/parent_detail_dto.dart';
+import 'package:tilmez_bus/features/parent/data/models/student_info_dto.dart';
 
 part 'parent_remote_datasource.g.dart';
 

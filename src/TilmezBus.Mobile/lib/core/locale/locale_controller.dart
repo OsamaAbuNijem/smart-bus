@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/storage/secure_storage.dart';
+import 'package:tilmez_bus/core/storage/secure_storage.dart';
 
 part 'locale_controller.g.dart';
 

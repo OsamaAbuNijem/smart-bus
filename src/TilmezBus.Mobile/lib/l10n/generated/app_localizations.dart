@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'SmartBus'**
+  /// **'TilmezBus'**
   String get appTitle;
 
   /// No description provided for @loginAppName.
@@ -287,7 +287,7 @@ abstract class AppLocalizations {
   /// No description provided for @otpFooter.
   ///
   /// In en, this message translates to:
-  /// **'Never share this code — SmartBus will never ask for it'**
+  /// **'Never share this code — TilmezBus will never ask for it'**
   String get otpFooter;
 
   /// No description provided for @otpBack.

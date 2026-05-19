@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/features/notifications/data/datasources/notifications_remote_datasource.dart';
-import 'package:smart_bus/features/notifications/domain/entities/notification_item.dart';
+import 'package:tilmez_bus/features/notifications/data/datasources/notifications_remote_datasource.dart';
+import 'package:tilmez_bus/features/notifications/domain/entities/notification_item.dart';
 
 part 'notifications_repository.g.dart';
 

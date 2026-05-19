@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:smart_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
 
 /// 76×76 rounded badge with the bus illustration from
 /// `Template/login-en (3).html`. Yellow gradient + soft glow.

@@ -2,9 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/network/api_exception.dart';
-import 'package:smart_bus/core/network/dio_client.dart';
-import 'package:smart_bus/features/notifications/data/models/notification_dto.dart';
+import 'package:tilmez_bus/core/network/api_exception.dart';
+import 'package:tilmez_bus/core/network/dio_client.dart';
+import 'package:tilmez_bus/features/notifications/data/models/notification_dto.dart';
 
 part 'notifications_remote_datasource.g.dart';
 

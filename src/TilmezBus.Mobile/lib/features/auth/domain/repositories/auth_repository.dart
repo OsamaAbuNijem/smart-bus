@@ -1,4 +1,4 @@
-import 'package:smart_bus/features/auth/domain/entities/user.dart';
+import 'package:tilmez_bus/features/auth/domain/entities/user.dart';
 
 class OtpRequestResult {
   const OtpRequestResult({

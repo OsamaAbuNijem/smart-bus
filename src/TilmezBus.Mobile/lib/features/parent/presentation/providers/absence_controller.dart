@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/features/parent/data/repositories/parent_repository.dart';
-import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
+import 'package:tilmez_bus/features/parent/data/repositories/parent_repository.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/parent_controllers.dart';
 
 part 'absence_controller.g.dart';
 

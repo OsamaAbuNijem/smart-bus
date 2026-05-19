@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/parent/domain/entities/child_trip.dart';
-import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/child_trip.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/parent_controllers.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 class TripHistoryScreen extends ConsumerWidget {
   const TripHistoryScreen({super.key, required this.studentId});

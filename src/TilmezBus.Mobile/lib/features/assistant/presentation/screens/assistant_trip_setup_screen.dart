@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:smart_bus/core/errors/failures.dart';
-import 'package:smart_bus/core/routing/app_router.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
-import 'package:smart_bus/features/assistant/data/models/bus_summary_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/driver_summary_dto.dart';
-import 'package:smart_bus/features/assistant/data/models/roster_student_dto.dart';
-import 'package:smart_bus/features/assistant/presentation/providers/assistant_controllers.dart';
-import 'package:smart_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/errors/failures.dart';
+import 'package:tilmez_bus/core/routing/app_router.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:tilmez_bus/features/assistant/data/models/bus_summary_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/driver_summary_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/roster_student_dto.dart';
+import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
+import 'package:tilmez_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 /// State 2 (post-QR) and State 3 (manual) trip-setup screen.
 /// In QR mode, the bus is locked to whatever the scan resolved (rendered as

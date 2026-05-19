@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import 'package:smart_bus/core/errors/failures.dart';
+import 'package:tilmez_bus/core/errors/failures.dart';
 
 /// Maps a low-level [DioException] (or anything else) to a [Failure].
 /// Centralised here so every datasource produces the same Failure types.

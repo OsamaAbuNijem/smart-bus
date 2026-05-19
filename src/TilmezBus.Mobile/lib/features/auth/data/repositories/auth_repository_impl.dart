@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/core/storage/secure_storage.dart';
-import 'package:smart_bus/features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:smart_bus/features/auth/data/models/otp_request_request.dart';
-import 'package:smart_bus/features/auth/data/models/otp_verify_request.dart';
-import 'package:smart_bus/features/auth/domain/entities/user.dart';
-import 'package:smart_bus/features/auth/domain/repositories/auth_repository.dart';
+import 'package:tilmez_bus/core/storage/secure_storage.dart';
+import 'package:tilmez_bus/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:tilmez_bus/features/auth/data/models/otp_request_request.dart';
+import 'package:tilmez_bus/features/auth/data/models/otp_verify_request.dart';
+import 'package:tilmez_bus/features/auth/domain/entities/user.dart';
+import 'package:tilmez_bus/features/auth/domain/repositories/auth_repository.dart';
 
 part 'auth_repository_impl.g.dart';
 

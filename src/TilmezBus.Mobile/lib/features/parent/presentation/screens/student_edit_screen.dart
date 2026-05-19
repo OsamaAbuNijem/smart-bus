@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_bus/core/errors/failures.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/parent/domain/entities/student_info.dart';
-import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
-import 'package:smart_bus/features/parent/presentation/providers/student_edit_controller.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/errors/failures.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/student_info.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/parent_controllers.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/student_edit_controller.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 const _gradeOptions = <String>[
   'KG-A',

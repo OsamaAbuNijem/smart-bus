@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:smart_bus/core/location/current_location.dart';
-import 'package:smart_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
-import 'package:smart_bus/features/assistant/data/models/trip_details_dto.dart';
+import 'package:tilmez_bus/core/location/current_location.dart';
+import 'package:tilmez_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:tilmez_bus/features/assistant/data/models/trip_details_dto.dart';
 
 /// Trip details (header + roster), keyed by tripId.
 final tripDetailsProvider =

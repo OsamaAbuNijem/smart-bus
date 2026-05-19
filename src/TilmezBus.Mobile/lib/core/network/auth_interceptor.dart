@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import 'package:smart_bus/core/storage/secure_storage.dart';
+import 'package:tilmez_bus/core/storage/secure_storage.dart';
 
 /// Attaches the JWT bearer token to every outgoing request and forces
 /// re-authentication when the server returns 401.

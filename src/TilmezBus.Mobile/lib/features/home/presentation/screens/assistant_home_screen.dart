@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import 'package:smart_bus/core/routing/app_router.dart';
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/assistant/data/models/my_today_trip_dto.dart';
-import 'package:smart_bus/features/assistant/presentation/providers/assistant_controllers.dart';
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/routing/app_router.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/assistant/data/models/my_today_trip_dto.dart';
+import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 class AssistantHomeScreen extends ConsumerWidget {
   const AssistantHomeScreen({super.key});

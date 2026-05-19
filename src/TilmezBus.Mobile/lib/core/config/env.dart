@@ -19,8 +19,8 @@ class Env {
   /// iOS simulator can use localhost directly. Switch via --dart-define.
   static const String _devAndroidEmulatorBase = 'http://10.0.2.2:8083';
   static const String _devLocalhostBase = 'http://localhost:8083';
-  static const String _stagingBase = 'https://staging.smartbus.example/api';
-  static const String _prodBase = 'https://api.smartbus.example';
+  static const String _stagingBase = 'https://staging.tilmezbus.example/api';
+  static const String _prodBase = 'https://api.tilmezbus.example';
 
   static Flavor get flavor => switch (_flavor) {
         'prod' => Flavor.prod,

@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 
-import 'package:smart_bus/core/config/env.dart';
-import 'package:smart_bus/core/storage/secure_storage.dart';
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/features/parent/data/repositories/parent_repository.dart';
-import 'package:smart_bus/features/parent/domain/entities/live_tracking.dart';
+import 'package:tilmez_bus/core/config/env.dart';
+import 'package:tilmez_bus/core/storage/secure_storage.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/features/parent/data/repositories/parent_repository.dart';
+import 'package:tilmez_bus/features/parent/domain/entities/live_tracking.dart';
 
 part 'live_tracking_controller.g.dart';
 

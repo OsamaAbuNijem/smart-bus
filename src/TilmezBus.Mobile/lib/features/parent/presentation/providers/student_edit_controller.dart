@@ -1,8 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:smart_bus/features/auth/presentation/providers/auth_controller.dart';
-import 'package:smart_bus/features/parent/data/repositories/parent_repository.dart';
-import 'package:smart_bus/features/parent/presentation/providers/parent_controllers.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/features/parent/data/repositories/parent_repository.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/parent_controllers.dart';
 
 part 'student_edit_controller.g.dart';
 

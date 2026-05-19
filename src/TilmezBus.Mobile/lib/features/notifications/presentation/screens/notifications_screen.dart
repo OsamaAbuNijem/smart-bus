@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
-import 'package:smart_bus/core/theme/app_theme.dart';
-import 'package:smart_bus/features/notifications/domain/entities/notification_item.dart';
-import 'package:smart_bus/features/notifications/presentation/providers/notifications_controller.dart';
-import 'package:smart_bus/l10n/generated/app_localizations.dart';
+import 'package:tilmez_bus/core/theme/app_theme.dart';
+import 'package:tilmez_bus/features/notifications/domain/entities/notification_item.dart';
+import 'package:tilmez_bus/features/notifications/presentation/providers/notifications_controller.dart';
+import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
