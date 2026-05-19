@@ -68,5 +68,10 @@
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>TilmezBus uses your location to record student pickup points during morning trips.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>

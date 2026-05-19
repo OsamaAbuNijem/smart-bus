@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:tilmez_bus/core/config/env.dart';
 import 'package:tilmez_bus/core/errors/failures.dart';
 import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/assistant/data/models/trip_details_dto.dart';
@@ -304,7 +305,7 @@ class _RoutedMapState extends State<_RoutedMap> {
         .map((s) => '${s.point.longitude},${s.point.latitude}')
         .join(';');
     final uri = Uri.parse(
-      'https://router.project-osrm.org/route/v1/driving/$coords'
+      '${Env.osrmBaseUrl}/route/v1/driving/$coords'
       '?overview=full&geometries=geojson',
     );
     try {

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:tilmez_bus/core/config/env.dart';
+
 part 'route_provider.g.dart';
 
 /// Fetches a driving route between two points from the OSRM public demo.
@@ -19,7 +21,7 @@ Future<List<LatLng>> routedPath(
   required double toLng,
 }) async {
   final url =
-      'https://router.project-osrm.org/route/v1/driving/'
+      '${Env.osrmBaseUrl}/route/v1/driving/'
       '$fromLng,$fromLat;$toLng,$toLat'
       '?overview=full&geometries=geojson';
   final dio = Dio(BaseOptions(

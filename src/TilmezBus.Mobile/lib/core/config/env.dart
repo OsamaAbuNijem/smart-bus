@@ -15,6 +15,15 @@ class Env {
     defaultValue: '',
   );
 
+  /// OSRM routing host. Defaults to the public demo for dev/demo use; in prod
+  /// point this at your self-hosted instance (see deploy/osrm/README.md) via
+  /// `--dart-define=OSRM_BASE_URL=https://routing.tilmezbus.example`.
+  static const String _osrmBaseUrl = String.fromEnvironment(
+    'OSRM_BASE_URL',
+    defaultValue: 'https://router.project-osrm.org',
+  );
+  static String get osrmBaseUrl => _osrmBaseUrl;
+
   /// 10.0.2.2 is the Android emulator's loopback to the host's localhost.
   /// iOS simulator can use localhost directly. Switch via --dart-define.
   static const String _devAndroidEmulatorBase = 'http://10.0.2.2:8083';

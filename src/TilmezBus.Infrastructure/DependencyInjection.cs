@@ -126,19 +126,21 @@ public static class DependencyInjection
         services.AddScoped<BusTrackingCleanupJob>();
 
         // Firebase Cloud Messaging — initialize once with the service-account
-        // JSON whose path is in Firebase:CredentialsPath. App still boots if
-        // the file is missing; pushes will just fail gracefully at send time.
+        // credentials. In dev we load the JSON from Firebase:CredentialsPath;
+        // on Azure we paste the file contents into Firebase:CredentialsJson
+        // (an App Service setting) so nothing has to ship with the build.
+        // App still boots if neither is configured; pushes will just fail
+        // gracefully at send time.
+        GoogleCredential? fcmCred = null;
+        var fcmCredsJson = configuration["Firebase:CredentialsJson"];
         var fcmCredsPath = configuration["Firebase:CredentialsPath"];
-        if (!string.IsNullOrWhiteSpace(fcmCredsPath) && File.Exists(fcmCredsPath))
-        {
-            if (FirebaseApp.DefaultInstance == null)
-            {
-                FirebaseApp.Create(new AppOptions
-                {
-                    Credential = GoogleCredential.FromFile(fcmCredsPath),
-                });
-            }
-        }
+        if (!string.IsNullOrWhiteSpace(fcmCredsJson))
+            fcmCred = GoogleCredential.FromJson(fcmCredsJson);
+        else if (!string.IsNullOrWhiteSpace(fcmCredsPath) && File.Exists(fcmCredsPath))
+            fcmCred = GoogleCredential.FromFile(fcmCredsPath);
+
+        if (fcmCred != null && FirebaseApp.DefaultInstance == null)
+            FirebaseApp.Create(new AppOptions { Credential = fcmCred });
         services.AddScoped<IPushNotificationService, FcmPushNotificationService>();
         services.AddScoped<INotificationTemplateService, NotificationTemplateService>();
 
