@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Hangfire;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using TilmezBus.API.HealthChecks;
@@ -188,9 +189,15 @@ try
 
     var app = builder.Build();
 
-    // Seed database
+    // Apply pending EF Core migrations, then seed. Required for first boot
+    // on Hetzner — the host has an empty Postgres, so a missing migration
+    // step would 500 every request. Idempotent: re-runs are no-ops.
     using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await db.Database.MigrateAsync();
         await TilmezBus.Infrastructure.Persistence.DbSeeder.SeedAsync(scope.ServiceProvider);
+    }
 
     app.UseMiddleware<ExceptionHandlingMiddleware>();
     app.UseMiddleware<RequestResponseLoggingMiddleware>();

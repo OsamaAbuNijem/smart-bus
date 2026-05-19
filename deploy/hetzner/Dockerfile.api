@@ -1,0 +1,36 @@
+# syntax=docker/dockerfile:1.7
+
+# ──────────────────────────────────────────────────────────────────────
+# Build stage — restore + publish the API
+# ──────────────────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy csproj files first so `dotnet restore` can be cached separately
+# from the source. Changing a .cs file shouldn't bust the restore layer.
+COPY src/TilmezBus.Domain/TilmezBus.Domain.csproj           TilmezBus.Domain/
+COPY src/TilmezBus.Application/TilmezBus.Application.csproj TilmezBus.Application/
+COPY src/TilmezBus.Infrastructure/TilmezBus.Infrastructure.csproj TilmezBus.Infrastructure/
+COPY src/TilmezBus.API/TilmezBus.API.csproj                 TilmezBus.API/
+RUN dotnet restore TilmezBus.API/TilmezBus.API.csproj
+
+# Now copy the full source and publish a Release build.
+COPY src/TilmezBus.Domain/         TilmezBus.Domain/
+COPY src/TilmezBus.Application/    TilmezBus.Application/
+COPY src/TilmezBus.Infrastructure/ TilmezBus.Infrastructure/
+COPY src/TilmezBus.API/            TilmezBus.API/
+RUN dotnet publish TilmezBus.API/TilmezBus.API.csproj \
+    -c Release -o /app/publish --no-restore /p:UseAppHost=false
+
+# ──────────────────────────────────────────────────────────────────────
+# Runtime stage — slim ASP.NET image, no SDK
+# ──────────────────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+# Container listens on 8080 inside the network; nginx upstreams here.
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "TilmezBus.API.dll"]

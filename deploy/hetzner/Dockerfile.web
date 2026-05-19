@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1.7
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY src/TilmezBus.Domain/TilmezBus.Domain.csproj           TilmezBus.Domain/
+COPY src/TilmezBus.Application/TilmezBus.Application.csproj TilmezBus.Application/
+COPY src/TilmezBus.Infrastructure/TilmezBus.Infrastructure.csproj TilmezBus.Infrastructure/
+COPY src/TilmezBus.Web/TilmezBus.Web.csproj                 TilmezBus.Web/
+RUN dotnet restore TilmezBus.Web/TilmezBus.Web.csproj
+
+COPY src/TilmezBus.Domain/         TilmezBus.Domain/
+COPY src/TilmezBus.Application/    TilmezBus.Application/
+COPY src/TilmezBus.Infrastructure/ TilmezBus.Infrastructure/
+COPY src/TilmezBus.Web/            TilmezBus.Web/
+RUN dotnet publish TilmezBus.Web/TilmezBus.Web.csproj \
+    -c Release -o /app/publish --no-restore /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "TilmezBus.Web.dll"]
