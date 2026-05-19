@@ -76,19 +76,25 @@ try
         .SetDefaultCulture("ar")
         .AddSupportedCultures(webCultures)
         .AddSupportedUICultures(webCultures);
-    webLocOpts.RequestCultureProviders.Insert(
-        0, new CookieRequestCultureProvider());
+    // Only honor an explicit cookie set by the language toggle. Drop the
+    // built-in QueryString + Accept-Language providers so the browser's
+    // OS-level preference doesn't auto-flip first-time visitors to English —
+    // we want Arabic out of the box, and the toggle is the only way to opt
+    // into English (the toggle writes the same cookie this provider reads).
+    webLocOpts.RequestCultureProviders.Clear();
+    webLocOpts.RequestCultureProviders.Add(new CookieRequestCultureProvider());
     app.UseRequestLocalization(webLocOpts);
 
     app.UseSession();
     app.UseAuthentication();
     app.UseAuthorization();
 
-    // "/" → Account/Login (landing page)
+    // "/" → public marketing landing page (Home/Index). The page has a
+    // login CTA that links to /Account/Login for school admins.
     app.MapControllerRoute(
         name: "home",
         pattern: "",
-        defaults: new { controller = "Account", action = "Login" });
+        defaults: new { controller = "Home", action = "Index" });
 
     // Everything else uses Index as the default action, so /Drivers works without /Index.
     app.MapControllerRoute(

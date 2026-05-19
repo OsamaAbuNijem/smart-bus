@@ -1,0 +1,273 @@
+@model TilmezBus.Web.Models.DemoRequestsPageViewModel
+@using TilmezBus.Domain.Enums
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+
+    var pageIdx     = Model.Data.PageNumber;
+    var totalPages  = Math.Max(1, Model.Data.TotalPages);
+    var pageCount   = Model.Data.Items.Count;
+    var statusFilter = Model.StatusFilter;
+    string LinkFor(int p, string? s) {
+        var qs = $"?page={p}";
+        if (!string.IsNullOrEmpty(s)) qs += $"&status={s}";
+        return $"/SuperAdmin/DemoRequests{qs}";
+    }
+    var culture = System.Globalization.CultureInfo.CurrentUICulture;
+    string FmtDate(DateTime? d) => d?.ToLocalTime().ToString("d MMM yyyy", culture) ?? "—";
+    string FmtTime(DateTime? d) => d?.ToLocalTime().ToString("HH:mm", culture) ?? "";
+    var opResult = TempData["DemoOpResult"] as string;
+}
+
+<div class="page active" id="sa-page-demo-requests">
+
+  <!-- Header card: title + filter chips -->
+  <div class="card card-mb-16">
+    <div class="card-body dr-head-body">
+      <div class="dr-head-text">
+        <div class="dr-head-title">@L["SA_DemoReq_Title"]</div>
+        <div class="dr-head-sub">@L["SA_DemoReq_Sub"]</div>
+      </div>
+      <div class="dr-chip-row">
+        <a href="@LinkFor(1, null)"          class="filter-chip @(string.IsNullOrEmpty(statusFilter) ? "active" : "")">@L["SA_DemoReq_FilterAll"]</a>
+        <a href="@LinkFor(1, "Pending")"    class="filter-chip @(string.Equals(statusFilter, "Pending", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+          <span class="filter-chip-dot pending"></span>@L["SA_DemoReq_FilterPending"]
+        </a>
+        <a href="@LinkFor(1, "Completed")"  class="filter-chip @(string.Equals(statusFilter, "Completed", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+          <span class="filter-chip-dot completed"></span>@L["SA_DemoReq_FilterCompleted"]
+        </a>
+      </div>
+    </div>
+  </div>
+
+  @if (opResult == "ok")
+  {
+    <div class="op-banner ok">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>@L["SA_DemoReq_MarkedCompleted"]</span>
+    </div>
+  }
+
+  <!-- Main list card -->
+  <div class="card">
+    <div class="card-table-wrap">
+      <table class="table dr-table">
+        <thead>
+          <tr>
+            <th class="dr-col-school">@L["SA_DemoReq_Col_School"]</th>
+            <th>@L["SA_DemoReq_Col_Contact"]</th>
+            <th>@L["SA_DemoReq_Col_Email"]</th>
+            <th>@L["SA_DemoReq_Col_Phone"]</th>
+            <th>@L["SA_DemoReq_Col_Submitted"]</th>
+            <th>@L["SA_DemoReq_Col_Status"]</th>
+            <th class="col-actions">@L["SA_DemoReq_Col_Actions"]</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (pageCount == 0)
+          {
+            <tr><td colspan="7" class="td-empty">@L["SA_DemoReq_Empty"]</td></tr>
+          }
+          else
+          {
+            foreach (var r in Model.Data.Items)
+            {
+              var pillCls = r.Status == DemoRequestStatus.Pending ? "pending" : "completed";
+              var pillLbl = r.Status == DemoRequestStatus.Pending ? L["SA_DemoReq_StatusPending"].Value : L["SA_DemoReq_StatusCompleted"].Value;
+              var rowId   = $"dr-row-{r.Id}";
+              var hasNotes = !string.IsNullOrWhiteSpace(r.Notes);
+
+              <tr class="dr-row @(r.Status == DemoRequestStatus.Completed ? "is-completed" : "is-pending")">
+                <td class="dr-cell-school">
+                  <div class="dr-school-name">@r.SchoolName</div>
+                  @if (hasNotes)
+                  {
+                    <button type="button" class="dr-notes-toggle" data-toggle-id="@rowId">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                      <span>@L["SA_DemoReq_NotesToggle"]</span>
+                    </button>
+                  }
+                </td>
+                <td>@r.ContactName</td>
+                <td><a class="dr-link" href="mailto:@r.Email">@r.Email</a></td>
+                <td>
+                  @if (!string.IsNullOrWhiteSpace(r.PhoneNumber))
+                  {
+                    <a class="dr-link" href="tel:@r.PhoneNumber">@r.PhoneNumber</a>
+                  }
+                  else
+                  {
+                    <span class="dr-muted">—</span>
+                  }
+                </td>
+                <td class="dr-cell-time">
+                  <div>@FmtDate(r.CreatedAt)</div>
+                  <div class="dr-muted">@FmtTime(r.CreatedAt)</div>
+                </td>
+                <td>
+                  <span class="status-pill @pillCls"><span class="status-dot"></span>@pillLbl</span>
+                  @if (r.Status == DemoRequestStatus.Completed && r.CompletedAt.HasValue)
+                  {
+                    <div class="dr-completed-at">@L["SA_DemoReq_CompletedAt"] @FmtDate(r.CompletedAt)</div>
+                  }
+                </td>
+                <td class="col-actions">
+                  @if (r.Status == DemoRequestStatus.Pending)
+                  {
+                    <form method="post" action="/SuperAdmin/DemoRequests/complete/@r.Id" class="dr-action-form">
+                      @Html.AntiForgeryToken()
+                      <input type="hidden" name="page" value="@pageIdx"/>
+                      @if (!string.IsNullOrEmpty(statusFilter)) { <input type="hidden" name="status" value="@statusFilter"/> }
+                      <button type="submit" class="btn-mark">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>@L["SA_DemoReq_MarkButton"]</span>
+                      </button>
+                    </form>
+                  }
+                  else
+                  {
+                    <span class="dr-done-glyph" title="@L["SA_DemoReq_StatusCompleted"]">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                  }
+                </td>
+              </tr>
+              @if (hasNotes)
+              {
+                <tr id="@rowId" class="dr-notes-row" hidden>
+                  <td colspan="7">
+                    <div class="dr-notes-card">
+                      <div class="dr-notes-head">@L["SA_DemoReq_NotesHead"]</div>
+                      <div class="dr-notes-body">@r.Notes</div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (totalPages > 1)
+    {
+      <div class="pager">
+        <a href="@LinkFor(Math.Max(1, pageIdx-1), statusFilter)" class="pager-btn @(pageIdx <= 1 ? "disabled" : "")">‹ @L["SA_DemoReq_Prev"]</a>
+        <span class="pager-info">@pageIdx / @totalPages</span>
+        <a href="@LinkFor(Math.Min(totalPages, pageIdx+1), statusFilter)" class="pager-btn @(pageIdx >= totalPages ? "disabled" : "")">@L["SA_DemoReq_Next"] ›</a>
+      </div>
+    }
+  </div>
+</div>
+
+<script>
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.dr-notes-toggle');
+    if (!btn) return;
+    var id = btn.getAttribute('data-toggle-id');
+    var row = document.getElementById(id);
+    if (!row) return;
+    var open = !row.hidden;
+    row.hidden = open;
+    btn.classList.toggle('open', !open);
+  });
+</script>
+
+<style>
+/* ── Header card: title + chips ─────────────────────────────────────── */
+.dr-head-body{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+.dr-head-text{min-width:200px;}
+.dr-head-title{font-size:18px;font-weight:800;color:#E2E8F0;letter-spacing:-.2px;}
+.dr-head-sub{font-size:12.5px;color:#94A3B8;margin-top:3px;line-height:1.5;}
+
+.dr-chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-chip{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);
+  color:#CBD5E1;font-size:12px;font-weight:600;text-decoration:none;
+  transition:background-color .15s,color .15s,border-color .15s;
+}
+.filter-chip:hover{background:rgba(255,255,255,.08);color:#E2E8F0;}
+.filter-chip.active{background:rgba(255,255,255,.10);color:#E2E8F0;border-color:rgba(255,255,255,.22);}
+.filter-chip-dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
+.filter-chip-dot.pending  {background:#F5B400;}
+.filter-chip-dot.completed{background:#22C55E;}
+
+/* ── Op banner (after marking) ─────────────────────────────────────── */
+.op-banner{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:700;margin-bottom:14px;}
+.op-banner.ok{background:rgba(34,197,94,.18);color:#86EFAC;border:1px solid rgba(34,197,94,.35);}
+
+/* ── Table ─────────────────────────────────────────────────────────── */
+.dr-table tbody tr.dr-row td{vertical-align:middle;color:#CBD5E1;font-size:13px;}
+.dr-table tbody tr.dr-row.is-completed td{color:#94A3B8;}
+.dr-cell-school{min-width:170px;}
+.dr-school-name{font-size:13px;font-weight:700;color:#E2E8F0;letter-spacing:-.1px;}
+.dr-notes-toggle{
+  margin-top:5px;display:inline-flex;align-items:center;gap:5px;
+  background:transparent;border:1px dashed rgba(255,255,255,.16);
+  color:#94A3B8;font:600 10.5px/1 'Cairo',sans-serif;
+  border-radius:7px;padding:4px 8px;cursor:pointer;letter-spacing:.04em;
+  transition:color .15s,border-color .15s,background-color .15s;
+}
+.dr-notes-toggle:hover,.dr-notes-toggle.open{color:#E2E8F0;border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.04);}
+
+.dr-link{color:inherit;text-decoration:none;}
+.dr-link:hover{text-decoration:underline;}
+.dr-muted{color:#64748B;}
+
+.dr-cell-time{line-height:1.2;font-variant-numeric:tabular-nums;}
+.dr-cell-time > div:first-child{font-size:12.5px;color:#CBD5E1;font-weight:600;}
+.dr-cell-time > .dr-muted{font-size:11px;}
+
+.dr-completed-at{font-size:10.5px;color:#64748B;margin-top:3px;}
+
+/* Notes expansion row */
+.dr-notes-row > td{padding:0 !important;}
+.dr-notes-card{
+  margin:0 18px 14px;
+  background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;padding:12px 14px;
+}
+.dr-notes-head{font-size:10px;font-weight:700;color:#94A3B8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.dr-notes-body{font-size:13px;color:#E2E8F0;line-height:1.65;white-space:pre-wrap;}
+
+/* ── Status + actions ──────────────────────────────────────────────── */
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.02em;}
+.status-pill .status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.status-pill.pending  {background:rgba(245,180,0,.18);color:#FCD34D;}
+.status-pill.completed{background:rgba(34,197,94,.18);color:#86EFAC;}
+
+.col-actions{width:1px;white-space:nowrap;}
+.dr-action-form{margin:0;}
+.btn-mark{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#F5B400;color:#0F172A;border:none;border-radius:9px;
+  padding:7px 13px;font:800 12px/1 'Cairo',sans-serif;cursor:pointer;
+  transition:transform .15s,box-shadow .15s,background-color .15s;
+  box-shadow:0 4px 12px rgba(245,180,0,.32);
+}
+.btn-mark:hover{background:#C58E00;transform:translateY(-1px);box-shadow:0 8px 18px rgba(245,180,0,.4);}
+
+.dr-done-glyph{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(34,197,94,.18);color:#86EFAC;
+}
+
+/* ── Pager ─────────────────────────────────────────────────────────── */
+.pager{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 0 4px;}
+.pager-btn{
+  padding:7px 14px;border-radius:9px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);color:#CBD5E1;font-size:12px;font-weight:700;text-decoration:none;
+  transition:background-color .15s,color .15s;
+}
+.pager-btn:hover{background:rgba(255,255,255,.1);color:#fff;}
+.pager-btn.disabled{pointer-events:none;opacity:.4;}
+.pager-info{font-size:12px;color:#94A3B8;font-variant-numeric:tabular-nums;}
+
+.td-empty{padding:48px 24px;text-align:center;color:#94A3B8;font-size:13px;}
+
+@@media (max-width:900px){
+  .dr-head-body{flex-direction:column;align-items:flex-start;}
+  .dr-chip-row{width:100%;}
+}
+</style>

@@ -38,6 +38,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<EmployeeQrToken> EmployeeQrTokens => Set<EmployeeQrToken>();
     public DbSet<StudentQrToken>  StudentQrTokens  => Set<StudentQrToken>();
     public DbSet<UserDeviceToken> UserDeviceTokens => Set<UserDeviceToken>();
+    public DbSet<DemoRequest> DemoRequests => Set<DemoRequest>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -71,6 +72,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<School>().HasQueryFilter(s => !s.IsDeleted);
         builder.Entity<BusSchedule>().HasQueryFilter(s => !s.IsDeleted);
         builder.Entity<EmployeeQrToken>().HasQueryFilter(t => !t.IsDeleted);
+        builder.Entity<DemoRequest>().HasQueryFilter(d => !d.IsDeleted);
+        builder.Entity<DemoRequest>().Property(d => d.SchoolName).HasMaxLength(200);
+        builder.Entity<DemoRequest>().Property(d => d.ContactName).HasMaxLength(200);
+        builder.Entity<DemoRequest>().Property(d => d.Email).HasMaxLength(256);
+        builder.Entity<DemoRequest>().Property(d => d.PhoneNumber).HasMaxLength(40);
+        builder.Entity<DemoRequest>().Property(d => d.Notes).HasMaxLength(2000);
+        // SuperAdmin queue is always read newest-first and may filter by status,
+        // so a composite index keeps the list page snappy as the table grows.
+        builder.Entity<DemoRequest>()
+            .HasIndex(d => new { d.Status, d.CreatedAt });
 
         // ── Subscriptions ──────────────────────────────────────────────────
         builder.Entity<Subscription>().HasQueryFilter(s => !s.IsDeleted);

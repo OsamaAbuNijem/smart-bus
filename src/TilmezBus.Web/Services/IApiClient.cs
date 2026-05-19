@@ -1,6 +1,8 @@
 using TilmezBus.Application.Common.Models;
 using TilmezBus.Application.Features.Alerts.Queries.GetAllAlerts;
 using TilmezBus.Application.Features.Buses.Queries.GetAllBuses;
+using TilmezBus.Application.Features.DemoRequests.Queries.GetAllDemoRequests;
+using TilmezBus.Domain.Enums;
 using TilmezBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using TilmezBus.Application.Features.Schools.Queries.GetAllSchools;
 using TilmezBus.Application.Features.Students.Queries.GetAllStudents;
@@ -88,4 +90,9 @@ public interface IApiClient
 
     // Notifications
     Task<(bool Ok, int Delivered, string? Error)> SendPushToStudentParentAsync(Guid studentId, string title, string body);
+
+    // Demo requests (public submission + SuperAdmin management)
+    Task<(bool Ok, string? Error)> SubmitDemoRequestAsync(string schoolName, string contactName, string email, string? phoneNumber, string? notes);
+    Task<PagedResult<DemoRequestDto>?> GetDemoRequestsAsync(int pageNumber = 1, int pageSize = 20, DemoRequestStatus? status = null);
+    Task<(bool Ok, string? Error)> CompleteDemoRequestAsync(Guid id);
 }

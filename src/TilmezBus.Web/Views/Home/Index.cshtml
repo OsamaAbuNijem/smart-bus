@@ -1,8 +1,1216 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    Layout = null;
+    var _isRtl   = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var _dir     = _isRtl ? "rtl" : "ltr";
+    var _culture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var _toggleCulture = _isRtl ? "en" : "ar";
+    var _returnUrl     = Context.Request.Path + Context.Request.QueryString;
+}
+<!DOCTYPE html>
+<html lang="@_culture" dir="@_dir">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>@L["Home_PageTitle"]</title>
+<meta name="description" content="@L["Home_MetaDescription"]"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --y:#F5B400;--yd:#C58E00;--yl:#FFF8E1;
+  --bg:#FFFFFF;--bg-soft:#F8FAFC;--surface:#FFFFFF;
+  --border:#E5E7EB;--border-strong:#D1D5DB;
+  --text:#0F172A;--text2:#475569;--text3:#94A3B8;
+  --ring:rgba(245,180,0,.18);
+  --shadow-sm:0 1px 2px rgba(15,23,42,.04);
+  --shadow:0 8px 24px -12px rgba(15,23,42,.18),0 2px 6px rgba(15,23,42,.06);
+  --shadow-lg:0 24px 60px -20px rgba(15,23,42,.22),0 6px 16px -8px rgba(15,23,42,.08);
+}
+html{scroll-behavior:smooth;}
+html,body{height:100%;}
+body{
+  font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;line-height:1.5;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
+
+/* ── Page chrome ──────────────────────────────────────────── */
+.page{position:relative;overflow:hidden;}
+.page::before{
+  content:'';position:absolute;top:-200px;inset-inline-start:-200px;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,180,0,.35),transparent 60%);filter:blur(60px);
+  pointer-events:none;z-index:0;
+}
+.page::after{
+  content:'';position:absolute;top:300px;inset-inline-end:-180px;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(59,130,246,.18),transparent 60%);filter:blur(60px);
+  pointer-events:none;z-index:0;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+/* ── Nav bar ──────────────────────────────────────────────── */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.78);
+  backdrop-filter:saturate(140%) blur(14px);-webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid rgba(15,23,42,.06);
+}
+.nav-inner{
+  max-width:1180px;margin:0 auto;padding:14px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.2px;}
+.nav-logo img{height:36px;width:auto;}
+.nav-actions{display:flex;align-items:center;gap:10px;}
+.btn-ghost{
+  height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--border);
+  background:#fff;color:var(--text);font:600 13px/1 'Cairo',sans-serif;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+  transition:border-color .15s,color .15s,background-color .15s;text-decoration:none;
+}
+.btn-ghost:hover{border-color:var(--y);color:var(--yd);}
+.btn-primary{
+  height:38px;padding:0 18px;border-radius:10px;border:none;
+  background:var(--y);color:#0F172A;font:800 13px/1 'Cairo',sans-serif;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;
+  box-shadow:0 6px 18px rgba(245,180,0,.32);
+  transition:transform .15s,box-shadow .2s,background-color .15s;text-decoration:none;
+}
+.btn-primary:hover{background:var(--yd);transform:translateY(-1px);box-shadow:0 10px 24px rgba(245,180,0,.4);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary svg, .btn-ghost svg{width:14px;height:14px;}
+
+/* ── Hero ────────────────────────────────────────────────── */
+.hero{position:relative;z-index:1;}
+.hero-inner{
+  max-width:1180px;margin:0 auto;padding:72px 28px 64px;
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;align-items:center;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
+  background:var(--yl);border:1px solid rgba(245,180,0,.4);
+  font-size:12px;font-weight:700;color:var(--yd);letter-spacing:.02em;
+}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,.18);}
+.hero-title{
+  font-size:54px;font-weight:900;line-height:1.05;letter-spacing:-1.1px;
+  margin:18px 0 16px;color:var(--text);
+}
+.hero-title .accent{
+  background:linear-gradient(120deg,#F5B400 0%,#FFA500 50%,#F5B400 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{font-size:17px;color:var(--text2);max-width:560px;margin-bottom:28px;line-height:1.7;}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;}
+.hero-cta .btn-primary{height:48px;font-size:14px;padding:0 22px;}
+.hero-cta .btn-primary svg{width:16px;height:16px;}
+.hero-cta .btn-ghost{height:48px;font-size:14px;padding:0 18px;}
+
+.hero-foot{display:flex;align-items:center;gap:18px;margin-top:26px;font-size:12px;color:var(--text3);flex-wrap:wrap;}
+.hero-foot-item{display:inline-flex;align-items:center;gap:6px;}
+.hero-foot-item svg{width:14px;height:14px;color:var(--y);}
+
+/* ── Hero visual (right side) ─────────────────────────────── */
+.hero-visual{position:relative;}
+.preview-card{
+  position:relative;background:#fff;border:1px solid var(--border);border-radius:24px;
+  padding:18px;box-shadow:var(--shadow-lg);transform:rotate(-.6deg);
+}
+.preview-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:0 4px;}
+.preview-pulse{
+  width:10px;height:10px;border-radius:50%;background:#22C55E;flex-shrink:0;
+  box-shadow:0 0 0 0 rgba(34,197,94,.55);animation:livepulse 1.8s infinite;
+}
+@@keyframes livepulse{
+  0%{box-shadow:0 0 0 0 rgba(34,197,94,.55);}
+  70%{box-shadow:0 0 0 10px rgba(34,197,94,0);}
+  100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}
+}
+.preview-title{font-size:13px;font-weight:700;color:var(--text);}
+.preview-eta{margin-inline-start:auto;font-size:11px;color:var(--text2);font-weight:600;background:#F1F5F9;padding:4px 10px;border-radius:999px;}
+.preview-map{
+  position:relative;height:200px;border-radius:18px;overflow:hidden;
+  background:
+    radial-gradient(800px 240px at 50% 100%, rgba(245,180,0,.10), transparent 70%),
+    linear-gradient(160deg,#F8FAFC 0%,#EFF6FF 100%);
+  border:1px solid var(--border);
+}
+.preview-map svg{width:100%;height:100%;display:block;}
+.preview-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding:0 2px;}
+.preview-stat{background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:10px 12px;}
+.preview-stat-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.preview-stat-value{font-size:14px;color:var(--text);font-weight:800;margin-top:2px;display:flex;align-items:center;gap:6px;}
+.preview-stat-value .dot{width:6px;height:6px;border-radius:50%;background:var(--y);}
+
+/* Floating mini-cards */
+.float-card{
+  position:absolute;background:#fff;border:1px solid var(--border);border-radius:14px;
+  padding:10px 13px;display:flex;align-items:center;gap:10px;
+  box-shadow:var(--shadow-lg);font-size:12px;font-weight:700;color:var(--text);z-index:2;
+}
+.float-card .icon{width:30px;height:30px;border-radius:9px;background:var(--yl);border:1px solid rgba(245,180,0,.4);display:flex;align-items:center;justify-content:center;color:var(--yd);}
+.float-card.tl{top:-22px;inset-inline-start:-22px;transform:rotate(-3deg);}
+.float-card.br{bottom:-22px;inset-inline-end:-22px;transform:rotate(3deg);}
+
+/* Hero float — Student NFC + QR ID badge (top-left) */
+.float-card.id-mini{
+  padding:8px 11px;gap:9px;
+  background:linear-gradient(135deg,#F5B400 0%,#FFA500 100%);
+  border:1px solid rgba(255,255,255,.5);
+  color:#0F172A;
+}
+.id-mini-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(15,23,42,.92);color:#FCD34D;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;letter-spacing:.4px;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.55);
+}
+.id-mini-body{display:flex;flex-direction:column;line-height:1.1;}
+.id-mini-body strong{font-size:11px;font-weight:800;color:#0F172A;letter-spacing:-.1px;}
+.id-mini-icons{
+  display:inline-flex;align-items:center;gap:6px;margin-top:3px;
+  font-size:10px;font-weight:700;color:rgba(15,23,42,.7);
+}
+.id-mini-icons svg{width:13px;height:13px;color:rgba(15,23,42,.85);}
+.id-mini-icons em{font-style:normal;letter-spacing:.02em;}
+
+/* Hero float — Bus QR sticker (bottom-right) */
+.float-card.qr-mini{
+  padding:8px 11px;gap:10px;
+}
+.qr-mini-code{
+  width:34px;height:34px;border-radius:7px;
+  background:#fff;border:1.5px solid #0F172A;
+  padding:3px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;color:#0F172A;
+}
+.qr-mini-code svg{width:100%;height:100%;display:block;}
+.qr-mini-body{display:flex;flex-direction:column;line-height:1.15;}
+.qr-mini-body strong{font-size:11px;font-weight:800;color:var(--text);letter-spacing:-.1px;}
+.qr-mini-body span{font-size:10px;font-weight:600;color:var(--text2);margin-top:2px;letter-spacing:.02em;}
+
+/* ── Section helpers ──────────────────────────────────────── */
+.section{position:relative;z-index:1;padding:80px 28px;}
+.section-inner{max-width:1180px;margin:0 auto;}
+.section-eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--yd);text-transform:uppercase;margin-bottom:10px;text-align:center;}
+.section-title{font-size:36px;font-weight:900;letter-spacing:-.6px;text-align:center;margin-bottom:14px;color:var(--text);line-height:1.15;}
+.section-lead{font-size:16px;color:var(--text2);max-width:640px;margin:0 auto 48px;text-align:center;line-height:1.7;}
+
+/* ── Features grid ───────────────────────────────────────── */
+.features{background:linear-gradient(180deg,#FFFFFF 0%,#F8FAFC 100%);}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.feature{
+  background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;
+  transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;
+}
+.feature:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(245,180,0,.4);}
+.feature-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;
+}
+.feature-icon.y{background:var(--yl);color:var(--yd);}
+.feature-icon.b{background:#EFF6FF;color:#1D4ED8;}
+.feature-icon.g{background:#F0FDF4;color:#15803D;}
+.feature-icon.p{background:#F5F3FF;color:#7C3AED;}
+.feature-icon.r{background:#FEF2F2;color:#B91C1C;}
+.feature-icon.o{background:#FFF7ED;color:#C2410C;}
+.feature-icon svg{width:22px;height:22px;}
+.feature-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-.2px;}
+.feature-desc{font-size:13px;color:var(--text2);line-height:1.65;}
+
+/* ── How it works ─────────────────────────────────────────── */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;position:relative;}
+.steps::before{
+  content:'';position:absolute;top:36px;inset-inline-start:14%;inset-inline-end:14%;height:2px;
+  background:repeating-linear-gradient(90deg,var(--border) 0 6px,transparent 6px 12px);
+  z-index:0;
+}
+[dir="rtl"] .steps::before{background:repeating-linear-gradient(-90deg,var(--border) 0 6px,transparent 6px 12px);}
+.step{position:relative;z-index:1;text-align:center;padding:0 8px;}
+.step-num{
+  width:72px;height:72px;border-radius:50%;
+  background:#fff;border:2px solid var(--y);color:var(--yd);
+  font-size:24px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+  box-shadow:0 8px 24px -10px rgba(245,180,0,.5);
+}
+.step-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-.2px;}
+.step-desc{font-size:13px;color:var(--text2);line-height:1.7;max-width:280px;margin:0 auto;}
+
+/* ── Audience tabs (Schools / Drivers / Parents) ──────────── */
+.audiences{background:#F8FAFC;}
+.aud-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.aud{
+  background:#fff;border:1px solid var(--border);border-radius:18px;padding:28px;
+  position:relative;overflow:hidden;
+}
+.aud::before{
+  content:'';position:absolute;top:0;inset-inline-start:0;width:100%;height:3px;background:var(--y);
+}
+.aud.b::before{background:#3B82F6;}
+.aud.g::before{background:#22C55E;}
+.aud-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;color:var(--yd);text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:12px;
+}
+.aud.b .aud-tag{color:#1D4ED8;}
+.aud.g .aud-tag{color:#15803D;}
+.aud-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.3px;}
+.aud-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;}
+.aud-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+.aud-list li{font-size:13px;color:var(--text);display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.aud-list svg{width:16px;height:16px;color:var(--y);flex-shrink:0;margin-top:1px;}
+.aud.b .aud-list svg{color:#3B82F6;}
+.aud.g .aud-list svg{color:#22C55E;}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.foot{padding:24px 28px;background:#fff;border-top:1px solid var(--border);position:relative;z-index:1;}
+.foot-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:12px;color:var(--text3);flex-wrap:wrap;}
+.foot strong{color:var(--text2);font-weight:700;}
+.foot-brand{flex:1;min-width:200px;}
+.foot-tag{flex:1;min-width:160px;text-align:end;}
+
+.foot-contact{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;}
+.foot-contact-item{
+  display:inline-flex;align-items:center;gap:7px;
+  color:var(--text2);text-decoration:none;font-weight:600;
+  transition:color .15s;
+}
+.foot-contact-item:hover{color:var(--yd);}
+.foot-contact-item svg{color:var(--yd);flex-shrink:0;}
+.foot-contact-item span{font-variant-numeric:tabular-nums;}
+
+/* ── Language button ──────────────────────────────────────── */
+.lang-btn{
+  height:38px;padding:0 12px;border-radius:10px;
+  border:1px solid var(--border);background:#fff;
+  font:700 12px/1 'Cairo',sans-serif;color:var(--text);
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  text-decoration:none;transition:border-color .15s,color .15s;
+}
+.lang-btn:hover{border-color:var(--y);color:var(--yd);}
+.lang-btn svg{width:14px;height:14px;}
+
+/* ── NFC spotlight (signature feature) ──────────────────── */
+.nfc-spotlight{
+  position:relative;background:#0F172A;color:#fff;overflow:hidden;
+}
+.nfc-spotlight::before{
+  content:'';position:absolute;top:-160px;inset-inline-start:-160px;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,180,0,.45),transparent 60%);filter:blur(60px);pointer-events:none;
+}
+.nfc-spotlight::after{
+  content:'';position:absolute;bottom:-180px;inset-inline-end:-160px;width:560px;height:560px;border-radius:50%;
+  background:radial-gradient(circle,rgba(59,130,246,.32),transparent 60%);filter:blur(70px);pointer-events:none;
+}
+.nfc-grid{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:56px;align-items:center;
+}
+.nfc-copy{max-width:560px;}
+.nfc-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(245,180,0,.16);border:1px solid rgba(245,180,0,.4);
+  font-size:12px;font-weight:700;color:#FCD34D;letter-spacing:.04em;text-transform:uppercase;
+  margin-bottom:18px;
+}
+.nfc-title{
+  font-size:42px;font-weight:900;line-height:1.1;letter-spacing:-.8px;
+  color:#fff;margin-bottom:16px;
+}
+.nfc-title .accent{
+  background:linear-gradient(120deg,#F5B400 0%,#FFA500 50%,#F5B400 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nfc-lead{font-size:16px;color:#CBD5E1;line-height:1.75;margin-bottom:28px;}
+.nfc-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;}
+.nfc-list li{display:flex;align-items:flex-start;gap:14px;}
+.nfc-list-ico{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.nfc-list-ico svg{width:18px;height:18px;}
+.nfc-list-ico.y{background:rgba(245,180,0,.18);color:#FCD34D;border:1px solid rgba(245,180,0,.35);}
+.nfc-list-ico.b{background:rgba(59,130,246,.18);color:#93C5FD;border:1px solid rgba(59,130,246,.35);}
+.nfc-list-ico.g{background:rgba(34,197,94,.18);color:#86EFAC;border:1px solid rgba(34,197,94,.35);}
+.nfc-list strong{display:block;font-size:15px;font-weight:800;color:#fff;letter-spacing:-.2px;margin-bottom:3px;}
+.nfc-list span{display:block;font-size:13.5px;color:#94A3B8;line-height:1.65;}
+
+/* Visual stage */
+.nfc-visual{position:relative;}
+.nfc-stage{
+  position:relative;height:440px;display:flex;align-items:center;justify-content:center;
+}
+
+/* The student card */
+.nfc-card{
+  position:absolute;
+  width:320px;height:200px;border-radius:18px;
+  background:linear-gradient(135deg,#F5B400 0%,#FFA500 65%,#F59E0B 100%);
+  color:#0F172A;
+  padding:18px;display:flex;flex-direction:column;justify-content:space-between;
+  box-shadow:0 28px 60px -18px rgba(245,180,0,.55),0 12px 24px -10px rgba(15,23,42,.45);
+  inset-inline-start:8%;bottom:18%;transform:rotate(-8deg);
+  border:1px solid rgba(255,255,255,.4);
+  overflow:hidden;
+  animation:nfcFloat 6s ease-in-out infinite;
+}
+.nfc-card::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(80% 60% at 0% 0%, rgba(255,255,255,.45), transparent 55%),
+    radial-gradient(60% 40% at 100% 100%, rgba(0,0,0,.10), transparent 55%);
+  pointer-events:none;
+}
+@@keyframes nfcFloat{
+  0%,100%{transform:rotate(-8deg) translateY(0);}
+  50%{transform:rotate(-8deg) translateY(-6px);}
+}
+.nfc-card-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1;}
+.nfc-card-logo{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:-.1px;color:#0F172A;}
+.nfc-card-logo svg{color:#0F172A;}
+.nfc-card-chip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+  width:34px;height:24px;background:rgba(15,23,42,.85);border-radius:5px;padding:3px;
+}
+.nfc-card-chip span{background:#FCD34D;border-radius:1px;}
+.nfc-card-body{display:flex;align-items:center;gap:10px;position:relative;z-index:1;}
+.nfc-card-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(15,23,42,.92);color:#FCD34D;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;letter-spacing:.5px;
+  flex-shrink:0;
+  border:2px solid rgba(255,255,255,.6);
+}
+.nfc-card-name{font-size:17px;font-weight:900;line-height:1.1;color:#0F172A;letter-spacing:-.3px;}
+.nfc-card-meta{font-size:11px;color:rgba(15,23,42,.7);font-weight:600;margin-top:2px;}
+.nfc-card-bottom{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
+.nfc-card-id{font-size:10px;font-weight:700;color:rgba(15,23,42,.6);letter-spacing:.04em;text-transform:uppercase;}
+.nfc-card-wave{width:24px;height:24px;color:rgba(15,23,42,.6);}
+
+/* Hovering phone / scanner readout */
+.nfc-phone{
+  position:absolute;
+  width:200px;height:340px;border-radius:32px;
+  background:#0B1320;border:3px solid #1F2937;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.6),0 10px 26px -8px rgba(0,0,0,.4);
+  inset-inline-end:6%;top:6%;transform:rotate(6deg);
+  padding:8px;display:flex;flex-direction:column;
+  animation:nfcFloat2 6s ease-in-out infinite;
+}
+@@keyframes nfcFloat2{
+  0%,100%{transform:rotate(6deg) translateY(0);}
+  50%{transform:rotate(6deg) translateY(-6px);}
+}
+.nfc-phone-notch{
+  width:60px;height:18px;border-radius:0 0 12px 12px;
+  background:#1F2937;margin:0 auto 8px;
+}
+.nfc-phone-screen{
+  flex:1;background:#FFFFFF;border-radius:22px;
+  padding:14px 12px;display:flex;flex-direction:column;gap:8px;
+  color:#0F172A;
+}
+.nfc-phone-head{display:flex;align-items:center;gap:7px;padding:0 2px 8px;border-bottom:1px dashed #E2E8F0;}
+.nfc-phone-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,.2);}
+.nfc-phone-title{font-size:11px;font-weight:800;color:#0F172A;letter-spacing:-.1px;}
+.nfc-phone-row{display:flex;flex-direction:column;gap:1px;}
+.nfc-phone-label{font-size:9px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;}
+.nfc-phone-val{font-size:12px;font-weight:700;color:#0F172A;line-height:1.3;}
+.nfc-phone-btn{
+  margin-top:auto;
+  background:#F5B400;color:#0F172A;
+  font-size:11px;font-weight:800;letter-spacing:.02em;
+  padding:8px 10px;border-radius:9px;text-align:center;
+  box-shadow:0 4px 10px rgba(245,180,0,.4);
+}
+
+/* NFC waves emanating between phone and card */
+.nfc-waves{
+  position:absolute;
+  inset-inline-start:42%;top:42%;
+  width:120px;height:120px;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.nfc-waves span{
+  position:absolute;border:2px solid #F5B400;border-radius:50%;
+  width:24px;height:24px;opacity:0;
+  animation:nfcPing 2.4s ease-out infinite;
+}
+.nfc-waves span:nth-child(2){animation-delay:.6s;}
+.nfc-waves span:nth-child(3){animation-delay:1.2s;}
+@@keyframes nfcPing{
+  0%{transform:scale(.6);opacity:.9;}
+  80%{transform:scale(3.2);opacity:0;}
+  100%{transform:scale(3.2);opacity:0;}
+}
+
+/* ── Differentiators (auto-routing + QR) ────────────────── */
+.diff-section{background:linear-gradient(180deg,#F8FAFC 0%,#FFFFFF 100%);}
+.diff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;}
+.diff-card{
+  background:#fff;border:1px solid var(--border);border-radius:20px;padding:0 28px 28px;
+  display:flex;flex-direction:column;position:relative;overflow:hidden;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+}
+.diff-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(245,180,0,.4);}
+
+.diff-visual{
+  margin:-1px -28px 22px;
+  height:200px;
+  background:linear-gradient(160deg,#FFFDE7 0%,#F8FAFC 100%);
+  border-bottom:1px solid var(--border);position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.diff-visual-route svg{width:100%;height:100%;display:block;}
+.diff-visual-qr{
+  background:
+    radial-gradient(600px 220px at 50% 100%, rgba(245,180,0,.18), transparent 70%),
+    linear-gradient(160deg,#EFF6FF 0%,#F8FAFC 100%);
+}
+
+/* QR frame */
+.qr-frame{
+  position:relative;width:120px;height:120px;background:#fff;
+  border-radius:14px;padding:12px;
+  box-shadow:0 18px 36px -14px rgba(15,23,42,.25);
+  display:flex;align-items:center;justify-content:center;
+}
+.qr-svg{width:100%;height:100%;display:block;}
+.qr-corner{
+  position:absolute;width:18px;height:18px;
+  border:3px solid var(--y);
+}
+.qr-corner.tl{top:-3px;inset-inline-start:-3px;border-inline-end:none;border-bottom:none;border-start-start-radius:8px;}
+.qr-corner.tr{top:-3px;inset-inline-end:-3px;border-inline-start:none;border-bottom:none;border-start-end-radius:8px;}
+.qr-corner.bl{bottom:-3px;inset-inline-start:-3px;border-inline-end:none;border-top:none;border-end-start-radius:8px;}
+.qr-corner.br{bottom:-3px;inset-inline-end:-3px;border-inline-start:none;border-top:none;border-end-end-radius:8px;}
+.qr-scanline{
+  position:absolute;inset-inline-start:8%;inset-inline-end:8%;
+  height:3px;background:linear-gradient(90deg,transparent,#F5B400,transparent);
+  border-radius:3px;top:50%;box-shadow:0 0 18px rgba(245,180,0,.6);
+  animation:qrScan 2.2s ease-in-out infinite;
+}
+@@keyframes qrScan{
+  0%,100%{top:14%;}
+  50%{top:82%;}
+}
+.qr-toast{
+  position:absolute;inset-inline-end:18px;bottom:18px;
+  background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:9px 12px;display:flex;align-items:center;gap:10px;
+  box-shadow:var(--shadow-lg);
+  max-width:200px;
+}
+.qr-toast-ico{
+  width:26px;height:26px;border-radius:8px;
+  background:#F0FDF4;color:#15803D;border:1px solid rgba(34,197,94,.35);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.qr-toast strong{display:block;font-size:11px;font-weight:800;color:var(--text);letter-spacing:-.1px;}
+.qr-toast span{display:block;font-size:10px;color:var(--text2);margin-top:1px;}
+
+.diff-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 9px;border-radius:999px;align-self:flex-start;
+  margin-bottom:10px;
+}
+.diff-tag.y{background:var(--yl);color:var(--yd);}
+.diff-tag.b{background:#EFF6FF;color:#1D4ED8;}
+
+.diff-card-title{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-bottom:8px;}
+.diff-card-desc{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:14px;}
+.diff-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+.diff-list li{font-size:13px;color:var(--text);display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.diff-list svg{width:16px;height:16px;color:var(--y);flex-shrink:0;margin-top:1px;}
+
+/* ── Request a demo ──────────────────────────────────────── */
+.request-section{background:linear-gradient(180deg,#FFFFFF 0%,#F8FAFC 100%);}
+.request-grid{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:48px;align-items:start;
+}
+.request-copy{padding-top:8px;}
+.request-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;}
+.request-list li{font-size:14px;color:var(--text);display:flex;align-items:flex-start;gap:10px;line-height:1.6;}
+.request-list svg{width:18px;height:18px;color:var(--y);flex-shrink:0;margin-top:1px;}
+
+.request-form{
+  background:#fff;border:1px solid var(--border);border-radius:18px;
+  padding:28px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:14px;
+}
+.request-banner{
+  display:flex;align-items:center;gap:10px;padding:11px 14px;
+  border-radius:10px;font-size:13px;font-weight:700;
+}
+.request-banner.ok{background:#F0FDF4;color:#15803D;border:1px solid rgba(34,197,94,.35);}
+.request-banner.err{background:#FEF2F2;color:#B91C1C;border:1px solid rgba(239,68,68,.35);}
+
+.request-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.request-fullrow,.request-row > label{display:flex;flex-direction:column;gap:6px;}
+.request-label{font-size:13px;font-weight:700;color:var(--text);}
+.request-label .opt{font-size:11px;font-weight:600;color:var(--text3);font-style:normal;margin-inline-start:4px;}
+
+.request-form input,
+.request-form textarea{
+  width:100%;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
+  padding:11px 13px;
+  font-size:14px;font-family:'Cairo',sans-serif;color:var(--text);outline:none;
+  transition:border-color .2s,box-shadow .2s,background-color .2s;
+}
+.request-form input::placeholder,
+.request-form textarea::placeholder{color:var(--text3);}
+.request-form input:focus,
+.request-form textarea:focus{border-color:var(--y);box-shadow:0 0 0 4px var(--ring);background:#FFFDF5;}
+.request-form textarea{resize:vertical;min-height:88px;font-family:'Cairo',sans-serif;}
+
+.request-submit{
+  height:48px;align-self:flex-start;font-size:14px;padding:0 22px;margin-top:6px;
+}
+.request-submit svg{width:16px;height:16px;}
+.request-fineprint{font-size:11px;color:var(--text3);margin-top:-2px;}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@@media (max-width:980px){
+  .hero-inner{grid-template-columns:1fr;gap:48px;padding:56px 24px;}
+  .hero-title{font-size:40px;}
+  .hero-sub{font-size:16px;}
+  .feature-grid,.aud-grid{grid-template-columns:1fr 1fr;}
+  .steps{grid-template-columns:1fr;gap:32px;}
+  .steps::before{display:none;}
+  .section{padding:64px 24px;}
+  .section-title{font-size:30px;}
+  .nfc-grid{grid-template-columns:1fr;gap:36px;}
+  .nfc-title{font-size:32px;}
+  .nfc-stage{height:380px;}
+  .diff-grid{grid-template-columns:1fr;}
+  .request-grid{grid-template-columns:1fr;gap:32px;}
+  .request-row{grid-template-columns:1fr;}
+}
+@@media (max-width:600px){
+  .nav-inner{padding:12px 18px;}
+  .nav-logo span{display:none;}
+  .hero-inner{padding:40px 18px;}
+  .hero-title{font-size:32px;letter-spacing:-.6px;}
+  .hero-cta .btn-primary,.hero-cta .btn-ghost{height:44px;font-size:13px;}
+  .feature-grid,.aud-grid{grid-template-columns:1fr;}
+  .section{padding:56px 18px;}
+  .section-title{font-size:26px;}
+  .preview-card{transform:none;}
+  .float-card.tl,.float-card.br{display:none;}
+  .nfc-title{font-size:26px;}
+  .nfc-stage{height:340px;}
+  .nfc-card{width:260px;height:170px;inset-inline-start:2%;}
+  .nfc-phone{width:170px;height:300px;inset-inline-end:2%;}
+  .nfc-waves{inset-inline-start:36%;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">
+        <img src="~/img/tilmez_bus_logo.png" alt="@L["Home_BrandName"]"/>
+        <span>@L["Home_BrandName"]</span>
+      </a>
+      <div class="nav-actions">
+        <a class="lang-btn" href="/Language/Set?culture=@_toggleCulture&returnUrl=@Uri.EscapeDataString(_returnUrl)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>@L["SwitchLang"]</span>
+        </a>
+        <a class="btn-primary" href="/Account/Login">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          <span>@L["Home_NavLogin"]</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="hero-eyebrow"><span class="dot"></span>@L["Home_HeroEyebrow"]</span>
+        <h1 class="hero-title">@L["Home_HeroTitle1"] <span class="accent">@L["Home_HeroTitleAccent"]</span> @L["Home_HeroTitle2"]</h1>
+        <p class="hero-sub">@L["Home_HeroSub"]</p>
+        <div class="hero-cta">
+          <a class="btn-primary" href="/Account/Login">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span>@L["Home_HeroCTAPrimary"]</span>
+          </a>
+          <a class="btn-ghost" href="#features">
+            <span>@L["Home_HeroCTASecondary"]</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          </a>
+        </div>
+        <div class="hero-foot">
+          <span class="hero-foot-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_HeroBadge1"]</span>
+          <span class="hero-foot-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_HeroBadge2"]</span>
+          <span class="hero-foot-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_HeroBadge3"]</span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="preview-card">
+          <!-- Top-left float: student NFC + QR ID badge -->
+          <div class="float-card id-mini tl">
+            <span class="id-mini-avatar">@L["Home_NFC_AvatarInitials"]</span>
+            <div class="id-mini-body">
+              <strong>@L["Home_Demo_IdTitle"]</strong>
+              <span class="id-mini-icons">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 18 0"/><path d="M6.5 12a5.5 5.5 0 0 1 11 0"/><path d="M10 12a2 2 0 0 1 4 0"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <rect x="3" y="3" width="6" height="6" rx="1"/>
+                  <rect x="15" y="3" width="6" height="6" rx="1"/>
+                  <rect x="3" y="15" width="6" height="6" rx="1"/>
+                  <rect x="12" y="12" width="3" height="3"/>
+                  <rect x="17" y="12" width="3" height="3"/>
+                  <rect x="12" y="17" width="3" height="3"/>
+                  <rect x="17" y="17" width="3" height="3"/>
+                </svg>
+                <em>@L["Home_Demo_IdSub"]</em>
+              </span>
+            </div>
+          </div>
+          <!-- Bottom-right float: bus QR sticker -->
+          <div class="float-card qr-mini br">
+            <span class="qr-mini-code">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="0" y="0" width="7" height="7"/>
+                <rect x="1.5" y="1.5" width="4" height="4" fill="#fff"/>
+                <rect x="2.75" y="2.75" width="1.5" height="1.5" fill="currentColor"/>
+                <rect x="17" y="0" width="7" height="7"/>
+                <rect x="18.5" y="1.5" width="4" height="4" fill="#fff"/>
+                <rect x="19.75" y="2.75" width="1.5" height="1.5" fill="currentColor"/>
+                <rect x="0" y="17" width="7" height="7"/>
+                <rect x="1.5" y="18.5" width="4" height="4" fill="#fff"/>
+                <rect x="2.75" y="19.75" width="1.5" height="1.5" fill="currentColor"/>
+                <rect x="9" y="2" width="2" height="2"/>
+                <rect x="12" y="5" width="2" height="2"/>
+                <rect x="14" y="9" width="2" height="2"/>
+                <rect x="9" y="11" width="2" height="2"/>
+                <rect x="17" y="11" width="2" height="2"/>
+                <rect x="11" y="14" width="2" height="2"/>
+                <rect x="14" y="14" width="2" height="2"/>
+                <rect x="17" y="14" width="2" height="2"/>
+                <rect x="10" y="17" width="2" height="2"/>
+                <rect x="14" y="17" width="2" height="2"/>
+                <rect x="17" y="17" width="2" height="2"/>
+                <rect x="11" y="20" width="2" height="2"/>
+                <rect x="15" y="20" width="2" height="2"/>
+              </svg>
+            </span>
+            <div class="qr-mini-body">
+              <strong>@L["Home_Demo_BusQrTitle"]</strong>
+              <span>@L["Home_Demo_BusQrSub"]</span>
+            </div>
+          </div>
+
+          <div class="preview-head">
+            <span class="preview-pulse"></span>
+            <span class="preview-title">@L["Home_DemoLiveTrip"]</span>
+            <span class="preview-eta">@L["Home_DemoOnTime"]</span>
+          </div>
+
+          <div class="preview-map">
+            <svg viewBox="0 0 460 200" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="rt" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#F5B400"/>
+                  <stop offset="100%" stop-color="#FFA500"/>
+                </linearGradient>
+                <pattern id="streets" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                  <path d="M0 30 H60 M30 0 V60" stroke="#E2E8F0" stroke-width="1" fill="none"/>
+                </pattern>
+              </defs>
+              <rect width="460" height="200" fill="url(#streets)"/>
+              <path d="M30 160 C 100 150, 130 70, 220 80 S 360 150, 430 60"
+                    fill="none" stroke="url(#rt)" stroke-width="5" stroke-linecap="round"/>
+              <path d="M30 160 C 100 150, 130 70, 220 80 S 360 150, 430 60"
+                    fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="3 6" opacity=".75"/>
+              <g>
+                <circle cx="30" cy="160" r="7" fill="#0F172A"/>
+                <circle cx="30" cy="160" r="3" fill="#fff"/>
+                <circle cx="220" cy="80" r="6" fill="#fff" stroke="#0F172A" stroke-width="2"/>
+                <circle cx="430" cy="60" r="9" fill="#F5B400" stroke="#0F172A" stroke-width="2"/>
+                <path d="M427 57 l3 3 6-6" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <g transform="translate(170,65)">
+                <rect x="-22" y="-12" width="44" height="22" rx="5" fill="#F5B400" stroke="#0F172A" stroke-width="2"/>
+                <rect x="-17" y="-8" width="10" height="8" rx="1.5" fill="#fff"/>
+                <rect x="-4"  y="-8" width="10" height="8" rx="1.5" fill="#fff"/>
+                <rect x="9"   y="-8" width="10" height="8" rx="1.5" fill="#fff"/>
+                <circle cx="-12" cy="11" r="4" fill="#0F172A"/>
+                <circle cx="14"  cy="11" r="4" fill="#0F172A"/>
+              </g>
+            </svg>
+          </div>
+
+          <div class="preview-stats">
+            <div class="preview-stat">
+              <div class="preview-stat-label">@L["Home_DemoDistanceLbl"]</div>
+              <div class="preview-stat-value"><span class="dot"></span>@L["Home_DemoDistance"]</div>
+            </div>
+            <div class="preview-stat">
+              <div class="preview-stat-label">@L["Home_DemoSpeedLbl"]</div>
+              <div class="preview-stat-value">@L["Home_DemoSpeed"]</div>
+            </div>
+            <div class="preview-stat">
+              <div class="preview-stat-label">@L["Home_DemoOnOffLbl"]</div>
+              <div class="preview-stat-value">@L["Home_DemoOnOff"]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NFC spotlight (signature feature) ──────────────── -->
+  <section class="section nfc-spotlight" id="nfc">
+    <div class="section-inner nfc-grid">
+      <div class="nfc-copy">
+        <span class="nfc-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 0 1 18 0"/>
+            <path d="M6.5 12a5.5 5.5 0 0 1 11 0"/>
+            <path d="M10 12a2 2 0 0 1 4 0"/>
+          </svg>
+          @L["Home_NFC_Badge"]
+        </span>
+        <h2 class="nfc-title">@L["Home_NFC_Title1"] <span class="accent">@L["Home_NFC_TitleAccent"]</span> @L["Home_NFC_Title2"]</h2>
+        <p class="nfc-lead">@L["Home_NFC_Lead"]</p>
+
+        <ul class="nfc-list">
+          <li>
+            <span class="nfc-list-ico y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <div>
+              <strong>@L["Home_NFC_Bullet1_Title"]</strong>
+              <span>@L["Home_NFC_Bullet1_Desc"]</span>
+            </div>
+          </li>
+          <li>
+            <span class="nfc-list-ico b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+            <div>
+              <strong>@L["Home_NFC_Bullet2_Title"]</strong>
+              <span>@L["Home_NFC_Bullet2_Desc"]</span>
+            </div>
+          </li>
+          <li>
+            <span class="nfc-list-ico g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <div>
+              <strong>@L["Home_NFC_Bullet3_Title"]</strong>
+              <span>@L["Home_NFC_Bullet3_Desc"]</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nfc-visual" aria-hidden="true">
+        <!-- Stylized NFC tap: student card under a hovering phone with NFC waves -->
+        <div class="nfc-stage">
+          <!-- Student NFC card -->
+          <div class="nfc-card">
+            <div class="nfc-card-top">
+              <div class="nfc-card-logo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/>
+                  <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
+                <span>@L["Home_BrandName"]</span>
+              </div>
+              <div class="nfc-card-chip">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="nfc-card-body">
+              <div class="nfc-card-avatar">@L["Home_NFC_AvatarInitials"]</div>
+              <div class="nfc-card-name">@L["Home_NFC_CardName"]</div>
+              <div class="nfc-card-meta">@L["Home_NFC_CardMeta"]</div>
+            </div>
+            <div class="nfc-card-bottom">
+              <span class="nfc-card-id">@L["Home_NFC_CardIdLabel"] · NFC-04821</span>
+              <svg class="nfc-card-wave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 0 1 18 0"/>
+                <path d="M6.5 12a5.5 5.5 0 0 1 11 0"/>
+                <path d="M10 12a2 2 0 0 1 4 0"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Hovering phone / scanner -->
+          <div class="nfc-phone">
+            <div class="nfc-phone-notch"></div>
+            <div class="nfc-phone-screen">
+              <div class="nfc-phone-head">
+                <span class="nfc-phone-dot"></span>
+                <span class="nfc-phone-title">@L["Home_NFC_ScanTitle"]</span>
+              </div>
+              <div class="nfc-phone-row">
+                <span class="nfc-phone-label">@L["Home_NFC_ScanField1"]</span>
+                <span class="nfc-phone-val">@L["Home_NFC_CardName"]</span>
+              </div>
+              <div class="nfc-phone-row">
+                <span class="nfc-phone-label">@L["Home_NFC_ScanField2"]</span>
+                <span class="nfc-phone-val">@L["Home_NFC_CardMeta"]</span>
+              </div>
+              <div class="nfc-phone-row">
+                <span class="nfc-phone-label">@L["Home_NFC_ScanField3"]</span>
+                <span class="nfc-phone-val">@L["Home_NFC_ScanParent"]</span>
+              </div>
+              <div class="nfc-phone-btn">@L["Home_NFC_ScanCTA"]</div>
+            </div>
+          </div>
+
+          <!-- NFC waves between the two -->
+          <div class="nfc-waves" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section features" id="features">
+    <div class="section-inner">
+      <div class="section-eyebrow">@L["Home_FeaturesEyebrow"]</div>
+      <h2 class="section-title">@L["Home_FeaturesTitle"]</h2>
+      <p class="section-lead">@L["Home_FeaturesLead"]</p>
+
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="feature-icon y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div class="feature-title">@L["Home_F1_Title"]</div>
+          <div class="feature-desc">@L["Home_F1_Desc"]</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="feature-title">@L["Home_F2_Title"]</div>
+          <div class="feature-desc">@L["Home_F2_Desc"]</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div class="feature-title">@L["Home_F3_Title"]</div>
+          <div class="feature-desc">@L["Home_F3_Desc"]</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon p"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div class="feature-title">@L["Home_F4_Title"]</div>
+          <div class="feature-desc">@L["Home_F4_Desc"]</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon o"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feature-title">@L["Home_F5_Title"]</div>
+          <div class="feature-desc">@L["Home_F5_Desc"]</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <div class="feature-title">@L["Home_F6_Title"]</div>
+          <div class="feature-desc">@L["Home_F6_Desc"]</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Differentiators: auto-routing + QR trip start ─── -->
+  <section class="section diff-section" id="how">
+    <div class="section-inner">
+      <div class="section-eyebrow">@L["Home_Diff_Eyebrow"]</div>
+      <h2 class="section-title">@L["Home_Diff_Title"]</h2>
+      <p class="section-lead">@L["Home_Diff_Lead"]</p>
+
+      <div class="diff-grid">
+        <!-- 1. Smart auto-routing -->
+        <article class="diff-card">
+          <div class="diff-visual diff-visual-route" aria-hidden="true">
+            <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <pattern id="diffgrid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M0 20 H40 M20 0 V40" stroke="#E2E8F0" stroke-width="1" fill="none"/>
+                </pattern>
+                <linearGradient id="diffroute" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#F5B400"/>
+                  <stop offset="100%" stop-color="#FFA500"/>
+                </linearGradient>
+              </defs>
+              <rect width="360" height="200" fill="url(#diffgrid)"/>
+              <!-- Three home → school auto-drawn paths -->
+              <path d="M40 60 Q 130 30 180 100" fill="none" stroke="url(#diffroute)" stroke-width="3" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="0">
+                <animate attributeName="stroke-dashoffset" from="220" to="0" dur="2.4s" repeatCount="indefinite"/>
+              </path>
+              <path d="M50 160 Q 140 170 180 100" fill="none" stroke="url(#diffroute)" stroke-width="3" stroke-linecap="round" stroke-dasharray="180" stroke-dashoffset="0">
+                <animate attributeName="stroke-dashoffset" from="180" to="0" dur="2.4s" begin=".6s" repeatCount="indefinite"/>
+              </path>
+              <path d="M320 50 Q 240 50 180 100" fill="none" stroke="url(#diffroute)" stroke-width="3" stroke-linecap="round" stroke-dasharray="170" stroke-dashoffset="0">
+                <animate attributeName="stroke-dashoffset" from="170" to="0" dur="2.4s" begin="1.2s" repeatCount="indefinite"/>
+              </path>
+              <path d="M310 160 Q 240 150 180 100" fill="none" stroke="url(#diffroute)" stroke-width="3" stroke-linecap="round" stroke-dasharray="160" stroke-dashoffset="0">
+                <animate attributeName="stroke-dashoffset" from="160" to="0" dur="2.4s" begin="1.8s" repeatCount="indefinite"/>
+              </path>
+              <!-- Houses -->
+              <g fill="#fff" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round">
+                <g transform="translate(40,60)"><path d="M-9 4 L-9 -2 L0 -10 L9 -2 L9 4 Z"/><rect x="-3" y="-2" width="6" height="6" fill="#F5B400"/></g>
+                <g transform="translate(50,160)"><path d="M-9 4 L-9 -2 L0 -10 L9 -2 L9 4 Z"/><rect x="-3" y="-2" width="6" height="6" fill="#F5B400"/></g>
+                <g transform="translate(320,50)"><path d="M-9 4 L-9 -2 L0 -10 L9 -2 L9 4 Z"/><rect x="-3" y="-2" width="6" height="6" fill="#F5B400"/></g>
+                <g transform="translate(310,160)"><path d="M-9 4 L-9 -2 L0 -10 L9 -2 L9 4 Z"/><rect x="-3" y="-2" width="6" height="6" fill="#F5B400"/></g>
+              </g>
+              <!-- School at center -->
+              <g transform="translate(180,100)">
+                <circle r="22" fill="#0F172A"/>
+                <path d="M-10 4 L-10 -2 L0 -10 L10 -2 L10 4 Z M-4 4 L-4 -2 L4 -2 L4 4 Z" fill="#F5B400" stroke="none"/>
+                <rect x="-12" y="4" width="24" height="3" fill="#F5B400"/>
+              </g>
+            </svg>
+          </div>
+          <span class="diff-tag y">@L["Home_Diff_Card1_Tag"]</span>
+          <h3 class="diff-card-title">@L["Home_Diff_Card1_Title"]</h3>
+          <p class="diff-card-desc">@L["Home_Diff_Card1_Desc"]</p>
+          <ul class="diff-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Diff_Card1_B1"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Diff_Card1_B2"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Diff_Card1_B3"]</li>
+          </ul>
+        </article>
+
+        <!-- 2. Tap-to-start QR -->
+        <article class="diff-card">
+          <div class="diff-visual diff-visual-qr" aria-hidden="true">
+            <!-- Stylized QR code -->
+            <div class="qr-frame">
+              <span class="qr-corner tl"></span>
+              <span class="qr-corner tr"></span>
+              <span class="qr-corner bl"></span>
+              <span class="qr-corner br"></span>
+              <svg class="qr-svg" viewBox="0 0 24 24" fill="#0F172A" aria-hidden="true">
+                <rect x="0" y="0" width="7" height="7"/>
+                <rect x="1.5" y="1.5" width="4" height="4" fill="#fff"/>
+                <rect x="2.75" y="2.75" width="1.5" height="1.5" fill="#0F172A"/>
+                <rect x="17" y="0" width="7" height="7"/>
+                <rect x="18.5" y="1.5" width="4" height="4" fill="#fff"/>
+                <rect x="19.75" y="2.75" width="1.5" height="1.5" fill="#0F172A"/>
+                <rect x="0" y="17" width="7" height="7"/>
+                <rect x="1.5" y="18.5" width="4" height="4" fill="#fff"/>
+                <rect x="2.75" y="19.75" width="1.5" height="1.5" fill="#0F172A"/>
+                <rect x="9" y="2" width="2" height="2"/>
+                <rect x="12" y="2" width="2" height="2"/>
+                <rect x="9" y="5" width="2" height="2"/>
+                <rect x="14" y="5" width="2" height="2"/>
+                <rect x="2" y="9" width="2" height="2"/>
+                <rect x="5" y="9" width="2" height="2"/>
+                <rect x="9" y="9" width="2" height="2"/>
+                <rect x="12" y="9" width="2" height="2"/>
+                <rect x="17" y="9" width="2" height="2"/>
+                <rect x="20" y="9" width="2" height="2"/>
+                <rect x="2" y="12" width="2" height="2"/>
+                <rect x="6" y="12" width="2" height="2"/>
+                <rect x="11" y="12" width="2" height="2"/>
+                <rect x="14" y="12" width="2" height="2"/>
+                <rect x="18" y="12" width="2" height="2"/>
+                <rect x="21" y="12" width="2" height="2"/>
+                <rect x="9" y="15" width="2" height="2"/>
+                <rect x="14" y="15" width="2" height="2"/>
+                <rect x="17" y="15" width="2" height="2"/>
+                <rect x="20" y="15" width="2" height="2"/>
+                <rect x="9" y="18" width="2" height="2"/>
+                <rect x="12" y="18" width="2" height="2"/>
+                <rect x="15" y="18" width="2" height="2"/>
+                <rect x="18" y="18" width="2" height="2"/>
+                <rect x="21" y="18" width="2" height="2"/>
+                <rect x="9" y="21" width="2" height="2"/>
+                <rect x="14" y="21" width="2" height="2"/>
+                <rect x="17" y="21" width="2" height="2"/>
+              </svg>
+              <span class="qr-scanline"></span>
+            </div>
+            <!-- Resume toast -->
+            <div class="qr-toast">
+              <span class="qr-toast-ico">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <div>
+                <strong>@L["Home_Diff_Card2_ToastTitle"]</strong>
+                <span>@L["Home_Diff_Card2_ToastDesc"]</span>
+              </div>
+            </div>
+          </div>
+          <span class="diff-tag b">@L["Home_Diff_Card2_Tag"]</span>
+          <h3 class="diff-card-title">@L["Home_Diff_Card2_Title"]</h3>
+          <p class="diff-card-desc">@L["Home_Diff_Card2_Desc"]</p>
+          <ul class="diff-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Diff_Card2_B1"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Diff_Card2_B2"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Diff_Card2_B3"]</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-eyebrow">@L["Home_StepsEyebrow"]</div>
+      <h2 class="section-title">@L["Home_StepsTitle"]</h2>
+      <p class="section-lead">@L["Home_StepsLead"]</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-title">@L["Home_Step1_Title"]</div>
+          <div class="step-desc">@L["Home_Step1_Desc"]</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-title">@L["Home_Step2_Title"]</div>
+          <div class="step-desc">@L["Home_Step2_Desc"]</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-title">@L["Home_Step3_Title"]</div>
+          <div class="step-desc">@L["Home_Step3_Desc"]</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section audiences">
+    <div class="section-inner">
+      <div class="section-eyebrow">@L["Home_AudEyebrow"]</div>
+      <h2 class="section-title">@L["Home_AudTitle"]</h2>
+      <p class="section-lead">@L["Home_AudLead"]</p>
+
+      <div class="aud-grid">
+        <div class="aud">
+          <div class="aud-tag">@L["Home_Aud1_Tag"]</div>
+          <div class="aud-title">@L["Home_Aud1_Title"]</div>
+          <div class="aud-desc">@L["Home_Aud1_Desc"]</div>
+          <ul class="aud-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud1_Bullet1"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud1_Bullet2"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud1_Bullet3"]</li>
+          </ul>
+        </div>
+        <div class="aud b">
+          <div class="aud-tag">@L["Home_Aud2_Tag"]</div>
+          <div class="aud-title">@L["Home_Aud2_Title"]</div>
+          <div class="aud-desc">@L["Home_Aud2_Desc"]</div>
+          <ul class="aud-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud2_Bullet1"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud2_Bullet2"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud2_Bullet3"]</li>
+          </ul>
+        </div>
+        <div class="aud g">
+          <div class="aud-tag">@L["Home_Aud3_Tag"]</div>
+          <div class="aud-title">@L["Home_Aud3_Title"]</div>
+          <div class="aud-desc">@L["Home_Aud3_Desc"]</div>
+          <ul class="aud-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud3_Bullet1"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud3_Bullet2"]</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Aud3_Bullet3"]</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Request a demo ─────────────────────────────────── -->
+  <section class="section request-section" id="request-demo">
+    <div class="section-inner request-grid">
+      <div class="request-copy">
+        <div class="section-eyebrow" style="text-align:start;">@L["Home_Request_Eyebrow"]</div>
+        <h2 class="section-title" style="text-align:start;">@L["Home_Request_Title"]</h2>
+        <p class="section-lead" style="text-align:start;margin:0 0 24px;">@L["Home_Request_Lead"]</p>
+        <ul class="request-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Request_Bullet1"]</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Request_Bullet2"]</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>@L["Home_Request_Bullet3"]</li>
+        </ul>
+      </div>
+
+      <form class="request-form" method="post" action="/Home/RequestDemo">
+        @Html.AntiForgeryToken()
+
+        @{
+          var demoResult  = TempData["DemoResult"]  as string;
+          var demoMessage = TempData["DemoMessage"] as string;
+        }
+        @if (demoResult == "ok")
+        {
+          <div class="request-banner ok">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>@L["Home_Request_Success"]</span>
+          </div>
+        }
+        else if (demoResult == "error")
+        {
+          <div class="request-banner err">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>@(demoMessage == "missing-fields" ? L["Home_Request_ErrMissing"].Value : L["Home_Request_ErrGeneric"].Value)</span>
+          </div>
+        }
+
+        <div class="request-row">
+          <label>
+            <span class="request-label">@L["Home_Request_FieldSchool"]</span>
+            <input type="text" name="schoolName" required maxlength="200" placeholder="@L["Home_Request_PHSchool"]"/>
+          </label>
+          <label>
+            <span class="request-label">@L["Home_Request_FieldContact"]</span>
+            <input type="text" name="contactName" required maxlength="200" placeholder="@L["Home_Request_PHContact"]"/>
+          </label>
+        </div>
+        <div class="request-row">
+          <label>
+            <span class="request-label">@L["Home_Request_FieldEmail"]</span>
+            <input type="email" name="email" required maxlength="256" placeholder="@L["Home_Request_PHEmail"]"/>
+          </label>
+          <label>
+            <span class="request-label">@L["Home_Request_FieldPhone"] <em class="opt">@L["Home_Request_Optional"]</em></span>
+            <input type="tel" name="phoneNumber" maxlength="40" placeholder="@L["Home_Request_PHPhone"]"/>
+          </label>
+        </div>
+        <label class="request-fullrow">
+          <span class="request-label">@L["Home_Request_FieldNotes"] <em class="opt">@L["Home_Request_Optional"]</em></span>
+          <textarea name="notes" rows="3" maxlength="2000" placeholder="@L["Home_Request_PHNotes"]"></textarea>
+        </label>
+
+        <button type="submit" class="btn-primary request-submit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span>@L["Home_Request_Submit"]</span>
+        </button>
+        <div class="request-fineprint">@L["Home_Request_FinePrint"]</div>
+      </form>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="foot-inner">
+      <div class="foot-brand">
+        © @DateTime.Now.Year <strong>@L["Home_BrandName"]</strong> · @L["Home_FooterRights"]
+      </div>
+      <div class="foot-contact">
+        <a class="foot-contact-item" href="tel:+962797277989" dir="ltr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>+962 79 727 7989</span>
+        </a>
+        <a class="foot-contact-item" href="mailto:info@TilmezBus.com">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>info@TilmezBus.com</span>
+        </a>
+      </div>
+      <div class="foot-tag">@L["Home_FooterTagline"]</div>
+    </div>
+  </footer>
 </div>
+</body>
+</html>

@@ -32,6 +32,7 @@ public interface IApplicationDbContext
     DbSet<EmployeeQrToken> EmployeeQrTokens { get; }
     DbSet<StudentQrToken>  StudentQrTokens  { get; }
     DbSet<UserDeviceToken> UserDeviceTokens { get; }
+    DbSet<DemoRequest> DemoRequests { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

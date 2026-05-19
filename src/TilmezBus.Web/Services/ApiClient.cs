@@ -4,6 +4,8 @@ using System.Text.Json;
 using TilmezBus.Application.Common.Models;
 using TilmezBus.Application.Features.Alerts.Queries.GetAllAlerts;
 using TilmezBus.Application.Features.Buses.Queries.GetAllBuses;
+using TilmezBus.Application.Features.DemoRequests.Queries.GetAllDemoRequests;
+using TilmezBus.Domain.Enums;
 using TilmezBus.Application.Features.Drivers.Queries.GetAllDrivers;
 using TilmezBus.Application.Features.Schools.Queries.GetAllSchools;
 using TilmezBus.Application.Features.Students.Queries.GetAllStudents;
@@ -300,4 +302,23 @@ public class ApiClient : IApiClient
     }
 
     private record LoginResult(string Token, string Email, IEnumerable<string> Roles, DateTime ExpiresAt);
+
+    // ── Demo requests ──────────────────────────────────────────────────────
+    public Task<(bool Ok, string? Error)> SubmitDemoRequestAsync(
+        string schoolName, string contactName, string email, string? phoneNumber, string? notes)
+        => SendAsync(HttpMethod.Post, "api/v1/demo-requests", new
+        {
+            schoolName, contactName, email, phoneNumber, notes
+        });
+
+    public Task<PagedResult<DemoRequestDto>?> GetDemoRequestsAsync(
+        int pageNumber = 1, int pageSize = 20, DemoRequestStatus? status = null)
+    {
+        var url = $"api/v1/superadmin/demo-requests?pageNumber={pageNumber}&pageSize={pageSize}";
+        if (status.HasValue) url += $"&status={status.Value}";
+        return GetAsync<PagedResult<DemoRequestDto>>(url);
+    }
+
+    public Task<(bool Ok, string? Error)> CompleteDemoRequestAsync(Guid id)
+        => SendAsync(HttpMethod.Post, $"api/v1/superadmin/demo-requests/{id}/complete");
 }

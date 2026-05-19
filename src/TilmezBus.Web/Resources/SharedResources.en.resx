@@ -58,6 +58,7 @@
   <data name="Login_BrandName"    xml:space="preserve"><value>Tilmez Bus Platform</value></data>
   <data name="Login_BrandShort"   xml:space="preserve"><value>Tilmez</value></data>
   <data name="Login_PageTitle"    xml:space="preserve"><value>Tilmez — Sign In</value></data>
+  <data name="Login_BackToHome"   xml:space="preserve"><value>Back to home</value></data>
   <data name="Login_DemoLiveTrip" xml:space="preserve"><value>Live Trip</value></data>
   <data name="Login_DemoRoute"    xml:space="preserve"><value>Route #3</value></data>
   <data name="Login_DemoOnTime"   xml:space="preserve"><value>On time</value></data>
@@ -707,4 +708,186 @@
   <data name="Dash_TripsWeek"          xml:space="preserve"><value>trips over 7 days</value></data>
   <data name="Dash_ChartLabelTrips"    xml:space="preserve"><value>Trips</value></data>
   <data name="Dash_Total"              xml:space="preserve"><value>Total</value></data>
+
+  <!-- Public landing page (Home/Index) -->
+  <data name="Home_PageTitle"          xml:space="preserve"><value>TilmezBus — School transport, simplified.</value></data>
+  <data name="Home_MetaDescription"    xml:space="preserve"><value>TilmezBus is a school-bus operations platform: live trip tracking, parent notifications, attendance, and roster management — built for schools, drivers, and parents.</value></data>
+  <data name="Home_BrandName"          xml:space="preserve"><value>TilmezBus</value></data>
+  <data name="Home_NavLogin"           xml:space="preserve"><value>School login</value></data>
+
+  <data name="Home_HeroEyebrow"        xml:space="preserve"><value>Live trips, every morning</value></data>
+  <data name="Home_HeroTitle1"         xml:space="preserve"><value>Track every</value></data>
+  <data name="Home_HeroTitleAccent"    xml:space="preserve"><value>student.</value></data>
+  <data name="Home_HeroTitle2"         xml:space="preserve"><value>Trust every trip.</value></data>
+  <data name="Home_HeroSub"            xml:space="preserve"><value>TilmezBus gives schools real-time visibility into every bus, keeps parents calm with live notifications, and gives drivers and assistants a simple mobile app to run the day.</value></data>
+  <data name="Home_HeroCTAPrimary"    xml:space="preserve"><value>Sign in to dashboard</value></data>
+  <data name="Home_HeroCTASecondary"  xml:space="preserve"><value>See what's included</value></data>
+  <data name="Home_HeroBadge1"        xml:space="preserve"><value>No app for parents required</value></data>
+  <data name="Home_HeroBadge2"        xml:space="preserve"><value>Arabic + English</value></data>
+  <data name="Home_HeroBadge3"        xml:space="preserve"><value>Cloud-hosted, always on</value></data>
+
+  <data name="Home_DemoBoarded"       xml:space="preserve"><value>18 / 22 boarded</value></data>
+  <data name="Home_DemoEta"           xml:space="preserve"><value>ETA 7 min</value></data>
+  <data name="Home_Demo_IdTitle"      xml:space="preserve"><value>Student ID</value></data>
+  <data name="Home_Demo_IdSub"        xml:space="preserve"><value>NFC + QR</value></data>
+  <data name="Home_Demo_BusQrTitle"   xml:space="preserve"><value>Bus QR</value></data>
+  <data name="Home_Demo_BusQrSub"     xml:space="preserve"><value>Scan to start</value></data>
+  <data name="Home_DemoLiveTrip"      xml:space="preserve"><value>Live trip · Bus-1042</value></data>
+  <data name="Home_DemoOnTime"        xml:space="preserve"><value>On time</value></data>
+  <data name="Home_DemoDistanceLbl"   xml:space="preserve"><value>Distance</value></data>
+  <data name="Home_DemoDistance"      xml:space="preserve"><value>4.2 km</value></data>
+  <data name="Home_DemoSpeedLbl"      xml:space="preserve"><value>Speed</value></data>
+  <data name="Home_DemoSpeed"        xml:space="preserve"><value>38 km/h</value></data>
+  <data name="Home_DemoOnOffLbl"     xml:space="preserve"><value>Onboard</value></data>
+  <data name="Home_DemoOnOff"        xml:space="preserve"><value>18 / 22</value></data>
+
+  <!-- NFC spotlight -->
+  <data name="Home_NFC_Badge"        xml:space="preserve"><value>Signature feature · NFC</value></data>
+  <data name="Home_NFC_Title1"       xml:space="preserve"><value>One tap is the whole</value></data>
+  <data name="Home_NFC_TitleAccent"  xml:space="preserve"><value>roll call</value></data>
+  <data name="Home_NFC_Title2"       xml:space="preserve"><value>— and a safety net for every student.</value></data>
+  <data name="Home_NFC_Lead"         xml:space="preserve"><value>Every student carries a personalised NFC card. Assistants tap it to board or drop off in a single gesture — no typing, no roll call. If the card is ever lost or a stranger finds the student, anyone with a phone can scan it and instantly see who they belong to and how to reach the school and parent.</value></data>
+  <data name="Home_NFC_Bullet1_Title" xml:space="preserve"><value>Tap to board, tap to drop off</value></data>
+  <data name="Home_NFC_Bullet1_Desc"  xml:space="preserve"><value>Attendance for the whole bus in seconds — boarding and drop-off events stream live to the school dashboard and to parents.</value></data>
+  <data name="Home_NFC_Bullet2_Title" xml:space="preserve"><value>Parents notified the moment they're off</value></data>
+  <data name="Home_NFC_Bullet2_Desc"  xml:space="preserve"><value>Every tap pings the right parent with name, time, and bus — no follow-up calls, no "did they make it?" texts.</value></data>
+  <data name="Home_NFC_Bullet3_Title" xml:space="preserve"><value>Lost-and-found safety</value></data>
+  <data name="Home_NFC_Bullet3_Desc"  xml:space="preserve"><value>Anyone — a passer-by, a shopkeeper, a teacher — can scan the card with any phone to see the student's name, school, and a direct contact number for the parent.</value></data>
+
+  <data name="Home_NFC_AvatarInitials" xml:space="preserve"><value>SA</value></data>
+  <data name="Home_NFC_CardName"     xml:space="preserve"><value>Sara Al-Hashimi</value></data>
+  <data name="Home_NFC_CardMeta"     xml:space="preserve"><value>Grade 4 · Bright Minds School</value></data>
+  <data name="Home_NFC_CardIdLabel"  xml:space="preserve"><value>Student ID</value></data>
+  <data name="Home_NFC_ScanTitle"    xml:space="preserve"><value>Scan result</value></data>
+  <data name="Home_NFC_ScanField1"   xml:space="preserve"><value>Student</value></data>
+  <data name="Home_NFC_ScanField2"   xml:space="preserve"><value>School + grade</value></data>
+  <data name="Home_NFC_ScanField3"   xml:space="preserve"><value>Parent contact</value></data>
+  <data name="Home_NFC_ScanParent"   xml:space="preserve"><value>Mr Al-Hashimi · +962 79 555 0123</value></data>
+  <data name="Home_NFC_ScanCTA"      xml:space="preserve"><value>Call parent</value></data>
+
+  <data name="Home_FeaturesEyebrow"  xml:space="preserve"><value>What's inside</value></data>
+  <data name="Home_FeaturesTitle"    xml:space="preserve"><value>Everything a school transport day needs</value></data>
+  <data name="Home_FeaturesLead"     xml:space="preserve"><value>One platform for the people who run the route, the people who ride it, and the people waiting at home.</value></data>
+
+  <data name="Home_F1_Title"         xml:space="preserve"><value>Live tracking</value></data>
+  <data name="Home_F1_Desc"          xml:space="preserve"><value>See every in-progress trip on a live map with ETA, current speed, and a countdown to expected arrival.</value></data>
+  <data name="Home_F2_Title"         xml:space="preserve"><value>Roster + attendance</value></data>
+  <data name="Home_F2_Desc"          xml:space="preserve"><value>Assistants check students on and off with a tap. Daily attendance and absences flow straight into the admin dashboard.</value></data>
+  <data name="Home_F3_Title"         xml:space="preserve"><value>Instant alerts</value></data>
+  <data name="Home_F3_Desc"          xml:space="preserve"><value>Parents get a push notification when their child boards, when the bus is nearby, and if a delay is brewing.</value></data>
+  <data name="Home_F4_Title"         xml:space="preserve"><value>Zero-config trips</value></data>
+  <data name="Home_F4_Desc"          xml:space="preserve"><value>You don't draw routes or build trips by hand. The system studies each school's homes, picks the shortest path per student, and spins up the daily trips on its own.</value></data>
+  <data name="Home_F5_Title"         xml:space="preserve"><value>Driver + assistant app</value></data>
+  <data name="Home_F5_Desc"          xml:space="preserve"><value>Scan the bus's QR sticker to start the day — the app picks up where the last trip left off, loads the right roster, and walks the team from boarding to drop-off.</value></data>
+  <data name="Home_F6_Title"         xml:space="preserve"><value>Multi-school ready</value></data>
+  <data name="Home_F6_Desc"          xml:space="preserve"><value>One platform, many tenants. SuperAdmins onboard schools and manage subscriptions; each school sees only its own data.</value></data>
+
+  <!-- Differentiator spotlight (auto-routing + QR) -->
+  <data name="Home_Diff_Eyebrow"     xml:space="preserve"><value>Setup is one evening</value></data>
+  <data name="Home_Diff_Title"       xml:space="preserve"><value>The system does the busywork. You just confirm.</value></data>
+  <data name="Home_Diff_Lead"        xml:space="preserve"><value>Two design choices keep the day-to-day painless: routes draw themselves from the student roster, and a sticker on the bus is the whole "start the trip" workflow.</value></data>
+  <data name="Home_Diff_Card1_Tag"   xml:space="preserve"><value>Smart auto-routing</value></data>
+  <data name="Home_Diff_Card1_Title" xml:space="preserve"><value>No routes to draw. Ever.</value></data>
+  <data name="Home_Diff_Card1_Desc"  xml:space="preserve"><value>The school doesn't enter its own location, and doesn't enter students' locations either — the system deduces both automatically. TilmezBus picks up each student's home location from the parent's device, and the school's location from the moment it's onboarded, then studies the geometry, groups students by area, and draws the shortest realistic path on its own.</value></data>
+  <data name="Home_Diff_Card1_B1"    xml:space="preserve"><value>Student homes + school location are detected automatically — no admin input needed</value></data>
+  <data name="Home_Diff_Card1_B2"    xml:space="preserve"><value>Shortest-path routing picked for each student, end to end</value></data>
+  <data name="Home_Diff_Card1_B3"    xml:space="preserve"><value>Re-balances on its own when students are added, moved, or absent</value></data>
+
+  <data name="Home_Diff_Card2_Tag"   xml:space="preserve"><value>Tap-to-start QR</value></data>
+  <data name="Home_Diff_Card2_Title" xml:space="preserve"><value>One sticker. The trip starts itself.</value></data>
+  <data name="Home_Diff_Card2_Desc"  xml:space="preserve"><value>Every bus has a QR sticker. The driver or assistant scans it once at the start of the day — the app identifies the bus, loads the right roster, and resumes the last trip that was running on it. No menus, no manual selection.</value></data>
+  <data name="Home_Diff_Card2_B1"    xml:space="preserve"><value>Scan the bus → trip begins instantly</value></data>
+  <data name="Home_Diff_Card2_B2"    xml:space="preserve"><value>Automatically picks up the last roster on that bus</value></data>
+  <data name="Home_Diff_Card2_B3"    xml:space="preserve"><value>Same flow every morning — no app screen to memorise</value></data>
+  <data name="Home_Diff_Card2_ToastTitle" xml:space="preserve"><value>Trip resumed</value></data>
+  <data name="Home_Diff_Card2_ToastDesc"  xml:space="preserve"><value>BUS-1042 · 22 students loaded</value></data>
+
+  <data name="Home_StepsEyebrow"     xml:space="preserve"><value>How it works</value></data>
+  <data name="Home_StepsTitle"       xml:space="preserve"><value>Three steps to a calmer morning</value></data>
+  <data name="Home_StepsLead"        xml:space="preserve"><value>Onboarding is a one-evening job. The day-to-day fits into a single app per role.</value></data>
+  <data name="Home_Step1_Title"      xml:space="preserve"><value>Add buses + students</value></data>
+  <data name="Home_Step1_Desc"       xml:space="preserve"><value>That's the whole setup. No drawing routes, no scheduling trips — the system studies the homes and picks the shortest path per student on its own.</value></data>
+  <data name="Home_Step2_Title"      xml:space="preserve"><value>Scan the bus, run the trip</value></data>
+  <data name="Home_Step2_Desc"       xml:space="preserve"><value>Drivers scan the QR sticker on the bus. The app picks up the right roster (resuming the last trip on that bus), then walks the team through boarding and drop-off.</value></data>
+  <data name="Home_Step3_Title"      xml:space="preserve"><value>Stay in sync</value></data>
+  <data name="Home_Step3_Desc"       xml:space="preserve"><value>Admins watch the live dashboard. Parents receive push updates. Attendance, absences, and exceptions are logged automatically.</value></data>
+
+  <data name="Home_AudEyebrow"       xml:space="preserve"><value>Built for everyone in the trip</value></data>
+  <data name="Home_AudTitle"         xml:space="preserve"><value>Three roles, one source of truth</value></data>
+  <data name="Home_AudLead"          xml:space="preserve"><value>Each role gets exactly the view it needs — nothing more, nothing less.</value></data>
+  <data name="Home_Aud1_Tag"         xml:space="preserve"><value>For schools</value></data>
+  <data name="Home_Aud1_Title"       xml:space="preserve"><value>Admin control room</value></data>
+  <data name="Home_Aud1_Desc"        xml:space="preserve"><value>Run the whole transport operation from one dashboard — buses, students, drivers, schedules, and live trip status.</value></data>
+  <data name="Home_Aud1_Bullet1"     xml:space="preserve"><value>Live + today + roster metrics at a glance</value></data>
+  <data name="Home_Aud1_Bullet2"     xml:space="preserve"><value>Bulk student import and roster editing</value></data>
+  <data name="Home_Aud1_Bullet3"     xml:space="preserve"><value>Subscription + seat-limit awareness</value></data>
+  <data name="Home_Aud2_Tag"         xml:space="preserve"><value>For drivers + assistants</value></data>
+  <data name="Home_Aud2_Title"       xml:space="preserve"><value>Mobile-first trip flow</value></data>
+  <data name="Home_Aud2_Desc"        xml:space="preserve"><value>A purpose-built mobile app that walks the trip team from bus scan to last drop-off without typing.</value></data>
+  <data name="Home_Aud2_Bullet1"     xml:space="preserve"><value>QR-scan a bus to start a trip</value></data>
+  <data name="Home_Aud2_Bullet2"     xml:space="preserve"><value>One-tap boarding and drop-off</value></data>
+  <data name="Home_Aud2_Bullet3"     xml:space="preserve"><value>Offline-tolerant for spotty coverage</value></data>
+  <data name="Home_Aud3_Tag"         xml:space="preserve"><value>For parents</value></data>
+  <data name="Home_Aud3_Title"       xml:space="preserve"><value>Calm visibility, no app required</value></data>
+  <data name="Home_Aud3_Desc"        xml:space="preserve"><value>Push notifications keep parents in the loop without installing anything heavy or learning a new system.</value></data>
+  <data name="Home_Aud3_Bullet1"     xml:space="preserve"><value>Boarding + drop-off pings in real time</value></data>
+  <data name="Home_Aud3_Bullet2"     xml:space="preserve"><value>Absence requests in a couple of taps</value></data>
+  <data name="Home_Aud3_Bullet3"     xml:space="preserve"><value>Direct line to the assistant if needed</value></data>
+
+  <data name="Home_CTATitle"         xml:space="preserve"><value>Ready to start the day?</value></data>
+  <data name="Home_CTASub"           xml:space="preserve"><value>Sign in to your school's admin dashboard to manage buses, students, and today's trips.</value></data>
+  <data name="Home_CTAButton"        xml:space="preserve"><value>Sign in to dashboard</value></data>
+
+  <data name="Home_FooterRights"     xml:space="preserve"><value>All rights reserved.</value></data>
+  <data name="Home_FooterTagline"    xml:space="preserve"><value>School transport, simplified.</value></data>
+
+  <!-- Request-a-demo section (landing page) -->
+  <data name="Home_Request_Eyebrow"  xml:space="preserve"><value>Get in touch</value></data>
+  <data name="Home_Request_Title"    xml:space="preserve"><value>Request a demo for your school</value></data>
+  <data name="Home_Request_Lead"     xml:space="preserve"><value>Tell us a bit about your school and we'll set up a personalised walkthrough — usually within one business day.</value></data>
+  <data name="Home_Request_Bullet1"  xml:space="preserve"><value>Live walkthrough of the admin dashboard with your own data</value></data>
+  <data name="Home_Request_Bullet2"  xml:space="preserve"><value>Driver + assistant app demo on a real phone</value></data>
+  <data name="Home_Request_Bullet3"  xml:space="preserve"><value>Pricing tailored to your fleet and student roster</value></data>
+  <data name="Home_Request_FieldSchool"  xml:space="preserve"><value>School name</value></data>
+  <data name="Home_Request_FieldContact" xml:space="preserve"><value>Contact name</value></data>
+  <data name="Home_Request_FieldEmail"   xml:space="preserve"><value>Email</value></data>
+  <data name="Home_Request_FieldPhone"   xml:space="preserve"><value>Phone</value></data>
+  <data name="Home_Request_FieldNotes"   xml:space="preserve"><value>Anything we should know?</value></data>
+  <data name="Home_Request_PHSchool"     xml:space="preserve"><value>Bright Minds School</value></data>
+  <data name="Home_Request_PHContact"    xml:space="preserve"><value>Sara Al-Hashimi</value></data>
+  <data name="Home_Request_PHEmail"      xml:space="preserve"><value>name@school.example</value></data>
+  <data name="Home_Request_PHPhone"      xml:space="preserve"><value>+962 79 555 0123</value></data>
+  <data name="Home_Request_PHNotes"      xml:space="preserve"><value>Roughly how many students and buses, preferred demo time, etc.</value></data>
+  <data name="Home_Request_Optional"     xml:space="preserve"><value>(optional)</value></data>
+  <data name="Home_Request_Submit"       xml:space="preserve"><value>Send request</value></data>
+  <data name="Home_Request_FinePrint"    xml:space="preserve"><value>We'll only use your details to schedule the demo and won't share them with anyone else.</value></data>
+  <data name="Home_Request_Success"      xml:space="preserve"><value>Thanks — your request was received. We'll be in touch within one business day.</value></data>
+  <data name="Home_Request_ErrMissing"   xml:space="preserve"><value>Please fill in school, contact name, and email.</value></data>
+  <data name="Home_Request_ErrGeneric"   xml:space="preserve"><value>Something went wrong while submitting. Please try again in a moment.</value></data>
+
+  <!-- SuperAdmin · Demo requests queue -->
+  <data name="Nav_DemoRequests"          xml:space="preserve"><value>Demo requests</value></data>
+  <data name="SA_DemoReq_Title"          xml:space="preserve"><value>Demo requests</value></data>
+  <data name="SA_DemoReq_Sub"            xml:space="preserve"><value>Leads from the public landing page. Mark each one completed once you've reached out.</value></data>
+  <data name="SA_DemoReq_FilterAll"      xml:space="preserve"><value>All</value></data>
+  <data name="SA_DemoReq_FilterPending"  xml:space="preserve"><value>Pending</value></data>
+  <data name="SA_DemoReq_FilterCompleted" xml:space="preserve"><value>Completed</value></data>
+  <data name="SA_DemoReq_StatusPending"  xml:space="preserve"><value>Pending</value></data>
+  <data name="SA_DemoReq_StatusCompleted" xml:space="preserve"><value>Completed</value></data>
+  <data name="SA_DemoReq_MarkButton"     xml:space="preserve"><value>Mark completed</value></data>
+  <data name="SA_DemoReq_MarkedCompleted" xml:space="preserve"><value>Request marked as completed.</value></data>
+  <data name="SA_DemoReq_CompletedAt"    xml:space="preserve"><value>Completed</value></data>
+  <data name="SA_DemoReq_Empty"          xml:space="preserve"><value>No demo requests yet.</value></data>
+  <data name="SA_DemoReq_Prev"           xml:space="preserve"><value>Prev</value></data>
+  <data name="SA_DemoReq_Next"           xml:space="preserve"><value>Next</value></data>
+  <data name="SA_DemoReq_TotalAll"       xml:space="preserve"><value>Total all-time</value></data>
+  <data name="SA_DemoReq_Col_School"     xml:space="preserve"><value>School</value></data>
+  <data name="SA_DemoReq_Col_Contact"    xml:space="preserve"><value>Contact</value></data>
+  <data name="SA_DemoReq_Col_Email"      xml:space="preserve"><value>Email</value></data>
+  <data name="SA_DemoReq_Col_Phone"      xml:space="preserve"><value>Phone</value></data>
+  <data name="SA_DemoReq_Col_Submitted"  xml:space="preserve"><value>Submitted</value></data>
+  <data name="SA_DemoReq_Col_Status"     xml:space="preserve"><value>Status</value></data>
+  <data name="SA_DemoReq_Col_Actions"    xml:space="preserve"><value>Actions</value></data>
+  <data name="SA_DemoReq_NotesToggle"    xml:space="preserve"><value>Notes</value></data>
+  <data name="SA_DemoReq_NotesHead"      xml:space="preserve"><value>Submitter's notes</value></data>
 </root>

@@ -3,6 +3,8 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TilmezBus.Application.Features.DemoRequests.Commands.CompleteDemoRequest;
+using TilmezBus.Application.Features.DemoRequests.Queries.GetAllDemoRequests;
 using TilmezBus.Application.Features.SuperAdmin.Commands.ImpersonateSchoolAdmin;
 using TilmezBus.Application.Features.SuperAdmin.Commands.SendBroadcast;
 using TilmezBus.Application.Features.SuperAdmin.Queries.GetBroadcasts;
@@ -73,6 +75,30 @@ public class SuperAdminController : ControllerBase
         var result = await _mediator.Send(new ImpersonateSchoolAdminCommand(schoolId), cancellationToken);
         return result.IsSuccess
             ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>Paginated demo-request queue from the public landing page.</summary>
+    [HttpGet("demo-requests")]
+    public async Task<IActionResult> ListDemoRequests(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize   = 20,
+        [FromQuery] DemoRequestStatus? status = null,
+        CancellationToken cancellationToken = default)
+        => Ok(await _mediator.Send(new GetAllDemoRequestsQuery(pageNumber, pageSize, status), cancellationToken));
+
+    /// <summary>
+    /// Flip a demo request to Completed once the SuperAdmin has reached out
+    /// to the school. Idempotent — re-calling on an already-completed row
+    /// is a no-op.
+    /// </summary>
+    [HttpPost("demo-requests/{id:guid}/complete")]
+    public async Task<IActionResult> CompleteDemoRequest(Guid id, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var result = await _mediator.Send(new CompleteDemoRequestCommand(id, userId), cancellationToken);
+        return result.IsSuccess
+            ? Ok(new { ok = true })
             : BadRequest(new { error = result.Error });
     }
 }
