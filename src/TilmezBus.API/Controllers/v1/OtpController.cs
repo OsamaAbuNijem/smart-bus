@@ -44,7 +44,7 @@ public class OtpController : ControllerBase
     [HttpPost("request")]
     [ProducesResponseType(typeof(RequestOtpResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Request(
+    public new async Task<IActionResult> Request(
         [FromBody] OtpRequestDto dto,
         CancellationToken cancellationToken)
     {

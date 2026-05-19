@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'package:tilmez_bus/core/errors/failures.dart';
 import 'package:tilmez_bus/core/routing/app_router.dart';
@@ -9,9 +10,6 @@ import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
-/// Stand-in for a camera-based QR scanner. The iOS simulator can't access a
-/// camera, so we accept manual token entry. On real devices we'd swap in
-/// `mobile_scanner` and call the same [_submit] flow on detection.
 class AssistantQrScanScreen extends ConsumerStatefulWidget {
   const AssistantQrScanScreen({super.key});
 
@@ -22,26 +20,37 @@ class AssistantQrScanScreen extends ConsumerStatefulWidget {
 
 class _AssistantQrScanScreenState
     extends ConsumerState<AssistantQrScanScreen> {
-  final _ctrl = TextEditingController();
+  final MobileScannerController _scannerCtrl = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+    formats: const [BarcodeFormat.qrCode],
+  );
+  final TextEditingController _manualCtrl = TextEditingController();
   bool _busy = false;
+  bool _manualMode = false;
   String? _error;
+  String? _lastSubmitted;
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _scannerCtrl.dispose();
+    _manualCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    final token = _ctrl.text.trim();
-    if (token.isEmpty) return;
+  Future<void> _submit(String token) async {
+    final t = token.trim();
+    if (t.isEmpty || _busy) return;
+    // Guard against the scanner firing the same code twice in a row.
+    if (t == _lastSubmitted) return;
+    _lastSubmitted = t;
     setState(() {
       _busy = true;
       _error = null;
     });
+    await _scannerCtrl.stop();
     final scanned = await ref
         .read(scannedBusControllerProvider.notifier)
-        .resolveQr(token);
+        .resolveQr(t);
     if (!mounted) return;
     if (scanned != null) {
       context.pushReplacement(AppRoute.assistantTripSetup);
@@ -51,7 +60,10 @@ class _AssistantQrScanScreenState
     setState(() {
       _busy = false;
       _error = _humaniseError(err);
+      _lastSubmitted = null;
     });
+    // Restart the camera so the user can try another code.
+    await _scannerCtrl.start();
   }
 
   String _humaniseError(Object? err) {
@@ -60,6 +72,12 @@ class _AssistantQrScanScreenState
     if (err is NetworkFailure) return 'Network error.';
     if (err is Failure) return err.message;
     return 'Could not register scan.';
+  }
+
+  void _onDetect(BarcodeCapture capture) {
+    if (_busy) return;
+    final code = capture.barcodes.firstOrNull?.rawValue;
+    if (code != null && code.isNotEmpty) _submit(code);
   }
 
   @override
@@ -73,111 +91,128 @@ class _AssistantQrScanScreenState
           onPressed: () => context.pop(),
         ),
         title: Text(l.assistantScanBusQr),
+        actions: [
+          IconButton(
+            tooltip: _manualMode ? 'Use camera' : 'Enter manually',
+            icon: Icon(
+              _manualMode
+                  ? Icons.qr_code_scanner_rounded
+                  : Icons.keyboard_rounded,
+            ),
+            onPressed: () => setState(() => _manualMode = !_manualMode),
+          ),
+          if (!_manualMode)
+            IconButton(
+              tooltip: 'Toggle torch',
+              icon: const Icon(Icons.flash_on_rounded),
+              onPressed: () => _scannerCtrl.toggleTorch(),
+            ),
+        ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF111827),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.yellow, AppColors.yellowDeep],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Icon(
-                        Icons.qr_code_2_rounded,
-                        color: AppColors.ink,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      l.assistantQrSimulatorTitle,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      l.assistantQrSimulatorBody,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0x99FFFFFF),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _ctrl,
-                enabled: !_busy,
-                autofocus: true,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9\-_]')),
-                ],
-                decoration: InputDecoration(
-                  hintText: l.assistantQrEntryHint,
-                  prefixIcon: const Icon(Icons.qr_code_scanner_rounded),
-                ),
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ink,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 10),
-                Text(
-                  _error!,
-                  style: const TextStyle(
-                    color: AppColors.redDark,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-              const Spacer(),
-              FilledButton(
-                onPressed: _busy ? null : _submit,
-                child: _busy
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.ink,
-                        ),
-                      )
-                    : Text(l.assistantQrEntryConfirm),
-              ),
-            ],
+        child: _manualMode ? _buildManualEntry(l) : _buildScanner(),
+      ),
+    );
+  }
+
+  Widget _buildScanner() {
+    return Stack(
+      children: [
+        MobileScanner(controller: _scannerCtrl, onDetect: _onDetect),
+        // Translucent frame overlay
+        Center(
+          child: Container(
+            width: 240,
+            height: 240,
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.yellow, width: 3),
+              borderRadius: BorderRadius.circular(20),
+            ),
           ),
         ),
+        if (_error != null)
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 24,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.redDark,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        if (_busy)
+          const Positioned.fill(
+            child: ColoredBox(
+              color: Color(0x66000000),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildManualEntry(AppLocalizations l) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 8),
+          TextField(
+            controller: _manualCtrl,
+            enabled: !_busy,
+            autofocus: true,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9\-_]')),
+            ],
+            decoration: InputDecoration(
+              hintText: l.assistantQrEntryHint,
+              prefixIcon: const Icon(Icons.qr_code_scanner_rounded),
+            ),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              _error!,
+              style: const TextStyle(
+                color: AppColors.redDark,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+          const Spacer(),
+          FilledButton(
+            onPressed: _busy ? null : () => _submit(_manualCtrl.text),
+            child: _busy
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.ink,
+                    ),
+                  )
+                : Text(l.assistantQrEntryConfirm),
+          ),
+        ],
       ),
     );
   }

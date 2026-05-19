@@ -138,6 +138,9 @@ public class BusesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] BusRequest request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.PlateNumber))
+            return BadRequest(new { error = "PlateNumber is required." });
+
         var command = new CreateBusCommand(request.PlateNumber, request.Capacity ?? 50, request.Status ?? "Active");
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess

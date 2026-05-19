@@ -19,6 +19,7 @@ public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, R
             .Include(s => s.Parent)
             .Include(s => s.Allergies)
             .Include(s => s.EmergencyContacts)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(cancellationToken);
 
         if (student is null) return Result<StudentDetailDto>.Failure("Student not found.");

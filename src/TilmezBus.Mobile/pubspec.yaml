@@ -46,6 +46,9 @@ dependencies:
   firebase_messaging: ^15.1.5
   flutter_local_notifications: ^18.0.1
 
+  # QR scanning (assistant scans bus QR to start trip)
+  mobile_scanner: ^5.2.3
+
   # Models / serialization
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0

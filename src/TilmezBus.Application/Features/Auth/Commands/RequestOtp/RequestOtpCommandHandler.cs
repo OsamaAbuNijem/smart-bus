@@ -74,7 +74,7 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
     }
 
     private static string GenerateOtp()
-        => Random.Shared.Next(100_000, 999_999).ToString();
+        => Random.Shared.Next(1000, 10_000).ToString();
 }
 
 internal record OtpRecord(string Code, DateTime CreatedAt, int Attempts);
