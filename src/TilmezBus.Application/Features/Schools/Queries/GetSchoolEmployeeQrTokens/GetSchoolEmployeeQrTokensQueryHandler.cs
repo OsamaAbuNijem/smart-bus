@@ -27,25 +27,25 @@ public class GetSchoolEmployeeQrTokensQueryHandler
             .OrderBy(t => t.Type).ThenBy(t => t.CreatedAt)
             .ToListAsync(ct);
 
-        // Resolve consumed-employee names cheaply via two batch queries.
-        var driverIds    = rows.Where(r => r.UsedDriverId    is not null).Select(r => r.UsedDriverId!.Value).Distinct().ToList();
-        var assistantIds = rows.Where(r => r.UsedAssistantId is not null).Select(r => r.UsedAssistantId!.Value).Distinct().ToList();
-        var driverMap    = await _context.Drivers
-            .Where(d => driverIds.Contains(d.Id))
+        // Drivers and Assistants both live in the Drivers table now —
+        // UsedDriverId and UsedAssistantId both reference Drivers.Id.
+        var employeeIds = rows
+            .SelectMany(r => new[] { r.UsedDriverId, r.UsedAssistantId })
+            .Where(id => id is not null)
+            .Select(id => id!.Value)
+            .Distinct()
+            .ToList();
+        var employeeMap = await _context.Drivers
+            .Where(d => employeeIds.Contains(d.Id))
             .Select(d => new { d.Id, d.FullName, d.PhoneNumber })
             .ToDictionaryAsync(d => d.Id, ct);
-        var assistantMap = await _context.Assistants
-            .Where(a => assistantIds.Contains(a.Id))
-            .Select(a => new { a.Id, a.FullName, a.PhoneNumber })
-            .ToDictionaryAsync(a => a.Id, ct);
 
         EmployeeQrTokenDto Map(Domain.Entities.EmployeeQrToken t)
         {
             string? name = null, phone = null;
-            if (t.UsedDriverId is not null && driverMap.TryGetValue(t.UsedDriverId.Value, out var d))
-                { name = d.FullName; phone = d.PhoneNumber; }
-            else if (t.UsedAssistantId is not null && assistantMap.TryGetValue(t.UsedAssistantId.Value, out var a))
-                { name = a.FullName; phone = a.PhoneNumber; }
+            var employeeId = t.UsedDriverId ?? t.UsedAssistantId;
+            if (employeeId is not null && employeeMap.TryGetValue(employeeId.Value, out var e))
+                { name = e.FullName; phone = e.PhoneNumber; }
 
             return new EmployeeQrTokenDto(
                 t.Id, t.Token, t.Type.ToString(), t.IsUsed, t.UsedAt, name, phone, t.CreatedAt);

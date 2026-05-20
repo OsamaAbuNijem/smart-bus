@@ -31,20 +31,12 @@ public class GetMyTodayTripsQueryHandler
         if (string.IsNullOrEmpty(userId))
             return Result<List<MyTodayTripDto>>.Failure("Unauthenticated.");
 
-        // Caller is either in the Drivers table (Driver/Assistant role) or
-        // the parallel Assistants table (QR-registered path). Resolve their
-        // school from whichever matches so we can still show school-wide
-        // trips when they aren't in any BusSchedule slot.
+        // Drivers and Assistants both live in the Drivers table; DriverType
+        // disambiguates. We just need the school from whichever Drivers row
+        // is wired to this UserId.
         var driver = await _context.Drivers
             .FirstOrDefaultAsync(d => d.UserId == userId, ct);
         Guid? schoolId = driver?.SchoolId;
-        if (schoolId is null)
-        {
-            schoolId = await _context.Assistants
-                .Where(a => a.UserId == userId && !a.IsDeleted)
-                .Select(a => a.SchoolId)
-                .FirstOrDefaultAsync(ct);
-        }
 
         var scheduleBusIds = driver is null
             ? new List<Guid>()

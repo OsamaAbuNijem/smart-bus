@@ -12,7 +12,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     public DbSet<Bus> Buses => Set<Bus>();
     public DbSet<Driver> Drivers => Set<Driver>();
-    public DbSet<Assistant> Assistants => Set<Assistant>();
     public DbSet<Route> Routes => Set<Route>();
     public DbSet<Stop> Stops => Set<Stop>();
     public DbSet<Student> Students => Set<Student>();
@@ -49,7 +48,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<Bus>().HasQueryFilter(b => !b.IsDeleted);
         builder.Entity<BusLocation>().HasQueryFilter(l => !l.IsDeleted);
         builder.Entity<Driver>().HasQueryFilter(d => !d.IsDeleted);
-        builder.Entity<Assistant>().HasQueryFilter(a => !a.IsDeleted);
         builder.Entity<Route>().HasQueryFilter(r => !r.IsDeleted);
         builder.Entity<Stop>().HasQueryFilter(s => !s.IsDeleted);
         builder.Entity<Student>().HasQueryFilter(s => !s.IsDeleted);
@@ -234,7 +232,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             .IsRequired(false)
             .OnDelete(DeleteBehavior.NoAction);
 
-        // Tenant scope: Bus / Driver / Assistant belong to a school. Nullable
+        // Tenant scope: Bus / Driver belong to a school. Nullable
         // FK so existing rows (created before the column existed) survive
         // the migration; new rows always have a SchoolId.
         builder.Entity<Bus>()
@@ -249,15 +247,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             .HasForeignKey(d => d.SchoolId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<Assistant>()
-            .HasOne(a => a.School)
-            .WithMany()
-            .HasForeignKey(a => a.SchoolId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<Bus>()       .HasIndex(b => b.SchoolId);
-        builder.Entity<Driver>()    .HasIndex(d => d.SchoolId);
-        builder.Entity<Assistant>() .HasIndex(a => a.SchoolId);
+        builder.Entity<Bus>()    .HasIndex(b => b.SchoolId);
+        builder.Entity<Driver>() .HasIndex(d => d.SchoolId);
 
         // StudentTrip composite index
         builder.Entity<StudentTrip>()

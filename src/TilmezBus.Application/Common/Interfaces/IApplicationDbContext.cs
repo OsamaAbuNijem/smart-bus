@@ -7,7 +7,6 @@ public interface IApplicationDbContext
 {
     DbSet<Bus> Buses { get; }
     DbSet<Driver> Drivers { get; }
-    DbSet<Assistant> Assistants { get; }
     DbSet<Route> Routes { get; }
     DbSet<Stop> Stops { get; }
     DbSet<Student> Students { get; }

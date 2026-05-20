@@ -9,7 +9,6 @@ public interface IUnitOfWork : IDisposable
     ITripRepository Trips { get; }
     INotificationRepository Notifications { get; }
     IParentRepository Parents { get; }
-    IAssistantRepository Assistants { get; }
     IAttendanceRepository Attendances { get; }
     IAbsenceRequestRepository AbsenceRequests { get; }
     IStudentTripRepository StudentTrips { get; }

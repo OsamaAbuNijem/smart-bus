@@ -60,17 +60,12 @@ public class RegisterFromQrCommandHandler
         if (qr.IsUsed)              return Fail("This QR has already been used to register an employee.");
         if (qr.School.IsDeleted)    return Fail("The school associated with this QR is no longer active.");
 
-        // ── Phone uniqueness — guard the right table for the token's type ──
-        if (qr.Type == EmployeeQrTokenType.Driver)
-        {
-            if (await _unitOfWork.Drivers.GetByPhoneNumberAsync(phone, ct) is not null)
-                return Fail("A driver with this phone number is already registered.");
-        }
-        else
-        {
-            if (await _unitOfWork.Assistants.GetByPhoneNumberAsync(phone, ct) is not null)
-                return Fail("An assistant with this phone number is already registered.");
-        }
+        // Drivers and Assistants share the Drivers table — DriverType
+        // disambiguates. One uniqueness check covers both roles.
+        if (await _unitOfWork.Drivers.GetByPhoneNumberAsync(phone, ct) is not null)
+            return Fail(qr.Type == EmployeeQrTokenType.Driver
+                ? "A driver with this phone number is already registered."
+                : "An assistant with this phone number is already registered.");
 
         // ── Identity user (synthetic phone-based email, same as OTP login) ─
         var email = $"{phone}@smartbus.local";
@@ -83,39 +78,28 @@ public class RegisterFromQrCommandHandler
         if (user is null) return Fail("Failed to load the newly-created user account.");
 
         // ── Domain row + token consumption ─────────────────────────────────
-        Guid employeeId;
+        // Both Driver and Assistant land in the Drivers table — the
+        // DriverType discriminator carries the role. UsedDriverId/UsedAssistantId
+        // both reference Drivers.Id (no FK constraint enforces this).
+        var employee = new Driver
+        {
+            FullName    = name,
+            PhoneNumber = phone,
+            UserId      = user.Id,
+            IsActive    = true,
+            DriverType  = qr.Type == EmployeeQrTokenType.Driver
+                ? DriverType.Driver
+                : DriverType.Assistant,
+            SchoolId    = qr.SchoolId
+        };
+        await _unitOfWork.Drivers.AddAsync(employee, ct);
+        await _unitOfWork.SaveChangesAsync(ct);
+        var employeeId = employee.Id;
+
         if (qr.Type == EmployeeQrTokenType.Driver)
-        {
-            var driver = new Driver
-            {
-                FullName    = name,
-                PhoneNumber = phone,
-                UserId      = user.Id,
-                IsActive    = true,
-                DriverType  = DriverType.Driver,
-                SchoolId    = qr.SchoolId
-            };
-            await _unitOfWork.Drivers.AddAsync(driver, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
-            employeeId = driver.Id;
-
-            qr.UsedDriverId = driver.Id;
-        }
+            qr.UsedDriverId = employee.Id;
         else
-        {
-            var assistant = new Assistant
-            {
-                FullName    = name,
-                PhoneNumber = phone,
-                UserId      = user.Id,
-                SchoolId    = qr.SchoolId
-            };
-            await _unitOfWork.Assistants.AddAsync(assistant, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
-            employeeId = assistant.Id;
-
-            qr.UsedAssistantId = assistant.Id;
-        }
+            qr.UsedAssistantId = employee.Id;
 
         qr.IsUsed = true;
         qr.UsedAt = DateTime.UtcNow;

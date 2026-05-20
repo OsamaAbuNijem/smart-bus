@@ -16,7 +16,6 @@ public class UnitOfWork : IUnitOfWork
     public ITripRepository Trips { get; }
     public INotificationRepository Notifications { get; }
     public IParentRepository Parents { get; }
-    public IAssistantRepository Assistants { get; }
     public IAttendanceRepository Attendances { get; }
     public IAbsenceRequestRepository AbsenceRequests { get; }
     public IStudentTripRepository StudentTrips { get; }
@@ -33,7 +32,6 @@ public class UnitOfWork : IUnitOfWork
         Trips = new TripRepository(context);
         Notifications = new NotificationRepository(context);
         Parents = new ParentRepository(context);
-        Assistants = new AssistantRepository(context);
         Attendances = new AttendanceRepository(context);
         AbsenceRequests = new AbsenceRequestRepository(context);
         StudentTrips = new StudentTripRepository(context);
