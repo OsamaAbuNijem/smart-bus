@@ -39,7 +39,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
     public async Task<Result<OtpLoginResponse>> Handle(
         VerifyOtpCommand request, CancellationToken cancellationToken)
     {
-        var phone = request.PhoneNumber.Trim();
+        var phone = PhoneNumberHelper.Normalize(request.PhoneNumber.Trim());
         var otp   = request.Otp.Trim();
 
         // Resolve role from the phone — must match what RequestOtp resolved.

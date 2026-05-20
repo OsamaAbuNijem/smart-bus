@@ -47,7 +47,9 @@ dependencies:
   flutter_local_notifications: ^18.0.1
 
   # QR scanning (assistant scans bus QR to start trip)
-  mobile_scanner: ^5.2.3
+  # 7.x uses newer MLKit so its GoogleUtilities pin doesn't clash with
+  # firebase_messaging's transitive GoogleUtilities>=8 requirement.
+  mobile_scanner: ^7.0.1
 
   # Models / serialization
   freezed_annotation: ^3.0.0
@@ -70,6 +72,16 @@ dev_dependencies:
   # Lint helpers
   custom_lint: ^0.7.3
   riverpod_lint: ^2.6.3
+
+  # App-icon generator (iOS + Android sizes from one 1024px source)
+  flutter_launcher_icons: ^0.14.1
+
+# Run with: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icon/app_icon.png"
 
 flutter:
   uses-material-design: true

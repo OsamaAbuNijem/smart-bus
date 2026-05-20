@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
+using TilmezBus.Application.Common.Utilities;
 
 namespace TilmezBus.Application.Features.Drivers.Commands.UpdateDriver;
 
@@ -19,14 +20,18 @@ public class UpdateDriverCommandHandler : IRequestHandler<UpdateDriverCommand, R
         if (driver is null) return Result.Failure("Driver not found.");
 
         // Phone uniqueness — reject if another driver owns this number.
-        if (!string.IsNullOrWhiteSpace(request.PhoneNumber)
-            && !string.Equals(driver.PhoneNumber, request.PhoneNumber, StringComparison.Ordinal))
+        // Canonicalise to +9627XXXXXXXX so storage matches OTP lookups.
+        if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
         {
-            var phoneTaken = await _context.Drivers
-                .AnyAsync(d => !d.IsDeleted && d.Id != request.DriverId && d.PhoneNumber == request.PhoneNumber, cancellationToken);
-            if (phoneTaken)
-                return Result.Failure($"Phone '{request.PhoneNumber}' is already used by another driver.");
-            driver.PhoneNumber = request.PhoneNumber;
+            var newPhone = PhoneNumberHelper.Normalize(request.PhoneNumber);
+            if (!string.Equals(driver.PhoneNumber, newPhone, StringComparison.Ordinal))
+            {
+                var phoneTaken = await _context.Drivers
+                    .AnyAsync(d => !d.IsDeleted && d.Id != request.DriverId && d.PhoneNumber == newPhone, cancellationToken);
+                if (phoneTaken)
+                    return Result.Failure($"Phone '{newPhone}' is already used by another driver.");
+                driver.PhoneNumber = newPhone;
+            }
         }
         if (!string.IsNullOrWhiteSpace(request.FullName))   driver.FullName   = request.FullName;
         if (request.FullNameEn is not null)                  driver.FullNameEn = request.FullNameEn;

@@ -1,6 +1,7 @@
 using MediatR;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
+using TilmezBus.Application.Common.Utilities;
 using TilmezBus.Domain.Enums;
 
 namespace TilmezBus.Application.Features.Auth.Commands.RequestOtp;
@@ -28,7 +29,10 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
     public async Task<Result<RequestOtpResponse>> Handle(
         RequestOtpCommand request, CancellationToken cancellationToken)
     {
-        var phone = request.PhoneNumber.Trim();
+        // Canonicalise the inbound phone to +9627XXXXXXXX so a parent who
+        // typed "079…" and a mobile client that posts "+962…" resolve to the
+        // same DB row. Lookups below all use this canonical form.
+        var phone = PhoneNumberHelper.Normalize(request.PhoneNumber.Trim());
 
         // Resolve the role from the phone. Parent first, then Driver/Assistant.
         // Drivers and Assistants share the Drivers table — DriverType disambiguates.
