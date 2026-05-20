@@ -37,10 +37,13 @@ services:
     restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
-      # Web UI is behind nginx auth; admin sets a password on first visit.
+      # Newer Seq versions require an admin password on first boot.
+      # Set SEQ_ADMIN_PASSWORD in .env (any strong string).
+      SEQ_FIRSTRUN_ADMINPASSWORD: ${SEQ_ADMIN_PASSWORD}
     volumes:
       - seqdata:/data
-    # NOT exposed publicly. Reach it through `ssh -L 5341:localhost:5341 ...`.
+    # NOT exposed publicly on the public network. The override binds
+    # 127.0.0.1:8341 on the host so an SSH tunnel can reach the UI.
 
   api:
     build:
