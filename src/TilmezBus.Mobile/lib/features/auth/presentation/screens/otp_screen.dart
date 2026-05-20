@@ -22,25 +22,27 @@ class OtpScreen extends ConsumerStatefulWidget {
 }
 
 class _OtpScreenState extends ConsumerState<OtpScreen> {
-  late final List<TextEditingController> _ctrls;
-  late final List<FocusNode> _focusNodes;
+  // Single source of truth — one hidden TextField captures all input
+  // (number pad, backspace, paste). The visible boxes are read-only and
+  // just display individual digits from this controller. This pattern
+  // keeps the iOS keyboard open across all 4 positions; the multi-field
+  // approach was making iOS drop focus between fields and dismiss the
+  // keyboard on every keystroke.
+  final TextEditingController _ctrl = TextEditingController();
+  final FocusNode _focus = FocusNode();
   Timer? _ticker;
   Duration _remaining = Duration.zero;
 
   @override
   void initState() {
     super.initState();
-    _ctrls = List.generate(_otpLength, (_) => TextEditingController());
-    _focusNodes = List.generate(_otpLength, (_) => FocusNode());
-    for (final f in _focusNodes) {
-      f.addListener(() => setState(() {}));
-    }
+    _ctrl.addListener(_onTextChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final s = ref.read(otpControllerProvider).valueOrNull;
       if (s is OtpPending) {
         _restartTimer(s.expiresAt);
-        _focusNodes.first.requestFocus();
+        _focus.requestFocus();
       }
     });
   }
@@ -48,13 +50,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   @override
   void dispose() {
     _ticker?.cancel();
-    for (final c in _ctrls) {
-      c.dispose();
-    }
-    for (final f in _focusNodes) {
-      f.dispose();
-    }
+    _ctrl.removeListener(_onTextChanged);
+    _ctrl.dispose();
+    _focus.dispose();
     super.dispose();
+  }
+
+  void _onTextChanged() {
+    // Auto-submit once the full code is typed.
+    if (_ctrl.text.length == _otpLength) {
+      _verify();
+    }
   }
 
   void _restartTimer(DateTime expiresAt) {
@@ -68,7 +74,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     });
   }
 
-  String get _enteredCode => _ctrls.map((c) => c.text).join();
+  String get _enteredCode => _ctrl.text;
   bool get _codeComplete => _enteredCode.length == _otpLength;
 
   Future<void> _verify() async {
@@ -80,11 +86,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final l = AppLocalizations.of(context);
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(l.otpInvalid)));
-    for (final c in _ctrls) {
-      c.clear();
-    }
-    _focusNodes.first.requestFocus();
-    setState(() {});
+    _ctrl.clear();
+    _focus.requestFocus();
   }
 
   Future<void> _resend() async {
@@ -147,6 +150,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      // Static layout — content is anchored to the top of the screen so
+      // it never moves when the keyboard appears or focus changes. The
+      // OTP card sits high enough that the keyboard never covers it on
+      // any modern iPhone, so we don't need keyboard-aware padding.
+      resizeToAvoidBottomInset: false,
       body: AuthBackdrop(
         child: SafeArea(
           child: Stack(
@@ -154,41 +162,32 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               Column(
                 children: [
                   Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(22, 56, 22, 12),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: constraints.maxHeight - 68,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const BrandBlock(showTagline: false),
-                                const SizedBox(height: 24),
-                                _OtpCard(
-                                  title: l.otpTitle,
-                                  sentLabel: l.otpSentTo,
-                                  sentTo: phone,
-                                  verifyLabel: l.otpConfirm,
-                                  resendPrefix: l.otpResendPrefix,
-                                  resendLabel: l.otpResend,
-                                  countdown: _formatRemaining(),
-                                  ctrls: _ctrls,
-                                  focusNodes: _focusNodes,
-                                  onChanged: (_) => setState(() {}),
-                                  onComplete: _verify,
-                                  onSubmit: _verify,
-                                  onResend: loading ? null : _resend,
-                                  loading: loading,
-                                  codeComplete: _codeComplete,
-                                ),
-                              ],
-                            ),
+                    child: Padding(
+                      // Bottom padding > top padding so MainAxisAlignment.center
+                      // sits visually a bit above true-center — clear of the
+                      // keyboard area when it's open.
+                      padding: const EdgeInsets.fromLTRB(22, 40, 22, 220),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const BrandBlock(showTagline: false),
+                          const SizedBox(height: 24),
+                          _OtpCard(
+                            title: l.otpTitle,
+                            sentLabel: l.otpSentTo,
+                            sentTo: phone,
+                            verifyLabel: l.otpConfirm,
+                            resendPrefix: l.otpResendPrefix,
+                            resendLabel: l.otpResend,
+                            countdown: _formatRemaining(),
+                            controller: _ctrl,
+                            focusNode: _focus,
+                            onSubmit: _verify,
+                            onResend: loading ? null : _resend,
+                            loading: loading,
                           ),
-                        );
-                      },
+                        ],
+                      ),
                     ),
                   ),
                   Padding(
@@ -273,14 +272,11 @@ class _OtpCard extends StatelessWidget {
     required this.resendPrefix,
     required this.resendLabel,
     required this.countdown,
-    required this.ctrls,
-    required this.focusNodes,
-    required this.onChanged,
-    required this.onComplete,
+    required this.controller,
+    required this.focusNode,
     required this.onSubmit,
     required this.onResend,
     required this.loading,
-    required this.codeComplete,
   });
 
   final String title;
@@ -290,14 +286,11 @@ class _OtpCard extends StatelessWidget {
   final String resendPrefix;
   final String resendLabel;
   final String countdown;
-  final List<TextEditingController> ctrls;
-  final List<FocusNode> focusNodes;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onComplete;
+  final TextEditingController controller;
+  final FocusNode focusNode;
   final VoidCallback onSubmit;
   final VoidCallback? onResend;
   final bool loading;
-  final bool codeComplete;
 
   @override
   Widget build(BuildContext context) {
@@ -358,18 +351,17 @@ class _OtpCard extends StatelessWidget {
               ],
             ),
           const SizedBox(height: 16),
-          _OtpRow(
-            ctrls: ctrls,
-            focusNodes: focusNodes,
-            onChanged: onChanged,
-            onComplete: onComplete,
-          ),
+          _OtpRow(controller: controller, focusNode: focusNode),
           const SizedBox(height: 14),
-          _VerifyButton(
-            label: verifyLabel,
-            loading: loading,
-            enabled: codeComplete,
-            onPressed: onSubmit,
+          // Verify button enables itself when the controller has 4 digits.
+          AnimatedBuilder(
+            animation: controller,
+            builder: (_, _) => _VerifyButton(
+              label: verifyLabel,
+              loading: loading,
+              enabled: controller.text.length == _otpLength,
+              onPressed: onSubmit,
+            ),
           ),
           const SizedBox(height: 14),
           _ResendRow(
@@ -384,70 +376,105 @@ class _OtpCard extends StatelessWidget {
   }
 }
 
-// ── 4 OTP boxes (square, equal width, gap 9) ────────────────────────────────
+// ── OTP input: 4 visual boxes backed by a single hidden TextField ───────────
+//
+// Why: with 4 separate TextFields and focus-jumping in onChanged, iOS drops
+// focus between fields each keystroke, which dismisses + re-presents the
+// software keyboard and shifts the layout. It also makes backspace tricky
+// because an already-empty field doesn't fire onChanged. With one input,
+// the keyboard stays attached for the whole sequence and the native
+// backspace deletes the last digit naturally.
 
 class _OtpRow extends StatelessWidget {
-  const _OtpRow({
-    required this.ctrls,
-    required this.focusNodes,
-    required this.onChanged,
-    required this.onComplete,
-  });
-  final List<TextEditingController> ctrls;
-  final List<FocusNode> focusNodes;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onComplete;
+  const _OtpRow({required this.controller, required this.focusNode});
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Row(
-        children: List.generate(_otpLength, (i) {
-          return Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: i == 0 ? 0 : 9),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: _OtpBox(
-                  controller: ctrls[i],
-                  focusNode: focusNodes[i],
-                  onChanged: (v) {
-                    if (v.isNotEmpty && i < _otpLength - 1) {
-                      focusNodes[i + 1].requestFocus();
-                    }
-                    if (v.isEmpty && i > 0) {
-                      focusNodes[i - 1].requestFocus();
-                    }
-                    onChanged(v);
-                    if (ctrls.every((c) => c.text.isNotEmpty)) onComplete();
-                  },
+    return GestureDetector(
+      onTap: focusNode.requestFocus,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
+        children: [
+          // Visual boxes — read directly from the shared controller.
+          AnimatedBuilder(
+            animation: Listenable.merge([controller, focusNode]),
+            builder: (_, _) {
+              final text = controller.text;
+              final focused = focusNode.hasFocus;
+              return Directionality(
+                textDirection: TextDirection.ltr,
+                child: Row(
+                  children: List.generate(_otpLength, (i) {
+                    final filled = i < text.length;
+                    // The "active" box is where the next digit will go.
+                    final active = focused && i == text.length;
+                    return Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: i == 0 ? 0 : 9),
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: _OtpVisualBox(
+                            digit: filled ? text[i] : '',
+                            active: active,
+                            filled: filled,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              );
+            },
+          ),
+          // Invisible TextField overlaid across the whole row that
+          // actually owns the keyboard. Zero opacity so it doesn't show,
+          // but still receives input + caret.
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0,
+              child: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                maxLength: _otpLength,
+                scrollPadding: EdgeInsets.zero,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  counterText: '',
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                  isCollapsed: true,
                 ),
               ),
             ),
-          );
-        }),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _OtpBox extends StatelessWidget {
-  const _OtpBox({
-    required this.controller,
-    required this.focusNode,
-    required this.onChanged,
+/// Read-only single-box visual. Doesn't own any controller or focus —
+/// just renders whatever the parent tells it.
+class _OtpVisualBox extends StatelessWidget {
+  const _OtpVisualBox({
+    required this.digit,
+    required this.active,
+    required this.filled,
   });
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final ValueChanged<String> onChanged;
+
+  final String digit;
+  final bool active;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
-    final filled = controller.text.isNotEmpty;
-    final focused = focusNode.hasFocus;
-    final active = focused;
-
     Color borderColor;
     Color bg;
     if (active) {
@@ -460,9 +487,7 @@ class _OtpBox extends StatelessWidget {
       borderColor = AppColors.slate200;
       bg = AppColors.slate50;
     }
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
+    return Container(
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(14),
@@ -477,34 +502,14 @@ class _OtpBox extends StatelessWidget {
               ]
             : null,
       ),
-      child: Center(
-        child: TextField(
-          controller: controller,
-          focusNode: focusNode,
-          keyboardType: TextInputType.number,
-          textAlign: TextAlign.center,
-          maxLength: 1,
-          showCursor: true,
-          cursorColor: AppColors.yellowDeep,
-          cursorHeight: 24,
-          cursorWidth: 2,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-            color: AppColors.ink,
-            fontFeatures: [FontFeature.tabularFigures()],
-          ),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: const InputDecoration(
-            counterText: '',
-            contentPadding: EdgeInsets.zero,
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            filled: false,
-            isCollapsed: true,
-          ),
-          onChanged: onChanged,
+      alignment: Alignment.center,
+      child: Text(
+        digit,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: AppColors.ink,
+          fontFeatures: [FontFeature.tabularFigures()],
         ),
       ),
     );

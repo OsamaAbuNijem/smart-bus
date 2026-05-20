@@ -14,7 +14,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
-        android:label="Tilmiz Bus"
+        android:label="Tilmez Bus"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

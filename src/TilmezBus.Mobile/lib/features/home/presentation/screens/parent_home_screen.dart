@@ -746,15 +746,18 @@ class _RouteProgress extends StatelessWidget {
                 // so it visually halts at the dots, not past them.
                 const endInset = 8.0;
                 final travel = (width - busSize).clamp(0.0, width);
-                final busLeft = endInset + (travel - endInset * 2) * f;
+                final busStart = endInset + (travel - endInset * 2) * f;
+                // Use the *Directional widgets so the bus moves home→school
+                // visually right-to-left in Arabic locales (matches reading
+                // direction). All offsets are in start/end terms, not left/right.
                 return SizedBox(
                   height: totalHeight,
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      Positioned(
-                        left: 0,
-                        right: 0,
+                      PositionedDirectional(
+                        start: 0,
+                        end: 0,
                         top: railCenterY - railHeight / 2,
                         child: Container(
                           height: railHeight,
@@ -764,11 +767,11 @@ class _RouteProgress extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Positioned(
-                        left: 0,
+                      PositionedDirectional(
+                        start: 0,
                         top: railCenterY - railHeight / 2,
                         child: Container(
-                          width: (busLeft + busSize / 2).clamp(0.0, width),
+                          width: (busStart + busSize / 2).clamp(0.0, width),
                           height: railHeight,
                           decoration: BoxDecoration(
                             color: AppColors.yellow,
@@ -776,20 +779,20 @@ class _RouteProgress extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Positioned(
-                        left: 0,
+                      PositionedDirectional(
+                        start: 0,
                         top: railCenterY - 4,
                         child: _EndDot(),
                       ),
-                      Positioned(
-                        right: 0,
+                      PositionedDirectional(
+                        end: 0,
                         top: railCenterY - 4,
                         child: _EndDot(),
                       ),
-                      AnimatedPositioned(
+                      AnimatedPositionedDirectional(
                         duration: const Duration(milliseconds: 600),
                         curve: Curves.easeOutCubic,
-                        left: busLeft,
+                        start: busStart,
                         top: railCenterY - busSize / 2,
                         child: Container(
                           width: busSize,

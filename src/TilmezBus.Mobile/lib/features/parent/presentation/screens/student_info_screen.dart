@@ -121,18 +121,6 @@ class _FormState extends ConsumerState<_Form> {
                     label: l.studentEditStudentId,
                     value: info.nationalNumber,
                   ),
-                  _ReadOnlyField(
-                    icon: Icons.school,
-                    label: l.studentEditGrade,
-                    value: info.grade,
-                  ),
-                  _ReadOnlyField(
-                    icon: Icons.grid_view,
-                    label: l.studentEditClass,
-                    value: info.className == null || info.className!.isEmpty
-                        ? '—'
-                        : info.className!,
-                  ),
                   if (info.homeAddress.isNotEmpty)
                     _ReadOnlyField(
                       icon: Icons.location_on_outlined,
