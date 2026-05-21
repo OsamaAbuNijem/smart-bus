@@ -81,6 +81,8 @@ public class GetStudentInfoQueryHandler
             HomeAddress: homeAddress,
             HomeArea: s.HomeArea,
             HomeStreet: s.HomeStreet,
+            HomeLatitude: s.Latitude,
+            HomeLongitude: s.Longitude,
             Notes: s.Address, // re-use Address as freeform notes when used
             RouteName: s.Route != null ? s.Route.Name : null,
             PickupStopName: s.PickupStop != null ? s.PickupStop.Name : null,

@@ -6,10 +6,10 @@ part of 'locale_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$localeControllerHash() => r'76b7c7198a384920e7f6b2bcfb3cbf66107096aa';
+String _$localeControllerHash() => r'e34e269d310c6e865ad948eebb9e3d11cf4ac953';
 
-/// Holds the user's chosen locale (`en` or `ar`). `null` means follow the
-/// system locale. Persisted in [SecureStorage].
+/// Holds the user's chosen locale (`en` or `ar`). Arabic is the default
+/// when no preference is stored. Persisted in [SecureStorage].
 ///
 /// Copied from [LocaleController].
 @ProviderFor(LocaleController)

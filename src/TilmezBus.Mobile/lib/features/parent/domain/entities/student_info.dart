@@ -17,6 +17,8 @@ abstract class StudentInfo with _$StudentInfo {
     required String homeAddress,
     String? homeArea,
     String? homeStreet,
+    double? homeLatitude,
+    double? homeLongitude,
     String? notes,
     String? routeName,
     String? pickupStopName,

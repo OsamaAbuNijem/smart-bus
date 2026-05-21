@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$StudentInfoDto {
 
- String get id; String get fullName; String? get fullNameEn; String get nationalNumber; String get grade;@JsonKey(name: 'class') String? get className; DateTime? get dateOfBirth; String? get schoolName; String? get schoolAddress; String get homeAddress; String? get homeArea; String? get homeStreet; String? get notes; String? get routeName; String? get pickupStopName; List<String> get allergies; StudentContactDto? get parent;
+ String get id; String get fullName; String? get fullNameEn; String get nationalNumber; String get grade;@JsonKey(name: 'class') String? get className; DateTime? get dateOfBirth; String? get schoolName; String? get schoolAddress; String get homeAddress; String? get homeArea; String? get homeStreet; double? get homeLatitude; double? get homeLongitude; String? get notes; String? get routeName; String? get pickupStopName; List<String> get allergies; StudentContactDto? get parent;
 /// Create a copy of StudentInfoDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $StudentInfoDtoCopyWith<StudentInfoDto> get copyWith => _$StudentInfoDtoCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentInfoDto&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.fullNameEn, fullNameEn) || other.fullNameEn == fullNameEn)&&(identical(other.nationalNumber, nationalNumber) || other.nationalNumber == nationalNumber)&&(identical(other.grade, grade) || other.grade == grade)&&(identical(other.className, className) || other.className == className)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.schoolAddress, schoolAddress) || other.schoolAddress == schoolAddress)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.homeArea, homeArea) || other.homeArea == homeArea)&&(identical(other.homeStreet, homeStreet) || other.homeStreet == homeStreet)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.routeName, routeName) || other.routeName == routeName)&&(identical(other.pickupStopName, pickupStopName) || other.pickupStopName == pickupStopName)&&const DeepCollectionEquality().equals(other.allergies, allergies)&&(identical(other.parent, parent) || other.parent == parent));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentInfoDto&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.fullNameEn, fullNameEn) || other.fullNameEn == fullNameEn)&&(identical(other.nationalNumber, nationalNumber) || other.nationalNumber == nationalNumber)&&(identical(other.grade, grade) || other.grade == grade)&&(identical(other.className, className) || other.className == className)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.schoolAddress, schoolAddress) || other.schoolAddress == schoolAddress)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.homeArea, homeArea) || other.homeArea == homeArea)&&(identical(other.homeStreet, homeStreet) || other.homeStreet == homeStreet)&&(identical(other.homeLatitude, homeLatitude) || other.homeLatitude == homeLatitude)&&(identical(other.homeLongitude, homeLongitude) || other.homeLongitude == homeLongitude)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.routeName, routeName) || other.routeName == routeName)&&(identical(other.pickupStopName, pickupStopName) || other.pickupStopName == pickupStopName)&&const DeepCollectionEquality().equals(other.allergies, allergies)&&(identical(other.parent, parent) || other.parent == parent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fullName,fullNameEn,nationalNumber,grade,className,dateOfBirth,schoolName,schoolAddress,homeAddress,homeArea,homeStreet,notes,routeName,pickupStopName,const DeepCollectionEquality().hash(allergies),parent);
+int get hashCode => Object.hashAll([runtimeType,id,fullName,fullNameEn,nationalNumber,grade,className,dateOfBirth,schoolName,schoolAddress,homeAddress,homeArea,homeStreet,homeLatitude,homeLongitude,notes,routeName,pickupStopName,const DeepCollectionEquality().hash(allergies),parent]);
 
 @override
 String toString() {
-  return 'StudentInfoDto(id: $id, fullName: $fullName, fullNameEn: $fullNameEn, nationalNumber: $nationalNumber, grade: $grade, className: $className, dateOfBirth: $dateOfBirth, schoolName: $schoolName, schoolAddress: $schoolAddress, homeAddress: $homeAddress, homeArea: $homeArea, homeStreet: $homeStreet, notes: $notes, routeName: $routeName, pickupStopName: $pickupStopName, allergies: $allergies, parent: $parent)';
+  return 'StudentInfoDto(id: $id, fullName: $fullName, fullNameEn: $fullNameEn, nationalNumber: $nationalNumber, grade: $grade, className: $className, dateOfBirth: $dateOfBirth, schoolName: $schoolName, schoolAddress: $schoolAddress, homeAddress: $homeAddress, homeArea: $homeArea, homeStreet: $homeStreet, homeLatitude: $homeLatitude, homeLongitude: $homeLongitude, notes: $notes, routeName: $routeName, pickupStopName: $pickupStopName, allergies: $allergies, parent: $parent)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $StudentInfoDtoCopyWith<$Res>  {
   factory $StudentInfoDtoCopyWith(StudentInfoDto value, $Res Function(StudentInfoDto) _then) = _$StudentInfoDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String fullName, String? fullNameEn, String nationalNumber, String grade,@JsonKey(name: 'class') String? className, DateTime? dateOfBirth, String? schoolName, String? schoolAddress, String homeAddress, String? homeArea, String? homeStreet, String? notes, String? routeName, String? pickupStopName, List<String> allergies, StudentContactDto? parent
+ String id, String fullName, String? fullNameEn, String nationalNumber, String grade,@JsonKey(name: 'class') String? className, DateTime? dateOfBirth, String? schoolName, String? schoolAddress, String homeAddress, String? homeArea, String? homeStreet, double? homeLatitude, double? homeLongitude, String? notes, String? routeName, String? pickupStopName, List<String> allergies, StudentContactDto? parent
 });
 
 
@@ -65,7 +65,7 @@ class _$StudentInfoDtoCopyWithImpl<$Res>
 
 /// Create a copy of StudentInfoDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? fullNameEn = freezed,Object? nationalNumber = null,Object? grade = null,Object? className = freezed,Object? dateOfBirth = freezed,Object? schoolName = freezed,Object? schoolAddress = freezed,Object? homeAddress = null,Object? homeArea = freezed,Object? homeStreet = freezed,Object? notes = freezed,Object? routeName = freezed,Object? pickupStopName = freezed,Object? allergies = null,Object? parent = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? fullNameEn = freezed,Object? nationalNumber = null,Object? grade = null,Object? className = freezed,Object? dateOfBirth = freezed,Object? schoolName = freezed,Object? schoolAddress = freezed,Object? homeAddress = null,Object? homeArea = freezed,Object? homeStreet = freezed,Object? homeLatitude = freezed,Object? homeLongitude = freezed,Object? notes = freezed,Object? routeName = freezed,Object? pickupStopName = freezed,Object? allergies = null,Object? parent = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
@@ -79,7 +79,9 @@ as String?,schoolAddress: freezed == schoolAddress ? _self.schoolAddress : schoo
 as String?,homeAddress: null == homeAddress ? _self.homeAddress : homeAddress // ignore: cast_nullable_to_non_nullable
 as String,homeArea: freezed == homeArea ? _self.homeArea : homeArea // ignore: cast_nullable_to_non_nullable
 as String?,homeStreet: freezed == homeStreet ? _self.homeStreet : homeStreet // ignore: cast_nullable_to_non_nullable
-as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,homeLatitude: freezed == homeLatitude ? _self.homeLatitude : homeLatitude // ignore: cast_nullable_to_non_nullable
+as double?,homeLongitude: freezed == homeLongitude ? _self.homeLongitude : homeLongitude // ignore: cast_nullable_to_non_nullable
+as double?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,routeName: freezed == routeName ? _self.routeName : routeName // ignore: cast_nullable_to_non_nullable
 as String?,pickupStopName: freezed == pickupStopName ? _self.pickupStopName : pickupStopName // ignore: cast_nullable_to_non_nullable
 as String?,allergies: null == allergies ? _self.allergies : allergies // ignore: cast_nullable_to_non_nullable
@@ -181,10 +183,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade, @JsonKey(name: 'class')  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContactDto? parent)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade, @JsonKey(name: 'class')  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  double? homeLatitude,  double? homeLongitude,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContactDto? parent)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _StudentInfoDto() when $default != null:
-return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
+return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.homeLatitude,_that.homeLongitude,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
   return orElse();
 
 }
@@ -202,10 +204,10 @@ return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade, @JsonKey(name: 'class')  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContactDto? parent)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade, @JsonKey(name: 'class')  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  double? homeLatitude,  double? homeLongitude,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContactDto? parent)  $default,) {final _that = this;
 switch (_that) {
 case _StudentInfoDto():
-return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
+return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.homeLatitude,_that.homeLongitude,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -222,10 +224,10 @@ return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade, @JsonKey(name: 'class')  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContactDto? parent)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  String? fullNameEn,  String nationalNumber,  String grade, @JsonKey(name: 'class')  String? className,  DateTime? dateOfBirth,  String? schoolName,  String? schoolAddress,  String homeAddress,  String? homeArea,  String? homeStreet,  double? homeLatitude,  double? homeLongitude,  String? notes,  String? routeName,  String? pickupStopName,  List<String> allergies,  StudentContactDto? parent)?  $default,) {final _that = this;
 switch (_that) {
 case _StudentInfoDto() when $default != null:
-return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
+return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_that.grade,_that.className,_that.dateOfBirth,_that.schoolName,_that.schoolAddress,_that.homeAddress,_that.homeArea,_that.homeStreet,_that.homeLatitude,_that.homeLongitude,_that.notes,_that.routeName,_that.pickupStopName,_that.allergies,_that.parent);case _:
   return null;
 
 }
@@ -237,7 +239,7 @@ return $default(_that.id,_that.fullName,_that.fullNameEn,_that.nationalNumber,_t
 @JsonSerializable()
 
 class _StudentInfoDto implements StudentInfoDto {
-  const _StudentInfoDto({required this.id, required this.fullName, this.fullNameEn, required this.nationalNumber, required this.grade, @JsonKey(name: 'class') this.className, this.dateOfBirth, this.schoolName, this.schoolAddress, required this.homeAddress, this.homeArea, this.homeStreet, this.notes, this.routeName, this.pickupStopName, final  List<String> allergies = const <String>[], this.parent}): _allergies = allergies;
+  const _StudentInfoDto({required this.id, required this.fullName, this.fullNameEn, required this.nationalNumber, required this.grade, @JsonKey(name: 'class') this.className, this.dateOfBirth, this.schoolName, this.schoolAddress, required this.homeAddress, this.homeArea, this.homeStreet, this.homeLatitude, this.homeLongitude, this.notes, this.routeName, this.pickupStopName, final  List<String> allergies = const <String>[], this.parent}): _allergies = allergies;
   factory _StudentInfoDto.fromJson(Map<String, dynamic> json) => _$StudentInfoDtoFromJson(json);
 
 @override final  String id;
@@ -252,6 +254,8 @@ class _StudentInfoDto implements StudentInfoDto {
 @override final  String homeAddress;
 @override final  String? homeArea;
 @override final  String? homeStreet;
+@override final  double? homeLatitude;
+@override final  double? homeLongitude;
 @override final  String? notes;
 @override final  String? routeName;
 @override final  String? pickupStopName;
@@ -277,16 +281,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StudentInfoDto&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.fullNameEn, fullNameEn) || other.fullNameEn == fullNameEn)&&(identical(other.nationalNumber, nationalNumber) || other.nationalNumber == nationalNumber)&&(identical(other.grade, grade) || other.grade == grade)&&(identical(other.className, className) || other.className == className)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.schoolAddress, schoolAddress) || other.schoolAddress == schoolAddress)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.homeArea, homeArea) || other.homeArea == homeArea)&&(identical(other.homeStreet, homeStreet) || other.homeStreet == homeStreet)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.routeName, routeName) || other.routeName == routeName)&&(identical(other.pickupStopName, pickupStopName) || other.pickupStopName == pickupStopName)&&const DeepCollectionEquality().equals(other._allergies, _allergies)&&(identical(other.parent, parent) || other.parent == parent));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StudentInfoDto&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.fullNameEn, fullNameEn) || other.fullNameEn == fullNameEn)&&(identical(other.nationalNumber, nationalNumber) || other.nationalNumber == nationalNumber)&&(identical(other.grade, grade) || other.grade == grade)&&(identical(other.className, className) || other.className == className)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.schoolName, schoolName) || other.schoolName == schoolName)&&(identical(other.schoolAddress, schoolAddress) || other.schoolAddress == schoolAddress)&&(identical(other.homeAddress, homeAddress) || other.homeAddress == homeAddress)&&(identical(other.homeArea, homeArea) || other.homeArea == homeArea)&&(identical(other.homeStreet, homeStreet) || other.homeStreet == homeStreet)&&(identical(other.homeLatitude, homeLatitude) || other.homeLatitude == homeLatitude)&&(identical(other.homeLongitude, homeLongitude) || other.homeLongitude == homeLongitude)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.routeName, routeName) || other.routeName == routeName)&&(identical(other.pickupStopName, pickupStopName) || other.pickupStopName == pickupStopName)&&const DeepCollectionEquality().equals(other._allergies, _allergies)&&(identical(other.parent, parent) || other.parent == parent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fullName,fullNameEn,nationalNumber,grade,className,dateOfBirth,schoolName,schoolAddress,homeAddress,homeArea,homeStreet,notes,routeName,pickupStopName,const DeepCollectionEquality().hash(_allergies),parent);
+int get hashCode => Object.hashAll([runtimeType,id,fullName,fullNameEn,nationalNumber,grade,className,dateOfBirth,schoolName,schoolAddress,homeAddress,homeArea,homeStreet,homeLatitude,homeLongitude,notes,routeName,pickupStopName,const DeepCollectionEquality().hash(_allergies),parent]);
 
 @override
 String toString() {
-  return 'StudentInfoDto(id: $id, fullName: $fullName, fullNameEn: $fullNameEn, nationalNumber: $nationalNumber, grade: $grade, className: $className, dateOfBirth: $dateOfBirth, schoolName: $schoolName, schoolAddress: $schoolAddress, homeAddress: $homeAddress, homeArea: $homeArea, homeStreet: $homeStreet, notes: $notes, routeName: $routeName, pickupStopName: $pickupStopName, allergies: $allergies, parent: $parent)';
+  return 'StudentInfoDto(id: $id, fullName: $fullName, fullNameEn: $fullNameEn, nationalNumber: $nationalNumber, grade: $grade, className: $className, dateOfBirth: $dateOfBirth, schoolName: $schoolName, schoolAddress: $schoolAddress, homeAddress: $homeAddress, homeArea: $homeArea, homeStreet: $homeStreet, homeLatitude: $homeLatitude, homeLongitude: $homeLongitude, notes: $notes, routeName: $routeName, pickupStopName: $pickupStopName, allergies: $allergies, parent: $parent)';
 }
 
 
@@ -297,7 +301,7 @@ abstract mixin class _$StudentInfoDtoCopyWith<$Res> implements $StudentInfoDtoCo
   factory _$StudentInfoDtoCopyWith(_StudentInfoDto value, $Res Function(_StudentInfoDto) _then) = __$StudentInfoDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String fullName, String? fullNameEn, String nationalNumber, String grade,@JsonKey(name: 'class') String? className, DateTime? dateOfBirth, String? schoolName, String? schoolAddress, String homeAddress, String? homeArea, String? homeStreet, String? notes, String? routeName, String? pickupStopName, List<String> allergies, StudentContactDto? parent
+ String id, String fullName, String? fullNameEn, String nationalNumber, String grade,@JsonKey(name: 'class') String? className, DateTime? dateOfBirth, String? schoolName, String? schoolAddress, String homeAddress, String? homeArea, String? homeStreet, double? homeLatitude, double? homeLongitude, String? notes, String? routeName, String? pickupStopName, List<String> allergies, StudentContactDto? parent
 });
 
 
@@ -314,7 +318,7 @@ class __$StudentInfoDtoCopyWithImpl<$Res>
 
 /// Create a copy of StudentInfoDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? fullNameEn = freezed,Object? nationalNumber = null,Object? grade = null,Object? className = freezed,Object? dateOfBirth = freezed,Object? schoolName = freezed,Object? schoolAddress = freezed,Object? homeAddress = null,Object? homeArea = freezed,Object? homeStreet = freezed,Object? notes = freezed,Object? routeName = freezed,Object? pickupStopName = freezed,Object? allergies = null,Object? parent = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? fullNameEn = freezed,Object? nationalNumber = null,Object? grade = null,Object? className = freezed,Object? dateOfBirth = freezed,Object? schoolName = freezed,Object? schoolAddress = freezed,Object? homeAddress = null,Object? homeArea = freezed,Object? homeStreet = freezed,Object? homeLatitude = freezed,Object? homeLongitude = freezed,Object? notes = freezed,Object? routeName = freezed,Object? pickupStopName = freezed,Object? allergies = null,Object? parent = freezed,}) {
   return _then(_StudentInfoDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
@@ -328,7 +332,9 @@ as String?,schoolAddress: freezed == schoolAddress ? _self.schoolAddress : schoo
 as String?,homeAddress: null == homeAddress ? _self.homeAddress : homeAddress // ignore: cast_nullable_to_non_nullable
 as String,homeArea: freezed == homeArea ? _self.homeArea : homeArea // ignore: cast_nullable_to_non_nullable
 as String?,homeStreet: freezed == homeStreet ? _self.homeStreet : homeStreet // ignore: cast_nullable_to_non_nullable
-as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,homeLatitude: freezed == homeLatitude ? _self.homeLatitude : homeLatitude // ignore: cast_nullable_to_non_nullable
+as double?,homeLongitude: freezed == homeLongitude ? _self.homeLongitude : homeLongitude // ignore: cast_nullable_to_non_nullable
+as double?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,routeName: freezed == routeName ? _self.routeName : routeName // ignore: cast_nullable_to_non_nullable
 as String?,pickupStopName: freezed == pickupStopName ? _self.pickupStopName : pickupStopName // ignore: cast_nullable_to_non_nullable
 as String?,allergies: null == allergies ? _self._allergies : allergies // ignore: cast_nullable_to_non_nullable

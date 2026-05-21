@@ -19,6 +19,8 @@ abstract class StudentInfoDto with _$StudentInfoDto {
     required String homeAddress,
     String? homeArea,
     String? homeStreet,
+    double? homeLatitude,
+    double? homeLongitude,
     String? notes,
     String? routeName,
     String? pickupStopName,

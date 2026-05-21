@@ -237,7 +237,12 @@ class _RoutedMapState extends State<_RoutedMap> {
         ),
       ).listen((p) {
         if (!mounted) return;
+        final hadPos = _currentPos != null;
         setState(() => _currentPos = LatLng(p.latitude, p.longitude));
+        // First GPS fix — refetch so the polyline starts at the bus.
+        // Subsequent moves (every 25m via distanceFilter) don't refetch;
+        // the bus icon moves along the existing polyline.
+        if (!hadPos) _fetchRoute();
       });
     } catch (_) {
       // Silent — distance pills just won't update.
@@ -283,13 +288,25 @@ class _RoutedMapState extends State<_RoutedMap> {
     return true;
   }
 
-  /// Hits OSRM's public demo server to retrieve a real driving polyline
-  /// across the ordered stops. On any failure we silently fall back to
-  /// straight lines between stops so the screen still renders.
+  /// Hits the self-hosted OSRM (same domain as the API) to retrieve a real
+  /// driving polyline across the ordered stops. On any failure we silently
+  /// fall back to straight lines between stops so the screen still renders.
+  ///
+  /// We always prepend the driver's current GPS position to the waypoint
+  /// list when it's known. That gives two useful behaviours:
+  ///   - Early in a Morning trip the route is drawn from the bus to the
+  ///     first pickup, so the driver sees the leg they're about to drive.
+  ///   - Once every student has boarded, `_activeStops` collapses to just
+  ///     `[school]` — without the bus position we'd have a 1-point route
+  ///     and nothing rendered. With it we get a clean current→school leg.
   Future<void> _fetchRoute() async {
     if (!mounted) return;
     final active = _activeStops;
-    if (active.length < 2) {
+    final waypoints = <LatLng>[
+      ?_currentPos,
+      ...active.map((s) => s.point),
+    ];
+    if (waypoints.length < 2) {
       setState(() {
         _route = const [];
         _loading = false;
@@ -301,8 +318,8 @@ class _RoutedMapState extends State<_RoutedMap> {
       _loading = true;
       _error = null;
     });
-    final coords = active
-        .map((s) => '${s.point.longitude},${s.point.latitude}')
+    final coords = waypoints
+        .map((p) => '${p.longitude},${p.latitude}')
         .join(';');
     final uri = Uri.parse(
       '${Env.osrmBaseUrl}/route/v1/driving/$coords'

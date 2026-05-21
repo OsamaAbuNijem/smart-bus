@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tilmez_bus/core/errors/failures.dart';
 import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/parent/domain/entities/student_info.dart';
@@ -130,6 +132,13 @@ class _FormState extends ConsumerState<_Form> {
                   ),
                 ],
               ),
+              if (info.homeLatitude != null && info.homeLongitude != null) ...[
+                const SizedBox(height: 14),
+                _HomeMap(
+                  latitude: info.homeLatitude!,
+                  longitude: info.homeLongitude!,
+                ),
+              ],
               const SizedBox(height: 14),
               _SectionTitle(text: l.studentInfoSchool),
               const SizedBox(height: 8),
@@ -614,4 +623,56 @@ String _initials(String name) {
   }
   return (parts.first.characters.first + parts.last.characters.first)
       .toUpperCase();
+}
+
+// ─── Home location map preview ──────────────────────────────────────────────
+
+class _HomeMap extends StatelessWidget {
+  const _HomeMap({required this.latitude, required this.longitude});
+  final double latitude;
+  final double longitude;
+
+  @override
+  Widget build(BuildContext context) {
+    final point = LatLng(latitude, longitude);
+    return Container(
+      height: 180,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.slate200),
+      ),
+      child: FlutterMap(
+        options: MapOptions(
+          initialCenter: point,
+          initialZoom: 15,
+          // Read-only preview — disable all gestures so it doesn't fight
+          // the parent ListView scroll.
+          interactionOptions: const InteractionOptions(
+            flags: InteractiveFlag.none,
+          ),
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.smartbus.tilmez_bus',
+          ),
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: point,
+                width: 36,
+                height: 36,
+                child: const Icon(
+                  Icons.location_on,
+                  color: AppColors.yellowDeep,
+                  size: 36,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

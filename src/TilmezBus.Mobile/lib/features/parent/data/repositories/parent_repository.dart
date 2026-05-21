@@ -92,6 +92,8 @@ class ParentRepository {
       homeAddress: dto.homeAddress,
       homeArea: dto.homeArea,
       homeStreet: dto.homeStreet,
+      homeLatitude: dto.homeLatitude,
+      homeLongitude: dto.homeLongitude,
       notes: dto.notes,
       routeName: dto.routeName,
       pickupStopName: dto.pickupStopName,

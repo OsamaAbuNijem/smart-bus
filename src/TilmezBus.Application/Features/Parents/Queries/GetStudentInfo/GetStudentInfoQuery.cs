@@ -23,6 +23,8 @@ public record StudentInfoDto(
     string HomeAddress,
     string? HomeArea,
     string? HomeStreet,
+    double? HomeLatitude,
+    double? HomeLongitude,
     string? Notes,
     string? RouteName,
     string? PickupStopName,

@@ -6,7 +6,7 @@ part of 'dio_client.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dioClientHash() => r'7086de2dc5f747528e3e4cffb87309f5014e009e';
+String _$dioClientHash() => r'7b16b7a99bd08e08c518e5f7241f5212bd7f5883';
 
 /// The single Dio instance used by every datasource. Configured with the
 /// API base URL, auth interceptor, and (in dev) a request/response logger.
