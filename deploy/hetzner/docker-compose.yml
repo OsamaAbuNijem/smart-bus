@@ -85,6 +85,8 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ApiBaseUrl: "http://api:8080/"
       Seq__ServerUrl: "http://seq:5341"
+    volumes:
+      - webkeys:/keys
 
   # ── OSRM routing ──────────────────────────────────────────────────────
   # One-shot preprocessor: downloads the Jordan OSM extract (~50 MB) on
@@ -153,3 +155,4 @@ volumes:
   redisdata:
   seqdata:
   osrmdata:
+  webkeys:

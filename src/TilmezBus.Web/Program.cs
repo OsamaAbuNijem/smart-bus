@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Localization;
 using Serilog;
 using TilmezBus.Web.Services;
@@ -39,6 +40,21 @@ try
     builder.Services.Configure<Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions>(o =>
         o.ViewLocationExpanders.Add(new TilmezBus.Web.Infrastructure.FeatureFolderViewLocationExpander()));
     builder.Services.AddHttpContextAccessor();
+
+    // Persist Data Protection keys to a mounted volume so session cookies
+    // survive container restarts/redeploys. Without this, every redeploy
+    // generates a new key ring and old cookies throw CryptographicException
+    // ("key {…} was not found in the key ring") in Session middleware.
+    var keysPath = builder.Configuration["DataProtection:KeysPath"]
+        ?? (builder.Environment.IsDevelopment() ? null : "/keys");
+    var dp = builder.Services.AddDataProtection()
+        .SetApplicationName("TilmezBus.Web");
+    if (!string.IsNullOrWhiteSpace(keysPath))
+    {
+        Directory.CreateDirectory(keysPath);
+        dp.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+    }
+
     builder.Services.AddSession(options =>
     {
         options.IdleTimeout = TimeSpan.FromHours(8);
