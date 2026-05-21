@@ -121,35 +121,36 @@ class _FormState extends ConsumerState<_Form> {
                     label: l.studentEditStudentId,
                     value: info.nationalNumber,
                   ),
-                  if (info.homeAddress.isNotEmpty)
-                    _ReadOnlyField(
-                      icon: Icons.location_on_outlined,
-                      label: l.studentInfoHomeAddress,
-                      value: info.homeAddress,
-                    ),
+                  // Always show the student's home address — when none is on
+                  // file we display a dash so the parent knows where it goes.
+                  _ReadOnlyField(
+                    icon: Icons.location_on_outlined,
+                    label: l.studentInfoHomeAddress,
+                    value: info.homeAddress.isEmpty ? '—' : info.homeAddress,
+                  ),
                 ],
               ),
-              if (info.schoolName != null && info.schoolName!.isNotEmpty) ...[
-                const SizedBox(height: 14),
-                _SectionTitle(text: l.studentInfoSchool),
-                const SizedBox(height: 8),
-                _Card(
-                  children: [
-                    _ReadOnlyField(
-                      icon: Icons.account_balance_outlined,
-                      label: l.studentInfoSchool,
-                      value: info.schoolName!,
-                    ),
-                    if (info.schoolAddress != null &&
-                        info.schoolAddress!.isNotEmpty)
-                      _ReadOnlyField(
-                        icon: Icons.place_outlined,
-                        label: l.studentInfoSchoolAddress,
-                        value: info.schoolAddress!,
-                      ),
-                  ],
-                ),
-              ],
+              const SizedBox(height: 14),
+              _SectionTitle(text: l.studentInfoSchool),
+              const SizedBox(height: 8),
+              _Card(
+                children: [
+                  _ReadOnlyField(
+                    icon: Icons.account_balance_outlined,
+                    label: l.studentInfoSchool,
+                    value: info.schoolName == null || info.schoolName!.isEmpty
+                        ? '—'
+                        : info.schoolName!,
+                  ),
+                  _ReadOnlyField(
+                    icon: Icons.place_outlined,
+                    label: l.studentInfoSchoolAddress,
+                    value: info.schoolAddress == null || info.schoolAddress!.isEmpty
+                        ? '—'
+                        : info.schoolAddress!,
+                  ),
+                ],
+              ),
               const SizedBox(height: 14),
               _SectionTitle(text: l.studentEditNotes),
               const SizedBox(height: 8),

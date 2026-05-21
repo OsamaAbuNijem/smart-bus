@@ -15,14 +15,25 @@ class Env {
     defaultValue: '',
   );
 
-  /// OSRM routing host. Defaults to the public demo for dev/demo use; in prod
-  /// point this at your self-hosted instance (see deploy/osrm/README.md) via
-  /// `--dart-define=OSRM_BASE_URL=https://routing.tilmezbus.example`.
-  static const String _osrmBaseUrl = String.fromEnvironment(
+  /// OSRM routing host. If you pass `--dart-define=OSRM_BASE_URL=...` we
+  /// use that. Otherwise we infer: when the app targets a non-localhost
+  /// API host, OSRM is served from the same domain (under /route/v1/);
+  /// when targeting a dev / emulator API host, we fall back to the public
+  /// OSRM demo so local work doesn't require the full stack.
+  static const String _osrmBaseUrlOverride = String.fromEnvironment(
     'OSRM_BASE_URL',
-    defaultValue: 'https://router.project-osrm.org',
+    defaultValue: '',
   );
-  static String get osrmBaseUrl => _osrmBaseUrl;
+  static String get osrmBaseUrl {
+    if (_osrmBaseUrlOverride.isNotEmpty) return _osrmBaseUrlOverride;
+    final base = apiBaseUrl;
+    // Local API → use the public OSRM demo (LAN / emulator can't reach
+    // an OSRM running only on the Mac's docker network).
+    if (base.contains('localhost') || base.contains('10.0.2.2')) {
+      return 'https://router.project-osrm.org';
+    }
+    return base;
+  }
 
   /// 10.0.2.2 is the Android emulator's loopback to the host's localhost.
   /// iOS simulator can use localhost directly. Switch via --dart-define.

@@ -86,12 +86,60 @@ services:
       ApiBaseUrl: "http://api:8080/"
       Seq__ServerUrl: "http://seq:5341"
 
+  # ── OSRM routing ──────────────────────────────────────────────────────
+  # One-shot preprocessor: downloads the Jordan OSM extract (~50 MB) on
+  # first run, then produces the .osrm, .osrm.mldgr, .osrm.partition,
+  # .osrm.cell files (~250 MB). Idempotent — subsequent boots see the
+  # files and exit immediately, so `up -d` is cheap. To pull a fresh
+  # snapshot of the map data, delete `jordan-latest.osm.pbf` from the
+  # osrmdata volume and run `up -d osrm-init` again.
+  osrm-init:
+    image: ghcr.io/project-osrm/osrm-backend:latest
+    restart: "no"
+    volumes:
+      - osrmdata:/data
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -e
+        cd /data
+        if [ ! -f jordan-latest.osm.pbf ]; then
+          echo "Downloading Jordan OSM extract..."
+          wget -q -O jordan-latest.osm.pbf http://download.geofabrik.de/asia/jordan-latest.osm.pbf
+        fi
+        if [ ! -f jordan-latest.osrm.mldgr ]; then
+          echo "Preprocessing (extract → partition → customize)..."
+          osrm-extract -p /opt/car.lua jordan-latest.osm.pbf
+          osrm-partition jordan-latest.osrm
+          osrm-customize jordan-latest.osrm
+        fi
+        echo "OSRM data ready."
+
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:latest
+    restart: unless-stopped
+    depends_on:
+      osrm-init:
+        condition: service_completed_successfully
+    command:
+      - osrm-routed
+      - --algorithm
+      - mld
+      - --max-table-size
+      - "1000"
+      - /data/jordan-latest.osrm
+    volumes:
+      - osrmdata:/data
+    # Internal-only — nginx proxies /route/v1/ to osrm:5000.
+
   nginx:
     image: nginx:alpine
     restart: unless-stopped
     depends_on:
-      api: { condition: service_started }
-      web: { condition: service_started }
+      api:  { condition: service_started }
+      web:  { condition: service_started }
+      osrm: { condition: service_started }
     ports:
       - "80:80"
       - "443:443"
@@ -104,3 +152,4 @@ volumes:
   pgdata:
   redisdata:
   seqdata:
+  osrmdata:

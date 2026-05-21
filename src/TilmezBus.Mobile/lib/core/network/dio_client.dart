@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tilmez_bus/core/config/env.dart';
 import 'package:tilmez_bus/core/network/auth_interceptor.dart';
 import 'package:tilmez_bus/core/storage/secure_storage.dart';
+import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
 
 part 'dio_client.g.dart';
 
@@ -34,8 +35,13 @@ Dio dioClient(Ref ref) {
     AuthInterceptor(
       storage,
       onUnauthorized: () async {
-        // Hook for the router to listen via authControllerProvider.
-        // Clearing storage already happened inside the interceptor.
+        // Storage is already cleared by the interceptor. Push that state
+        // to the auth controller so the GoRouter's redirect rule fires
+        // and the app navigates back to /login. Without this the user
+        // is stuck on a screen that 401-loops every refresh.
+        // invalidate() re-runs AuthController.build() which reads the
+        // now-empty storage and emits AsyncData(null).
+        ref.invalidate(authControllerProvider);
       },
     ),
   );
