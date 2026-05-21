@@ -124,6 +124,8 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
                 home: _homeLatLng,
                 school: _schoolLatLng,
                 destination: _destinationLatLng,
+                pickup: _pickup(widget.data),
+                pickupAlreadyVisited: _pickupVisited(widget.data),
                 busLabel: data.busPlateNumber == null
                     ? null
                     : 'Bus #${data.busPlateNumber}',
@@ -353,6 +355,8 @@ class _Map extends ConsumerWidget {
     required this.home,
     required this.school,
     required this.destination,
+    required this.pickup,
+    required this.pickupAlreadyVisited,
     required this.busLabel,
     required this.homeLabel,
     required this.schoolLabel,
@@ -363,6 +367,15 @@ class _Map extends ConsumerWidget {
   final LatLng? school;
   // Active destination — school in morning trips, home in return trips.
   final LatLng? destination;
+  // Pickup point — home in morning, school in return. Used as the middle
+  // waypoint when fetching the OSRM route so the parent sees the full
+  // bus → pickup → destination path BEFORE the student boards.
+  final LatLng? pickup;
+  // True once the bus has reached the pickup — i.e., on Morning trips
+  // after the student is on board (boardingStatus = "Boarded"), or on
+  // Return trips since the bus always starts at the school. When true we
+  // drop the pickup waypoint and just draw bus → destination.
+  final bool pickupAlreadyVisited;
   final String? busLabel;
   final String homeLabel;
   final String schoolLabel;
@@ -373,21 +386,44 @@ class _Map extends ConsumerWidget {
         bus ?? destination ?? home ?? school ?? const LatLng(31.95, 35.93);
     final initialZoom = bus != null && destination != null ? 13.0 : 14.0;
 
-    // Fetch a street-following route between bus and the active destination
-    // (school for morning, home for return). Snap to ~111m grid so small bus
-    // movements reuse the cached path.
-    List<LatLng> linePoints =
-        (bus != null && destination != null) ? [bus!, destination!] : const [];
-    if (bus != null && destination != null) {
-      final routed = ref.watch(routedPathProvider(
-        fromLat: bus!.latitude.roundForRoute,
-        fromLng: bus!.longitude.roundForRoute,
-        toLat: destination!.latitude.roundForRoute,
-        toLng: destination!.longitude.roundForRoute,
-      ));
+    // Only draw the REMAINING distance from the bus to the destination.
+    // - Before pickup (Morning, status=Waiting): include the home as an
+    //   intermediate waypoint so the parent sees bus → home → school.
+    // - After pickup (Morning, status=Boarded): home is behind the bus
+    //   already, so we drop it and draw bus → school straight away.
+    // - Return trips: pickup is the school which the bus has left, so we
+    //   skip it and draw bus → home.
+    final waypoints = <LatLng>[
+      if (bus != null) bus!,
+      if (pickup != null &&
+          !pickupAlreadyVisited &&
+          (bus == null || _distSq(bus!, pickup!) > 0.000001))
+        pickup!,
+      if (destination != null &&
+          (pickup == null ||
+              pickupAlreadyVisited ||
+              _distSq(pickup!, destination!) > 0.000001))
+        destination!,
+    ];
+    List<LatLng> linePoints = waypoints.length >= 2 ? waypoints : const [];
+    if (waypoints.length >= 2) {
+      final key = waypointsCacheKey(waypoints);
+      final routed = ref.watch(routedPathThroughProvider(waypointsKey: key));
       final routedList = routed.valueOrNull;
       if (routedList != null && routedList.length >= 2) {
         linePoints = routedList;
+      }
+    }
+    // Project the bus's actual GPS onto the polyline so the marker glides
+    // along the road shape between OSRM refetches. Also trim the polyline
+    // so it starts at the bus — anything "behind" the bus's projected
+    // position is dropped, leaving only the remaining route to render.
+    LatLng? busOnLine = bus;
+    if (bus != null && linePoints.length >= 2) {
+      final trimmed = _trimPolylineFrom(bus!, linePoints);
+      if (trimmed.isNotEmpty) {
+        busOnLine = trimmed.first;
+        linePoints = trimmed;
       }
     }
 
@@ -444,9 +480,9 @@ class _Map extends ConsumerWidget {
                   icon: Icons.school,
                 ),
               ),
-            if (bus != null)
+            if (busOnLine != null)
               Marker(
-                point: bus!,
+                point: busOnLine,
                 width: 100,
                 height: 80,
                 alignment: Alignment.bottomCenter,
@@ -1234,6 +1270,65 @@ String _etaRange(int mins) {
   var high = (mins * 1.20).round() + 1;
   if (high - low < 2) high = low + 2;
   return '$low-$high';
+}
+
+/// Whether the bus has already reached the pickup point — i.e., we
+/// shouldn't include `pickup` in the OSRM waypoint list because it's
+/// behind the bus. Morning trips: true once the student is on board.
+/// Return trips: always true (bus has left the school before the parent
+/// starts watching).
+bool _pickupVisited(LiveTracking data) {
+  final morning = data.tripType?.toLowerCase() == 'morning';
+  if (!morning) return true;
+  final status = data.boardingStatus?.toLowerCase();
+  return status == 'boarded' ||
+      status == 'arrived' ||
+      status == 'droppedoff' ||
+      status == 'dropped_off';
+}
+
+/// Trims [line] so it starts at the closest point to [p], dropping every
+/// vertex that's "behind" [p] along the polyline. Result is
+/// `[projected_bus, next_vertex, ..., destination]` — i.e., the remaining
+/// route to render. Empty when the polyline is too short to project onto.
+List<LatLng> _trimPolylineFrom(LatLng p, List<LatLng> line) {
+  if (line.length < 2) return line;
+  int bestSegment = 0;
+  LatLng bestPoint = line.first;
+  var bestDistSq = double.infinity;
+  for (var i = 0; i < line.length - 1; i++) {
+    final candidate = _projectOntoSegment(p, line[i], line[i + 1]);
+    final d = _distSq(p, candidate);
+    if (d < bestDistSq) {
+      bestDistSq = d;
+      bestSegment = i;
+      bestPoint = candidate;
+    }
+  }
+  // Keep: projected_bus + vertex(bestSegment + 1) + everything after.
+  return <LatLng>[bestPoint, ...line.sublist(bestSegment + 1)];
+}
+
+/// Perpendicular foot of [p] on segment [a]→[b], clamped to the segment.
+LatLng _projectOntoSegment(LatLng p, LatLng a, LatLng b) {
+  final dx = b.longitude - a.longitude;
+  final dy = b.latitude - a.latitude;
+  final lenSq = dx * dx + dy * dy;
+  if (lenSq < 1e-15) return a;
+  var t = ((p.longitude - a.longitude) * dx + (p.latitude - a.latitude) * dy) /
+      lenSq;
+  if (t < 0) t = 0;
+  if (t > 1) t = 1;
+  return LatLng(a.latitude + t * dy, a.longitude + t * dx);
+}
+
+/// Squared planar distance between two points — fine for short
+/// city-scale distances where we just need an "are these the same point"
+/// check (used to drop redundant waypoints from the OSRM call).
+double _distSq(LatLng a, LatLng b) {
+  final dx = a.latitude - b.latitude;
+  final dy = a.longitude - b.longitude;
+  return dx * dx + dy * dy;
 }
 
 LatLng? _pickup(LiveTracking data) {

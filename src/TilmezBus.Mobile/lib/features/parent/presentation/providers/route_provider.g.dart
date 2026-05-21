@@ -6,7 +6,7 @@ part of 'route_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$routedPathHash() => r'e064badc8d62d1a102d92216b234498af29cfbd3';
+String _$routedPathHash() => r'53d62d5701c687ba76a0bf9dc5420765228c4820';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,7 +29,7 @@ class _SystemHash {
   }
 }
 
-/// Fetches a driving route between two points from the OSRM public demo.
+/// Fetches a driving route between two points from the self-hosted OSRM.
 /// The result is a list of LatLng forming a polyline that follows streets.
 ///
 /// We snap each input coordinate to ~111m grid (3 decimal places) so small
@@ -39,7 +39,7 @@ class _SystemHash {
 @ProviderFor(routedPath)
 const routedPathProvider = RoutedPathFamily();
 
-/// Fetches a driving route between two points from the OSRM public demo.
+/// Fetches a driving route between two points from the self-hosted OSRM.
 /// The result is a list of LatLng forming a polyline that follows streets.
 ///
 /// We snap each input coordinate to ~111m grid (3 decimal places) so small
@@ -47,7 +47,7 @@ const routedPathProvider = RoutedPathFamily();
 ///
 /// Copied from [routedPath].
 class RoutedPathFamily extends Family<AsyncValue<List<LatLng>>> {
-  /// Fetches a driving route between two points from the OSRM public demo.
+  /// Fetches a driving route between two points from the self-hosted OSRM.
   /// The result is a list of LatLng forming a polyline that follows streets.
   ///
   /// We snap each input coordinate to ~111m grid (3 decimal places) so small
@@ -56,7 +56,7 @@ class RoutedPathFamily extends Family<AsyncValue<List<LatLng>>> {
   /// Copied from [routedPath].
   const RoutedPathFamily();
 
-  /// Fetches a driving route between two points from the OSRM public demo.
+  /// Fetches a driving route between two points from the self-hosted OSRM.
   /// The result is a list of LatLng forming a polyline that follows streets.
   ///
   /// We snap each input coordinate to ~111m grid (3 decimal places) so small
@@ -104,7 +104,7 @@ class RoutedPathFamily extends Family<AsyncValue<List<LatLng>>> {
   String? get name => r'routedPathProvider';
 }
 
-/// Fetches a driving route between two points from the OSRM public demo.
+/// Fetches a driving route between two points from the self-hosted OSRM.
 /// The result is a list of LatLng forming a polyline that follows streets.
 ///
 /// We snap each input coordinate to ~111m grid (3 decimal places) so small
@@ -112,7 +112,7 @@ class RoutedPathFamily extends Family<AsyncValue<List<LatLng>>> {
 ///
 /// Copied from [routedPath].
 class RoutedPathProvider extends FutureProvider<List<LatLng>> {
-  /// Fetches a driving route between two points from the OSRM public demo.
+  /// Fetches a driving route between two points from the self-hosted OSRM.
   /// The result is a list of LatLng forming a polyline that follows streets.
   ///
   /// We snap each input coordinate to ~111m grid (3 decimal places) so small
@@ -238,6 +238,166 @@ class _RoutedPathProviderElement extends FutureProviderElement<List<LatLng>>
   double get toLat => (origin as RoutedPathProvider).toLat;
   @override
   double get toLng => (origin as RoutedPathProvider).toLng;
+}
+
+String _$routedPathThroughHash() => r'21268d645a81c17977229ccb633174cf91130d7d';
+
+/// Multi-waypoint variant: fetches a street-following polyline through
+/// every point in [waypoints], in order. Used by the parent live-tracking
+/// map to draw bus → home → school (morning) or bus → home (return) as
+/// one continuous route, matching the driver-map look. Coordinates are
+/// snapped to ~111m grid so the keepAlive cache hits across bus jitter.
+///
+/// Copied from [routedPathThrough].
+@ProviderFor(routedPathThrough)
+const routedPathThroughProvider = RoutedPathThroughFamily();
+
+/// Multi-waypoint variant: fetches a street-following polyline through
+/// every point in [waypoints], in order. Used by the parent live-tracking
+/// map to draw bus → home → school (morning) or bus → home (return) as
+/// one continuous route, matching the driver-map look. Coordinates are
+/// snapped to ~111m grid so the keepAlive cache hits across bus jitter.
+///
+/// Copied from [routedPathThrough].
+class RoutedPathThroughFamily extends Family<AsyncValue<List<LatLng>>> {
+  /// Multi-waypoint variant: fetches a street-following polyline through
+  /// every point in [waypoints], in order. Used by the parent live-tracking
+  /// map to draw bus → home → school (morning) or bus → home (return) as
+  /// one continuous route, matching the driver-map look. Coordinates are
+  /// snapped to ~111m grid so the keepAlive cache hits across bus jitter.
+  ///
+  /// Copied from [routedPathThrough].
+  const RoutedPathThroughFamily();
+
+  /// Multi-waypoint variant: fetches a street-following polyline through
+  /// every point in [waypoints], in order. Used by the parent live-tracking
+  /// map to draw bus → home → school (morning) or bus → home (return) as
+  /// one continuous route, matching the driver-map look. Coordinates are
+  /// snapped to ~111m grid so the keepAlive cache hits across bus jitter.
+  ///
+  /// Copied from [routedPathThrough].
+  RoutedPathThroughProvider call({required String waypointsKey}) {
+    return RoutedPathThroughProvider(waypointsKey: waypointsKey);
+  }
+
+  @override
+  RoutedPathThroughProvider getProviderOverride(
+    covariant RoutedPathThroughProvider provider,
+  ) {
+    return call(waypointsKey: provider.waypointsKey);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'routedPathThroughProvider';
+}
+
+/// Multi-waypoint variant: fetches a street-following polyline through
+/// every point in [waypoints], in order. Used by the parent live-tracking
+/// map to draw bus → home → school (morning) or bus → home (return) as
+/// one continuous route, matching the driver-map look. Coordinates are
+/// snapped to ~111m grid so the keepAlive cache hits across bus jitter.
+///
+/// Copied from [routedPathThrough].
+class RoutedPathThroughProvider extends FutureProvider<List<LatLng>> {
+  /// Multi-waypoint variant: fetches a street-following polyline through
+  /// every point in [waypoints], in order. Used by the parent live-tracking
+  /// map to draw bus → home → school (morning) or bus → home (return) as
+  /// one continuous route, matching the driver-map look. Coordinates are
+  /// snapped to ~111m grid so the keepAlive cache hits across bus jitter.
+  ///
+  /// Copied from [routedPathThrough].
+  RoutedPathThroughProvider({required String waypointsKey})
+    : this._internal(
+        (ref) => routedPathThrough(
+          ref as RoutedPathThroughRef,
+          waypointsKey: waypointsKey,
+        ),
+        from: routedPathThroughProvider,
+        name: r'routedPathThroughProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$routedPathThroughHash,
+        dependencies: RoutedPathThroughFamily._dependencies,
+        allTransitiveDependencies:
+            RoutedPathThroughFamily._allTransitiveDependencies,
+        waypointsKey: waypointsKey,
+      );
+
+  RoutedPathThroughProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.waypointsKey,
+  }) : super.internal();
+
+  final String waypointsKey;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<LatLng>> Function(RoutedPathThroughRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RoutedPathThroughProvider._internal(
+        (ref) => create(ref as RoutedPathThroughRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        waypointsKey: waypointsKey,
+      ),
+    );
+  }
+
+  @override
+  FutureProviderElement<List<LatLng>> createElement() {
+    return _RoutedPathThroughProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RoutedPathThroughProvider &&
+        other.waypointsKey == waypointsKey;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, waypointsKey.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin RoutedPathThroughRef on FutureProviderRef<List<LatLng>> {
+  /// The parameter `waypointsKey` of this provider.
+  String get waypointsKey;
+}
+
+class _RoutedPathThroughProviderElement
+    extends FutureProviderElement<List<LatLng>>
+    with RoutedPathThroughRef {
+  _RoutedPathThroughProviderElement(super.provider);
+
+  @override
+  String get waypointsKey => (origin as RoutedPathThroughProvider).waypointsKey;
 }
 
 // ignore_for_file: type=lint

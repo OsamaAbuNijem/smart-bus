@@ -15,6 +15,7 @@ import 'package:tilmez_bus/core/config/env.dart';
 import 'package:tilmez_bus/core/errors/failures.dart';
 import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/assistant/data/models/trip_details_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/services/trip_location_broadcaster.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
@@ -71,7 +72,16 @@ class _DriverTripMapScreenState extends ConsumerState<DriverTripMapScreen> {
           message: e is Failure ? e.message : '$e',
           onRetry: () => ref.invalidate(tripDetailsProvider(widget.tripId)),
         ),
-        data: (d) => _MapView(details: d, l: l),
+        data: (d) {
+          // Keep the GPS broadcaster alive while this screen is mounted.
+          // The same provider is watched on the trip-details screen, so
+          // the broadcaster keeps running as the assistant navigates
+          // between map and details.
+          if (d.status != 'Completed') {
+            ref.watch(tripLocationBroadcasterProvider(d.busId));
+          }
+          return _MapView(details: d, l: l);
+        },
       ),
     );
   }
@@ -183,7 +193,7 @@ class _MapView extends StatelessWidget {
   }
 }
 
-class _RoutedMap extends StatefulWidget {
+class _RoutedMap extends ConsumerStatefulWidget {
   const _RoutedMap({
     required this.stops,
     required this.details,
@@ -194,10 +204,10 @@ class _RoutedMap extends StatefulWidget {
   final AppLocalizations l;
 
   @override
-  State<_RoutedMap> createState() => _RoutedMapState();
+  ConsumerState<_RoutedMap> createState() => _RoutedMapState();
 }
 
-class _RoutedMapState extends State<_RoutedMap> {
+class _RoutedMapState extends ConsumerState<_RoutedMap> {
   final MapController _map = MapController();
   List<LatLng> _route = const [];
   bool _loading = true;
@@ -207,6 +217,9 @@ class _RoutedMapState extends State<_RoutedMap> {
   /// down while the driver moves.
   LatLng? _currentPos;
   StreamSubscription<Position>? _posSub;
+  /// Total driving duration for the active route, in seconds, as reported
+  /// by OSRM. Null until the first successful fetch.
+  double? _routeDurationSec;
 
   @override
   void initState() {
@@ -240,8 +253,6 @@ class _RoutedMapState extends State<_RoutedMap> {
         final hadPos = _currentPos != null;
         setState(() => _currentPos = LatLng(p.latitude, p.longitude));
         // First GPS fix — refetch so the polyline starts at the bus.
-        // Subsequent moves (every 25m via distanceFilter) don't refetch;
-        // the bus icon moves along the existing polyline.
         if (!hadPos) _fetchRoute();
       });
     } catch (_) {
@@ -351,11 +362,15 @@ class _RoutedMapState extends State<_RoutedMap> {
                 (c[0] as num).toDouble(),
               ))
           .toList();
+      // OSRM returns the total drive time in seconds at routes[0].duration.
+      // We display it as the ETA pill on the map header.
+      final duration = (first['duration'] as num?)?.toDouble();
       if (!mounted) return;
       setState(() {
         _route = pts;
         _loading = false;
         _error = null;
+        _routeDurationSec = duration;
       });
       _fitBounds();
     } catch (_) {
@@ -364,6 +379,7 @@ class _RoutedMapState extends State<_RoutedMap> {
         _route = active.map((s) => s.point).toList();
         _loading = false;
         _error = widget.l.driverRouteFallback;
+        _routeDurationSec = null;
       });
       _fitBounds();
     }
@@ -460,6 +476,7 @@ class _RoutedMapState extends State<_RoutedMap> {
                       details: widget.details,
                       stops: widget.stops,
                       l: widget.l,
+                      durationSec: _routeDurationSec,
                     ),
                   ),
                 ],
@@ -503,10 +520,14 @@ class _RouteSummaryCard extends StatelessWidget {
     required this.details,
     required this.stops,
     required this.l,
+    this.durationSec,
   });
   final TripDetailsDto details;
   final List<_Stop> stops;
   final AppLocalizations l;
+  /// Total drive time of the currently-rendered OSRM route in seconds.
+  /// Null while we're still fetching or if OSRM failed.
+  final double? durationSec;
   @override
   Widget build(BuildContext context) {
     final morning = details.isMorning;
@@ -586,6 +607,10 @@ class _RouteSummaryCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (durationSec != null) ...[
+                const SizedBox(width: 8),
+                _EtaPill(seconds: durationSec!),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -1282,4 +1307,46 @@ class _Stop {
   /// True once the assistant has marked this student as DroppedOff —
   /// renders the pin greyed with a check overlay and tags the row "Arrived".
   final bool dropped;
+}
+
+// ─── ETA pill shown on the route summary card ───────────────────────────────
+
+class _EtaPill extends StatelessWidget {
+  const _EtaPill({required this.seconds});
+  final double seconds;
+
+  @override
+  Widget build(BuildContext context) {
+    // Round up so "59s" reads as "1 min" instead of "0".
+    final minutes = (seconds / 60).ceil().clamp(1, 999);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.yellowTint,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: const Color(0x66F5C518)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.schedule_outlined,
+            size: 13,
+            color: AppColors.ink,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            '$minutes min',
+            style: const TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
+              color: AppColors.ink,
+              fontFeatures: [FontFeature.tabularFigures()],
+              letterSpacing: -0.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

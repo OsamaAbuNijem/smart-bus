@@ -1,3 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -123,13 +128,12 @@ class _FormState extends ConsumerState<_Form> {
                     label: l.studentEditStudentId,
                     value: info.nationalNumber,
                   ),
-                  // Always show the student's home address — when none is on
-                  // file we display a dash so the parent knows where it goes.
-                  _ReadOnlyField(
-                    icon: Icons.location_on_outlined,
-                    label: l.studentInfoHomeAddress,
-                    value: info.homeAddress.isEmpty ? '—' : info.homeAddress,
-                  ),
+                  // Always show the student's home address. Cascade:
+                  //   1. full "street, building, area" if present
+                  //   2. just the area name
+                  //   3. reverse-geocoded label from the saved coordinates
+                  //   4. "—"
+                  _HomeAddressField(info: info, label: l.studentInfoHomeAddress),
                 ],
               ),
               if (info.homeLatitude != null && info.homeLongitude != null) ...[
@@ -613,6 +617,137 @@ class _SaveBar extends StatelessWidget {
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────
+
+// ─── Home address with reverse-geocode fallback ─────────────────────────────
+//
+// When the student's address text is empty but lat/lng are saved we ask
+// Nominatim (OpenStreetMap's free reverse-geocoder) for a human-readable
+// label. The result is cached for the app's lifetime so we don't re-query
+// every time the parent re-opens the screen.
+
+class _HomeAddressField extends StatefulWidget {
+  const _HomeAddressField({required this.info, required this.label});
+  final StudentInfo info;
+  final String label;
+
+  @override
+  State<_HomeAddressField> createState() => _HomeAddressFieldState();
+}
+
+class _HomeAddressFieldState extends State<_HomeAddressField> {
+  String? _resolved;
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _maybeReverseGeocode();
+  }
+
+  Future<void> _maybeReverseGeocode() async {
+    final info = widget.info;
+    // Skip if we already have a usable address from the API.
+    final hasText = info.homeAddress.trim().isNotEmpty ||
+        (info.homeArea?.trim().isNotEmpty ?? false);
+    if (hasText) return;
+    final lat = info.homeLatitude;
+    final lng = info.homeLongitude;
+    if (lat == null || lng == null) return;
+
+    setState(() => _loading = true);
+    try {
+      final label = await _reverseGeocode(lat, lng);
+      if (!mounted) return;
+      setState(() {
+        _resolved = label;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('[reverse-geocode] failed: $e');
+      }
+    }
+  }
+
+  String _displayValue() {
+    final info = widget.info;
+    if (info.homeAddress.trim().isNotEmpty) return info.homeAddress;
+    final area = info.homeArea?.trim();
+    if (area != null && area.isNotEmpty) return area;
+    if (_resolved != null && _resolved!.isNotEmpty) return _resolved!;
+    if (_loading) return '…';
+    return '—';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _ReadOnlyField(
+      icon: Icons.location_on_outlined,
+      label: widget.label,
+      value: _displayValue(),
+    );
+  }
+}
+
+// In-memory cache so each session only hits Nominatim once per coord pair.
+final Map<String, String> _reverseGeocodeCache = {};
+Dio? _geocodeDio;
+
+Future<String> _reverseGeocode(double lat, double lng) async {
+  // Round to 4 decimals (~11m) for the cache key — same building hits the
+  // same key regardless of GPS jitter.
+  final key = '${lat.toStringAsFixed(4)},${lng.toStringAsFixed(4)}';
+  final cached = _reverseGeocodeCache[key];
+  if (cached != null) return cached;
+
+  _geocodeDio ??= Dio(BaseOptions(
+    connectTimeout: const Duration(seconds: 6),
+    receiveTimeout: const Duration(seconds: 8),
+    headers: {
+      // Nominatim's usage policy requires a unique User-Agent identifying
+      // the application; otherwise requests are silently throttled.
+      'User-Agent': 'TilmezBusMobile/1.0 (https://tilmezbus.com)',
+    },
+  ));
+
+  final res = await _geocodeDio!.get<dynamic>(
+    'https://nominatim.openstreetmap.org/reverse',
+    queryParameters: {
+      'lat': lat,
+      'lon': lng,
+      'format': 'json',
+      'zoom': '14',
+      'addressdetails': '1',
+      'accept-language': 'ar,en',
+    },
+  );
+
+  final data = res.data is Map<String, dynamic>
+      ? res.data as Map<String, dynamic>
+      : (res.data is String
+          ? jsonDecode(res.data as String) as Map<String, dynamic>
+          : <String, dynamic>{});
+  final addr = (data['address'] as Map<String, dynamic>?) ?? const {};
+  // Prefer the most specific neighbourhood label we can find before falling
+  // back to the full display_name.
+  String? pick(String k) {
+    final v = addr[k];
+    return (v is String && v.trim().isNotEmpty) ? v.trim() : null;
+  }
+  final label = pick('neighbourhood') ??
+      pick('suburb') ??
+      pick('quarter') ??
+      pick('village') ??
+      pick('town') ??
+      pick('city') ??
+      (data['display_name'] as String?) ??
+      '';
+  _reverseGeocodeCache[key] = label;
+  return label;
+}
 
 String _initials(String name) {
   final parts =

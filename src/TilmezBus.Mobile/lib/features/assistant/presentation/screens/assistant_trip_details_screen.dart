@@ -10,6 +10,7 @@ import 'package:tilmez_bus/core/routing/app_router.dart';
 import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
 import 'package:tilmez_bus/features/assistant/data/models/trip_details_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/services/trip_location_broadcaster.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
@@ -51,6 +52,14 @@ class _TripBody extends ConsumerWidget {
     // existing `readOnly` gate covered the post-completion case; we widen
     // it to cover the pre-start (Scheduled) case too.
     final readOnly = completed || scheduled;
+
+    // Start broadcasting the bus's GPS to the API for as long as this
+    // screen is mounted with an in-progress trip. The parent app reads
+    // these pings via /live so the bus marker moves in real time.
+    // The provider auto-disposes on screen exit, stopping the broadcast.
+    if (!completed) {
+      ref.watch(tripLocationBroadcasterProvider(details.busId));
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

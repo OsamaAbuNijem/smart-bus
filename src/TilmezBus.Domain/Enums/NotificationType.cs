@@ -11,5 +11,6 @@ public enum NotificationType
     StudentArrived = 6,
     AbsenceConfirmed = 7,
     DriverMessage = 8,
-    SchoolNotice = 9
+    SchoolNotice = 9,
+    StudentArrivedAtSchool = 10,
 }
