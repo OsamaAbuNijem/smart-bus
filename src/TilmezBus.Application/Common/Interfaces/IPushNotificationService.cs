@@ -22,4 +22,18 @@ public interface IPushNotificationService
         NotificationType type = NotificationType.SystemAlert,
         IDictionary<string, string>? data = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Sends a templated notification to a user, picking the language
+    /// template per registered device. A parent with an Arabic phone and
+    /// an English tablet gets each language in its own push. Also writes
+    /// the message to the inbox once per language (so the in-app inbox
+    /// shows the most-recently-used device's language).
+    /// </summary>
+    Task<int> SendTemplatedToUserAsync(
+        string userId,
+        NotificationType type,
+        IReadOnlyDictionary<string, string?> templateVars,
+        IDictionary<string, string>? data = null,
+        CancellationToken cancellationToken = default);
 }

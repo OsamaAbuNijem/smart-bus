@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -36,9 +38,19 @@ class DeviceTokenRegistrar extends _$DeviceTokenRegistrar {
   Future<void> _post(String token) async {
     try {
       final dio = ref.read(dioClientProvider);
+      // Detect the device's preferred language so the server picks the
+      // right notification template (Arabic vs English) when pushing
+      // to this device. Falls back to "ar" if the locale is unset.
+      final localeCode =
+          PlatformDispatcher.instance.locale.languageCode.toLowerCase();
+      final language = localeCode.isEmpty ? 'ar' : localeCode;
       await dio.post<void>(
         '/notifications/devices',
-        data: {'token': token, 'platform': 'android'},
+        data: {
+          'token': token,
+          'platform': Platform.isIOS ? 'ios' : 'android',
+          'language': language,
+        },
       );
       if (kDebugMode) {
         // ignore: avoid_print

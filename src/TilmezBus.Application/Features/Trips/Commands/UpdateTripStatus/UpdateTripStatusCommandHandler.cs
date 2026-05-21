@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
-using TilmezBus.Application.Features.Notifications.Commands.SendNotification;
 using TilmezBus.Domain.Enums;
 
 namespace TilmezBus.Application.Features.Trips.Commands.UpdateTripStatus;
@@ -13,23 +12,20 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
     private readonly IUnitOfWork _unitOfWork;
     private readonly IApplicationDbContext _context;
     private readonly ISignalRNotificationService _notificationService;
-    private readonly INotificationTemplateService _templates;
-    private readonly IMediator _mediator;
+    private readonly IPushNotificationService _push;
     private readonly ILogger<UpdateTripStatusCommandHandler> _logger;
 
     public UpdateTripStatusCommandHandler(
         IUnitOfWork unitOfWork,
         IApplicationDbContext context,
         ISignalRNotificationService notificationService,
-        INotificationTemplateService templates,
-        IMediator mediator,
+        IPushNotificationService push,
         ILogger<UpdateTripStatusCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _context = context;
         _notificationService = notificationService;
-        _templates = templates;
-        _mediator = mediator;
+        _push = push;
         _logger = logger;
     }
 
@@ -110,19 +106,22 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                     if (string.IsNullOrEmpty(a.ParentUserId)) continue;
                     try
                     {
-                        var (title, message) = await _templates.RenderAsync(
+                        // SendTemplatedToUserAsync picks the right language
+                        // per registered device, writes the inbox row, and
+                        // pushes via FCM. Per-parent failures are swallowed
+                        // so one stale device doesn't block the others.
+                        await _push.SendTemplatedToUserAsync(
+                            a.ParentUserId,
                             NotificationType.StudentArrivedAtSchool,
-                            "ar",
                             new Dictionary<string, string?>
                             {
                                 ["studentName"] = a.FullName,
                             },
-                            cancellationToken);
-                        await _mediator.Send(
-                            new SendNotificationCommand(
-                                title, message,
-                                NotificationType.StudentArrivedAtSchool,
-                                a.ParentUserId, trip.Id, null),
+                            new Dictionary<string, string>
+                            {
+                                ["type"] = "StudentArrivedAtSchool",
+                                ["tripId"] = trip.Id.ToString(),
+                            },
                             cancellationToken);
                     }
                     catch (Exception ex)

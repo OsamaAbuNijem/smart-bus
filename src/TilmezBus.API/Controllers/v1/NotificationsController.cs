@@ -98,6 +98,17 @@ public class NotificationsController : ControllerBase
         if (string.IsNullOrWhiteSpace(request.Token))
             return BadRequest(new { error = "Token is required." });
 
+        // Normalise the language tag to two lower-case letters so "ar-JO",
+        // "AR", and "ar" all collapse to "ar". Null/blank → "ar" fallback
+        // applied at send time, not stored here.
+        string? lang = null;
+        if (!string.IsNullOrWhiteSpace(request.Language))
+        {
+            var twoChar = request.Language!.Trim().ToLowerInvariant();
+            if (twoChar.Length > 2) twoChar = twoChar[..2];
+            lang = twoChar;
+        }
+
         // Upsert by (UserId, Token). EF Core 8 has no native upsert, so do a
         // find-or-insert; the unique index protects against races.
         var existing = await _db.UserDeviceTokens
@@ -109,11 +120,15 @@ public class NotificationsController : ControllerBase
                 UserId = userId,
                 Token = request.Token,
                 Platform = string.IsNullOrWhiteSpace(request.Platform) ? "android" : request.Platform.ToLowerInvariant(),
+                Language = lang,
                 LastSeenAt = DateTime.UtcNow,
             });
         }
         else
         {
+            // Refresh language too — the user might have switched the app
+            // locale since the last registration of this token.
+            if (lang is not null) existing.Language = lang;
             existing.LastSeenAt = DateTime.UtcNow;
         }
         await _db.SaveChangesAsync(cancellationToken);
@@ -169,5 +184,5 @@ public class NotificationsController : ControllerBase
     }
 }
 
-public record RegisterDeviceRequest(string Token, string? Platform);
+public record RegisterDeviceRequest(string Token, string? Platform, string? Language);
 public record SendPushRequest(string Title, string Body);
