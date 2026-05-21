@@ -8,7 +8,7 @@ namespace TilmezBus.Application.Features.Auth.Commands.RequestOtp;
 
 public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Result<RequestOtpResponse>>
 {
-    private const int OtpTtlSeconds    = 300;
+    private const int OtpTtlSeconds    = 120;
     private const int MaxResendSeconds = 60;
 
     private readonly IUnitOfWork   _unitOfWork;

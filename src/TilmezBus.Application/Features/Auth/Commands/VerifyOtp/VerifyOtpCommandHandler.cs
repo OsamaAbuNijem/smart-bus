@@ -77,7 +77,8 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         if (record.Code != otp)
         {
             var updated = record with { Attempts = record.Attempts + 1 };
-            var remaining = (int)(record.CreatedAt.AddSeconds(300) - DateTime.UtcNow).TotalSeconds;
+            // Must mirror OtpTtlSeconds in RequestOtpCommandHandler.
+            var remaining = (int)(record.CreatedAt.AddSeconds(120) - DateTime.UtcNow).TotalSeconds;
             if (remaining > 0)
                 await _cache.SetAsync(cacheKey, updated, TimeSpan.FromSeconds(remaining), cancellationToken);
 

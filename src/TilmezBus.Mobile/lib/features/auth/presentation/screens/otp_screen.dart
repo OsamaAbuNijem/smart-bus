@@ -183,7 +183,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                             controller: _ctrl,
                             focusNode: _focus,
                             onSubmit: _verify,
-                            onResend: loading ? null : _resend,
+                            // Disable until the OTP countdown elapses —
+                            // a server cooldown would reject early
+                            // resends anyway and the gray-out signals it.
+                            onResend: (loading || _remaining > Duration.zero)
+                                ? null
+                                : _resend,
                             loading: loading,
                           ),
                         ],
@@ -553,6 +558,7 @@ class _ResendRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final disabled = onResend == null;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -571,10 +577,12 @@ class _ResendRow extends StatelessWidget {
                   TextSpan(text: '$resendPrefix '),
                   TextSpan(
                     text: resendLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.yellowDeep,
+                      color: disabled
+                          ? AppColors.slate400
+                          : AppColors.yellowDeep,
                     ),
                   ),
                 ],
