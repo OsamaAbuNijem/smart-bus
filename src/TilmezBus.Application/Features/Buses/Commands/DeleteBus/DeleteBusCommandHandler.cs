@@ -27,10 +27,6 @@ public class DeleteBusCommandHandler : IRequestHandler<DeleteBusCommand, Result>
             .ToListAsync(cancellationToken);
         foreach (var trip in orphanTrips) trip.IsDeleted = true;
 
-        var orphanSchedule = await _context.BusSchedules
-            .FirstOrDefaultAsync(s => s.BusId == request.BusId && !s.IsDeleted, cancellationToken);
-        if (orphanSchedule is not null) orphanSchedule.IsDeleted = true;
-
         bus.IsDeleted = true;
         await _unitOfWork.Buses.UpdateAsync(bus);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

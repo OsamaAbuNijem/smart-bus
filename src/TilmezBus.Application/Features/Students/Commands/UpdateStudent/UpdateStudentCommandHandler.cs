@@ -41,8 +41,6 @@ public class UpdateStudentCommandHandler : IRequestHandler<UpdateStudentCommand,
         student.DateOfBirth    = request.DateOfBirth;
         student.Address        = request.Address;
         student.ParentId       = parentId;
-        student.RouteId        = request.RouteId;
-        student.PickupStopId   = request.PickupStopId;
         student.Latitude             = request.Latitude;
         student.Longitude            = request.Longitude;
         student.HomeArea             = request.HomeArea;

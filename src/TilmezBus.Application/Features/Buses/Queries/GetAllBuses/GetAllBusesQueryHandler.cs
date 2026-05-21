@@ -31,74 +31,37 @@ public class GetAllBusesQueryHandler : IRequestHandler<GetAllBusesQuery, PagedRe
             baseQuery = baseQuery.Where(b => EF.Functions.Like(b.PlateNumber, $"%{plate}%"));
         }
 
-        // Driver/assistant-name filter: any of the 4 schedule slots has a matching Driver.FullName.
+        // PersonName filter previously matched any of the 4 BusSchedule
+        // driver/assistant slots. Schedules were removed; the filter now
+        // returns no results to keep the existing search box from
+        // crashing the call. Admin web hides this filter going forward.
         if (!string.IsNullOrWhiteSpace(request.PersonName))
         {
-            var name = request.PersonName.Trim();
-            baseQuery = baseQuery.Where(b =>
-                _context.BusSchedules.Any(s => s.BusId == b.Id && !s.IsDeleted && (
-                    (s.MorningDriver    != null && EF.Functions.Like(s.MorningDriver.FullName,    $"%{name}%")) ||
-                    (s.MorningAssistant != null && EF.Functions.Like(s.MorningAssistant.FullName, $"%{name}%")) ||
-                    (s.ReturnDriver     != null && EF.Functions.Like(s.ReturnDriver.FullName,     $"%{name}%")) ||
-                    (s.ReturnAssistant  != null && EF.Functions.Like(s.ReturnAssistant.FullName,  $"%{name}%"))
-                )));
+            baseQuery = baseQuery.Where(_ => false);
         }
 
         var totalCount = await baseQuery.CountAsync(cancellationToken);
 
         var busEntities = await baseQuery
             // Bus numbers are BUS-#### so a lexicographic sort matches the
-            // visual numeric order (zero-padded). Reverts the previous newest-
-            // first sort: the admin grid is easier to scan in serial order.
+            // visual numeric order (zero-padded).
             .OrderBy(b => b.PlateNumber)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        var busIds = busEntities.Select(b => b.Id).ToList();
-
-        var schedules = await _context.BusSchedules
-            .Where(s => busIds.Contains(s.BusId))
-            .Include(s => s.MorningDriver)
-            .Include(s => s.MorningAssistant)
-            .Select(s => new
-            {
-                s.BusId,
-                MorningDriverName    = s.MorningDriver != null ? s.MorningDriver.FullName : null,
-                MorningAssistantName = s.MorningAssistant != null ? s.MorningAssistant.FullName : null,
-                s.StudentCount,
-                HasAllAssignments =
-                    s.MorningDriverId    != null &&
-                    s.MorningAssistantId != null &&
-                    s.ReturnDriverId     != null &&
-                    s.ReturnAssistantId  != null &&
-                    s.StudentCount > 0
-            })
-            .ToListAsync(cancellationToken);
-
-        var studentsByBus = await _context.BusScheduleStudents
-            .Where(x => busIds.Contains(x.BusSchedule.BusId))
-            .Select(x => new { x.BusSchedule.BusId, x.StudentId })
-            .ToListAsync(cancellationToken);
-
-        var idsByBus = studentsByBus
-            .GroupBy(x => x.BusId)
-            .ToDictionary(g => g.Key, g => (IReadOnlyList<Guid>)g.Select(x => x.StudentId).ToList());
-
-        var buses = busEntities.Select(b => {
-            var sched = schedules.FirstOrDefault(x => x.BusId == b.Id);
-            idsByBus.TryGetValue(b.Id, out var ids);
-            return new BusDto(
-                b.Id, b.PlateNumber, b.Capacity, b.Status.ToString(),
-                sched?.MorningDriverName,
-                sched?.MorningAssistantName,
-                sched?.StudentCount ?? 0,
-                ids ?? Array.Empty<Guid>(),
-                b.LastLocation?.Latitude, b.LastLocation?.Longitude,
-                b.CreatedAt,
-                sched?.HasAllAssignments ?? false,
-                b.QrToken);
-        }).ToList();
+        // BusSchedule columns are gone — driver/assistant + roster are now
+        // populated per trip, not per bus. The DTO fields stay null/empty.
+        var buses = busEntities.Select(b => new BusDto(
+            b.Id, b.PlateNumber, b.Capacity, b.Status.ToString(),
+            DriverName:          null,
+            AssistantDriverName: null,
+            StudentCount: 0,
+            StudentIds:   Array.Empty<Guid>(),
+            b.LastLocation?.Latitude, b.LastLocation?.Longitude,
+            b.CreatedAt,
+            IsScheduleComplete: false,
+            b.QrToken)).ToList();
 
         return PagedResult<BusDto>.Create(buses, totalCount, request.PageNumber, request.PageSize);
     }

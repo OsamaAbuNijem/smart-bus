@@ -21,7 +21,6 @@ public class UpdateTripCommandHandler : IRequestHandler<UpdateTripCommand, Resul
         trip.Name = request.Name;
         trip.Type = request.Type;
         trip.BusId = request.BusId;
-        trip.RouteId = request.RouteId;
         trip.ScheduledDeparture = request.ScheduledDeparture;
         trip.RepeatDays = request.RepeatDays;
         trip.Notes = request.Notes;

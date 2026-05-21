@@ -68,29 +68,6 @@ public class CreateSchoolCommandHandler : IRequestHandler<CreateSchoolCommand, R
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync(cancellationToken);
 
-        // Pre-mint registration QRs in fixed pools. Schools used to declare
-        // their own driver / assistant caps; with those gone we mint a
-        // generous pool up front and the admin can ignore the unused tokens.
-        const int driverPoolSize    = 30;
-        const int assistantPoolSize = 30;
-        for (var i = 0; i < driverPoolSize; i++)
-        {
-            _context.EmployeeQrTokens.Add(new EmployeeQrToken
-            {
-                Token    = Guid.NewGuid().ToString("N"),
-                SchoolId = school.Id,
-                Type     = EmployeeQrTokenType.Driver
-            });
-        }
-        for (var i = 0; i < assistantPoolSize; i++)
-        {
-            _context.EmployeeQrTokens.Add(new EmployeeQrToken
-            {
-                Token    = Guid.NewGuid().ToString("N"),
-                SchoolId = school.Id,
-                Type     = EmployeeQrTokenType.Assistant
-            });
-        }
         // Pre-mint a registration QR per student slot. The first scan binds
         // the QR to a real Student row (parent submits the details); later
         // scans from the bus mark boarding/alighting + attendance.

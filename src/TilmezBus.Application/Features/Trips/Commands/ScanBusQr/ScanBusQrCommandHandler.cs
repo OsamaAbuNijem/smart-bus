@@ -61,23 +61,10 @@ public class ScanBusQrCommandHandler : IRequestHandler<ScanBusQrCommand, Result<
         if (driver is null)
             return Result<ScanBusQrResponse>.Failure("The scanning user is not registered as a driver/assistant.");
 
-        // 3. Bus schedule + slot matching.
-        var schedule = await _context.BusSchedules
-            .FirstOrDefaultAsync(s => s.BusId == bus.Id, ct);
-        if (schedule is null)
-            return Result<ScanBusQrResponse>.Failure("This bus has no schedule configured. Ask the admin to set one.");
-
-        var inMorning = driver.Id == schedule.MorningDriverId || driver.Id == schedule.MorningAssistantId;
-        var inReturn  = driver.Id == schedule.ReturnDriverId  || driver.Id == schedule.ReturnAssistantId;
-
-        if (!inMorning && !inReturn)
-            return Result<ScanBusQrResponse>.Failure("You are not assigned to this bus.");
-
-        TripType tripType;
-        if (inMorning && inReturn)
-            tripType = DateTime.UtcNow.Hour < 12 ? TripType.Morning : TripType.Return;
-        else
-            tripType = inMorning ? TripType.Morning : TripType.Return;
+        // 3. Trip type purely by clock — BusSchedule (which used to slot
+        //    drivers into Morning vs Return) is gone. Anyone with a valid
+        //    Drivers row for the same school can start either leg.
+        var tripType = DateTime.UtcNow.Hour < 12 ? TripType.Morning : TripType.Return;
 
         // 4. Idempotency: re-scanning today should return the existing trip,
         //    not create a duplicate. "Today" is the UTC calendar day for parity
@@ -100,12 +87,7 @@ public class ScanBusQrCommandHandler : IRequestHandler<ScanBusQrCommand, Result<
 
         // 5. Create the trip — already InProgress because scanning *is* the start.
         var now       = DateTime.UtcNow;
-        var departure = tripType == TripType.Morning
-            ? today.Add(schedule.MorningTime.ToTimeSpan())
-            : today.Add(schedule.ReturnTime.ToTimeSpan());
-        // If the schedule's nominal time already passed for this leg, anchor to "now" instead
-        // so the trip's ScheduledDeparture sorts correctly in today's lists.
-        if (departure < now) departure = now;
+        var departure = now;
 
         var typeLabel = tripType == TripType.Morning ? "ذهاب" : "إياب";
         var trip = new Trip
@@ -119,26 +101,10 @@ public class ScanBusQrCommandHandler : IRequestHandler<ScanBusQrCommand, Result<
             RepeatDays         = 0,
             IsTemplate         = false
         };
+        // The trip starts with an empty roster — the assistant adds
+        // students in the trip-setup screen before driving.
         await _unitOfWork.Trips.AddAsync(trip, ct);
-        await _unitOfWork.SaveChangesAsync(ct); // assign Trip.Id before roster rows
-
-        // 5b. Roster — copy the schedule's students into StudentTrip rows.
-        var studentIds = await _context.BusScheduleStudents
-            .Where(x => x.BusScheduleId == schedule.Id)
-            .Select(x => x.StudentId)
-            .ToListAsync(ct);
-
-        foreach (var studentId in studentIds)
-        {
-            _context.StudentTrips.Add(new StudentTrip
-            {
-                TripId         = trip.Id,
-                StudentId      = studentId,
-                BoardingStatus = BoardingStatus.Waiting
-            });
-        }
-        if (studentIds.Count > 0)
-            await _context.SaveChangesAsync(ct);
+        await _unitOfWork.SaveChangesAsync(ct);
 
         _logger.LogInformation(
             "[ScanQR] Bus={BusId} Driver={DriverId} Type={TripType} → Trip {TripId} created",

@@ -138,7 +138,8 @@ public class StartTripCommandHandler
         await _unitOfWork.SaveChangesAsync(ct);
 
         // Roster precedence: SkipRoster (explicit empty) → ManualStudentIds
-        // (hand-picked) → last trip on (bus, type) → BusSchedule assignment.
+        // (hand-picked) → last trip on (bus, type). BusSchedule fallback is
+        // gone with the table.
         List<Guid> studentIds;
         if (request.SkipRoster)
         {
@@ -165,20 +166,12 @@ public class StartTripCommandHandler
                 .Select(t => (Guid?)t.Id)
                 .FirstOrDefaultAsync(ct);
 
-            if (lastTripId is not null)
-            {
-                studentIds = await _context.StudentTrips
+            studentIds = lastTripId is not null
+                ? await _context.StudentTrips
                     .Where(st => st.TripId == lastTripId)
                     .Select(st => st.StudentId)
-                    .ToListAsync(ct);
-            }
-            else
-            {
-                studentIds = await _context.BusScheduleStudents
-                    .Where(x => x.BusSchedule.BusId == bus.Id)
-                    .Select(x => x.StudentId)
-                    .ToListAsync(ct);
-            }
+                    .ToListAsync(ct)
+                : new List<Guid>();
         }
 
         // Reject empty rosters unless the caller explicitly opted in via

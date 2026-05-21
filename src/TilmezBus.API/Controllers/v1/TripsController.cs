@@ -10,13 +10,10 @@ using TilmezBus.Application.Features.Trips.Commands.CancelEmptyTrip;
 using TilmezBus.Application.Features.Trips.Commands.DeleteTrip;
 using TilmezBus.Application.Features.Trips.Commands.ScanBusQr;
 using TilmezBus.Application.Features.Trips.Commands.ScanStudent;
-using TilmezBus.Application.Features.Trips.Commands.SetBusSchedule;
 using TilmezBus.Application.Features.Trips.Commands.StartTrip;
 using TilmezBus.Application.Features.Trips.Commands.UpdateTrip;
 using TilmezBus.Application.Features.Trips.Commands.UpdateTripStatus;
-using TilmezBus.Application.Features.Trips.Queries.GetAllBusSchedules;
 using TilmezBus.Application.Features.Trips.Queries.GetAllTrips;
-using TilmezBus.Application.Features.Trips.Queries.GetBusSchedule;
 using TilmezBus.Application.Features.Trips.Queries.GetMyTodayTrips;
 using TilmezBus.Application.Features.Trips.Queries.GetTripDetails;
 using TilmezBus.Application.Features.Trips.Queries.GetTripStudents;
@@ -151,16 +148,6 @@ public class TripsController : ControllerBase
             : BadRequest(new { error = result.Error });
     }
 
-    /// <summary>Get all saved bus schedules (used by the buses grid and the
-    /// mobile new-trip picker). Scoped to the calling user's school.</summary>
-    [HttpGet("schedules")]
-    public async Task<IActionResult> GetAllSchedules(CancellationToken cancellationToken)
-    {
-        var schoolId = await ResolveAdminSchoolIdAsync(cancellationToken);
-        var result = await _mediator.Send(new GetAllBusSchedulesQuery(schoolId), cancellationToken);
-        return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
-    }
-
     /// <summary>Admin path (email → School.AdminEmail) first, fleet fallback
     /// (userId → Driver/Assistant) for mobile callers.</summary>
     private async Task<Guid?> ResolveAdminSchoolIdAsync(CancellationToken cancellationToken)
@@ -178,36 +165,6 @@ public class TripsController : ControllerBase
             if (fleetSchoolId is not null) return fleetSchoolId;
         }
         return null;
-    }
-
-    /// <summary>Get the ذهاب/إياب schedule for a specific bus.</summary>
-    [HttpGet("bus/{busId:guid}/schedule")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetBusSchedule(Guid busId, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new GetBusScheduleQuery(busId), cancellationToken);
-        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
-    }
-
-    /// <summary>Set (create or update) the ذهاب/إياب schedule for a bus.</summary>
-    [HttpPost("bus/{busId:guid}/schedule")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> SetBusSchedule(Guid busId, [FromBody] BusScheduleRequest request, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(
-            new SetBusScheduleCommand(
-                busId,
-                request.MorningTime,
-                request.ReturnTime,
-                request.RepeatDays,
-                request.MorningDriverId,
-                request.MorningAssistantId,
-                request.ReturnDriverId,
-                request.ReturnAssistantId,
-                request.StudentIds ?? Array.Empty<Guid>()
-            ),
-            cancellationToken);
-        return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
     }
 
     /// <summary>Get students (with trip details) for a specific trip.</summary>
@@ -271,15 +228,4 @@ public class TripsController : ControllerBase
 public record UpdateStatusRequest(TripStatus Status, string? Notes);
 public record UpdateTripRequest(string Name, TripType Type, Guid BusId, Guid? RouteId, DateTime ScheduledDeparture, byte RepeatDays, string? Notes);
 public record ScanBusQrRequest(string QrToken);
-public record BusScheduleRequest(
-    string MorningTime,
-    string ReturnTime,
-    byte RepeatDays,
-    Guid? MorningDriverId,
-    Guid? MorningAssistantId,
-    Guid? ReturnDriverId,
-    Guid? ReturnAssistantId,
-    IReadOnlyList<Guid>? StudentIds
-);
-
 public record ScanStudentRequest(string QrToken, double? Latitude = null, double? Longitude = null);

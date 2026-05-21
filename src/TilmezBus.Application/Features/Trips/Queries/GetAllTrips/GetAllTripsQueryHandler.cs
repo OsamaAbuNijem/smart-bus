@@ -22,29 +22,19 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
         // Exclude trips whose Bus has been soft-deleted — otherwise the count (which
         // doesn't traverse the nav) won't match the rendered rows (where the Bus
         // query filter hides soft-deleted buses and their trips become orphans).
+        // BusSchedule fallback removed — driver/assistant come purely from
+        // Trip.DriverId / Trip.AssistantId (set by ScanBusQr / StartTrip).
         var query =
             from t in _context.Trips
             where !t.IsDeleted && !t.IsTemplate && t.Bus != null
-            from sched in _context.BusSchedules.Where(s => s.BusId == t.BusId).DefaultIfEmpty()
-            from tripDriver       in _context.Drivers.Where(d => d.Id == t.DriverId).DefaultIfEmpty()
-            from tripAssistant    in _context.Drivers.Where(d => d.Id == t.AssistantId).DefaultIfEmpty()
-            from morningDriver    in _context.Drivers.Where(d => sched != null && d.Id == sched.MorningDriverId).DefaultIfEmpty()
-            from morningAssistant in _context.Drivers.Where(d => sched != null && d.Id == sched.MorningAssistantId).DefaultIfEmpty()
-            from returnDriver     in _context.Drivers.Where(d => sched != null && d.Id == sched.ReturnDriverId).DefaultIfEmpty()
-            from returnAssistant  in _context.Drivers.Where(d => sched != null && d.Id == sched.ReturnAssistantId).DefaultIfEmpty()
-            let scheduleDriverName    = t.Type == TripType.Morning
-                ? (morningDriver    != null ? morningDriver.FullName    : null)
-                : (returnDriver     != null ? returnDriver.FullName     : null)
-            let scheduleAssistantName = t.Type == TripType.Morning
-                ? (morningAssistant != null ? morningAssistant.FullName : null)
-                : (returnAssistant  != null ? returnAssistant.FullName  : null)
+            from tripDriver    in _context.Drivers.Where(d => d.Id == t.DriverId).DefaultIfEmpty()
+            from tripAssistant in _context.Drivers.Where(d => d.Id == t.AssistantId).DefaultIfEmpty()
             select new
             {
                 Trip          = t,
                 Bus           = t.Bus,
-                Route         = t.Route,
-                DriverName    = tripDriver    != null ? tripDriver.FullName    : scheduleDriverName,
-                AssistantName = tripAssistant != null ? tripAssistant.FullName : scheduleAssistantName,
+                DriverName    = tripDriver    != null ? tripDriver.FullName    : null,
+                AssistantName = tripAssistant != null ? tripAssistant.FullName : null,
             };
 
         // Filter by driver or assistant name
@@ -88,7 +78,7 @@ public class GetAllTripsQueryHandler : IRequestHandler<GetAllTripsQuery, PagedRe
                 x.Trip.Id,
                 x.Trip.BusId,
                 x.Bus.PlateNumber,
-                x.Route != null ? x.Route.Name : null,
+                null,
                 x.Trip.Type.ToString(),
                 x.Trip.ScheduledDeparture,
                 x.Trip.ActualDeparture,

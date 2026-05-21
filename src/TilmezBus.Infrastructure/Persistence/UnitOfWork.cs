@@ -10,32 +10,26 @@ public class UnitOfWork : IUnitOfWork
     private IDbContextTransaction? _transaction;
 
     public IBusRepository Buses { get; }
-    public IRouteRepository Routes { get; }
     public IDriverRepository Drivers { get; }
     public IStudentRepository Students { get; }
     public ITripRepository Trips { get; }
     public INotificationRepository Notifications { get; }
     public IParentRepository Parents { get; }
-    public IAttendanceRepository Attendances { get; }
     public IAbsenceRequestRepository AbsenceRequests { get; }
     public IStudentTripRepository StudentTrips { get; }
-    public IAlertRepository Alerts { get; }
     public ISchoolRepository Schools { get; }
 
     public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
         Buses = new BusRepository(context);
-        Routes = new RouteRepository(context);
         Drivers = new DriverRepository(context);
         Students = new StudentRepository(context);
         Trips = new TripRepository(context);
         Notifications = new NotificationRepository(context);
         Parents = new ParentRepository(context);
-        Attendances = new AttendanceRepository(context);
         AbsenceRequests = new AbsenceRequestRepository(context);
         StudentTrips = new StudentTripRepository(context);
-        Alerts = new AlertRepository(context);
         Schools = new SchoolRepository(context);
     }
 

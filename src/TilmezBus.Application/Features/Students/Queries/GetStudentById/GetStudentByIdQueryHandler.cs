@@ -15,11 +15,7 @@ public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, R
     {
         var student = await _context.Students
             .Where(s => s.Id == request.StudentId && !s.IsDeleted)
-            .Include(s => s.Route)
             .Include(s => s.Parent)
-            .Include(s => s.Allergies)
-            .Include(s => s.EmergencyContacts)
-            .AsSplitQuery()
             .FirstOrDefaultAsync(cancellationToken);
 
         if (student is null) return Result<StudentDetailDto>.Failure("Student not found.");
@@ -35,14 +31,12 @@ public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, R
             student.Address,
             student.Parent?.FullName    ?? string.Empty,
             student.Parent?.PhoneNumber ?? string.Empty,
-            student.Route?.Name,
+            RouteName: null,
             student.Latitude,
             student.Longitude,
             student.HomeArea,
             student.HomeStreet,
             student.HomeBuildingNumber,
-            student.Allergies.Select(a => a.Condition).ToList(),
-            student.EmergencyContacts.Select(e => new EmergencyContactDto(e.Id, e.Name, e.PhoneNumber, e.Relation)).ToList(),
             student.CreatedAt);
 
         return Result<StudentDetailDto>.Success(dto);

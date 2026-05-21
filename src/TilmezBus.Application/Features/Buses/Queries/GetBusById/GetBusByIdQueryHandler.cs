@@ -22,34 +22,20 @@ public class GetBusByIdQueryHandler : IRequestHandler<GetBusByIdQuery, Result<Bu
         if (busEntity is null)
             return Result<BusDto>.Failure($"Bus with ID '{request.BusId}' not found.");
 
-        var schedule = await _context.BusSchedules
-            .Where(s => s.BusId == request.BusId)
-            .Include(s => s.MorningDriver)
-            .Include(s => s.MorningAssistant)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        var studentIds = schedule is null
-            ? new List<Guid>()
-            : await _context.BusScheduleStudents
-                .Where(x => x.BusScheduleId == schedule.Id)
-                .Select(x => x.StudentId)
-                .ToListAsync(cancellationToken);
-
-        var isComplete = schedule is not null
-            && schedule.StudentCount > 0
-            && schedule.MorningDriverId    is not null
-            && schedule.MorningAssistantId is not null
-            && schedule.ReturnDriverId     is not null
-            && schedule.ReturnAssistantId  is not null;
-
+        // BusSchedule was the old "this bus has these students + this driver"
+        // registry. Schedules were removed; drivers/assistants are assigned
+        // per trip on scan, and the roster is whoever the assistant adds
+        // during trip setup. The DTO fields are kept (for backward compat
+        // with the admin web list) but always null/empty now.
         var bus = new BusDto(
             busEntity.Id, busEntity.PlateNumber, busEntity.Capacity, busEntity.Status.ToString(),
-            schedule?.MorningDriver?.FullName,
-            schedule?.MorningAssistant?.FullName,
-            schedule?.StudentCount ?? studentIds.Count, studentIds,
+            DriverName:          null,
+            AssistantDriverName: null,
+            StudentCount: 0,
+            StudentIds:   new List<Guid>(),
             busEntity.LastLocation?.Latitude, busEntity.LastLocation?.Longitude,
             busEntity.CreatedAt,
-            isComplete,
+            IsScheduleComplete: false,
             busEntity.QrToken);
 
         return Result<BusDto>.Success(bus);

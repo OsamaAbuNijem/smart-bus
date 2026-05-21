@@ -1,5 +1,4 @@
 using TilmezBus.Application.Common.Models;
-using TilmezBus.Application.Features.Alerts.Queries.GetAllAlerts;
 using TilmezBus.Application.Features.Buses.Queries.GetAllBuses;
 using TilmezBus.Application.Features.DemoRequests.Queries.GetAllDemoRequests;
 using TilmezBus.Domain.Enums;
@@ -11,7 +10,6 @@ using TilmezBus.Application.Features.Dashboard.Queries.GetAdminDashboardStats;
 using TilmezBus.Application.Features.Dashboard.Queries.GetLiveDashboardStats;
 using TilmezBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
 using TilmezBus.Application.Features.Trips.Queries.GetAllTrips;
-using TilmezBus.Application.Features.Trips.Queries.GetBusSchedule;
 using TilmezBus.Web.Models;
 
 namespace TilmezBus.Web.Services;
@@ -81,12 +79,6 @@ public interface IApiClient
     Task<(bool Ok, string? Error)> StartTripAsync(Guid id);
     Task<(bool Ok, string? Error)> CompleteTripAsync(Guid id);
     Task<bool> DeleteTripAsync(Guid id);
-    Task<BusScheduleDto?> GetBusScheduleAsync(Guid busId);
-    Task<(bool Ok, string? Error)> SetBusScheduleAsync(Guid busId, BusScheduleInput input);
-
-    // Alerts
-    Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null);
-    Task<bool> SetAlertStatusAsync(Guid id, int status);
 
     // Notifications
     Task<(bool Ok, int Delivered, string? Error)> SendPushToStudentParentAsync(Guid studentId, string title, string body);

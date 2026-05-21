@@ -22,7 +22,8 @@ public class GetTripStudentsQueryHandler
         if (trip is null)
             return Result<List<TripStudentDto>>.Failure("الرحلة غير موجودة");
 
-        // Primary: StudentTrip rows for this trip (global filter handles IsDeleted)
+        // StudentTrip rows are the single source of truth — BusSchedule
+        // fallback is gone with the table.
         var studentTrips = await _context.StudentTrips
             .Where(st => st.TripId == request.TripId)
             .Include(st => st.Student)
@@ -36,25 +37,6 @@ public class GetTripStudentsQueryHandler
                 st.BoardingTime,
                 st.DropoffTime))
             .ToListAsync(cancellationToken);
-
-        // Fallback: no StudentTrip rows yet — show schedule-assigned students as Waiting
-        if (studentTrips.Count == 0)
-        {
-            studentTrips = await _context.BusScheduleStudents
-                .Where(x => x.BusSchedule.BusId == trip.BusId)
-                .Select(x => x.Student)
-                .Where(s => !s.IsDeleted)
-                .OrderBy(s => s.FullName)
-                .Select(s => new TripStudentDto(
-                    s.Id,
-                    s.FullName,
-                    s.Grade,
-                    s.HomeArea,
-                    "Waiting",
-                    null,
-                    null))
-                .ToListAsync(cancellationToken);
-        }
 
         return Result<List<TripStudentDto>>.Success(studentTrips);
     }

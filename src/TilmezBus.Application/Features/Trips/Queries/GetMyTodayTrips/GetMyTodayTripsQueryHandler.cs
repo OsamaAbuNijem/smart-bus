@@ -38,32 +38,20 @@ public class GetMyTodayTripsQueryHandler
             .FirstOrDefaultAsync(d => d.UserId == userId, ct);
         Guid? schoolId = driver?.SchoolId;
 
-        var scheduleBusIds = driver is null
-            ? new List<Guid>()
-            : await _context.BusSchedules
-                .Where(s =>
-                    s.MorningDriverId    == driver.Id ||
-                    s.MorningAssistantId == driver.Id ||
-                    s.ReturnDriverId     == driver.Id ||
-                    s.ReturnAssistantId  == driver.Id)
-                .Select(s => s.BusId)
-                .Distinct()
-                .ToListAsync(ct);
-
         var today     = DateTime.UtcNow.Date;
         var tomorrow  = today.AddDays(1);
         var rangeFrom = today.AddDays(-LookbackDays);
 
-        // Visible buses = whatever the schedule says ∪ every bus in the
-        // caller's school. The school union ensures assistants who manually
-        // create trips (no schedule slot) still see them in today's list.
-        var schoolBusIds = schoolId is null
+        // Visible buses = every bus in the caller's school. We used to also
+        // union in whatever BusSchedule slots referenced the driver, but
+        // BusSchedule has been removed; trips are created per-scan and the
+        // school filter is enough.
+        var busIds = schoolId is null
             ? new List<Guid>()
             : await _context.Buses
                 .Where(b => b.SchoolId == schoolId && !b.IsDeleted)
                 .Select(b => b.Id)
                 .ToListAsync(ct);
-        var busIds = scheduleBusIds.Concat(schoolBusIds).Distinct().ToList();
         if (busIds.Count == 0)
             return Result<List<MyTodayTripDto>>.Success(new List<MyTodayTripDto>());
 

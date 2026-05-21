@@ -17,7 +17,6 @@ public class GetParentByIdQueryHandler : IRequestHandler<GetParentByIdQuery, Res
         var parent = await _context.Parents
             .Where(p => p.Id == request.ParentId && !p.IsDeleted)
             .Include(p => p.Children.Where(c => !c.IsDeleted))
-            .ThenInclude(c => c.Route)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (parent is null) return Result<ParentDetailDto>.Failure("Parent not found.");
@@ -27,7 +26,7 @@ public class GetParentByIdQueryHandler : IRequestHandler<GetParentByIdQuery, Res
             parent.Children.Select(c => new StudentDto(
                 c.Id, c.FullName, c.FullNameEn, c.NationalNumber, c.Grade, c.Class,
                 parent.FullName, parent.PhoneNumber,
-                c.Route?.Name,
+                null,
                 c.Latitude, c.Longitude, c.HomeArea, c.HomeStreet, c.HomeBuildingNumber,
                 c.CreatedAt)).ToList(),
             parent.CreatedAt);

@@ -2,7 +2,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using TilmezBus.Application.Common.Models;
-using TilmezBus.Application.Features.Alerts.Queries.GetAllAlerts;
 using TilmezBus.Application.Features.Buses.Queries.GetAllBuses;
 using TilmezBus.Application.Features.DemoRequests.Queries.GetAllDemoRequests;
 using TilmezBus.Domain.Enums;
@@ -14,7 +13,6 @@ using TilmezBus.Application.Features.Dashboard.Queries.GetAdminDashboardStats;
 using TilmezBus.Application.Features.Dashboard.Queries.GetLiveDashboardStats;
 using TilmezBus.Application.Features.SuperAdmin.Queries.GetDashboardStats;
 using TilmezBus.Application.Features.Trips.Queries.GetAllTrips;
-using TilmezBus.Application.Features.Trips.Queries.GetBusSchedule;
 using TilmezBus.Web.Models;
 
 namespace TilmezBus.Web.Services;
@@ -254,26 +252,6 @@ public class ApiClient : IApiClient
         => SendAsync(HttpMethod.Post, $"api/v1/trips/{id}/complete");
 
     public Task<bool> DeleteTripAsync(Guid id) => DeleteAsync($"api/v1/trips/{id}");
-
-    public Task<BusScheduleDto?> GetBusScheduleAsync(Guid busId)
-        => GetAsync<BusScheduleDto>($"api/v1/trips/bus/{busId}/schedule");
-
-    public Task<(bool Ok, string? Error)> SetBusScheduleAsync(Guid busId, BusScheduleInput input)
-        => SendAsync(HttpMethod.Post, $"api/v1/trips/bus/{busId}/schedule", input);
-
-    // ── Alerts ─────────────────────────────────────────────────────────────
-    public Task<PagedResult<AlertDto>?> GetAlertsAsync(int pageNumber = 1, int pageSize = 10, int? status = null)
-    {
-        var url = $"api/v1/alerts?pageNumber={pageNumber}&pageSize={pageSize}";
-        if (status.HasValue) url += $"&status={status.Value}";
-        return GetAsync<PagedResult<AlertDto>>(url);
-    }
-
-    public async Task<bool> SetAlertStatusAsync(Guid id, int status)
-    {
-        var (ok, _) = await SendAsync(HttpMethod.Post, $"api/v1/alerts/{id}/status", new { status });
-        return ok;
-    }
 
     public async Task<(bool Ok, int Delivered, string? Error)> SendPushToStudentParentAsync(
         Guid studentId, string title, string body)

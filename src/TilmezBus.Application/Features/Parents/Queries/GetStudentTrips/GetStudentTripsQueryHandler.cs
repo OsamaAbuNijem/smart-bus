@@ -47,7 +47,6 @@ public class GetStudentTripsQueryHandler
         var rows = await _db.StudentTrips
             .Where(st => st.StudentId == request.StudentId)
             .Include(st => st.Trip).ThenInclude(t => t.Bus)
-            .Include(st => st.Trip).ThenInclude(t => t.Route)
             .OrderByDescending(st => st.Trip.ScheduledDeparture)
             .Take(pageSize)
             .Select(st => new
@@ -59,40 +58,28 @@ public class GetStudentTripsQueryHandler
             })
             .ToListAsync(ct);
 
-        // Driver + assistant names via the BusSchedule of each trip's bus,
-        // picked by TripType (Morning vs Return).
-        var busIds = rows.Select(r => r.Trip.BusId).Distinct().ToList();
-        var schedulesByBus = busIds.Count == 0
-            ? new Dictionary<Guid, _ScheduleStaff>()
-            : await _db.BusSchedules
-                .Where(bs => busIds.Contains(bs.BusId))
-                .Select(bs => new _ScheduleStaff
-                {
-                    BusId = bs.BusId,
-                    MorningDriverName = bs.MorningDriver != null ? bs.MorningDriver.FullName : null,
-                    MorningAssistantName = bs.MorningAssistant != null ? bs.MorningAssistant.FullName : null,
-                    ReturnDriverName = bs.ReturnDriver != null ? bs.ReturnDriver.FullName : null,
-                    ReturnAssistantName = bs.ReturnAssistant != null ? bs.ReturnAssistant.FullName : null,
-                })
-                .ToDictionaryAsync(s => s.BusId, ct);
+        // Driver names per trip via Trip.DriverId. Assistant is no longer
+        // tracked per trip (BusSchedule removed).
+        var driverIds = rows
+            .Select(r => r.Trip.DriverId)
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .Distinct()
+            .ToList();
+        var driverNames = driverIds.Count == 0
+            ? new Dictionary<Guid, string>()
+            : await _db.Drivers
+                .Where(d => driverIds.Contains(d.Id))
+                .Select(d => new { d.Id, d.FullName })
+                .ToDictionaryAsync(d => d.Id, d => d.FullName, ct);
 
         var result = rows.Select(r =>
         {
             var t = r.Trip;
-            string? driver = null, assistant = null;
-            if (schedulesByBus.TryGetValue(t.BusId, out var sched))
-            {
-                if (t.Type == TripType.Morning)
-                {
-                    driver = sched.MorningDriverName;
-                    assistant = sched.MorningAssistantName;
-                }
-                else
-                {
-                    driver = sched.ReturnDriverName;
-                    assistant = sched.ReturnAssistantName;
-                }
-            }
+            string? driver = t.DriverId.HasValue
+                ? driverNames.GetValueOrDefault(t.DriverId.Value)
+                : null;
+            string? assistant = null;
 
             var (pickup, dropoff) = t.Type == TripType.Morning
                 ? (homeLabel, schoolLabel)
@@ -121,7 +108,7 @@ public class GetStudentTripsQueryHandler
                 BusPlateNumber: t.Bus.PlateNumber,
                 DriverName: driver,
                 AssistantName: assistant,
-                RouteName: t.Route?.Name,
+                RouteName: null,
                 PickupStopName: pickup,
                 DropoffStopName: dropoff,
                 ScheduledDeparture: t.ScheduledDeparture,
@@ -137,14 +124,5 @@ public class GetStudentTripsQueryHandler
         }).ToList();
 
         return Result<List<StudentTripDetailDto>>.Success(result);
-    }
-
-    private sealed class _ScheduleStaff
-    {
-        public Guid BusId { get; set; }
-        public string? MorningDriverName { get; set; }
-        public string? MorningAssistantName { get; set; }
-        public string? ReturnDriverName { get; set; }
-        public string? ReturnAssistantName { get; set; }
     }
 }

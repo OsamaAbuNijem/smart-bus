@@ -24,19 +24,9 @@ public class GetTripDetailsQueryHandler
         if (trip is null)
             return Result<TripDetailsDto>.Failure("Trip not found.");
 
-        // Prefer the driver stamped on the trip itself; fall back to the
-        // bus schedule's morning/return slot for legacy trips that pre-date
-        // Trip.DriverId.
+        // Driver is whoever scanned the bus QR to start the trip. The
+        // BusSchedule fallback is gone with the schedule table.
         Guid? driverId = trip.DriverId;
-        if (driverId is null)
-        {
-            var schedule = await _context.BusSchedules
-                .FirstOrDefaultAsync(s => s.BusId == trip.BusId, ct);
-            driverId = trip.Type == TripType.Morning
-                ? schedule?.MorningDriverId
-                : schedule?.ReturnDriverId;
-        }
-
         string? driverName = null;
         if (driverId is not null)
         {

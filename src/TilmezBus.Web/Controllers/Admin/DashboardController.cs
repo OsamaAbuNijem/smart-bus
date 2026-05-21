@@ -83,7 +83,4 @@ public class DashboardController : AdminControllerBase
             Trips:        Array.Empty<LiveTripDto>()));
     }
 
-    [HttpGet]
-    public async Task<IActionResult> RecentAlerts()
-        => PartialView("_RecentAlerts", await ApiClient.GetAlertsAsync(1, 5, 0));
 }

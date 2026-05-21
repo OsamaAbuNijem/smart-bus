@@ -76,8 +76,6 @@ public class ScanStudentQrCommandHandler
             studentTrip.BoardingStatus = BoardingStatus.Boarded;
             studentTrip.BoardingTime   = now;
             action = "Boarded";
-
-            await UpsertAttendanceAsync(qr.StudentId.Value, trip.Id, now, dropoff: null, ct);
         }
         else // Boarded
         {
@@ -86,8 +84,6 @@ public class ScanStudentQrCommandHandler
                 // Second scan → dropoff (got off the bus)
                 studentTrip.DropoffTime = now;
                 action = "Dropoff";
-
-                await UpsertAttendanceAsync(qr.StudentId.Value, trip.Id, studentTrip.BoardingTime, dropoff: now, ct);
             }
             else
             {
@@ -146,38 +142,6 @@ public class ScanStudentQrCommandHandler
                 qr.StudentId.Value, studentName, trip.Id, action,
                 studentTrip.BoardingStatus.ToString(),
                 studentTrip.BoardingTime, studentTrip.DropoffTime));
-    }
-
-    /// <summary>
-    /// Today's daily attendance record for (student, trip). Created on first
-    /// scan; the second scan only updates DropoffTime.
-    /// </summary>
-    private async Task UpsertAttendanceAsync(
-        Guid studentId, Guid tripId, DateTime? boarding, DateTime? dropoff, CancellationToken ct)
-    {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var att = await _context.Attendances
-            .FirstOrDefaultAsync(a => a.StudentId == studentId && a.TripId == tripId && a.Date == today, ct);
-
-        if (att is null)
-        {
-            att = new TilmezBus.Domain.Entities.Attendance
-            {
-                StudentId    = studentId,
-                TripId       = tripId,
-                Date         = today,
-                Status       = AttendanceStatus.Present,
-                BoardingTime = boarding,
-                DropoffTime  = dropoff
-            };
-            _context.Attendances.Add(att);
-        }
-        else
-        {
-            if (boarding is not null) att.BoardingTime = boarding;
-            if (dropoff  is not null) att.DropoffTime  = dropoff;
-            att.Status = AttendanceStatus.Present;
-        }
     }
 
     private static Result<ScanStudentQrResponse> Fail(string message)

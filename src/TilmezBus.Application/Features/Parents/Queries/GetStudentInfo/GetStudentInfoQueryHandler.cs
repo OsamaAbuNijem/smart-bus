@@ -16,14 +16,10 @@ public class GetStudentInfoQueryHandler
     {
         var data = await _db.Students
             .Where(s => s.Id == request.StudentId && s.ParentId == request.ParentId)
-            .Include(s => s.Route)
-            .Include(s => s.PickupStop)
-            .Include(s => s.Allergies)
             .Include(s => s.Parent)
             .Select(s => new
             {
                 Student = s,
-                AllergyNames = s.Allergies.Select(a => a.Condition).ToList(),
                 Parent = s.Parent == null
                     ? null
                     : new StudentContactDto(
@@ -84,9 +80,9 @@ public class GetStudentInfoQueryHandler
             HomeLatitude: s.Latitude,
             HomeLongitude: s.Longitude,
             Notes: s.Address, // re-use Address as freeform notes when used
-            RouteName: s.Route != null ? s.Route.Name : null,
-            PickupStopName: s.PickupStop != null ? s.PickupStop.Name : null,
-            Allergies: data.AllergyNames,
+            RouteName: null,
+            PickupStopName: null,
+            Allergies: System.Array.Empty<string>(),
             Parent: data.Parent));
     }
 }

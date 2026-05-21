@@ -29,9 +29,5 @@ public record StudentDetailDto(
     string? HomeArea,
     string? HomeStreet,
     string? HomeBuildingNumber,
-    IReadOnlyList<string> Allergies,
-    IReadOnlyList<EmergencyContactDto> EmergencyContacts,
     DateTime CreatedAt
 );
-
-public record EmergencyContactDto(Guid Id, string Name, string PhoneNumber, string? Relation);

@@ -21,8 +21,6 @@ public class Trip : BaseEntity
     // records who actually ran the trip (vs. BusSchedule's scheduled one).
     public Guid? AssistantId { get; set; }
     public Driver? Assistant { get; set; }
-    public Guid? RouteId { get; set; }
-    public Route? Route { get; set; }
     public DateTime ScheduledDeparture { get; set; }
     public DateTime? ActualDeparture { get; set; }
     public DateTime? ActualArrival { get; set; }
@@ -40,7 +38,6 @@ public class Trip : BaseEntity
     public bool IsTemplate { get; set; } = false;
 
     public ICollection<StudentTrip> StudentTrips { get; set; } = new List<StudentTrip>();
-    public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 
     public void Start()
     {

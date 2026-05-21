@@ -36,11 +36,10 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
         IQueryable<TilmezBus.Domain.Entities.Student> query = _context.Students
             .Where(s => !s.IsDeleted && s.SchoolId == schoolIdString)
             .Where(s => activeStudentIds.Contains(s.Id))
-            .Include(s => s.Route)
             .Include(s => s.Parent);
 
-        if (request.RouteId.HasValue)
-            query = query.Where(s => s.RouteId == request.RouteId.Value);
+        // RouteId filter accepted but is a no-op now that Routes are gone —
+        // kept on the query DTO for binary compat with older admin clients.
 
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
@@ -89,7 +88,7 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, P
                 s.Id, s.FullName, s.FullNameEn, s.NationalNumber, s.Grade, s.Class,
                 s.Parent != null ? s.Parent.FullName    : string.Empty,
                 s.Parent != null ? s.Parent.PhoneNumber : string.Empty,
-                s.Route != null ? s.Route.Name : null,
+                null,
                 s.Latitude, s.Longitude, s.HomeArea, s.HomeStreet, s.HomeBuildingNumber,
                 s.CreatedAt))
             .ToListAsync(cancellationToken);

@@ -98,40 +98,19 @@ public class GetLiveTrackingQueryHandler
                 bl.Latitude, bl.Longitude, bl.Speed, bl.Heading, bl.Timestamp))
             .FirstOrDefaultAsync(ct);
 
-        // Driver + assistant via BusSchedule, picking the right slot for trip type
+        // Driver + assistant: read from Trip.DriverId (whoever scanned the
+        // bus QR to start). Assistant lookup is gone with BusSchedule;
+        // we leave the assistant fields null.
         string? driverName = null, driverPhone = null;
         string? assistantName = null, assistantPhone = null;
-        var sched = await _db.BusSchedules
-            .Where(bs => bs.BusId == trip.BusId)
-            .Select(bs => new
-            {
-                MorningDriverName = bs.MorningDriver != null ? bs.MorningDriver.FullName : null,
-                MorningDriverPhone = bs.MorningDriver != null ? bs.MorningDriver.PhoneNumber : null,
-                MorningAssistantName = bs.MorningAssistant != null ? bs.MorningAssistant.FullName : null,
-                MorningAssistantPhone = bs.MorningAssistant != null ? bs.MorningAssistant.PhoneNumber : null,
-                ReturnDriverName = bs.ReturnDriver != null ? bs.ReturnDriver.FullName : null,
-                ReturnDriverPhone = bs.ReturnDriver != null ? bs.ReturnDriver.PhoneNumber : null,
-                ReturnAssistantName = bs.ReturnAssistant != null ? bs.ReturnAssistant.FullName : null,
-                ReturnAssistantPhone = bs.ReturnAssistant != null ? bs.ReturnAssistant.PhoneNumber : null,
-            })
-            .FirstOrDefaultAsync(ct);
-
-        if (sched is not null)
+        if (trip.DriverId is not null)
         {
-            if (trip.Type == TripType.Morning)
-            {
-                driverName = sched.MorningDriverName;
-                driverPhone = sched.MorningDriverPhone;
-                assistantName = sched.MorningAssistantName;
-                assistantPhone = sched.MorningAssistantPhone;
-            }
-            else
-            {
-                driverName = sched.ReturnDriverName;
-                driverPhone = sched.ReturnDriverPhone;
-                assistantName = sched.ReturnAssistantName;
-                assistantPhone = sched.ReturnAssistantPhone;
-            }
+            var driver = await _db.Drivers
+                .Where(d => d.Id == trip.DriverId)
+                .Select(d => new { d.FullName, d.PhoneNumber })
+                .FirstOrDefaultAsync(ct);
+            driverName = driver?.FullName;
+            driverPhone = driver?.PhoneNumber;
         }
 
         return Result<LiveTrackingDto>.Success(new LiveTrackingDto(

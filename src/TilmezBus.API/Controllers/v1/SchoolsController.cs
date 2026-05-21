@@ -9,7 +9,6 @@ using TilmezBus.Application.Features.Schools.Commands.ResetSchoolAdminPassword;
 using TilmezBus.Application.Features.Schools.Commands.UpdateSchool;
 using TilmezBus.Application.Features.Schools.Queries.GetAllSchools;
 using TilmezBus.Application.Features.Schools.Queries.GetMySchool;
-using TilmezBus.Application.Features.Schools.Queries.GetSchoolEmployeeQrTokens;
 using TilmezBus.Application.Features.Schools.Queries.GetSchoolStudentQrTokens;
 using TilmezBus.Domain.Enums;
 
@@ -116,15 +115,6 @@ public class SchoolsController : ControllerBase
             new ResetSchoolAdminPasswordCommand(id, request.NewPassword),
             cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(new { error = result.Error });
-    }
-
-    /// <summary>SuperAdmin: list every employee-registration QR token for a school.</summary>
-    [HttpGet("{id:guid}/employee-qr-tokens")]
-    [Authorize(Roles = "SuperAdmin")]
-    public async Task<IActionResult> GetEmployeeQrTokens(Guid id, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new GetSchoolEmployeeQrTokensQuery(id), cancellationToken);
-        return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
     }
 
     /// <summary>SuperAdmin: list every student-registration QR token for a school.</summary>
