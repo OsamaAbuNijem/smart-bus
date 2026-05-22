@@ -47,7 +47,11 @@ class _DriverTripMapScreenState extends ConsumerState<DriverTripMapScreen> {
   @override
   void initState() {
     super.initState();
-    _poll = Timer.periodic(const Duration(seconds: 8), (_) {
+    // Poll every 3 s so any action the assistant takes on the other
+    // device (mark boarded, mark dropped off, end trip) shows up on the
+    // driver map within one cycle — matches the cadence of the parent's
+    // live-tracking poll so all three roles stay roughly in sync.
+    _poll = Timer.periodic(const Duration(seconds: 3), (_) {
       if (mounted) {
         ref.invalidate(tripDetailsProvider(widget.tripId));
       }
@@ -220,6 +224,11 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
   /// device reports an invalid / non-finite value so the on-map overlay
   /// can always render a number instead of a dash.
   double _currentSpeedMps = 0.0;
+  /// Compass heading from the GPS stream, degrees clockwise from true
+  /// north. Drives the rotation of the bus arrow marker so it always
+  /// points along the street the bus is travelling on. Null until the
+  /// device has a valid heading (stationary devices report -1 / NaN).
+  double? _currentHeadingDeg;
   StreamSubscription<Position>? _posSub;
   /// Total driving duration for the active route, in seconds, as reported
   /// by OSRM. Null until the first successful fetch.
@@ -284,9 +293,15 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
         if (!mounted) return;
         final fix = LatLng(p.latitude, p.longitude);
         final speedMps = p.speed.isFinite && p.speed >= 0 ? p.speed : 0.0;
+        // Geolocator reports heading in degrees [0, 360) when valid; -1
+        // or NaN when the device is stationary or the heading sensor
+        // hasn't locked. Keep the last good heading in that case so the
+        // arrow doesn't flicker back to north every time the bus stops.
+        final hadingValid = p.heading.isFinite && p.heading >= 0;
         setState(() {
           _currentPos = fix;
           _currentSpeedMps = speedMps;
+          if (hadingValid) _currentHeadingDeg = p.heading;
         });
         // Every GPS update refetches the polyline so the street-following
         // line redraws from the bus's new position. The 25 m geolocator
@@ -503,8 +518,10 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                 polylines: [
                   Polyline(
                     points: _route,
-                    color: AppColors.yellowDeep,
+                    color: AppColors.blue,
                     strokeWidth: 5,
+                    borderStrokeWidth: 1.0,
+                    borderColor: Colors.white,
                   ),
                 ],
               ),
@@ -526,9 +543,11 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                 if (_currentPos != null)
                   Marker(
                     point: _currentPos!,
-                    width: 24,
-                    height: 24,
-                    child: const _DriverHereDot(),
+                    width: 44,
+                    height: 44,
+                    child: _BusHeadingArrow(
+                      headingDeg: _currentHeadingDeg,
+                    ),
                   ),
               ],
             ),
@@ -1266,41 +1285,113 @@ class _PinMarker extends StatelessWidget {
   }
 }
 
-/// Pulsing blue dot rendered at the bus's current GPS position.
-class _DriverHereDot extends StatelessWidget {
-  const _DriverHereDot();
+/// Yellow heading-arrow marker at the bus's current GPS position. The
+/// arrow rotates to match [headingDeg] (degrees clockwise from north),
+/// so it visually points along the street the bus is travelling on.
+/// Falls back to a static yellow disc when no heading is available yet
+/// (stationary device, heading sensor not locked).
+class _BusHeadingArrow extends StatelessWidget {
+  const _BusHeadingArrow({required this.headingDeg});
+  final double? headingDeg;
+
   @override
   Widget build(BuildContext context) {
+    // Translucent halo + arrow disc + bus glyph. The Transform.rotate
+    // wraps only the arrow disc so the halo stays a round glow even
+    // when the bus is heading sideways.
+    final hasHeading = headingDeg != null;
     return Stack(
       alignment: Alignment.center,
       children: [
+        // Soft halo for visual weight against busy map tiles.
         Container(
-          width: 24,
-          height: 24,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0x332563EB),
-          ),
-        ),
-        Container(
-          width: 14,
-          height: 14,
+          width: 44,
+          height: 44,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.blue,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x40000000),
-                blurRadius: 6,
-                offset: Offset(0, 2),
-              ),
-            ],
+            color: AppColors.yellow.withValues(alpha: 0.30),
           ),
+        ),
+        // Arrow + disc, rotated to the bus heading.
+        Transform.rotate(
+          angle: hasHeading ? headingDeg! * math.pi / 180.0 : 0,
+          child: SizedBox(
+            width: 32,
+            height: 32,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                if (hasHeading)
+                  Positioned(
+                    top: -3,
+                    child: CustomPaint(
+                      size: const Size(14, 10),
+                      painter: _ArrowHeadPainter(color: AppColors.yellowDeep),
+                    ),
+                  ),
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.yellow, AppColors.yellowDeep],
+                    ),
+                    border: Border.all(color: Colors.white, width: 2.5),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x40000000),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Bus glyph stays upright regardless of heading — only the
+        // arrow + disc rotate, so the icon remains readable while the
+        // arrowhead does the directional work.
+        const Icon(
+          Icons.directions_bus,
+          size: 14,
+          color: AppColors.ink,
         ),
       ],
     );
   }
+}
+
+/// Painter for the small triangular arrowhead that sits above the bus
+/// disc and indicates heading. Stroked with [color] (typically yellowDeep)
+/// and rendered with a soft outline so it stays visible over both light
+/// and dark tile content.
+class _ArrowHeadPainter extends CustomPainter {
+  _ArrowHeadPainter({required this.color});
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = ui.Path()
+      ..moveTo(size.width / 2, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    final outline = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawPath(p, outline);
+    canvas.drawPath(p, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ArrowHeadPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _PinTipPainter extends CustomPainter {
