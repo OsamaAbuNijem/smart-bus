@@ -413,9 +413,15 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
     final coords = waypoints
         .map((p) => '${p.longitude},${p.latitude}')
         .join(';');
+    // alternatives=3 asks OSRM for up to three viable routes; we pick
+    // the one with the smallest `distance` so the driver gets the
+    // SHORTEST path (metres) after re-routing off-route, rather than
+    // the default route which optimises for duration. Especially
+    // important on detours where the fastest option might take the
+    // bus a few kilometres around to skip a small congestion zone.
     final uri = Uri.parse(
       '${Env.osrmBaseUrl}/route/v1/driving/$coords'
-      '?overview=full&geometries=geojson',
+      '?overview=full&geometries=geojson&alternatives=3',
     );
     try {
       final dio = Dio(BaseOptions(
@@ -433,7 +439,7 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
       if (routes == null || routes.isEmpty) {
         throw const FormatException('no route');
       }
-      final first = routes.first as Map<String, dynamic>;
+      final first = _shortestRoute(routes);
       final geometry = first['geometry'] as Map<String, dynamic>;
       final raw = geometry['coordinates'] as List<dynamic>;
       final pts = raw
@@ -1249,6 +1255,24 @@ double _haversineKm(LatLng a, LatLng b) {
 }
 
 double _deg2rad(double d) => d * (math.pi / 180.0);
+
+/// Returns the OSRM route with the smallest `distance` (metres). Routes
+/// missing a numeric distance are skipped; if none has one we fall back
+/// to the first route in the array so the screen still renders.
+Map<String, dynamic> _shortestRoute(List<dynamic> routes) {
+  Map<String, dynamic>? best;
+  double bestMeters = double.infinity;
+  for (final r in routes) {
+    if (r is! Map<String, dynamic>) continue;
+    final d = (r['distance'] as num?)?.toDouble();
+    if (d == null) continue;
+    if (d < bestMeters) {
+      bestMeters = d;
+      best = r;
+    }
+  }
+  return best ?? routes.first as Map<String, dynamic>;
+}
 
 /// Minimum distance in metres from [p] to any segment of [line].
 /// Returns infinity when the polyline is too short to project onto.

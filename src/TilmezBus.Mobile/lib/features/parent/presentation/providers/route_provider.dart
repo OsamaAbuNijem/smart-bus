@@ -61,9 +61,14 @@ Future<List<LatLng>> _fetchOsrmGeometry(List<LatLng> points) async {
   final coords = points
       .map((p) => '${p.longitude},${p.latitude}')
       .join(';');
+  // alternatives=3 asks OSRM for up to three viable routes between the
+  // waypoints; we then pick the one with the smallest `distance` so the
+  // parent always sees the SHORTEST path (by metres travelled) rather
+  // than the default which optimises for duration. Falls back to the
+  // first route silently if the server doesn't honour alternatives.
   final url =
       '${Env.osrmBaseUrl}/route/v1/driving/$coords'
-      '?overview=full&geometries=geojson';
+      '?overview=full&geometries=geojson&alternatives=3';
   final dio = Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 12),
@@ -71,14 +76,33 @@ Future<List<LatLng>> _fetchOsrmGeometry(List<LatLng> points) async {
   final resp = await dio.get<Map<String, dynamic>>(url);
   final routes = (resp.data?['routes'] as List?) ?? const [];
   if (routes.isEmpty) return const [];
+  final shortest = _shortestByDistance(routes);
   final raw =
-      (routes.first['geometry']?['coordinates'] as List?) ?? const [];
+      (shortest['geometry']?['coordinates'] as List?) ?? const [];
   return raw
       .map((c) => LatLng(
             (c[1] as num).toDouble(),
             (c[0] as num).toDouble(),
           ))
       .toList(growable: false);
+}
+
+/// Returns the OSRM route with the smallest `distance` (metres). Routes
+/// missing a numeric distance are skipped; if none has one we just
+/// return the first route the server gave us.
+Map<String, dynamic> _shortestByDistance(List<dynamic> routes) {
+  Map<String, dynamic>? best;
+  double bestMeters = double.infinity;
+  for (final r in routes) {
+    if (r is! Map<String, dynamic>) continue;
+    final d = (r['distance'] as num?)?.toDouble();
+    if (d == null) continue;
+    if (d < bestMeters) {
+      bestMeters = d;
+      best = r;
+    }
+  }
+  return best ?? routes.first as Map<String, dynamic>;
 }
 
 extension RoundForRouteCache on double {
