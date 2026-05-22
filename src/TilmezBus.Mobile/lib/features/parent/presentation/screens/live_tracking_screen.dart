@@ -57,6 +57,16 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
   /// Set once we've shown the "Trip ended" dialog so a stale poll doesn't
   /// re-open it after the parent dismisses.
   bool _tripEndedShown = false;
+  /// Bus position used as the first waypoint when fetching the OSRM
+  /// polyline. Held stable while the bus is on the cached route so the
+  /// line doesn't re-route on every 11 m of motion. Updated to the live
+  /// bus only when [_isOffRoute] flags a real deviation.
+  LatLng? _routeAnchorBus;
+
+  /// Threshold (metres) used to decide whether the bus has left the
+  /// currently rendered polyline. Set wide enough to absorb GPS jitter
+  /// and lane-level wander.
+  static const double _offRouteMeters = 80.0;
 
   @override
   void initState() {
@@ -162,6 +172,22 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
               if (mounted) _recenter();
             });
           }
+          // Decide whether the route polyline needs to be refetched. We
+          // only swap the anchor when the bus has actually deviated from
+          // the rendered polyline by > [_offRouteMeters] — otherwise we
+          // keep the previous anchor so the OSRM cache hits and the line
+          // stays visually identical, just with the bus marker gliding
+          // along it. First poll, or no stable line yet, also anchors.
+          final bus = _displayBusLatLng;
+          if (bus != null) {
+            final stable = ref.read(_stableLineProvider);
+            final shouldAnchor = _routeAnchorBus == null ||
+                stable.length < 2 ||
+                _minMetersToPolyline(bus, stable) > _offRouteMeters;
+            if (shouldAnchor) {
+              _routeAnchorBus = bus;
+            }
+          }
           if (d.tripStatus?.toLowerCase() == 'completed') {
             unawaited(_showTripEndedDialog());
           }
@@ -178,6 +204,13 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
               _Map(
                 controller: _mapController,
                 bus: _displayBusLatLng,
+                // routeBus is the anchored bus position that drives the
+                // OSRM cache key. Falls back to the live bus on the very
+                // first build before [_LiveBodyState] has had a chance to
+                // see a poll. Holding it stable while the bus is on the
+                // cached route keeps the polyline from re-routing on
+                // every poll.
+                routeBus: _routeAnchorBus ?? _displayBusLatLng,
                 home: _homeLatLng,
                 school: _schoolLatLng,
                 destination: _destinationLatLng,
@@ -385,6 +418,7 @@ class _Map extends ConsumerWidget {
   const _Map({
     required this.controller,
     required this.bus,
+    required this.routeBus,
     required this.home,
     required this.school,
     required this.destination,
@@ -395,7 +429,13 @@ class _Map extends ConsumerWidget {
     required this.schoolLabel,
   });
   final MapController controller;
+  /// Live bus position used for the marker + polyline trimming.
   final LatLng? bus;
+  /// Anchored bus position used as the first waypoint when fetching the
+  /// OSRM route. Held stable while the bus is on the cached route — see
+  /// `_LiveBodyState._routeAnchorBus`. The marker still tracks the live
+  /// [bus] so it glides along the polyline between OSRM refetches.
+  final LatLng? routeBus;
   final LatLng? home;
   final LatLng? school;
   // Active destination — school in morning trips, home in return trips.
@@ -426,11 +466,17 @@ class _Map extends ConsumerWidget {
     //   already, so we drop it and draw bus → school straight away.
     // - Return trips: pickup is the school which the bus has left, so we
     //   skip it and draw bus → home.
+    // Use the anchored bus position for the OSRM waypoint list — that's
+    // what keys the cache, so anchoring it while the bus follows the
+    // current polyline means the line stays stable. The marker tracks
+    // the live [bus] via trimming below, so visually the bus glides
+    // along the road even though the underlying polyline didn't change.
+    final routeStart = routeBus ?? bus;
     final waypoints = <LatLng>[
-      if (bus != null) bus!,
+      if (routeStart != null) routeStart,
       if (pickup != null &&
           !pickupAlreadyVisited &&
-          (bus == null || _distSq(bus!, pickup!) > 0.000001))
+          (routeStart == null || _distSq(routeStart, pickup!) > 0.000001))
         pickup!,
       if (destination != null &&
           (pickup == null ||
@@ -1488,6 +1534,43 @@ double _haversine(double lat1, double lng1, double lat2, double lng2) {
 }
 
 double _toRad(double d) => d * math.pi / 180.0;
+
+/// Minimum distance in metres from [p] to any segment of [line]. Used
+/// by the parent map to decide whether the bus has left the currently
+/// rendered polyline and we should refetch a fresh route. Computed in
+/// a local equirectangular frame (longitudes pre-scaled by cos(lat))
+/// so it stays accurate at non-equatorial latitudes.
+double _minMetersToPolyline(LatLng p, List<LatLng> line) {
+  if (line.length < 2) return double.infinity;
+  final kx = math.cos(p.latitude * math.pi / 180.0);
+  const metersPerDegLat = 111320.0;
+  final metersPerDegLon = metersPerDegLat * kx;
+  double best = double.infinity;
+  for (var i = 0; i < line.length - 1; i++) {
+    final a = line[i];
+    final b = line[i + 1];
+    final dx = (b.longitude - a.longitude) * metersPerDegLon;
+    final dy = (b.latitude  - a.latitude)  * metersPerDegLat;
+    final lenSq = dx * dx + dy * dy;
+    double t;
+    if (lenSq < 1e-9) {
+      t = 0;
+    } else {
+      t = ((p.longitude - a.longitude) * metersPerDegLon * dx +
+              (p.latitude  - a.latitude)  * metersPerDegLat * dy) /
+          lenSq;
+      if (t < 0) t = 0;
+      if (t > 1) t = 1;
+    }
+    final px = a.longitude * metersPerDegLon + t * dx;
+    final py = a.latitude  * metersPerDegLat + t * dy;
+    final qx = p.longitude * metersPerDegLon;
+    final qy = p.latitude  * metersPerDegLat;
+    final d = math.sqrt((px - qx) * (px - qx) + (py - qy) * (py - qy));
+    if (d < best) best = d;
+  }
+  return best;
+}
 
 String _relativeTime(DateTime? when, AppLocalizations l) {
   if (when == null) return l.liveTrackingNever;

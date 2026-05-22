@@ -243,6 +243,12 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
   /// tight that the driver loses context of upcoming turns.
   static const double _followZoom = 17.0;
 
+  /// Distance threshold (metres) used to decide whether the bus is still
+  /// on the cached polyline. Beyond this the route is re-fetched from
+  /// the new bus position; below it we keep the existing line. Set wide
+  /// enough to absorb GPS jitter and lane-level wander.
+  static const double _offRouteMeters = 80.0;
+
   @override
   void initState() {
     super.initState();
@@ -303,11 +309,15 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
           _currentSpeedMps = speedMps;
           if (hadingValid) _currentHeadingDeg = p.heading;
         });
-        // Every GPS update refetches the polyline so the street-following
-        // line redraws from the bus's new position. The 25 m geolocator
-        // filter already throttles this — OSRM only gets hit on real
-        // movement, not on stationary jitter.
-        _fetchRoute();
+        // Only refetch the polyline when the bus has actually left the
+        // cached route — otherwise the line flickers/redirects on every
+        // GPS update even though the driver is still on the same path.
+        // Threshold is generous (~80 m) to absorb GPS jitter and brief
+        // lane wanders without triggering a redraw.
+        if (_route.length < 2 ||
+            _minMetersToPolyline(fix, _route) > _offRouteMeters) {
+          _fetchRoute();
+        }
         // Follow-cam: keep the bus dead-center at a tight zoom on every
         // update so the driver always sees the road right under them.
         // Skipped when the user has actively interacted (panned/zoomed)
@@ -1227,6 +1237,46 @@ double _haversineKm(LatLng a, LatLng b) {
 }
 
 double _deg2rad(double d) => d * (math.pi / 180.0);
+
+/// Minimum distance in metres from [p] to any segment of [line].
+/// Returns infinity when the polyline is too short to project onto.
+/// Uses a local equirectangular frame (longitudes pre-scaled by
+/// cos(lat)) so the projection is accurate at mid-latitudes.
+double _minMetersToPolyline(LatLng p, List<LatLng> line) {
+  if (line.length < 2) return double.infinity;
+  final kx = math.cos(p.latitude * math.pi / 180.0);
+  // ~ metres per degree at this latitude. Scaling lat/lon deltas by these
+  // factors gives a Euclidean distance in metres that closely tracks
+  // haversine for short distances we care about (well under a kilometre).
+  const metersPerDegLat = 111320.0;
+  final metersPerDegLon = metersPerDegLat * kx;
+  double best = double.infinity;
+  for (var i = 0; i < line.length - 1; i++) {
+    final a = line[i];
+    final b = line[i + 1];
+    // Project p onto segment a→b in metric space.
+    final dx = (b.longitude - a.longitude) * metersPerDegLon;
+    final dy = (b.latitude  - a.latitude)  * metersPerDegLat;
+    final lenSq = dx * dx + dy * dy;
+    double t;
+    if (lenSq < 1e-9) {
+      t = 0;
+    } else {
+      t = ((p.longitude - a.longitude) * metersPerDegLon * dx +
+              (p.latitude  - a.latitude)  * metersPerDegLat * dy) /
+          lenSq;
+      if (t < 0) t = 0;
+      if (t > 1) t = 1;
+    }
+    final px = a.longitude * metersPerDegLon + t * dx;
+    final py = a.latitude  * metersPerDegLat + t * dy;
+    final qx = p.longitude * metersPerDegLon;
+    final qy = p.latitude  * metersPerDegLat;
+    final d = math.sqrt((px - qx) * (px - qx) + (py - qy) * (py - qy));
+    if (d < best) best = d;
+  }
+  return best;
+}
 
 class _PinMarker extends StatelessWidget {
   const _PinMarker({required this.step, required this.stop});
