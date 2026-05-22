@@ -396,14 +396,16 @@ class _ChildPanelState extends ConsumerState<_ChildPanel> {
                   .firstOrNull;
               // Peek at the live boarding status only when there's an
               // in-progress candidate to evaluate against — avoids spinning
-              // up the live tracker when no trip is rolling. On Morning
-              // trips we drop the hero while the bus is heading to the
-              // pickup but the student hasn't boarded yet: from the
-              // parent's perspective their child's journey has not
-              // started, so the home stays uncluttered until the
-              // assistant marks them boarded. Return trips never trigger
-              // this because students are auto-boarded the moment the
-              // assistant flips the trip to InProgress.
+              // up the live tracker when no trip is rolling. The hero is
+              // hidden at the two endpoints of the student's individual
+              // journey:
+              //   • Morning + Waiting → bus is heading to the pickup but
+              //     the student hasn't boarded; the journey hasn't begun.
+              //   • Return  + DroppedOff → student is already home; the
+              //     bus may still be carrying other passengers but this
+              //     parent's trip is done.
+              // Recent trips below still reflects the right status via
+              // _StatusTag, so the parent isn't left wondering.
               final live = candidate != null
                   ? ref
                       .watch(liveTrackingControllerProvider(child.id))
@@ -414,7 +416,13 @@ class _ChildPanelState extends ConsumerState<_ChildPanel> {
               final hideMorningPrePickup =
                   candidate?.tripType == 'Morning' &&
                       (liveBoarding == null || liveBoarding == 'waiting');
-              final liveTrip = hideMorningPrePickup ? null : candidate;
+              final hideReturnArrived =
+                  candidate?.tripType == 'Return' &&
+                      (liveBoarding == 'droppedoff' ||
+                          liveBoarding == 'dropped_off');
+              final liveTrip = (hideMorningPrePickup || hideReturnArrived)
+                  ? null
+                  : candidate;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
