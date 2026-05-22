@@ -216,6 +216,10 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
   /// "you-are-here" marker and the per-stop "X.X km away" pill that ticks
   /// down while the driver moves.
   LatLng? _currentPos;
+  /// Latest speed reading from the GPS stream, metres/second. 0 when the
+  /// device reports an invalid / non-finite value so the on-map overlay
+  /// can always render a number instead of a dash.
+  double _currentSpeedMps = 0.0;
   StreamSubscription<Position>? _posSub;
   /// Total driving duration for the active route, in seconds, as reported
   /// by OSRM. Null until the first successful fetch.
@@ -278,11 +282,17 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
         ),
       ).listen((p) {
         if (!mounted) return;
-        final hadPos = _currentPos != null;
         final fix = LatLng(p.latitude, p.longitude);
-        setState(() => _currentPos = fix);
-        // First GPS fix — refetch so the polyline starts at the bus.
-        if (!hadPos) _fetchRoute();
+        final speedMps = p.speed.isFinite && p.speed >= 0 ? p.speed : 0.0;
+        setState(() {
+          _currentPos = fix;
+          _currentSpeedMps = speedMps;
+        });
+        // Every GPS update refetches the polyline so the street-following
+        // line redraws from the bus's new position. The 25 m geolocator
+        // filter already throttles this — OSRM only gets hit on real
+        // movement, not on stationary jitter.
+        _fetchRoute();
         // Follow-cam: keep the bus dead-center at a tight zoom on every
         // update so the driver always sees the road right under them.
         // Skipped when the user has actively interacted (panned/zoomed)
@@ -546,7 +556,6 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                       details: widget.details,
                       stops: widget.stops,
                       l: widget.l,
-                      durationSec: _routeDurationSec,
                     ),
                   ),
                 ],
@@ -594,7 +603,97 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
               onTap: _recenterOnBus,
             ),
           ),
+
+        // Speed + ETA overlay. Anchored bottom-left, above the stops
+        // sheet, so the driver can glance at remaining time and current
+        // speed without looking away from the road shown on the map.
+        if (_currentPos != null)
+          Positioned(
+            left: 14,
+            bottom: 220,
+            child: _MapStatsCard(
+              speedKmh: (_currentSpeedMps * 3.6).round(),
+              durationSec: _routeDurationSec,
+            ),
+          ),
       ],
+    );
+  }
+}
+
+/// Compact on-map card showing the bus's current speed (km/h) and the
+/// remaining drive time to the active destination. Renders flush over
+/// the map tiles so the driver gets the numbers without taking eyes off
+/// the road geometry beneath.
+class _MapStatsCard extends StatelessWidget {
+  const _MapStatsCard({required this.speedKmh, required this.durationSec});
+  final int speedKmh;
+  final double? durationSec;
+
+  @override
+  Widget build(BuildContext context) {
+    final etaText = durationSec == null
+        ? '—'
+        : '${(durationSec! / 60).ceil().clamp(1, 999)} min';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.speed, size: 14, color: AppColors.violet),
+          const SizedBox(width: 5),
+          Text(
+            '$speedKmh',
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: AppColors.ink,
+              fontFeatures: [FontFeature.tabularFigures()],
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(width: 2),
+          const Text(
+            'km/h',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: AppColors.slate500,
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 14,
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            color: AppColors.slate200,
+          ),
+          const Icon(Icons.schedule_outlined,
+              size: 14, color: AppColors.yellowDeep),
+          const SizedBox(width: 5),
+          Text(
+            etaText,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: AppColors.ink,
+              fontFeatures: [FontFeature.tabularFigures()],
+              letterSpacing: -0.2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -641,14 +740,10 @@ class _RouteSummaryCard extends StatelessWidget {
     required this.details,
     required this.stops,
     required this.l,
-    this.durationSec,
   });
   final TripDetailsDto details;
   final List<_Stop> stops;
   final AppLocalizations l;
-  /// Total drive time of the currently-rendered OSRM route in seconds.
-  /// Null while we're still fetching or if OSRM failed.
-  final double? durationSec;
   @override
   Widget build(BuildContext context) {
     final morning = details.isMorning;
@@ -728,10 +823,10 @@ class _RouteSummaryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (durationSec != null) ...[
-                const SizedBox(width: 8),
-                _EtaPill(seconds: durationSec!),
-              ],
+              // ETA used to live here as a pill, but the remaining time
+              // is now rendered on the map itself via [_MapStatsCard] so
+              // the top banner stays purely about trip identity + stop
+              // count + boarding progress.
             ],
           ),
           const SizedBox(height: 8),
@@ -1430,44 +1525,3 @@ class _Stop {
   final bool dropped;
 }
 
-// ─── ETA pill shown on the route summary card ───────────────────────────────
-
-class _EtaPill extends StatelessWidget {
-  const _EtaPill({required this.seconds});
-  final double seconds;
-
-  @override
-  Widget build(BuildContext context) {
-    // Round up so "59s" reads as "1 min" instead of "0".
-    final minutes = (seconds / 60).ceil().clamp(1, 999);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.yellowTint,
-        borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: const Color(0x66F5C518)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.schedule_outlined,
-            size: 13,
-            color: AppColors.ink,
-          ),
-          const SizedBox(width: 5),
-          Text(
-            '$minutes min',
-            style: const TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w800,
-              color: AppColors.ink,
-              fontFeatures: [FontFeature.tabularFigures()],
-              letterSpacing: -0.2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

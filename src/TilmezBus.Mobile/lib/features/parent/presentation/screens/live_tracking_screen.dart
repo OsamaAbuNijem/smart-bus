@@ -227,7 +227,6 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final etaMinutes = _etaMinutes(data);
     return SafeArea(
       bottom: false,
       child: Container(
@@ -282,42 +281,11 @@ class _Hero extends StatelessWidget {
                 ],
               ),
             ),
-            if (etaMinutes != null) _EtaPill(minutes: etaMinutes),
+            // Top-banner ETA was removed — remaining time + speed live in
+            // the bottom-sheet `_Stats` grid so they don't compete with the
+            // student name for header space.
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _EtaPill extends StatelessWidget {
-  const _EtaPill({required this.minutes});
-  final int minutes;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        color: AppColors.yellowTint,
-        borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: const Color(0x66F5C518)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.directions_bus,
-              size: 13, color: AppColors.yellowDeep),
-          const SizedBox(width: 5),
-          Text(
-            '$minutes min',
-            style: const TextStyle(
-              color: AppColors.yellowDeep,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.2,
-            ),
-          ),
-        ],
       ),
     );
   }
