@@ -391,9 +391,27 @@ class _ChildPanelState extends ConsumerState<_ChildPanel> {
             data: (trips) {
               // Live card only when there's a trip currently rolling. Empty-
               // state placeholder is reserved for parents with no trips at all.
-              final liveTrip = trips
+              final candidate = trips
                   .where((t) => t.tripPhase == TripPhase.inProgress)
                   .firstOrNull;
+              // Peek at the live boarding status only when there's an
+              // in-progress candidate to evaluate against — avoids spinning
+              // up the live tracker when no trip is rolling. On Return
+              // trips we drop the hero once the assistant marks the
+              // student dropped off (DroppedOff), since the student's
+              // individual journey is done even if the bus is still
+              // carrying other passengers home.
+              final live = candidate != null
+                  ? ref
+                      .watch(liveTrackingControllerProvider(child.id))
+                      .valueOrNull
+                  : null;
+              final liveBoarding =
+                  live?.boardingStatus?.toLowerCase();
+              final hideAfterReturnDropoff = candidate?.tripType == 'Return' &&
+                  (liveBoarding == 'droppedoff' ||
+                      liveBoarding == 'dropped_off');
+              final liveTrip = hideAfterReturnDropoff ? null : candidate;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
