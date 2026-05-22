@@ -48,12 +48,13 @@ Future<List<LatLng>> routedPathThrough(
 }
 
 /// Builds the snapped `lng,lat;lng,lat;…` string used as the cache key for
-/// [routedPathThrough]. 5-decimal snap ≈ 1 m grid so the route start lines
-/// up with the bus marker visually; the keepAlive cache still hits across
-/// sub-meter GPS jitter from one poll to the next.
+/// [routedPathThrough]. 4-decimal snap ≈ 11 m grid so meaningful bus
+/// movements (>~25 m geolocator distance filter) reliably trigger a fresh
+/// OSRM fetch and the parent map redraws the street-following polyline
+/// after each update, while small jitters still hit the keepAlive cache.
 String waypointsCacheKey(Iterable<LatLng> points) => points
     .map((p) =>
-        '${(p.longitude * 100000).round() / 100000},${(p.latitude * 100000).round() / 100000}')
+        '${(p.longitude * 10000).round() / 10000},${(p.latitude * 10000).round() / 10000}')
     .join(';');
 
 Future<List<LatLng>> _fetchOsrmGeometry(List<LatLng> points) async {

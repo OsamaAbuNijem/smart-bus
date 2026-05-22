@@ -648,6 +648,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveTrackingNever => '—';
 
   @override
+  String get liveTrackingTripEndedTitle => 'Trip ended';
+
+  @override
+  String get liveTrackingTripEndedBody => 'The assistant has ended this trip.';
+
+  @override
+  String get liveTrackingTripEndedClose => 'Close';
+
+  @override
   String get onboardingSkip => 'Skip';
 
   @override

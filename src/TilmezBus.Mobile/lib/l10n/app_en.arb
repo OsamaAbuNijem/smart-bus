@@ -234,6 +234,9 @@
   },
   "liveTrackingJustNow": "just now",
   "liveTrackingNever": "—",
+  "liveTrackingTripEndedTitle": "Trip ended",
+  "liveTrackingTripEndedBody": "The assistant has ended this trip.",
+  "liveTrackingTripEndedClose": "Close",
 
   "onboardingSkip": "Skip",
   "onboardingNext": "Next",

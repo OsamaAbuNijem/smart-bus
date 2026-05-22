@@ -643,6 +643,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get liveTrackingNever => '—';
 
   @override
+  String get liveTrackingTripEndedTitle => 'انتهت الرحلة';
+
+  @override
+  String get liveTrackingTripEndedBody => 'قام المساعد بإنهاء هذه الرحلة.';
+
+  @override
+  String get liveTrackingTripEndedClose => 'إغلاق';
+
+  @override
   String get onboardingSkip => 'تخطّي';
 
   @override

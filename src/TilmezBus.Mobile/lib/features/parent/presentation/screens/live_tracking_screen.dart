@@ -50,6 +50,13 @@ class _LiveBody extends ConsumerStatefulWidget {
 class _LiveBodyState extends ConsumerState<_LiveBody> {
   final _mapController = MapController();
   Timer? _ageTicker;
+  /// Timestamp of the last bus fix we already recentered on. Tracked so the
+  /// 3 s parent poll only nudges the camera when the bus actually moved —
+  /// repeating the same fix shouldn't fight the user's pinch / pan.
+  DateTime? _lastRecenterTs;
+  /// Set once we've shown the "Trip ended" dialog so a stale poll doesn't
+  /// re-open it after the parent dismisses.
+  bool _tripEndedShown = false;
 
   @override
   void initState() {
@@ -66,6 +73,33 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
     _ageTicker?.cancel();
     _mapController.dispose();
     super.dispose();
+  }
+
+  /// Pops a one-shot dialog when the trip transitions to Completed while
+  /// the parent has the live map open. Localized via [_LiveBody.l].
+  Future<void> _showTripEndedDialog() async {
+    if (_tripEndedShown || !mounted) return;
+    _tripEndedShown = true;
+    final l = widget.l;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.flag_circle, color: AppColors.emerald),
+            const SizedBox(width: 8),
+            Expanded(child: Text(l.liveTrackingTripEndedTitle)),
+          ],
+        ),
+        content: Text(l.liveTrackingTripEndedBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l.liveTrackingTripEndedClose),
+          ),
+        ],
+      ),
+    );
   }
 
   LatLng? get _homeLatLng {
@@ -111,6 +145,32 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
   Widget build(BuildContext context) {
     final data = widget.data;
     final l = widget.l;
+
+    // React to every poll update for this student. Two things to handle:
+    //   • A fresh bus fix → recenter the camera so the parent stays focused
+    //     on the bus and its remaining route after each fetch.
+    //   • Trip status flipped to Completed → pop the one-shot "Trip ended"
+    //     dialog. We only fire the dialog once; later polls keep coming
+    //     back as Completed but [_tripEndedShown] guards against re-open.
+    ref.listen(
+      liveTrackingControllerProvider(widget.studentId),
+      (_, next) {
+        next.whenData((d) {
+          final ts = d.busLocation?.timestamp;
+          if (ts != null && ts != _lastRecenterTs) {
+            _lastRecenterTs = ts;
+            // Defer to post-frame so we don't fight the FlutterMap build
+            // that's currently happening for the same change.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) _recenter();
+            });
+          }
+          if (d.tripStatus?.toLowerCase() == 'completed') {
+            unawaited(_showTripEndedDialog());
+          }
+        });
+      },
+    );
 
     return Column(
       children: [
@@ -348,6 +408,14 @@ class _LivePulseState extends State<_LivePulse>
 
 // ─── Map ───────────────────────────────────────────────────────────
 
+/// Last successful OSRM polyline for this screen. Held outside the keyed
+/// `routedPathThroughProvider` so a refetch (which spawns a new family
+/// instance in the `loading` state) doesn't blank the polyline — we keep
+/// drawing the previous geometry while the new one is in flight. AutoDispose
+/// so a fresh entry to the screen starts empty.
+final _stableLineProvider =
+    StateProvider.autoDispose<List<LatLng>>((_) => const []);
+
 class _Map extends ConsumerWidget {
   const _Map({
     required this.controller,
@@ -409,9 +477,23 @@ class _Map extends ConsumerWidget {
     if (waypoints.length >= 2) {
       final key = waypointsCacheKey(waypoints);
       final routed = ref.watch(routedPathThroughProvider(waypointsKey: key));
-      final routedList = routed.valueOrNull;
-      if (routedList != null && routedList.length >= 2) {
-        linePoints = routedList;
+      // Promote each successful response into the stable cache so the next
+      // refetch (different key → fresh `loading` state) still has something
+      // to render against.
+      ref.listen(
+        routedPathThroughProvider(waypointsKey: key),
+        (_, next) => next.whenData((d) {
+          if (d.length >= 2) {
+            ref.read(_stableLineProvider.notifier).state = d;
+          }
+        }),
+      );
+      final fresh = routed.valueOrNull;
+      if (fresh != null && fresh.length >= 2) {
+        linePoints = fresh;
+      } else {
+        final stable = ref.watch(_stableLineProvider);
+        if (stable.length >= 2) linePoints = stable;
       }
     }
     // Project the bus's actual GPS onto the polyline so the marker glides
@@ -449,8 +531,10 @@ class _Map extends ConsumerWidget {
             polylines: [
               Polyline(
                 points: linePoints,
-                strokeWidth: 4.0,
-                color: AppColors.yellow,
+                strokeWidth: 4.5,
+                color: AppColors.blue,
+                borderStrokeWidth: 1.0,
+                borderColor: Colors.white,
               ),
             ],
           ),
@@ -483,9 +567,12 @@ class _Map extends ConsumerWidget {
             if (busOnLine != null)
               Marker(
                 point: busOnLine,
-                width: 100,
-                height: 80,
-                alignment: Alignment.bottomCenter,
+                width: 110,
+                height: 110,
+                // Center the marker on the coordinate so the bus icon sits
+                // exactly on the polyline's first vertex — no anchor offset,
+                // no visual gap between the icon and the route line.
+                alignment: Alignment.center,
                 child: _BusMarker(label: busLabel),
               ),
           ],
@@ -581,14 +668,19 @@ class _BusMarkerState extends State<_BusMarker>
 
   @override
   Widget build(BuildContext context) {
+    // Stack is centered: the bus disc and the pulse share the marker's
+    // centerpoint, which is exactly the polyline's first vertex. The label
+    // (if any) is `Positioned` above the icon and `clipBehavior: none`
+    // lets it overflow without shifting the icon's anchor.
     return Stack(
-      alignment: Alignment.bottomCenter,
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
       children: [
         AnimatedBuilder(
           animation: _ctrl,
           builder: (_, _) {
             final t = _ctrl.value;
-            final size = 30 + 50 * t;
+            final size = 32 + 50 * t;
             final opacity = (0.55 * (1 - t)).clamp(0.0, 1.0);
             return Container(
               width: size,
@@ -600,63 +692,61 @@ class _BusMarkerState extends State<_BusMarker>
             );
           },
         ),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.label != null)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.slate100),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.10),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Text(
-                  widget.label!,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.ink,
-                    letterSpacing: -0.1,
-                  ),
-                ),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.yellow, AppColors.yellowDeep],
+            ),
+            border: Border.all(color: Colors.white, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.25),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-            const SizedBox(height: 2),
-            Container(
-              width: 40,
-              height: 40,
+            ],
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.directions_bus,
+            size: 17,
+            color: AppColors.ink,
+          ),
+        ),
+        if (widget.label != null)
+          Positioned(
+            bottom: 60,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppColors.yellow, AppColors.yellowDeep],
-                ),
-                border: Border.all(color: Colors.white, width: 3),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.slate100),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.20),
-                    blurRadius: 10,
+                    color: Colors.black.withValues(alpha: 0.10),
+                    blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              alignment: Alignment.center,
-              child: const Icon(
-                Icons.directions_bus,
-                size: 18,
-                color: AppColors.ink,
+              child: Text(
+                widget.label!,
+                maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                  letterSpacing: -0.1,
+                ),
               ),
             ),
-          ],
-        ),
+          ),
       ],
     );
   }
@@ -1293,12 +1383,16 @@ bool _pickupVisited(LiveTracking data) {
 /// route to render. Empty when the polyline is too short to project onto.
 List<LatLng> _trimPolylineFrom(LatLng p, List<LatLng> line) {
   if (line.length < 2) return line;
+  // cos(lat) at the bus latitude — used to scale longitude into metric
+  // units so the projection is accurate at non-equatorial latitudes
+  // (Jordan ≈ 31°N, where unscaled lon distances are ~15% off).
+  final kx = math.cos(p.latitude * math.pi / 180.0);
   int bestSegment = 0;
   LatLng bestPoint = line.first;
   var bestDistSq = double.infinity;
   for (var i = 0; i < line.length - 1; i++) {
-    final candidate = _projectOntoSegment(p, line[i], line[i + 1]);
-    final d = _distSq(p, candidate);
+    final candidate = _projectOntoSegment(p, line[i], line[i + 1], kx);
+    final d = _metricDistSq(p, candidate, kx);
     if (d < bestDistSq) {
       bestDistSq = d;
       bestSegment = i;
@@ -1309,17 +1403,33 @@ List<LatLng> _trimPolylineFrom(LatLng p, List<LatLng> line) {
   return <LatLng>[bestPoint, ...line.sublist(bestSegment + 1)];
 }
 
-/// Perpendicular foot of [p] on segment [a]→[b], clamped to the segment.
-LatLng _projectOntoSegment(LatLng p, LatLng a, LatLng b) {
-  final dx = b.longitude - a.longitude;
+/// Perpendicular foot of [p] on segment [a]→[b], clamped to the segment,
+/// computed in a local equirectangular frame so the result tracks the road
+/// instead of skewing in longitude at our latitudes.
+LatLng _projectOntoSegment(LatLng p, LatLng a, LatLng b, double kx) {
+  final dx = (b.longitude - a.longitude) * kx;
   final dy = b.latitude - a.latitude;
   final lenSq = dx * dx + dy * dy;
   if (lenSq < 1e-15) return a;
-  var t = ((p.longitude - a.longitude) * dx + (p.latitude - a.latitude) * dy) /
+  var t = ((p.longitude - a.longitude) * kx * dx +
+          (p.latitude - a.latitude) * dy) /
       lenSq;
   if (t < 0) t = 0;
   if (t > 1) t = 1;
-  return LatLng(a.latitude + t * dy, a.longitude + t * dx);
+  return LatLng(
+    a.latitude + t * dy,
+    a.longitude + t * dx / (kx == 0 ? 1 : kx),
+  );
+}
+
+/// Squared distance between two points in a local metric frame (longitudes
+/// pre-scaled by [kx] = cos(lat)). Used to pick the closest road point so
+/// a bus near a curving street picks the nearest segment, not a far one
+/// that's just east/west of it.
+double _metricDistSq(LatLng a, LatLng b, double kx) {
+  final dx = (a.longitude - b.longitude) * kx;
+  final dy = a.latitude - b.latitude;
+  return dx * dx + dy * dy;
 }
 
 /// Squared planar distance between two points — fine for short

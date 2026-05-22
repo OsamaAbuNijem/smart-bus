@@ -21,10 +21,10 @@ part 'trip_location_broadcaster.g.dart';
 ///   • On start, fire `getCurrentPosition` immediately so the parent
 ///     gets a fresh fix without waiting for the stream's first emission.
 ///   • Subscribe to the geolocator stream with a 25 m distance filter —
-///     each emission is broadcast.
-///   • Heartbeat every 15 s — re-broadcasts a fresh position so the
+///     each emission is broadcast (so big movements still surface fast).
+///   • Heartbeat every 30 s — re-broadcasts a fresh position so the
 ///     parent's marker timestamp keeps ticking even when the bus is
-///     parked.
+///     parked, while keeping API traffic light.
 ///
 /// Errors from the geolocator or the HTTP POST are swallowed by design;
 /// a flaky network shouldn't disrupt the assistant's local UI.
@@ -53,10 +53,10 @@ class TripLocationBroadcaster extends _$TripLocationBroadcaster {
       _broadcast(busId, p);
     });
 
-    // Immediate first ping + 15 s heartbeat thereafter.
+    // Immediate first ping + 30 s heartbeat thereafter.
     unawaited(_broadcastNow(busId));
     _heartbeat = Timer.periodic(
-        const Duration(seconds: 15), (_) => _broadcastNow(busId));
+        const Duration(seconds: 30), (_) => _broadcastNow(busId));
   }
 
   Future<bool> _ensurePermission() async {

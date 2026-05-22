@@ -1334,6 +1334,24 @@ abstract class AppLocalizations {
   /// **'—'**
   String get liveTrackingNever;
 
+  /// No description provided for @liveTrackingTripEndedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip ended'**
+  String get liveTrackingTripEndedTitle;
+
+  /// No description provided for @liveTrackingTripEndedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The assistant has ended this trip.'**
+  String get liveTrackingTripEndedBody;
+
+  /// No description provided for @liveTrackingTripEndedClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get liveTrackingTripEndedClose;
+
   /// No description provided for @onboardingSkip.
   ///
   /// In en, this message translates to:

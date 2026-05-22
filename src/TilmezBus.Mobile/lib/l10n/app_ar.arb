@@ -222,6 +222,9 @@
   "liveTrackingLastUpdated": "آخر تحديث {when}",
   "liveTrackingJustNow": "الآن",
   "liveTrackingNever": "—",
+  "liveTrackingTripEndedTitle": "انتهت الرحلة",
+  "liveTrackingTripEndedBody": "قام المساعد بإنهاء هذه الرحلة.",
+  "liveTrackingTripEndedClose": "إغلاق",
 
   "onboardingSkip": "تخطّي",
   "onboardingNext": "التالي",

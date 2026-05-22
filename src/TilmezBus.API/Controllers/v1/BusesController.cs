@@ -13,6 +13,8 @@ using TilmezBus.Application.Features.Buses.Commands.UpdateBusLocation;
 using TilmezBus.Application.Features.Buses.Queries.GetAllBuses;
 using TilmezBus.Application.Features.Buses.Queries.GetBusById;
 using TilmezBus.Application.Features.Buses.Queries.GetBusByQrToken;
+using TilmezBus.Application.Features.Buses.Queries.GetBusDefaultDriver;
+using TilmezBus.Application.Features.Buses.Queries.GetBusLastRoster;
 using TilmezBus.Domain.Enums;
 
 namespace TilmezBus.API.Controllers.v1;
@@ -84,7 +86,44 @@ public class BusesController : ControllerBase
     }
 
     /// <summary>
-    /// Roster for the last trip on this bus + trip type, used by the
+    /// Driver from the most recent trip on this bus + trip type. Used by
+    /// the assistant trip-setup screen to pre-fill the driver picker so
+    /// the same driver who ran the previous leg is selected by default.
+    /// </summary>
+    [HttpGet("{id:guid}/default-driver")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> DefaultDriver(
+        Guid id,
+        [FromQuery] TripType tripType,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetBusDefaultDriverQuery(id, tripType), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Roster of students from the most recent trip on this bus + trip
+    /// type. Used by the assistant trip-setup screen to pre-fill the
+    /// student list so the same kids who rode the previous leg are
+    /// already on the new trip.
+    /// </summary>
+    [HttpGet("{id:guid}/last-roster")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> LastRoster(
+        Guid id,
+        [FromQuery] TripType tripType,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetBusLastRosterQuery(id, tripType), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : BadRequest(new { error = result.Error });
+    }
+
     /// <summary>Get a bus by ID.</summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(BusDto), StatusCodes.Status200OK)]
