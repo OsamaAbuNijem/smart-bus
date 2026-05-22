@@ -4,7 +4,12 @@ part 'child_trip.freezed.dart';
 
 enum TripResultTag { onTime, late, absent, pending }
 
-enum BoardingStatus { waiting, boarded, absent }
+/// Mirrors the server's StudentTrip.BoardingStatus enum:
+/// Waiting → bus hasn't picked the student up yet (or trip hasn't
+/// started); Boarded → student is on the bus; DroppedOff → student
+/// reached their destination (school on Morning, home on Return);
+/// Absent → parent reported absence for the day.
+enum BoardingStatus { waiting, boarded, droppedOff, absent }
 
 enum TripPhase { scheduled, inProgress, completed }
 
@@ -20,6 +25,7 @@ extension TripResultTagX on TripResultTag {
 extension BoardingStatusX on BoardingStatus {
   static BoardingStatus fromApi(String value) => switch (value) {
         'Boarded' => BoardingStatus.boarded,
+        'DroppedOff' => BoardingStatus.droppedOff,
         'Absent' => BoardingStatus.absent,
         _ => BoardingStatus.waiting,
       };

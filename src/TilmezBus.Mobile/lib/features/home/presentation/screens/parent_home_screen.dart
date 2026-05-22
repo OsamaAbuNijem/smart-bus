@@ -396,11 +396,14 @@ class _ChildPanelState extends ConsumerState<_ChildPanel> {
                   .firstOrNull;
               // Peek at the live boarding status only when there's an
               // in-progress candidate to evaluate against — avoids spinning
-              // up the live tracker when no trip is rolling. On Return
-              // trips we drop the hero once the assistant marks the
-              // student dropped off (DroppedOff), since the student's
-              // individual journey is done even if the bus is still
-              // carrying other passengers home.
+              // up the live tracker when no trip is rolling. On Morning
+              // trips we drop the hero while the bus is heading to the
+              // pickup but the student hasn't boarded yet: from the
+              // parent's perspective their child's journey has not
+              // started, so the home stays uncluttered until the
+              // assistant marks them boarded. Return trips never trigger
+              // this because students are auto-boarded the moment the
+              // assistant flips the trip to InProgress.
               final live = candidate != null
                   ? ref
                       .watch(liveTrackingControllerProvider(child.id))
@@ -408,10 +411,10 @@ class _ChildPanelState extends ConsumerState<_ChildPanel> {
                   : null;
               final liveBoarding =
                   live?.boardingStatus?.toLowerCase();
-              final hideAfterReturnDropoff = candidate?.tripType == 'Return' &&
-                  (liveBoarding == 'droppedoff' ||
-                      liveBoarding == 'dropped_off');
-              final liveTrip = hideAfterReturnDropoff ? null : candidate;
+              final hideMorningPrePickup =
+                  candidate?.tripType == 'Morning' &&
+                      (liveBoarding == null || liveBoarding == 'waiting');
+              final liveTrip = hideMorningPrePickup ? null : candidate;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -1301,9 +1304,13 @@ class _StatusTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tag now reflects the current trip phase (or absence) instead of the
-    // on-time/late computed result, so parents see "On the bus" / "Arrived
-    // safely" / "Awaiting today" / "Absent" alongside the trip-type row.
+    // Tag reflects the student's actual journey state, not just the
+    // trip phase. For an in-progress trip the boardingStatus drives
+    // the text: Waiting → "Bus on the way" (bus hasn't picked them up
+    // yet), DroppedOff → "Arrived safely" (they reached destination
+    // even if the bus is still rolling for others), Boarded → "On the
+    // bus". Absent and completed/scheduled fall back to the trip-level
+    // tag as before.
     final (IconData icon, Color bg, Color fg, String text) =
         trip.boardingStatus == BoardingStatus.absent
             ? (
@@ -1312,26 +1319,42 @@ class _StatusTag extends StatelessWidget {
                 const Color(0xFFE11D48),
                 l.parentTagAbsent,
               )
-            : switch (trip.tripPhase) {
-                TripPhase.completed => (
+            : trip.tripPhase == TripPhase.inProgress &&
+                    trip.boardingStatus == BoardingStatus.droppedOff
+                ? (
                     Icons.check,
                     AppColors.emeraldSoft,
                     AppColors.emerald,
                     l.parentStatusArrived,
-                  ),
-                TripPhase.inProgress => (
-                    Icons.directions_bus,
-                    const Color(0xFFFEF3C7),
-                    const Color(0xFFD97706),
-                    l.parentStatusOnBus,
-                  ),
-                TripPhase.scheduled => (
-                    Icons.schedule,
-                    AppColors.slate100,
-                    AppColors.slate500,
-                    l.parentStatusAwaiting,
-                  ),
-              };
+                  )
+                : trip.tripPhase == TripPhase.inProgress &&
+                        trip.boardingStatus == BoardingStatus.waiting
+                    ? (
+                        Icons.directions_bus_outlined,
+                        const Color(0xFFFEF3C7),
+                        const Color(0xFFD97706),
+                        l.parentStatusWaitingPickup,
+                      )
+                    : switch (trip.tripPhase) {
+                        TripPhase.completed => (
+                            Icons.check,
+                            AppColors.emeraldSoft,
+                            AppColors.emerald,
+                            l.parentStatusArrived,
+                          ),
+                        TripPhase.inProgress => (
+                            Icons.directions_bus,
+                            const Color(0xFFFEF3C7),
+                            const Color(0xFFD97706),
+                            l.parentStatusOnBus,
+                          ),
+                        TripPhase.scheduled => (
+                            Icons.schedule,
+                            AppColors.slate100,
+                            AppColors.slate500,
+                            l.parentStatusAwaiting,
+                          ),
+                      };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
