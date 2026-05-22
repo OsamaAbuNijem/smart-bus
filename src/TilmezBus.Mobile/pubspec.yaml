@@ -58,6 +58,10 @@ dependencies:
   # i18n / formatting
   intl: any
 
+  # Keep the screen awake while the assistant / driver is using the app
+  # (they hold the phone in a cradle and need the map visible at all times).
+  wakelock_plus: ^1.2.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
