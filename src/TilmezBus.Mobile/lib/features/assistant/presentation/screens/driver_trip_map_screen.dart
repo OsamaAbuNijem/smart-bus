@@ -233,6 +233,13 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
   /// Total driving duration for the active route, in seconds, as reported
   /// by OSRM. Null until the first successful fetch.
   double? _routeDurationSec;
+  /// Monotonically-increasing sequence number for in-flight OSRM fetches.
+  /// Every `_fetchRoute` call grabs the next value; only the latest call
+  /// is allowed to mutate state on completion. Older calls (already
+  /// superseded — e.g. initState's bus-less fetch raced by the first
+  /// GPS-fix fetch with bus) are discarded silently so the polyline
+  /// doesn't flicker between two stale geometries.
+  int _fetchSeq = 0;
   /// While true, every new GPS fix recenters the map on the driver at
   /// [_followZoom]. Toggled off when the driver manually pans / zooms;
   /// the recenter button turns it back on.
@@ -381,12 +388,17 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
   ///     and nothing rendered. With it we get a clean current→school leg.
   Future<void> _fetchRoute() async {
     if (!mounted) return;
+    // Claim the latest sequence number; if a newer fetch starts while
+    // we're still in flight, [seq != _fetchSeq] below will tell us to
+    // discard our result instead of overwriting the newer polyline.
+    final seq = ++_fetchSeq;
     final active = _activeStops;
     final waypoints = <LatLng>[
       ?_currentPos,
       ...active.map((s) => s.point),
     ];
     if (waypoints.length < 2) {
+      if (seq != _fetchSeq) return;
       setState(() {
         _route = const [];
         _loading = false;
@@ -456,7 +468,7 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
       // OSRM returns the total drive time in seconds at routes[0].duration.
       // We display it as the ETA pill on the map header.
       final duration = (first['duration'] as num?)?.toDouble();
-      if (!mounted) return;
+      if (!mounted || seq != _fetchSeq) return;
       setState(() {
         _route = pts;
         _loading = false;
@@ -465,7 +477,7 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
       });
       _fitBounds();
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted || seq != _fetchSeq) return;
       setState(() {
         _route = active.map((s) => s.point).toList();
         _loading = false;

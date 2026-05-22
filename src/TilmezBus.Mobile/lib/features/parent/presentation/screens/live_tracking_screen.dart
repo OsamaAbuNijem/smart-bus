@@ -167,6 +167,15 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
     //   • Trip status flipped to Completed → pop the one-shot "Trip ended"
     //     dialog. We only fire the dialog once; later polls keep coming
     //     back as Completed but [_tripEndedShown] guards against re-open.
+    // Keep _stableLineProvider mounted for the lifetime of this screen.
+    // It's autoDispose so it'd otherwise be reset to [] in the brief
+    // gaps where _Map.build is using `fresh` directly (no fallback
+    // watch), which broke the deviation check below: a momentarily
+    // empty stable line forced the anchor to advance, which changed
+    // the OSRM cache key, which triggered a re-fetch — that's what was
+    // making the polyline flicker on every poll.
+    ref.listen(_stableLineProvider, (_, _) {});
+
     ref.listen(
       liveTrackingControllerProvider(widget.studentId),
       (_, next) {
@@ -185,13 +194,15 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
           // the rendered polyline by > [_offRouteMeters] — otherwise we
           // keep the previous anchor so the OSRM cache hits and the line
           // stays visually identical, just with the bus marker gliding
-          // along it. First poll, or no stable line yet, also anchors.
-          final bus = _displayBusLatLng;
+          // along it. The bus position is read from the FRESH data [d]
+          // because widget.data isn't updated until the post-listen
+          // build runs.
+          final bus = _displayBus(d);
           if (bus != null) {
             final stable = ref.read(_stableLineProvider);
             final shouldAnchor = _routeAnchorBus == null ||
-                stable.length < 2 ||
-                _minMetersToPolyline(bus, stable) > _offRouteMeters;
+                (stable.length >= 2 &&
+                    _minMetersToPolyline(bus, stable) > _offRouteMeters);
             if (shouldAnchor) {
               _routeAnchorBus = bus;
             }
