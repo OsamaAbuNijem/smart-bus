@@ -471,7 +471,18 @@ class _TripHero extends ConsumerWidget {
     final live = isInProgress
         ? ref.watch(liveTrackingControllerProvider(studentId)).valueOrNull
         : null;
-    final progress = _computeRouteProgress(trip, live, isCompleted);
+    // While the bus is on its way to the pickup (Morning: home; Return:
+    // school) but hasn't picked the student up yet, the progress bar
+    // represents "the journey of *my child*" — and that journey hasn't
+    // begun. Freeze the rail at 0 % and hide the ETA so the card shows
+    // only the status text ("Bus on the way"). The rail + ETA come back
+    // the moment the assistant marks the student boarded.
+    final boardingStatusRaw = live?.boardingStatus?.toLowerCase();
+    final isPreBoarding =
+        isInProgress && boardingStatusRaw == 'waiting';
+    final progress = isPreBoarding
+        ? const _RouteProgressData(fraction: 0.0, remainingMinutes: null)
+        : _computeRouteProgress(trip, live, isCompleted);
 
     // Watch the live-tracking poll for a status transition into Completed
     // while the parent is sitting on the home page. We surface a SnackBar
@@ -1486,20 +1497,7 @@ _RouteProgressData _computeRouteProgress(
   bool isCompleted,
 ) {
   if (isCompleted) return const _RouteProgressData(fraction: 1.0, remainingMinutes: null);
-  // Schedule-based fallback used whenever live coords are unavailable.
-  _RouteProgressData scheduleFallback() {
-    final start = trip.actualDeparture ?? trip.scheduledDeparture;
-    final duration = trip.durationMinutes ?? 30;
-    final elapsedMin = DateTime.now().difference(start).inMinutes;
-    final fraction = (elapsedMin / duration).clamp(0.0, 1.0);
-    final remaining = (duration - elapsedMin).clamp(1, 999);
-    return _RouteProgressData(
-      fraction: fraction.toDouble(),
-      remainingMinutes: remaining,
-    );
-  }
-
-  if (live == null) return scheduleFallback();
+  if (live == null) return const _RouteProgressData(fraction: 0.0, remainingMinutes: null);
   final bus = live.busLocation;
   // Pickup / dropoff coordinate pair flips with trip type.
   final morning = trip.tripType == 'Morning';
@@ -1510,8 +1508,13 @@ _RouteProgressData _computeRouteProgress(
   if (bus == null ||
       pickupLat == null || pickupLng == null ||
       dropLat == null || dropLng == null) {
-    return scheduleFallback();
+    // No live GPS / coords — show an empty rail and no ETA rather than a
+    // schedule-based guess that would diverge from the live map's value.
+    return const _RouteProgressData(fraction: 0.0, remainingMinutes: null);
   }
+  // Use the same haversine + speed-fallback formula as the live map's
+  // `_etaMinutes` so the ETA shown next to this progress bar matches the
+  // ETA pill on the live tracking screen down to the minute.
   final total = _haversineMeters(pickupLat, pickupLng, dropLat, dropLng);
   final remaining = _haversineMeters(bus.latitude, bus.longitude, dropLat, dropLng);
   final fraction = total <= 1 ? 0.0 : (1 - remaining / total).clamp(0.0, 1.0);
