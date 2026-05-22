@@ -432,6 +432,31 @@ class _TripHero extends ConsumerWidget {
         : null;
     final progress = _computeRouteProgress(trip, live, isCompleted);
 
+    // Watch the live-tracking poll for a status transition into Completed
+    // while the parent is sitting on the home page. We surface a SnackBar
+    // and invalidate the trips list so the in-progress hero collapses
+    // into the "no trip" placeholder + the row in History reflects the
+    // new state. Guarded against re-firing by checking the previous
+    // value's tripStatus.
+    if (isInProgress) {
+      ref.listen(
+        liveTrackingControllerProvider(studentId),
+        (prev, next) {
+          final prevStatus =
+              prev?.valueOrNull?.tripStatus?.toLowerCase();
+          final nextStatus = next.valueOrNull?.tripStatus?.toLowerCase();
+          if (prevStatus != 'completed' && nextStatus == 'completed') {
+            ref.invalidate(childTripsProvider(studentId));
+            final messenger = ScaffoldMessenger.maybeOf(context);
+            messenger?.showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(l.liveTrackingTripEndedBody),
+            ));
+          }
+        },
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,

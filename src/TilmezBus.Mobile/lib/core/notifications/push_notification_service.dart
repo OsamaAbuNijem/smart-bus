@@ -44,7 +44,23 @@ class PushNotificationService {
     await _localNotifications.initialize(
       const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        // iOS needs explicit init for the local-notifications plugin to be
+        // able to present a banner via [_showForegroundNotification].
+        // Defaults map to alert+badge+sound so a notification posted while
+        // the app is foregrounded actually appears at the top of the
+        // screen instead of being silently dropped.
+        iOS: DarwinInitializationSettings(),
       ),
+    );
+
+    // iOS suppresses banners for foregrounded apps by default. Opt-in so
+    // arrived-at-school / trip-ended pushes still surface visually while
+    // the parent has the app open.
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
     );
 
     // Show banners while the app is foregrounded.
@@ -92,6 +108,11 @@ class PushNotificationService {
           importance: Importance.high,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
+        ),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
         ),
       ),
       payload: message.data.isEmpty ? null : message.data.toString(),

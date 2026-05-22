@@ -6,9 +6,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tilmez_bus/core/routing/app_router.dart';
 import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/parent/domain/entities/live_tracking.dart';
 import 'package:tilmez_bus/features/parent/presentation/providers/live_tracking_controller.dart';
+import 'package:tilmez_bus/features/parent/presentation/providers/parent_controllers.dart';
 import 'package:tilmez_bus/features/parent/presentation/providers/route_provider.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -86,7 +88,10 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
   }
 
   /// Pops a one-shot dialog when the trip transitions to Completed while
-  /// the parent has the live map open. Localized via [_LiveBody.l].
+  /// the parent has the live map open. Tapping Close drops the parent
+  /// back on their home screen and invalidates [childTripsProvider] so
+  /// the trip row updates from "in progress" to "completed" without a
+  /// manual pull-to-refresh.
   Future<void> _showTripEndedDialog() async {
     if (_tripEndedShown || !mounted) return;
     _tripEndedShown = true;
@@ -110,6 +115,9 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
         ],
       ),
     );
+    if (!mounted) return;
+    ref.invalidate(childTripsProvider(widget.studentId));
+    context.go(AppRoute.homeParent);
   }
 
   LatLng? get _homeLatLng {
