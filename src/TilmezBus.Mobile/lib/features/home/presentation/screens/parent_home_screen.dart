@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -324,13 +325,53 @@ class _ChildTab extends StatelessWidget {
 
 // ─── Child panel ───────────────────────────────────────────────────────
 
-class _ChildPanel extends ConsumerWidget {
+class _ChildPanel extends ConsumerStatefulWidget {
   const _ChildPanel({required this.child, required this.l});
   final ParentChild child;
   final AppLocalizations l;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ChildPanel> createState() => _ChildPanelState();
+}
+
+class _ChildPanelState extends ConsumerState<_ChildPanel> {
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Periodically invalidate the trips provider so the home picks up
+    // new trips the moment the assistant materialises one — without the
+    // parent having to pull-to-refresh. 10 s is a balance between
+    // surfacing a freshly-started trip quickly and not hammering the
+    // API for users whose trip is hours away.
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (!mounted) return;
+      ref.invalidate(childTripsProvider(widget.child.id));
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _ChildPanel old) {
+    super.didUpdateWidget(old);
+    // When the parent switches between children we want the next panel
+    // to start its own poll for that child immediately, not wait for
+    // the previous timer's tick.
+    if (old.child.id != widget.child.id) {
+      ref.invalidate(childTripsProvider(widget.child.id));
+    }
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = widget.l;
+    final child = widget.child;
     final tripsAsync = ref.watch(childTripsProvider(child.id));
 
     return RefreshIndicator(
@@ -518,7 +559,7 @@ class _TripHero extends ConsumerWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      _statusText(trip, l),
+                      _statusText(trip, l, live: live),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
@@ -1382,10 +1423,23 @@ String _relativeDay(DateTime when, AppLocalizations l) {
   return '${dt.day} ${_monthAbbrev(dt.month)}';
 }
 
-String _statusText(ChildTrip trip, AppLocalizations l) {
+String _statusText(ChildTrip trip, AppLocalizations l, {LiveTracking? live}) {
   if (trip.boardingStatus == BoardingStatus.absent) return l.parentTagAbsent;
   if (trip.tripPhase == TripPhase.completed) return l.parentStatusArrived;
-  if (trip.tripPhase == TripPhase.inProgress) return l.parentStatusOnBus;
+  if (trip.tripPhase == TripPhase.inProgress) {
+    // While the trip is rolling, prefer the live boardingStatus over the
+    // snapshot in [trip] so the chip reflects the *current* state of
+    // the student on the bus — "Bus on the way" before pickup, "On the
+    // bus" after the assistant marks them boarded, "Arrived safely"
+    // after dropoff. Falls back to "On the bus" if the live tracker
+    // hasn't reported a status yet.
+    final liveStatus = live?.boardingStatus?.toLowerCase();
+    if (liveStatus == 'waiting') return l.parentStatusWaitingPickup;
+    if (liveStatus == 'droppedoff' || liveStatus == 'dropped_off') {
+      return l.parentStatusArrived;
+    }
+    return l.parentStatusOnBus;
+  }
   return l.parentStatusAwaiting;
 }
 

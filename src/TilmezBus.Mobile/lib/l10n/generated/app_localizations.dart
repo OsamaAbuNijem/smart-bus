@@ -626,6 +626,24 @@ abstract class AppLocalizations {
   /// **'Awaiting today'**
   String get parentStatusAwaiting;
 
+  /// No description provided for @parentStatusWaitingPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus on the way'**
+  String get parentStatusWaitingPickup;
+
+  /// No description provided for @assistantStartAllAbsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to do'**
+  String get assistantStartAllAbsentTitle;
+
+  /// No description provided for @assistantStartAllAbsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every student on this trip is marked absent — there\'s nothing to drive.'**
+  String get assistantStartAllAbsentBody;
+
   /// No description provided for @parentSectionQuickActions.
   ///
   /// In en, this message translates to:

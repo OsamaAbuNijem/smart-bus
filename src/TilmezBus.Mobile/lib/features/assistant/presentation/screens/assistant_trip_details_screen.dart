@@ -2063,6 +2063,27 @@ class _StartScheduledBarState
 
   Future<void> _start() async {
     final l = widget.l;
+    // Block the start when every student on the roster is absent —
+    // there's nothing the bus would actually do, and the trip would
+    // immediately have nobody to pick up / drop off. Empty rosters
+    // are handled separately by the "delete empty trip" path.
+    final students = widget.details.students;
+    if (students.isNotEmpty && students.every((s) => s.isAbsent)) {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l.assistantStartAllAbsentTitle),
+          content: Text(l.assistantStartAllAbsentBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l.commonCancel),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

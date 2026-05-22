@@ -281,6 +281,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get parentStatusAwaiting => 'بانتظار اليوم';
 
   @override
+  String get parentStatusWaitingPickup => 'الحافلة في الطريق';
+
+  @override
+  String get assistantStartAllAbsentTitle => 'لا حاجة لبدء الرحلة';
+
+  @override
+  String get assistantStartAllAbsentBody =>
+      'جميع الطلاب في هذه الرحلة مُعلَّمون كغائبين — لا يوجد ما يستدعي القيادة.';
+
+  @override
   String get parentSectionQuickActions => 'إجراءات سريعة';
 
   @override

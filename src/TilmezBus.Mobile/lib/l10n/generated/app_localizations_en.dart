@@ -282,6 +282,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentStatusAwaiting => 'Awaiting today';
 
   @override
+  String get parentStatusWaitingPickup => 'Bus on the way';
+
+  @override
+  String get assistantStartAllAbsentTitle => 'Nothing to do';
+
+  @override
+  String get assistantStartAllAbsentBody =>
+      'Every student on this trip is marked absent — there\'s nothing to drive.';
+
+  @override
   String get parentSectionQuickActions => 'Quick actions';
 
   @override
