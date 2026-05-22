@@ -117,22 +117,19 @@ class _LiveBodyState extends ConsumerState<_LiveBody> {
   LatLng? get _destinationLatLng => _destination(widget.data);
   LatLng? get _displayBusLatLng => _displayBus(widget.data);
 
+  /// Tight follow-cam: keep the bus dead-center at a high zoom so the
+  /// parent always sees the bus and the streets right around it, not a
+  /// wide fit-bounds view that drifts as the destination changes. Falls
+  /// back to the destination only if no bus fix is available yet.
+  static const double _followZoom = 17.0;
   void _recenter() {
     final bus = _displayBusLatLng;
-    final dest = _destinationLatLng;
-    if (bus != null && dest != null) {
-      final bounds = LatLngBounds.fromPoints([bus, dest]);
-      _mapController.fitCamera(
-        CameraFit.bounds(
-          bounds: bounds,
-          padding: const EdgeInsets.all(60),
-        ),
-      );
-    } else if (bus != null) {
-      _mapController.move(bus, 15);
-    } else if (dest != null) {
-      _mapController.move(dest, 14);
+    if (bus != null) {
+      _mapController.move(bus, _followZoom);
+      return;
     }
+    final dest = _destinationLatLng;
+    if (dest != null) _mapController.move(dest, 14);
   }
 
   Future<void> _refresh() async {

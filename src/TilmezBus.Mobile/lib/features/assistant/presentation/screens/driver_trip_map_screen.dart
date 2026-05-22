@@ -220,12 +220,40 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
   /// Total driving duration for the active route, in seconds, as reported
   /// by OSRM. Null until the first successful fetch.
   double? _routeDurationSec;
+  /// While true, every new GPS fix recenters the map on the driver at
+  /// [_followZoom]. Toggled off when the driver manually pans / zooms;
+  /// the recenter button turns it back on.
+  bool _followBus = true;
+
+  /// Zoom level used when the map is in follow-cam mode. Tight enough that
+  /// the bus and the surrounding streets are clearly visible, but not so
+  /// tight that the driver loses context of upcoming turns.
+  static const double _followZoom = 17.0;
 
   @override
   void initState() {
     super.initState();
     _fetchRoute();
     _startLocationStream();
+  }
+
+  /// Center the camera on the bus at the follow zoom. Posted to
+  /// post-frame so we don't compete with a build that's in-flight for
+  /// the same setState (e.g. the GPS-stream listener).
+  void _centerOnBus(LatLng fix) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _map.move(fix, _followZoom);
+    });
+  }
+
+  /// Re-engage follow mode and snap to the bus immediately. Bound to the
+  /// recenter button at the right-edge of the map.
+  void _recenterOnBus() {
+    final fix = _currentPos;
+    if (fix == null) return;
+    setState(() => _followBus = true);
+    _centerOnBus(fix);
   }
 
   /// Best-effort: ask once for permission, then subscribe to high-accuracy
@@ -251,9 +279,15 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
       ).listen((p) {
         if (!mounted) return;
         final hadPos = _currentPos != null;
-        setState(() => _currentPos = LatLng(p.latitude, p.longitude));
+        final fix = LatLng(p.latitude, p.longitude);
+        setState(() => _currentPos = fix);
         // First GPS fix — refetch so the polyline starts at the bus.
         if (!hadPos) _fetchRoute();
+        // Follow-cam: keep the bus dead-center at a tight zoom on every
+        // update so the driver always sees the road right under them.
+        // Skipped when the user has actively interacted (panned/zoomed)
+        // since the last fix so we don't fight their gestures.
+        if (_followBus) _centerOnBus(fix);
       });
     } catch (_) {
       // Silent — distance pills just won't update.
@@ -362,6 +396,28 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                 (c[0] as num).toDouble(),
               ))
           .toList();
+      // OSRM snaps each waypoint to the nearest road, so the geometry's
+      // endpoints sit on the street — typically 10-30 m from a home pin
+      // inside a compound. Replace the closest geometry vertex of every
+      // waypoint with the pin's actual coordinate so the visible line
+      // touches the home / school marker instead of stopping short.
+      if (pts.length >= 2) {
+        for (final wp in waypoints) {
+          var bestIdx = 0;
+          var bestDistSq = double.infinity;
+          final kx = math.cos(wp.latitude * math.pi / 180.0);
+          for (var i = 0; i < pts.length; i++) {
+            final dLat = pts[i].latitude - wp.latitude;
+            final dLng = (pts[i].longitude - wp.longitude) * kx;
+            final d = dLat * dLat + dLng * dLng;
+            if (d < bestDistSq) {
+              bestDistSq = d;
+              bestIdx = i;
+            }
+          }
+          pts[bestIdx] = wp;
+        }
+      }
       // OSRM returns the total drive time in seconds at routes[0].duration.
       // We display it as the ETA pill on the map header.
       final duration = (first['duration'] as num?)?.toDouble();
@@ -385,8 +441,14 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
     }
   }
 
+  /// Fit the full route polyline into view. Used once at startup so the
+  /// driver gets a sense of the whole leg before the first GPS fix kicks
+  /// the camera into follow-cam mode. Skipped after a fix arrives —
+  /// re-fetches of the route would otherwise yank the camera back to a
+  /// wide view every time the assistant marked a student boarded.
   void _fitBounds() {
     if (_route.length < 2) return;
+    if (_currentPos != null) return;
     final bounds = LatLngBounds.fromPoints(_route);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -411,6 +473,14 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
             interactionOptions: const InteractionOptions(
               flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
             ),
+            // Any user-driven pan / zoom disengages follow mode so we
+            // don't yank the map back as soon as the driver tries to
+            // peek ahead. The recenter button re-engages it.
+            onPositionChanged: (pos, hasGesture) {
+              if (hasGesture && _followBus) {
+                setState(() => _followBus = false);
+              }
+            },
           ),
           children: [
             TileLayer(
@@ -510,7 +580,58 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
             right: 14,
             child: _ErrorChip(text: _error!),
           ),
+
+        // Recenter button: shows only once we have a GPS fix to snap to.
+        // Highlighted while follow mode is engaged so the driver knows
+        // the camera is locked to them; pressing it after a manual pan
+        // re-engages follow + jumps to the bus.
+        if (_currentPos != null)
+          Positioned(
+            right: 14,
+            bottom: 220,
+            child: _RecenterBtn(
+              active: _followBus,
+              onTap: _recenterOnBus,
+            ),
+          ),
       ],
+    );
+  }
+}
+
+/// Floating "snap-to-bus" button. Renders with a tinted highlight while
+/// follow-cam is engaged so the driver can tell whether tapping it would
+/// change anything (it's still tappable to re-snap after a small drift).
+class _RecenterBtn extends StatelessWidget {
+  const _RecenterBtn({required this.active, required this.onTap});
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: active ? AppColors.blue : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: active ? AppColors.blue : AppColors.slate200,
+        ),
+      ),
+      shadowColor: Colors.black.withValues(alpha: 0.12),
+      elevation: 3,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: SizedBox(
+          width: 42,
+          height: 42,
+          child: Icon(
+            Icons.my_location,
+            size: 19,
+            color: active ? Colors.white : AppColors.slate700,
+          ),
+        ),
+      ),
     );
   }
 }
