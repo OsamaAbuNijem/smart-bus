@@ -524,7 +524,10 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
             initialCenter: widget.stops.first.point,
             initialZoom: 13,
             interactionOptions: const InteractionOptions(
-              flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+              // Rotation enabled so the driver can swivel the map to
+              // match the heading of the bus / road they're on — easier
+              // to read at a glance than a fixed-north view.
+              flags: InteractiveFlag.all,
             ),
             // Any user-driven pan / zoom disengages follow mode so we
             // don't yank the map back as soon as the driver tries to
@@ -1024,6 +1027,10 @@ class _StopsListSheet extends StatelessWidget {
                                     ordered[i].point)),
                         isLive: currentPos != null,
                         isMorning: isMorning,
+                        // Highlight the bus's next stop — first row when
+                        // it's actually upcoming. If every stop has been
+                        // handled the list reverts to default styling.
+                        isNext: i == 0 && upcoming(ordered[0]),
                       ),
                     );
                   },
@@ -1044,6 +1051,7 @@ class _StopRow extends StatelessWidget {
     required this.legKm,
     required this.isMorning,
     this.isLive = false,
+    this.isNext = false,
   });
   final int step;
   final _Stop stop;
@@ -1053,6 +1061,11 @@ class _StopRow extends StatelessWidget {
   final double? legKm;
   final bool isMorning;
   final bool isLive;
+  /// True for the bus's upcoming destination (first row in the list when
+  /// it hasn't been handled yet). Renders with a yellow-tinted background,
+  /// thicker yellow border, and a small soft glow so the driver can spot
+  /// "where I'm headed right now" at a glance.
+  final bool isNext;
 
   @override
   Widget build(BuildContext context) {
@@ -1060,13 +1073,27 @@ class _StopRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: isSchool ? AppColors.blueSoft : AppColors.slate50,
+        color: isNext
+            ? AppColors.yellowTint
+            : (isSchool ? AppColors.blueSoft : AppColors.slate50),
         borderRadius: BorderRadius.circular(11),
         border: Border.all(
-          color: isSchool
-              ? AppColors.blue.withValues(alpha: 0.3)
-              : AppColors.slate100,
+          color: isNext
+              ? AppColors.yellowDeep
+              : (isSchool
+                  ? AppColors.blue.withValues(alpha: 0.3)
+                  : AppColors.slate100),
+          width: isNext ? 1.5 : 1,
         ),
+        boxShadow: isNext
+            ? [
+                BoxShadow(
+                  color: AppColors.yellow.withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 3),
+                ),
+              ]
+            : null,
       ),
       child: Row(
         children: [
@@ -1075,17 +1102,24 @@ class _StopRow extends StatelessWidget {
             height: 26,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isSchool ? AppColors.blue : AppColors.ink,
+              // Next row's step badge flips to yellow so the leading
+              // edge of the row matches the row-level highlight.
+              color: isNext
+                  ? AppColors.yellowDeep
+                  : (isSchool ? AppColors.blue : AppColors.ink),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(
-              '$step',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ),
+            child: isNext
+                ? const Icon(Icons.navigation_rounded,
+                    size: 14, color: Colors.white)
+                : Text(
+                    '$step',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
           ),
           const SizedBox(width: 10),
           Expanded(
