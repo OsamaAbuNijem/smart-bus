@@ -187,6 +187,9 @@ public class StudentsController : AdminControllerBase
             return StatusCode(400, new { result = _l["Student_ImportNoFile"].Value });
 
         int imported = 0, failed = 0;
+        // Hoist the per-row errors list outside the try so the success-
+        // path code that appends it to the toast message can see it.
+        var rowErrors = new List<string>();
         try
         {
             using var stream = file.OpenReadStream();
@@ -236,6 +239,11 @@ public class StudentsController : AdminControllerBase
                     fullName, fullEn, nat, DefaultGrade, parentName, phone));
             }
 
+            // Capture per-row errors from the API so we can surface them
+            // to the admin instead of just showing "Failed: N". Without
+            // this, a parent-upsert failure (invalid phone, identity
+            // policy, etc.) silently rolls every student row into the
+            // failed bucket with no hint why.
             if (bulkRows.Count > 0)
             {
                 var (ok, result, error) = await ApiClient.BulkUpsertStudentsAsync(bulkRows);
@@ -243,11 +251,19 @@ public class StudentsController : AdminControllerBase
                 {
                     imported += result.Created + result.Updated;
                     failed   += result.Failed;
+                    if (result.Errors is { Count: > 0 })
+                    {
+                        rowErrors.AddRange(result.Errors);
+                        _logger.LogWarning(
+                            "Bulk-upsert reported {Count} per-row errors. First: {First}",
+                            result.Errors.Count, result.Errors[0]);
+                    }
                 }
                 else
                 {
                     _logger.LogWarning("Bulk-upsert returned an error: {Error}", error);
                     failed += bulkRows.Count;
+                    if (!string.IsNullOrWhiteSpace(error)) rowErrors.Add(error);
                 }
             }
         }
@@ -258,6 +274,18 @@ public class StudentsController : AdminControllerBase
         }
 
         var message = string.Format(_l["Student_ImportResult"].Value, imported, failed);
+        // Append the first few error reasons so the admin can act on the
+        // failure without digging through server logs. Capped at 3 entries
+        // to keep the toast readable when every row fails the same way.
+        if (rowErrors.Count > 0)
+        {
+            var top = rowErrors
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(3)
+                .ToList();
+            message += " — " + string.Join(" | ", top);
+            if (rowErrors.Count > top.Count) message += $" (+{rowErrors.Count - top.Count})";
+        }
         return await SuccessWithList(message, page: 1, null, null);
     }
 
