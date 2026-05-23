@@ -77,8 +77,12 @@
     };
     var sbToday = DateTime.UtcNow.Date;
     string sbStatusKey;
+    // Treat IsActive=false the same as a past expiration — both show as
+    // "Expired" to the school admin. The internal "Disabled" state was
+    // visually distinct but operationally identical (the plan isn't
+    // serving the school) and just made the chip ambiguous.
     if (Model.SubscriptionType is null)                                  sbStatusKey = "Admin_Settings_Plan_None";
-    else if (Model.SubscriptionIsActive == false)                        sbStatusKey = "Admin_Settings_Plan_Disabled";
+    else if (Model.SubscriptionIsActive == false)                        sbStatusKey = "Admin_Settings_Plan_Expired";
     else if (Model.SubscriptionActivationDate?.Date > sbToday)           sbStatusKey = "Admin_Settings_Plan_Future";
     else if (Model.SubscriptionExpirationDate?.Date < sbToday)           sbStatusKey = "Admin_Settings_Plan_Expired";
     else                                                                  sbStatusKey = "Admin_Settings_Plan_Live";

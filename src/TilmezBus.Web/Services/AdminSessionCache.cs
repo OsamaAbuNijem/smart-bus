@@ -48,6 +48,24 @@ public static class AdminSessionCache
         catch { return null; }
     }
 
+    /// <summary>Projects a fresh school DTO into a SessionSubscription.
+    /// Used by AdminControllerBase.PopulateAsync to bypass the session
+    /// cache for the subscription block so DB updates (super-admin
+    /// extending the expiry, status flip) show up on the next page load
+    /// instead of waiting for the session to expire.</summary>
+    public static SessionSubscription? BuildSubscription(SchoolDto? school)
+    {
+        if (school is null) return null;
+        return new SessionSubscription(
+            school.LastSubscriptionActivationDate,
+            school.LastSubscriptionExpirationDate,
+            school.LastSubscriptionType,
+            school.LastSubscriptionIsActive,
+            school.LastSubscriptionMaxStudents,
+            school.LastSubscriptionMaxBuses,
+            school.LastSubscriptionPrice);
+    }
+
     /// <summary>Hydrates the subscription fields on any admin view model.</summary>
     public static void ApplySubscription(AdminPageViewModel vm, SessionSubscription? s)
     {

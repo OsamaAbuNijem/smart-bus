@@ -26,16 +26,27 @@ public abstract class AdminControllerBase : Controller
         vm.PageTitle  = pageTitle;
 
         var name = HttpContext.Session.GetString("SchoolName");
-        var sub  = AdminSessionCache.ReadSubscription(HttpContext.Session);
 
-        // Cache miss — fetch the school once and stash the full snapshot
-        // (name + city + subscription) so subsequent renders are free.
-        if (name is null || sub is null)
+        // The subscription part of the sidebar must reflect the latest DB
+        // state — when the SuperAdmin extends the expiry (or it lapses
+        // naturally) the sidebar should pick it up on the next page load,
+        // not after the admin logs out. So we always refetch the school
+        // snapshot here when the subscription isn't cached for THIS
+        // request, and we never persist the sub block across requests.
+        // Name + city are stable so they still get cached after the first
+        // /schools/current hit.
+        SessionSubscription? sub = null;
+        if (name is null)
         {
             var school = await ApiClient.GetMySchoolAsync();
             AdminSessionCache.StashSchoolInSession(HttpContext.Session, school);
             name = school?.Name ?? string.Empty;
-            sub  = AdminSessionCache.ReadSubscription(HttpContext.Session);
+            sub  = AdminSessionCache.BuildSubscription(school);
+        }
+        else
+        {
+            var school = await ApiClient.GetMySchoolAsync();
+            sub = AdminSessionCache.BuildSubscription(school);
         }
 
         vm.SchoolName = name ?? string.Empty;
