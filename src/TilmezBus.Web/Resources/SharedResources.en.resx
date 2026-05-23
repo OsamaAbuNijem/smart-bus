@@ -477,6 +477,7 @@
   <data name="Student_Loading"     xml:space="preserve"><value>Loading...</value></data>
   <data name="Student_ColNumber"   xml:space="preserve"><value>#</value></data>
   <data name="Student_ColStudent"  xml:space="preserve"><value>Student</value></data>
+  <data name="Student_ColNationalNumber" xml:space="preserve"><value>National No.</value></data>
   <data name="Student_ColGrade"    xml:space="preserve"><value>Grade</value></data>
   <data name="Student_ColParent"   xml:space="preserve"><value>Parent</value></data>
   <data name="Student_ColPhone"    xml:space="preserve"><value>Phone</value></data>
