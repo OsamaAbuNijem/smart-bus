@@ -743,17 +743,6 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
             child: _ErrorChip(text: _error!),
           ),
 
-        // Emergency call: tap dials the school's main phone number
-        // (fetched live from `myFleetSchoolProvider`). Disabled when no
-        // phone is on file. Anchored at the top-left, just under the
-        // back button + route summary row, so the driver's hand can
-        // reach it instantly without going past the stops sheet.
-        const Positioned(
-          left: 14,
-          top: 110,
-          child: _EmergencyCallBtn(),
-        ),
-
         // Recenter button: shows only once we have a GPS fix to snap to.
         // Highlighted while follow mode is engaged so the driver knows
         // the camera is locked to them; pressing it after a manual pan
@@ -1105,6 +1094,15 @@ class _RouteSummaryCard extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          // SOS chip slotted under the boarding-progress row so the
+          // emergency button rides with the route summary card — driver
+          // sees one tidy header block with progress + emergency action,
+          // no floating button competing with the map markers.
+          const SizedBox(height: 8),
+          const Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: _EmergencyCallBtn(),
           ),
         ],
       ),
