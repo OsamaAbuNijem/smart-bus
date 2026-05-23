@@ -8,11 +8,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:tilmez_bus/core/errors/failures.dart';
 import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/parent/domain/entities/student_info.dart';
 import 'package:tilmez_bus/features/parent/presentation/providers/parent_controllers.dart';
-import 'package:tilmez_bus/features/parent/presentation/providers/student_edit_controller.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 class StudentInfoScreen extends ConsumerWidget {
@@ -35,7 +33,7 @@ class StudentInfoScreen extends ConsumerWidget {
   }
 }
 
-class _Form extends ConsumerStatefulWidget {
+class _Form extends ConsumerWidget {
   const _Form({
     required this.info,
     required this.studentId,
@@ -46,65 +44,10 @@ class _Form extends ConsumerStatefulWidget {
   final AppLocalizations l;
 
   @override
-  ConsumerState<_Form> createState() => _FormState();
-}
-
-class _FormState extends ConsumerState<_Form> {
-  late final TextEditingController _notesCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _notesCtrl = TextEditingController(text: widget.info.notes ?? '');
-  }
-
-  @override
-  void dispose() {
-    _notesCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    final l = widget.l;
-    final info = widget.info;
-    FocusScope.of(context).unfocus();
-    // Only the note is editable on this screen — every other field is read
-    // from the persisted info, so we pass them through unchanged.
-    final ok = await ref
-        .read(studentEditControllerProvider(widget.studentId).notifier)
-        .save(
-          fullName: info.fullName,
-          grade: info.grade,
-          className: info.className,
-          notes: _notesCtrl.text.trim().isEmpty
-              ? null
-              : _notesCtrl.text.trim(),
-          parentName: info.parent?.name ?? '',
-          parentPhone: info.parent?.phoneNumber ?? '',
-        );
-    if (!mounted) return;
-    if (ok) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l.studentEditSaved)));
-      return;
-    }
-    final err =
-        ref.read(studentEditControllerProvider(widget.studentId)).error;
-    final msg = switch (err) {
-      ValidationFailure(:final message) when message.isNotEmpty => message,
-      Failure() => l.studentEditFailed,
-      _ => l.studentEditFailed,
-    };
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l = widget.l;
-    final info = widget.info;
-    final saving =
-        ref.watch(studentEditControllerProvider(widget.studentId)).isLoading;
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Pure read-only viewer — the driver-notes editor used to live here
+    // but parents no longer manage it from the app, so the screen is now
+    // a snapshot of the persisted student profile.
     return Column(
       children: [
         _Hero(l: l, onBack: () => context.pop()),
@@ -164,27 +107,8 @@ class _FormState extends ConsumerState<_Form> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
-              _SectionTitle(text: l.studentEditNotes),
-              const SizedBox(height: 8),
-              _Card(
-                children: [
-                  _TextAreaField(
-                    icon: Icons.description_outlined,
-                    label: l.studentEditDriverNote,
-                    controller: _notesCtrl,
-                    enabled: !saving,
-                    hint: l.studentEditNotesHint,
-                  ),
-                ],
-              ),
             ],
           ),
-        ),
-        _SaveBar(
-          saveText: l.studentEditSave,
-          saving: saving,
-          onSave: saving ? null : _save,
         ),
       ],
     );
@@ -496,120 +420,6 @@ class _ReadOnlyField extends StatelessWidget {
           fontWeight: FontWeight.w700,
           color: AppColors.slate500,
           letterSpacing: 0.2,
-        ),
-      ),
-    );
-  }
-}
-
-class _TextAreaField extends StatelessWidget {
-  const _TextAreaField({
-    required this.icon,
-    required this.label,
-    required this.controller,
-    required this.enabled,
-    this.hint,
-  });
-  final IconData icon;
-  final String label;
-  final TextEditingController controller;
-  final bool enabled;
-  final String? hint;
-
-  @override
-  Widget build(BuildContext context) {
-    return _FieldShell(
-      icon: icon,
-      label: label,
-      child: TextField(
-        controller: controller,
-        enabled: enabled,
-        maxLines: 3,
-        minLines: 2,
-        style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: AppColors.ink,
-          height: 1.45,
-          letterSpacing: -0.1,
-        ),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(
-            color: AppColors.slate400,
-            fontWeight: FontWeight.w500,
-          ),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          contentPadding: EdgeInsets.zero,
-          isDense: true,
-          filled: false,
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Save bar ──────────────────────────────────────────────────────
-
-class _SaveBar extends StatelessWidget {
-  const _SaveBar({
-    required this.saveText,
-    required this.saving,
-    required this.onSave,
-  });
-  final String saveText;
-  final bool saving;
-  final VoidCallback? onSave;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.slate100)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: FilledButton(
-            onPressed: onSave,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.yellow,
-              foregroundColor: AppColors.ink,
-              disabledBackgroundColor:
-                  AppColors.yellow.withValues(alpha: 0.45),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(13),
-              ),
-              textStyle: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.2,
-              ),
-            ),
-            child: saving
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.4,
-                      color: AppColors.ink,
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.check, size: 14, color: AppColors.ink),
-                      const SizedBox(width: 7),
-                      Text(saveText),
-                    ],
-                  ),
-          ),
         ),
       ),
     );
