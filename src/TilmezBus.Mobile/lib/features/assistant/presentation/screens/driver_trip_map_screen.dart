@@ -919,28 +919,43 @@ class _EmergencyCallBtn extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final phone = ref.watch(myFleetSchoolProvider).valueOrNull?.phoneNumber;
     final enabled = phone != null && phone.isNotEmpty;
+    // Pill-shaped red chip with the universal medical/emergency cross
+    // glyph + "SOS" label — much more readable as "this dials emergency"
+    // than the previous icon-only square. White-on-red contrast plus a
+    // red glow shadow draws the eye for an actual emergency case.
     return Material(
-      color: enabled ? const Color(0xFFE11D48) : AppColors.slate200,
+      color: enabled ? const Color(0xFFDC2626) : AppColors.slate200,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(100),
         side: BorderSide(
-          color: enabled ? const Color(0xFFE11D48) : AppColors.slate300,
+          color: enabled ? const Color(0xFF991B1B) : AppColors.slate300,
+          width: 1.5,
         ),
       ),
       shadowColor: enabled
-          ? const Color(0xFFE11D48).withValues(alpha: 0.45)
+          ? const Color(0xFFDC2626).withValues(alpha: 0.55)
           : Colors.black.withValues(alpha: 0.12),
-      elevation: enabled ? 4 : 1,
+      elevation: enabled ? 6 : 1,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(100),
         onTap: enabled ? () => _call(phone) : null,
-        child: const SizedBox(
-          width: 42,
-          height: 42,
-          child: Icon(
-            Icons.emergency_share_rounded,
-            size: 19,
-            color: Colors.white,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.emergency, size: 18, color: Colors.white),
+              SizedBox(width: 6),
+              Text(
+                'SOS',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
           ),
         ),
       ),
