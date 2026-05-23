@@ -1320,31 +1320,37 @@ class _PinMarker extends StatelessWidget {
   /// True for the upcoming student pin — the bus's next stop. Renders
   /// larger with a yellow halo so the driver picks it out at a glance.
   final bool isNext;
+
+  /// Student pins match the bus marker's disc size (24 px) so all map
+  /// icons read at the same visual weight. The "next" pin scales up to
+  /// 36 px with a halo for emphasis without ballooning past the bus.
+  static const double _studentDisc = 24.0;
+  static const double _nextDisc = 36.0;
+
   @override
   Widget build(BuildContext context) {
     final isSchool = stop.kind == _StopKind.school;
+    // Student pins are now blue (same family as the route polyline and
+    // the parent live-map's bus theming) instead of the previous yellow
+    // — keeps the map palette consistent: yellow for the BUS, blue for
+    // students, emerald for "done", and the school stays blue too with
+    // the school icon to disambiguate.
     final fill = stop.dropped
         ? AppColors.emerald
-        : (isSchool ? AppColors.blue : AppColors.yellowDeep);
-    // Student pins now carry a person icon instead of an integer step
-    // number — the visit order is already conveyed by the stops list
-    // below and the highlight on the next pin, so the number was
-    // redundant and a bit cryptic against the map.
-    final Widget innerIcon = stop.dropped
-        ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
-        : (isSchool
-            ? const Icon(Icons.school_rounded,
-                size: 14, color: Colors.white)
-            : const Icon(Icons.person_rounded,
-                size: 16, color: Colors.white));
-    final discSize = isNext ? 40.0 : 32.0;
+        : AppColors.blue;
+    final discSize = isNext ? _nextDisc : _studentDisc;
+    final iconSize = isNext ? 20.0 : 14.0;
+    final IconData glyph = stop.dropped
+        ? Icons.check_rounded
+        : (isSchool ? Icons.school_rounded : Icons.person_rounded);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Stack(
           alignment: Alignment.center,
           children: [
-            // Halo only renders for the next pin — soft yellow glow.
+            // Halo only renders for the next pin — soft yellow glow so
+            // it pops against the blue disc.
             if (isNext)
               Container(
                 width: discSize + 14,
@@ -1375,17 +1381,7 @@ class _PinMarker extends StatelessWidget {
                   ),
                 ],
               ),
-              child: isNext
-                  ? Icon(
-                      stop.dropped
-                          ? Icons.check_rounded
-                          : (isSchool
-                              ? Icons.school_rounded
-                              : Icons.person_rounded),
-                      size: 20,
-                      color: Colors.white,
-                    )
-                  : innerIcon,
+              child: Icon(glyph, size: iconSize, color: Colors.white),
             ),
           ],
         ),
