@@ -4,7 +4,7 @@
 
 @if (Model is null || !Model.Items.Any())
 {
-    <tr><td colspan="8" class="u-empty-state">@L["Student_None"]</td></tr>
+    <tr><td colspan="9" class="u-empty-state">@L["Student_None"]</td></tr>
 }
 else
 {
@@ -28,6 +28,30 @@ else
             <td><div class="td-sub">@s.ParentName</div></td>
             <td dir="ltr" style="text-align:start;"><div class="td-sub">@s.ParentPhone</div></td>
             <td><div class="td-sub">@(string.IsNullOrEmpty(s.HomeArea) ? "—" : s.HomeArea)</div></td>
+            <td>
+                @if (s.Latitude.HasValue && s.Longitude.HasValue)
+                {
+                    // Render the coordinates LTR so "(31.95, 35.93)" doesn't
+                    // flip in Arabic locale, and link to Google Maps for a
+                    // one-click verification of the home pin the parent saved.
+                    var lat = s.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    var lng = s.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    <a class="td-sub" dir="ltr" style="text-align:start; display:inline-flex; align-items:center; gap:4px;"
+                       href="https://www.google.com/maps/search/?api=1&query=@lat,@lng"
+                       target="_blank" rel="noopener"
+                       aria-label="@string.Format(L["Student_LocationAriaOpen"].Value, displayName)">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>@lat.Substring(0, Math.Min(7, lat.Length)), @lng.Substring(0, Math.Min(7, lng.Length))</span>
+                    </a>
+                }
+                else
+                {
+                    <div class="td-sub">—</div>
+                }
+            </td>
             <td><div class="td-sub">@s.CreatedAt.ToString("dd MMM yyyy")</div></td>
             <td>
                 <div class="tbl-actions">
