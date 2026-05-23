@@ -188,13 +188,16 @@ class _MapView extends StatelessWidget {
     return result;
   }
 
-  /// Squared planar distance is enough for ranking nearest neighbours over
-  /// city-scale distances; no need to invoke the haversine formula here.
-  double _sqDist(LatLng a, LatLng b) {
-    final dx = a.latitude - b.latitude;
-    final dy = a.longitude - b.longitude;
-    return dx * dx + dy * dy;
-  }
+}
+
+/// Squared planar distance is enough for ranking nearest neighbours over
+/// city-scale distances; no need to invoke the haversine formula here.
+/// Hoisted to file scope so [_RoutedMapState] can reuse the same metric
+/// when re-ordering stops from the GPS anchor.
+double _sqDist(LatLng a, LatLng b) {
+  final dx = a.latitude - b.latitude;
+  final dy = a.longitude - b.longitude;
+  return dx * dx + dy * dy;
 }
 
 class _RoutedMap extends ConsumerStatefulWidget {
@@ -229,6 +232,12 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
   /// points along the street the bus is travelling on. Null until the
   /// device has a valid heading (stationary devices report -1 / NaN).
   double? _currentHeadingDeg;
+  /// Anchor used to sort the visit order of the active stops. Locked to
+  /// the device's FIRST GPS fix on entering the screen so the order
+  /// matches "from where the assistant / driver is standing when the
+  /// trip starts" — and stays stable as the bus moves through the
+  /// trip rather than re-shuffling every poll.
+  LatLng? _orderAnchor;
   StreamSubscription<Position>? _posSub;
   /// Total driving duration for the active route, in seconds, as reported
   /// by OSRM. Null until the first successful fetch.
@@ -315,6 +324,12 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
           _currentPos = fix;
           _currentSpeedMps = speedMps;
           if (hadingValid) _currentHeadingDeg = p.heading;
+          // First GPS fix locks the route-ordering anchor — students
+          // are visited in nearest-neighbour order starting from this
+          // position. Both the assistant and the driver, who are on
+          // the same bus, will anchor on very nearly the same point
+          // and see the same visit order in their bottom-sheet grids.
+          _orderAnchor ??= fix;
         });
         // Only refetch the polyline when the bus has actually left the
         // cached route — otherwise the line flickers/redirects on every
@@ -353,13 +368,38 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
     }
   }
 
+  /// The full stops list re-ordered by greedy nearest-neighbour starting
+  /// from [_orderAnchor]. School (if present) stays at the end of the
+  /// chain for Morning trips, matching the original _buildStops logic.
+  /// Falls back to the widget's incoming order until the first GPS fix
+  /// has set the anchor.
+  List<_Stop> get _orderedStops {
+    final anchor = _orderAnchor;
+    if (anchor == null) return widget.stops;
+    final school =
+        widget.stops.where((s) => s.kind == _StopKind.school).toList();
+    final homes =
+        widget.stops.where((s) => s.kind == _StopKind.home).toList();
+    if (homes.isEmpty) return widget.stops;
+    final result = <_Stop>[];
+    final remaining = [...homes];
+    var cursor = anchor;
+    while (remaining.isNotEmpty) {
+      remaining.sort((a, b) => _sqDist(a.point, cursor)
+          .compareTo(_sqDist(b.point, cursor)));
+      result.add(remaining.removeAt(0));
+      cursor = result.last.point;
+    }
+    return [...result, ...school];
+  }
+
   /// Stops the bus still needs to drive to. We drop:
   ///   • Boarded students (Morning) — already on the bus.
   ///   • Dropped students (Return)  — already arrived home.
   /// The school stays in either list since it's still a destination on
   /// Morning trips and the origin for Return.
   List<_Stop> get _activeStops =>
-      widget.stops.where((s) => !s.boarded && !s.dropped).toList();
+      _orderedStops.where((s) => !s.boarded && !s.dropped).toList();
 
   bool _sameActiveStops(List<_Stop> oldAll, List<_Stop> newAll) {
     bool active(_Stop s) => !s.boarded && !s.dropped;
@@ -613,7 +653,7 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                   Expanded(
                     child: _RouteSummaryCard(
                       details: widget.details,
-                      stops: widget.stops,
+                      stops: _orderedStops,
                       l: widget.l,
                     ),
                   ),
@@ -629,7 +669,9 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
           right: 0,
           bottom: 0,
           child: _StopsListSheet(
-            stops: widget.stops,
+            // Render the GPS-anchored order so the row sequence matches
+            // the pin order on the map and the route line above.
+            stops: _orderedStops,
             currentPos: _currentPos,
             isMorning: widget.details.isMorning,
             l: widget.l,
