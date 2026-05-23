@@ -560,12 +560,21 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                 for (var i = 0; i < _activeStops.length; i++)
                   Marker(
                     point: _activeStops[i].point,
-                    width: 44,
-                    height: 56,
+                    // Next pin uses a wider/taller marker to fit the
+                    // enlarged disc + glow without clipping at the edges.
+                    width: i == 0 ? 56 : 44,
+                    height: i == 0 ? 68 : 56,
                     alignment: Alignment.topCenter,
                     child: _PinMarker(
-                      step: i + 1,
                       stop: _activeStops[i],
+                      // Highlight the bus's next stop so the driver can
+                      // pick it out at a glance — first item in the
+                      // active list is whoever they're driving to right
+                      // now. School and dropped stops keep their default
+                      // appearance.
+                      isNext: i == 0 &&
+                          _activeStops[i].kind != _StopKind.school &&
+                          !_activeStops[i].dropped,
                     ),
                   ),
                 if (_currentPos != null)
@@ -1306,54 +1315,84 @@ double _minMetersToPolyline(LatLng p, List<LatLng> line) {
 }
 
 class _PinMarker extends StatelessWidget {
-  const _PinMarker({required this.step, required this.stop});
-  final int step;
+  const _PinMarker({required this.stop, this.isNext = false});
   final _Stop stop;
+  /// True for the upcoming student pin — the bus's next stop. Renders
+  /// larger with a yellow halo so the driver picks it out at a glance.
+  final bool isNext;
   @override
   Widget build(BuildContext context) {
     final isSchool = stop.kind == _StopKind.school;
     final fill = stop.dropped
         ? AppColors.emerald
         : (isSchool ? AppColors.blue : AppColors.yellowDeep);
+    // Student pins now carry a person icon instead of an integer step
+    // number — the visit order is already conveyed by the stops list
+    // below and the highlight on the next pin, so the number was
+    // redundant and a bit cryptic against the map.
+    final Widget innerIcon = stop.dropped
+        ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
+        : (isSchool
+            ? const Icon(Icons.school_rounded,
+                size: 14, color: Colors.white)
+            : const Icon(Icons.person_rounded,
+                size: 16, color: Colors.white));
+    final discSize = isNext ? 40.0 : 32.0;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 32,
-          height: 32,
+        Stack(
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: fill,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2.5),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x40000000),
-                blurRadius: 8,
-                offset: Offset(0, 3),
+          children: [
+            // Halo only renders for the next pin — soft yellow glow.
+            if (isNext)
+              Container(
+                width: discSize + 14,
+                height: discSize + 14,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.yellow.withValues(alpha: 0.30),
+                ),
               ),
-            ],
-          ),
-          child: stop.dropped
-              ? const Icon(Icons.check_rounded,
-                  size: 16, color: Colors.white)
-              : (isSchool
-                  ? const Icon(Icons.school_rounded,
-                      size: 14, color: Colors.white)
-                  : Text(
-                      '$step',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1,
-                      ),
-                    )),
+            Container(
+              width: discSize,
+              height: discSize,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: fill,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: isNext ? 3 : 2.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isNext
+                        ? AppColors.yellow.withValues(alpha: 0.45)
+                        : const Color(0x40000000),
+                    blurRadius: isNext ? 12 : 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: isNext
+                  ? Icon(
+                      stop.dropped
+                          ? Icons.check_rounded
+                          : (isSchool
+                              ? Icons.school_rounded
+                              : Icons.person_rounded),
+                      size: 20,
+                      color: Colors.white,
+                    )
+                  : innerIcon,
+            ),
+          ],
         ),
         Padding(
           padding: const EdgeInsets.only(top: 2),
           child: CustomPaint(
-            size: const Size(10, 6),
+            size: Size(isNext ? 12 : 10, isNext ? 8 : 6),
             painter: _PinTipPainter(color: fill),
           ),
         ),
