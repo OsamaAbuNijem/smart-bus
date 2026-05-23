@@ -62,9 +62,15 @@ try
         options.Cookie.IsEssential = true;
     });
 
+    // Resolve once so we can both pass it to HttpClient and surface it in
+    // the boot log. This has bitten us when a Web container shipped with
+    // a stale appsettings.json still pointing at localhost while the API
+    // was running on a different host.
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7100/";
+    Log.Information("ApiClient BaseAddress = {ApiBaseUrl}", apiBaseUrl);
     builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
     {
-        client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7100/");
+        client.BaseAddress = new Uri(apiBaseUrl);
     });
 
     builder.Services.AddHttpClient("ApiProxy", client =>

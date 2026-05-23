@@ -191,11 +191,18 @@ public class ApiClient : IApiClient
         var json = JsonSerializer.Serialize(payload, _jsonOptions);
         using var content = new StringContent(json, Encoding.UTF8, "application/json");
         using var req = AuthorizedRequest(HttpMethod.Post, "api/v1/students/bulk-upsert", content);
+        // Log the resolved absolute URL up front so admins can confirm
+        // from server logs that the import is hitting the prod API and
+        // not a stale localhost / staging address.
+        _logger.LogInformation("Bulk-upsert students → {Url} ({Count} rows)",
+            req.RequestUri, rows.Count);
         using var response = await _httpClient.SendAsync(req);
         var body = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning("Bulk-upsert students failed. Status={Status} Body={Body}", response.StatusCode, body);
+            _logger.LogWarning(
+                "Bulk-upsert students failed. Url={Url} Status={Status} Body={Body}",
+                req.RequestUri, response.StatusCode, body);
             return (false, null, ExtractError(body));
         }
         var result = JsonSerializer.Deserialize<TilmezBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentsResult>(body, _jsonOptions);
