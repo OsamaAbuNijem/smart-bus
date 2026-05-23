@@ -229,6 +229,7 @@
   "liveTrackingSpeed": "Speed",
   "liveTrackingArrives": "Arrives",
   "liveTrackingDriver": "Driver",
+  "liveTrackingCall": "Call",
   "liveTrackingAssistant": "Assistant",
   "liveTrackingNoCrew": "Crew not assigned yet",
   "liveTrackingLastUpdated": "Last updated {when}",

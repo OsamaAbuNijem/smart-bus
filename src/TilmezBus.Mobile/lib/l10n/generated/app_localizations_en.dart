@@ -641,6 +641,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveTrackingDriver => 'Driver';
 
   @override
+  String get liveTrackingCall => 'Call';
+
+  @override
   String get liveTrackingAssistant => 'Assistant';
 
   @override

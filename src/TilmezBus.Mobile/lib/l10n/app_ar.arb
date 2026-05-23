@@ -220,6 +220,7 @@
   "liveTrackingSpeed": "السرعة",
   "liveTrackingArrives": "الوصول",
   "liveTrackingDriver": "السائق",
+  "liveTrackingCall": "اتصال",
   "liveTrackingAssistant": "المساعد",
   "liveTrackingNoCrew": "لم يُعيّن طاقم بعد",
   "liveTrackingLastUpdated": "آخر تحديث {when}",

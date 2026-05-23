@@ -636,6 +636,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get liveTrackingDriver => 'السائق';
 
   @override
+  String get liveTrackingCall => 'اتصال';
+
+  @override
   String get liveTrackingAssistant => 'المساعد';
 
   @override

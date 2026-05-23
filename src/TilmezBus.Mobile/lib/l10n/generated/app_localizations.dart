@@ -1322,6 +1322,12 @@ abstract class AppLocalizations {
   /// **'Driver'**
   String get liveTrackingDriver;
 
+  /// No description provided for @liveTrackingCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get liveTrackingCall;
+
   /// No description provided for @liveTrackingAssistant.
   ///
   /// In en, this message translates to:

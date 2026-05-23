@@ -1076,6 +1076,11 @@ class _StatTile extends StatelessWidget {
   }
 }
 
+/// Assistant contact card — parents reach the assistant on the bus, not
+/// the driver, so this is the only crew row we render. Polished layout:
+/// avatar with stronger yellow gradient, role pill above the name, phone
+/// number underneath, and a pair of call / WhatsApp action buttons with
+/// labels.
 class _CrewCard extends StatelessWidget {
   const _CrewCard({required this.data, required this.l});
   final LiveTracking data;
@@ -1083,70 +1088,48 @@ class _CrewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = <Widget>[];
-    if (data.driverName != null && data.driverName!.isNotEmpty) {
-      rows.add(_CrewRow(
-        role: l.liveTrackingDriver,
-        name: data.driverName!,
-        phone: data.driverPhone,
-        isDriver: true,
-      ));
-    }
-    if (data.assistantName != null && data.assistantName!.isNotEmpty) {
-      rows.add(_CrewRow(
-        role: l.liveTrackingAssistant,
-        name: data.assistantName!,
-        phone: data.assistantPhone,
-        isDriver: false,
-      ));
-    }
-    if (rows.isEmpty) {
-      rows.add(Padding(
-        padding: const EdgeInsets.all(14),
-        child: Text(
-          l.liveTrackingNoCrew,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.slate500,
-          ),
+    final name = data.assistantName;
+    final phone = data.assistantPhone;
+    if (name == null || name.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.slate200),
         ),
-      ));
-    }
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.slate200),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          for (var i = 0; i < rows.length; i++) ...[
-            if (i != 0)
-              const Divider(
-                height: 1,
-                thickness: 1,
-                color: AppColors.slate100,
+        child: Row(
+          children: [
+            const Icon(Icons.support_agent,
+                size: 18, color: AppColors.slate400),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l.liveTrackingNoCrew,
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.slate500,
+                ),
               ),
-            rows[i],
+            ),
           ],
-        ],
-      ),
-    );
+        ),
+      );
+    }
+    return _AssistantCard(name: name, phone: phone, l: l);
   }
 }
 
-class _CrewRow extends StatelessWidget {
-  const _CrewRow({
-    required this.role,
+class _AssistantCard extends StatelessWidget {
+  const _AssistantCard({
     required this.name,
     required this.phone,
-    required this.isDriver,
+    required this.l,
   });
-  final String role;
   final String name;
   final String? phone;
-  final bool isDriver;
+  final AppLocalizations l;
 
   Future<void> _call() async {
     if (phone == null) return;
@@ -1165,102 +1148,171 @@ class _CrewRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (gradient, fg) = isDriver
-        ? (
-            const LinearGradient(
-              colors: [Color(0xFFDBEAFE), Color(0xFF93C5FD)],
-            ),
-            const Color(0xFF1E40AF),
-          )
-        : (
-            const LinearGradient(
-              colors: [Color(0xFFFEF3C7), Color(0xFFFCD34D)],
-            ),
-            const Color(0xFF92400E),
-          );
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-      child: Row(
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFFBEB), Colors.white],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x66F5C518)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.yellow.withValues(alpha: 0.15),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: gradient,
-              border: Border.all(color: Colors.white, width: 1.5),
-              boxShadow: const [
-                BoxShadow(
-                  color: AppColors.slate200,
-                  blurRadius: 0,
-                  spreadRadius: 1.5,
-                ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              _initials(name),
-              style: TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w800,
-                color: fg,
-                letterSpacing: -0.3,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  role.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.slate400,
-                    letterSpacing: 0.6,
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.yellow, AppColors.yellowDeep],
                   ),
+                  border: Border.all(color: Colors.white, width: 2.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.yellow.withValues(alpha: 0.40),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                alignment: Alignment.center,
+                child: Text(
+                  _initials(name),
                   style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
                     color: AppColors.ink,
-                    letterSpacing: -0.1,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.yellowTint,
+                        borderRadius: BorderRadius.circular(100),
+                        border:
+                            Border.all(color: const Color(0x66F5C518)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.support_agent,
+                              size: 10, color: AppColors.yellowDeep),
+                          const SizedBox(width: 4),
+                          Text(
+                            l.liveTrackingAssistant.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.yellowDeep,
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.ink,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    if (phone != null && phone!.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.phone_outlined,
+                              size: 11, color: AppColors.slate500),
+                          const SizedBox(width: 4),
+                          Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Text(
+                              phone!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.slate500,
+                                letterSpacing: -0.1,
+                                fontFeatures: [
+                                  FontFeature.tabularFigures(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (phone != null && phone!.isNotEmpty) ...[
+            const SizedBox(height: 11),
+            Row(
+              children: [
+                Expanded(
+                  child: _CrewActionBtn(
+                    icon: Icons.message,
+                    label: 'WhatsApp',
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF34D399), Color(0xFF25D366)],
+                    ),
+                    foreground: Colors.white,
+                    shadow: const Color(0xFF25D366),
+                    onTap: _whatsapp,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _CrewActionBtn(
+                    icon: Icons.call,
+                    label: l.liveTrackingCall,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [AppColors.yellow, AppColors.yellowDeep],
+                    ),
+                    foreground: AppColors.ink,
+                    shadow: AppColors.yellow,
+                    onTap: _call,
                   ),
                 ),
               ],
-            ),
-          ),
-          if (phone != null) ...[
-            _CrewBtn(
-              icon: Icons.message,
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF34D399), Color(0xFF25D366)],
-              ),
-              foreground: Colors.white,
-              shadow: const Color(0xFF25D366),
-              onTap: _whatsapp,
-            ),
-            const SizedBox(width: 6),
-            _CrewBtn(
-              icon: Icons.call,
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [AppColors.yellow, AppColors.yellowDeep],
-              ),
-              foreground: AppColors.ink,
-              shadow: AppColors.yellow,
-              onTap: _call,
             ),
           ],
         ],
@@ -1269,15 +1321,19 @@ class _CrewRow extends StatelessWidget {
   }
 }
 
-class _CrewBtn extends StatelessWidget {
-  const _CrewBtn({
+/// Wide call/WhatsApp button with an icon + label. Stretches to fill its
+/// column so the two actions sit side-by-side with equal weight.
+class _CrewActionBtn extends StatelessWidget {
+  const _CrewActionBtn({
     required this.icon,
+    required this.label,
     required this.gradient,
     required this.foreground,
     required this.shadow,
     required this.onTap,
   });
   final IconData icon;
+  final String label;
   final Gradient gradient;
   final Color foreground;
   final Color shadow;
@@ -1292,20 +1348,35 @@ class _CrewBtn extends StatelessWidget {
         borderRadius: BorderRadius.circular(11),
         onTap: onTap,
         child: Ink(
-          width: 34,
-          height: 34,
+          height: 38,
           decoration: BoxDecoration(
             gradient: gradient,
             borderRadius: BorderRadius.circular(11),
             boxShadow: [
               BoxShadow(
-                color: shadow.withValues(alpha: 0.55),
+                color: shadow.withValues(alpha: 0.45),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Center(child: Icon(icon, size: 14, color: foreground)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 15, color: foreground),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: foreground,
+                  letterSpacing: -0.1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
