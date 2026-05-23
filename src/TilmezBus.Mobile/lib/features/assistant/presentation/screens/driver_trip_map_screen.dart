@@ -744,11 +744,12 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
           ),
 
         // Emergency call: tap dials the school's main phone number
-        // (fetched live from `myFleetSchoolProvider`). Disabled / hidden
-        // when no phone is on file. Sits above the recenter button so
-        // both fit comfortably above the bottom stops sheet.
+        // (fetched live from `myFleetSchoolProvider`). Disabled when no
+        // phone is on file. Pinned to the left edge (above the speed +
+        // ETA stats card) so it sits opposite the recenter / follow
+        // controls on the right and doesn't crowd them.
         const Positioned(
-          right: 14,
+          left: 14,
           bottom: 270,
           child: _EmergencyCallBtn(),
         ),
