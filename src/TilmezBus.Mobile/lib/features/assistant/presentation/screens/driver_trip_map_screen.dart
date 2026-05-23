@@ -13,9 +13,11 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:tilmez_bus/core/config/env.dart';
 import 'package:tilmez_bus/core/errors/failures.dart';
+import 'package:tilmez_bus/core/routing/app_router.dart';
 import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/assistant/data/models/trip_details_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/services/trip_location_broadcaster.dart';
+import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
@@ -43,6 +45,9 @@ class DriverTripMapScreen extends ConsumerStatefulWidget {
 
 class _DriverTripMapScreenState extends ConsumerState<DriverTripMapScreen> {
   Timer? _poll;
+  /// Set once we've shown the "Trip ended" dialog so a stale poll cycle
+  /// doesn't re-open it after the driver dismisses.
+  bool _tripEndedShown = false;
 
   @override
   void initState() {
@@ -64,10 +69,56 @@ class _DriverTripMapScreenState extends ConsumerState<DriverTripMapScreen> {
     super.dispose();
   }
 
+  /// One-shot dialog shown when the assistant flips the trip to Completed
+  /// while the driver still has the map open. Tapping Close drops the
+  /// driver back on their home screen and invalidates myTodayTripsProvider
+  /// so the list refreshes without a pull-to-refresh.
+  Future<void> _showTripEndedDialog() async {
+    if (_tripEndedShown || !mounted) return;
+    _tripEndedShown = true;
+    final l = AppLocalizations.of(context);
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.flag_circle, color: AppColors.emerald),
+            const SizedBox(width: 8),
+            Expanded(child: Text(l.liveTrackingTripEndedTitle)),
+          ],
+        ),
+        content: Text(l.liveTrackingTripEndedBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l.liveTrackingTripEndedClose),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    ref.invalidate(myTodayTripsProvider);
+    context.go(AppRoute.homeDriver);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final detailsAsync = ref.watch(tripDetailsProvider(widget.tripId));
+    // Watch for the Scheduled/InProgress → Completed transition so the
+    // driver gets a clear "trip ended" cue and lands back on home with
+    // a fresh trips list. Guarded by [_tripEndedShown] so it only fires
+    // once per screen mount.
+    ref.listen(
+      tripDetailsProvider(widget.tripId),
+      (_, next) {
+        next.whenData((d) {
+          if (d.status == 'Completed') {
+            unawaited(_showTripEndedDialog());
+          }
+        });
+      },
+    );
     return Scaffold(
       backgroundColor: Colors.white,
       body: detailsAsync.when(
