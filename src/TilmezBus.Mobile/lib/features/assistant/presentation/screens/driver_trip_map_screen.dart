@@ -978,19 +978,10 @@ class _StopsListSheet extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
-                  l.driverRouteOrderTitle,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.slate600,
-                    letterSpacing: 0.6,
-                  ),
-                ),
-              ),
+              // "Route order" title was removed — the drag handle above
+              // already signals this is the stops list, and each row is
+              // labelled with its visit-order number so the section
+              // header was redundant.
               const SizedBox(height: 8),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 200),

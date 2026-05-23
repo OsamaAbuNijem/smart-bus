@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,11 +14,37 @@ import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 /// Driver home — only shows in-progress trips. Tapping a trip opens the
 /// driver map with the routed pickup / drop-off waypoints.
-class DriverHomeScreen extends ConsumerWidget {
+class DriverHomeScreen extends ConsumerStatefulWidget {
   const DriverHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DriverHomeScreen> createState() => _DriverHomeScreenState();
+}
+
+class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Periodic refresh so a trip the assistant just started shows up on
+    // the driver's screen without a pull-to-refresh. 10 s mirrors the
+    // parent home's cadence; assistant actions land on this screen
+    // within one tick.
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (!mounted) return;
+      ref.invalidate(myTodayTripsProvider);
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(authControllerProvider).valueOrNull;
     final tripsAsync = ref.watch(myTodayTripsProvider);
     final l = AppLocalizations.of(context);
