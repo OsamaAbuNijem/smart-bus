@@ -4,7 +4,7 @@
 
 @if (Model is null || !Model.Items.Any())
 {
-    <tr><td colspan="9" class="u-empty-state">@L["Student_None"]</td></tr>
+    <tr><td colspan="8" class="u-empty-state">@L["Student_None"]</td></tr>
 }
 else
 {
@@ -27,7 +27,6 @@ else
             </td>
             <td><div class="td-sub">@s.ParentName</div></td>
             <td dir="ltr" style="text-align:start;"><div class="td-sub">@s.ParentPhone</div></td>
-            <td><div class="td-sub">@(string.IsNullOrEmpty(s.HomeArea) ? "—" : s.HomeArea)</div></td>
             <td>
                 @if (s.Latitude.HasValue && s.Longitude.HasValue)
                 {
