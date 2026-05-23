@@ -20,6 +20,7 @@ import 'package:tilmez_bus/features/assistant/data/services/trip_location_broadc
 import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Last-resort school anchor when the Schools row has no coords configured
 /// yet. Roughly the centre of Amman. The real coordinate comes from the
@@ -742,6 +743,16 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
             child: _ErrorChip(text: _error!),
           ),
 
+        // Emergency call: tap dials the school's main phone number
+        // (fetched live from `myFleetSchoolProvider`). Disabled / hidden
+        // when no phone is on file. Sits above the recenter button so
+        // both fit comfortably above the bottom stops sheet.
+        const Positioned(
+          right: 14,
+          bottom: 270,
+          child: _EmergencyCallBtn(),
+        ),
+
         // Recenter button: shows only once we have a GPS fix to snap to.
         // Highlighted while follow mode is engaged so the driver knows
         // the camera is locked to them; pressing it after a manual pan
@@ -880,6 +891,55 @@ class _RecenterBtn extends StatelessWidget {
             Icons.my_location,
             size: 19,
             color: active ? Colors.white : AppColors.slate700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Floating red "call school" button. Reads the school's phone number
+/// from [myFleetSchoolProvider] and dials it via the OS's tel: URL
+/// scheme. Renders disabled (grey, non-tappable) when no phone is on
+/// file so the driver gets a visible cue that the number is missing
+/// rather than the call quietly no-op'ing.
+class _EmergencyCallBtn extends ConsumerWidget {
+  const _EmergencyCallBtn();
+
+  Future<void> _call(String phone) async {
+    final cleaned = phone.replaceAll(RegExp(r'\s'), '');
+    final uri = Uri.parse('tel:$cleaned');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final phone = ref.watch(myFleetSchoolProvider).valueOrNull?.phoneNumber;
+    final enabled = phone != null && phone.isNotEmpty;
+    return Material(
+      color: enabled ? const Color(0xFFE11D48) : AppColors.slate200,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: enabled ? const Color(0xFFE11D48) : AppColors.slate300,
+        ),
+      ),
+      shadowColor: enabled
+          ? const Color(0xFFE11D48).withValues(alpha: 0.45)
+          : Colors.black.withValues(alpha: 0.12),
+      elevation: enabled ? 4 : 1,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: enabled ? () => _call(phone) : null,
+        child: const SizedBox(
+          width: 42,
+          height: 42,
+          child: Icon(
+            Icons.emergency_share_rounded,
+            size: 19,
+            color: Colors.white,
           ),
         ),
       ),
