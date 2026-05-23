@@ -1044,6 +1044,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsTitle => 'الإعدادات';
 
   @override
+  String get settingsSchoolInfo => 'معلومات المدرسة';
+
+  @override
+  String get settingsSchoolName => 'اسم المدرسة';
+
+  @override
+  String get settingsSchoolCity => 'المنطقة';
+
+  @override
+  String get settingsSchoolPhone => 'الهاتف';
+
+  @override
+  String get settingsSchoolMissing => 'لا توجد مدرسة مرتبطة بعد.';
+
+  @override
   String get settingsProfile => 'الملف الشخصي';
 
   @override

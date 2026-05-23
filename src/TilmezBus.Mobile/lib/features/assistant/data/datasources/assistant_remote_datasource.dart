@@ -5,6 +5,7 @@ import 'package:tilmez_bus/core/network/api_exception.dart';
 import 'package:tilmez_bus/core/network/dio_client.dart';
 import 'package:tilmez_bus/features/assistant/data/models/bus_summary_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/driver_summary_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/fleet_school_info_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/my_today_trip_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/roster_student_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/start_trip_response_dto.dart';
@@ -108,6 +109,26 @@ class AssistantRemoteDataSource {
           .map((e) => RosterStudentDto.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
+      throw mapDioErrorToFailure(e);
+    }
+  }
+
+  /// Lightweight school info (name / city / phone) for the driver or
+  /// assistant currently signed in — resolved server-side via
+  /// `Drivers.UserId → SchoolId`. Used by the settings screen's "School
+  /// info" section.
+  Future<FleetSchoolInfoDto?> getMyFleetSchool() async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/schools/my-fleet',
+      );
+      final data = response.data;
+      if (data == null) return null;
+      return FleetSchoolInfoDto.fromJson(data);
+    } on DioException catch (e) {
+      // 404 == this user isn't linked to a Driver row yet — return null
+      // so the UI can render a neutral empty state instead of an error.
+      if (e.response?.statusCode == 404) return null;
       throw mapDioErrorToFailure(e);
     }
   }

@@ -8,6 +8,7 @@ import 'package:tilmez_bus/core/locale/locale_controller.dart';
 import 'package:tilmez_bus/core/storage/secure_storage.dart';
 import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
 import 'package:tilmez_bus/features/auth/domain/entities/user.dart';
 import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
@@ -132,6 +133,12 @@ class _AssistantSettingsScreenState
     final l = AppLocalizations.of(context);
     final localeAsync = ref.watch(localeControllerProvider);
     final currentLang = localeAsync.valueOrNull?.languageCode ?? 'en';
+    // The "School info" card is only meaningful for crew members — the
+    // backing API resolves the school via Drivers.UserId, which parents
+    // don't have. Skip the section entirely on the parent settings page.
+    final role = ref.watch(authControllerProvider).valueOrNull?.role;
+    final showSchoolInfo =
+        role == UserRole.driver || role == UserRole.assistant;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
@@ -164,6 +171,12 @@ class _AssistantSettingsScreenState
                     ),
                   ],
                 ),
+                if (showSchoolInfo) ...[
+                  const SizedBox(height: 14),
+                  _SectionTitle(text: l.settingsSchoolInfo),
+                  const SizedBox(height: 8),
+                  _SchoolInfoCard(l: l),
+                ],
                 const SizedBox(height: 14),
                 _SectionTitle(text: l.settingsProfile),
                 const SizedBox(height: 8),
@@ -303,6 +316,115 @@ class _SectionTitle extends StatelessWidget {
           fontWeight: FontWeight.w800,
           color: AppColors.slate500,
           letterSpacing: 1.0,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── School info card ──────────────────────────────────────────────
+
+/// Reads the lightweight school info from `myFleetSchoolProvider` and
+/// renders a card with name / city (area) / phone. Falls back to a
+/// neutral empty state when the user isn't linked to any school yet.
+class _SchoolInfoCard extends ConsumerWidget {
+  const _SchoolInfoCard({required this.l});
+  final AppLocalizations l;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(myFleetSchoolProvider);
+    return async.when(
+      loading: () => Container(
+        height: 92,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.slate200),
+        ),
+        alignment: Alignment.center,
+        child: const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+      error: (_, _) => _Card(
+        children: [
+          _ReadOnlyRow(
+            icon: Icons.error_outline,
+            label: l.settingsSchoolInfo,
+            value: l.settingsSchoolMissing,
+          ),
+        ],
+      ),
+      data: (s) {
+        if (s == null) {
+          return _Card(
+            children: [
+              _ReadOnlyRow(
+                icon: Icons.school_outlined,
+                label: l.settingsSchoolName,
+                value: l.settingsSchoolMissing,
+              ),
+            ],
+          );
+        }
+        return _Card(
+          children: [
+            _ReadOnlyRow(
+              icon: Icons.school_outlined,
+              label: l.settingsSchoolName,
+              value: s.name.isEmpty ? '—' : s.name,
+            ),
+            _ReadOnlyRow(
+              icon: Icons.place_outlined,
+              label: l.settingsSchoolCity,
+              value: (s.city == null || s.city!.isEmpty) ? '—' : s.city!,
+            ),
+            _ReadOnlyRow(
+              icon: Icons.call_outlined,
+              label: l.settingsSchoolPhone,
+              // Render phone LTR so '+962…' doesn't flip in Arabic.
+              value: (s.phoneNumber == null || s.phoneNumber!.isEmpty)
+                  ? '—'
+                  : s.phoneNumber!,
+              valueDir: TextDirection.ltr,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ReadOnlyRow extends StatelessWidget {
+  const _ReadOnlyRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.valueDir,
+  });
+  final IconData icon;
+  final String label;
+  final String value;
+  final TextDirection? valueDir;
+
+  @override
+  Widget build(BuildContext context) {
+    return _FieldShell(
+      icon: icon,
+      label: label,
+      child: Directionality(
+        textDirection: valueDir ?? Directionality.of(context),
+        child: Text(
+          value,
+          style: const TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w700,
+            color: AppColors.slate700,
+            letterSpacing: 0.2,
+          ),
         ),
       ),
     );

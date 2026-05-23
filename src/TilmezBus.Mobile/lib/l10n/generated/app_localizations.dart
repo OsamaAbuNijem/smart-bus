@@ -2084,6 +2084,36 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
+  /// No description provided for @settingsSchoolInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'School info'**
+  String get settingsSchoolInfo;
+
+  /// No description provided for @settingsSchoolName.
+  ///
+  /// In en, this message translates to:
+  /// **'School name'**
+  String get settingsSchoolName;
+
+  /// No description provided for @settingsSchoolCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Area'**
+  String get settingsSchoolCity;
+
+  /// No description provided for @settingsSchoolPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get settingsSchoolPhone;
+
+  /// No description provided for @settingsSchoolMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'No school linked yet.'**
+  String get settingsSchoolMissing;
+
   /// No description provided for @settingsProfile.
   ///
   /// In en, this message translates to:

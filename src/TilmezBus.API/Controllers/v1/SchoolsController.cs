@@ -8,6 +8,7 @@ using TilmezBus.Application.Features.Schools.Commands.DeleteSchool;
 using TilmezBus.Application.Features.Schools.Commands.ResetSchoolAdminPassword;
 using TilmezBus.Application.Features.Schools.Commands.UpdateSchool;
 using TilmezBus.Application.Features.Schools.Queries.GetAllSchools;
+using TilmezBus.Application.Features.Schools.Queries.GetMyFleetSchoolInfo;
 using TilmezBus.Application.Features.Schools.Queries.GetMySchool;
 using TilmezBus.Application.Features.Schools.Queries.GetSchoolStudentQrTokens;
 using TilmezBus.Domain.Enums;
@@ -44,6 +45,23 @@ public class SchoolsController : ControllerBase
         if (string.IsNullOrEmpty(email)) return Unauthorized();
         var result = await _mediator.Send(new GetMySchoolQuery(email), cancellationToken);
         return result.IsSuccess ? Ok(result.Data) : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>Lightweight school info (name / city / phone) for the
+    /// caller resolved via Drivers.UserId. Used by the mobile settings
+    /// screen so drivers + assistants can see who they're driving for.</summary>
+    [HttpGet("my-fleet")]
+    [Authorize(Roles = "Driver,Assistant,Admin")]
+    public async Task<IActionResult> GetMyFleet(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+        var result = await _mediator.Send(
+            new GetMyFleetSchoolInfoQuery(userId), cancellationToken);
+        if (!result.IsSuccess) return BadRequest(new { error = result.Error });
+        return result.Data is null
+            ? NotFound(new { error = "School not found for this user." })
+            : Ok(result.Data);
     }
 
     [HttpPost]

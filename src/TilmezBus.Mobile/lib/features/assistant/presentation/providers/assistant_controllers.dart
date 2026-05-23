@@ -3,10 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tilmez_bus/features/assistant/data/datasources/assistant_remote_datasource.dart';
 import 'package:tilmez_bus/features/assistant/data/models/bus_summary_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/driver_summary_dto.dart';
+import 'package:tilmez_bus/features/assistant/data/models/fleet_school_info_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/my_today_trip_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/roster_student_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/start_trip_response_dto.dart';
 import 'package:tilmez_bus/features/assistant/data/models/trip_student_dto.dart';
+
+/// Lightweight school info (name / city / phone) for the currently
+/// signed-in driver or assistant. Drives the "School info" card on
+/// the settings screen. autoDispose so the value re-fetches on
+/// each entry to settings — keeps it fresh without manual invalidation.
+final myFleetSchoolProvider =
+    FutureProvider.autoDispose<FleetSchoolInfoDto?>(
+  (ref) async {
+    final ds = ref.watch(assistantRemoteDataSourceProvider);
+    return ds.getMyFleetSchool();
+  },
+);
 
 /// Today's trips for the current driver/assistant.
 final myTodayTripsProvider = FutureProvider.autoDispose<List<MyTodayTripDto>>(

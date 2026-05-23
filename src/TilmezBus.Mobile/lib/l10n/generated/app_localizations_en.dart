@@ -1050,6 +1050,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
+  String get settingsSchoolInfo => 'School info';
+
+  @override
+  String get settingsSchoolName => 'School name';
+
+  @override
+  String get settingsSchoolCity => 'Area';
+
+  @override
+  String get settingsSchoolPhone => 'Phone';
+
+  @override
+  String get settingsSchoolMissing => 'No school linked yet.';
+
+  @override
   String get settingsProfile => 'Profile';
 
   @override
