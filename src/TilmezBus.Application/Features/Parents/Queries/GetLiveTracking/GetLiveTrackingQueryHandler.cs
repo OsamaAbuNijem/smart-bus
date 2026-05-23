@@ -98,9 +98,10 @@ public class GetLiveTrackingQueryHandler
                 bl.Latitude, bl.Longitude, bl.Speed, bl.Heading, bl.Timestamp))
             .FirstOrDefaultAsync(ct);
 
-        // Driver + assistant: read from Trip.DriverId (whoever scanned the
-        // bus QR to start). Assistant lookup is gone with BusSchedule;
-        // we leave the assistant fields null.
+        // Driver + assistant are both read from the trip — DriverId is the
+        // person the assistant picked in trip setup; AssistantId is whoever
+        // scanned the bus QR to start. Both columns may be null on legacy
+        // trips, hence the guards.
         string? driverName = null, driverPhone = null;
         string? assistantName = null, assistantPhone = null;
         if (trip.DriverId is not null)
@@ -111,6 +112,15 @@ public class GetLiveTrackingQueryHandler
                 .FirstOrDefaultAsync(ct);
             driverName = driver?.FullName;
             driverPhone = driver?.PhoneNumber;
+        }
+        if (trip.AssistantId is not null)
+        {
+            var assistant = await _db.Drivers
+                .Where(d => d.Id == trip.AssistantId)
+                .Select(d => new { d.FullName, d.PhoneNumber })
+                .FirstOrDefaultAsync(ct);
+            assistantName = assistant?.FullName;
+            assistantPhone = assistant?.PhoneNumber;
         }
 
         return Result<LiveTrackingDto>.Success(new LiveTrackingDto(
