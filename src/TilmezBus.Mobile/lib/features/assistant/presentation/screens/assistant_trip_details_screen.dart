@@ -1015,23 +1015,38 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
                 ),
               ],
             ] else ...[
-              _PickupToggle(
-                // What "checked" means depends on the leg:
-                //   • Morning — student picked up (Boarded)
-                //   • Return  — student arrived home (DroppedOff)
-                // Boarded students on a Return trip are still "on the bus"
-                // and the toggle stays empty so the assistant can clearly
-                // tell who hasn't been delivered yet.
-                checked: widget.isMorning ? boarded : s.isDroppedOff,
-                busy: _busy,
-                onTap: _toggleBoarded,
-              ),
-              const SizedBox(width: 6),
-              _CommBtn(
-                icon: Icons.person_off_outlined,
-                color: AppColors.red,
-                onTap: _markAbsent,
-              ),
+              // What "checked" means depends on the leg:
+              //   • Morning — student picked up (Boarded)
+              //   • Return  — student arrived home (DroppedOff)
+              // Boarded students on a Return trip are still "on the bus"
+              // and the toggle stays empty so the assistant can clearly
+              // tell who hasn't been delivered yet.
+              Builder(builder: (_) {
+                final checked =
+                    widget.isMorning ? boarded : s.isDroppedOff;
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _PickupToggle(
+                      checked: checked,
+                      busy: _busy,
+                      onTap: _toggleBoarded,
+                    ),
+                    // The mark-absent button only makes sense while the
+                    // student hasn't been picked up / dropped off yet —
+                    // once they're checked, marking absent would be
+                    // contradictory, so we hide the button.
+                    if (!checked) ...[
+                      const SizedBox(width: 6),
+                      _CommBtn(
+                        icon: Icons.person_off_outlined,
+                        color: AppColors.red,
+                        onTap: _markAbsent,
+                      ),
+                    ],
+                  ],
+                );
+              }),
               const SizedBox(width: 4),
               // Single contact-the-parent button. Tap opens a dropdown
               // menu with Notify (bus-arrived push), WhatsApp, and Call so
