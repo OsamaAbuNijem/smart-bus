@@ -99,6 +99,11 @@ public class BulkUpsertStudentsHandler
                     .Select(x => x.StudentId)
                     .ToListAsync(cancellationToken));
 
+        // Detect duplicate NationalNumbers within the sheet up front so the
+        // admin sees a clear "duplicate national number X" error per row
+        // instead of a silent overwrite (the second occurrence used to
+        // clobber the first one's name fields).
+        var seenInSheet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         // 3. Apply each row in memory. Validation mirrors the Web importer.
         foreach (var row in rows)
         {
@@ -114,6 +119,14 @@ public class BulkUpsertStudentsHandler
 
             if (!parentByPhone.TryGetValue(row.ParentPhone.Trim(), out var parentId))
             {
+                failed++;
+                continue;
+            }
+
+            if (!seenInSheet.Add(row.NationalNumber))
+            {
+                errors.Add(
+                    $"Row '{row.FullName}': duplicate national number '{row.NationalNumber}' already used in this sheet.");
                 failed++;
                 continue;
             }
@@ -163,6 +176,12 @@ public class BulkUpsertStudentsHandler
                     SubscriptionId = activeSubId.Value,
                     StudentId      = student.Id
                 });
+                // Record this student as already-linked so a second row in the
+                // same batch with the same NationalNumber doesn't try to add a
+                // duplicate (SubscriptionId, StudentId) — Postgres would reject
+                // the composite primary key and the whole transaction would
+                // roll back, killing every row in the import.
+                alreadyLinkedSet.Add(student.Id);
                 // Keep the dict updated so two rows in the same batch with the
                 // same NationalNumber are treated as create-then-update, not
                 // create-twice (which would violate the unique index).
