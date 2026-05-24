@@ -108,18 +108,46 @@
             display: flex; align-items: center; gap: 4px;
         }
         .body { padding: 22px 22px 26px; }
+        .student-block {
+            margin-top: -2px;
+            padding: 22px 14px 18px;
+            border-radius: 18px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #FAFBFF 100%);
+            border: 1px solid var(--slate-100);
+            text-align: center;
+            position: relative;
+        }
+        .student-avatar {
+            width: 76px; height: 76px;
+            margin: -50px auto 12px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%);
+            border: 4px solid #FFFFFF;
+            box-shadow: 0 10px 24px -10px rgba(37, 99, 235, 0.45);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; font-weight: 800; color: #1E40AF;
+            letter-spacing: -0.8px;
+        }
+        .student-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 11px;
+            border-radius: 100px;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: #1E40AF;
+            font-size: 10.5px; font-weight: 800;
+            letter-spacing: 1.4px; text-transform: uppercase;
+        }
         .student-name {
+            margin-top: 9px;
             font-size: 24px; font-weight: 800; color: var(--ink);
             letter-spacing: -0.6px; line-height: 1.2;
         }
-        .student-grade {
-            margin-top: 6px;
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 11px;
-            background: var(--slate-50);
-            border: 1px solid var(--slate-100);
-            border-radius: 100px;
-            font-size: 12px; font-weight: 700; color: var(--slate-500);
+        .student-help {
+            margin-top: 10px;
+            font-size: 12.5px; font-weight: 600; color: var(--slate-500);
+            line-height: 1.5;
+            max-width: 320px; margin-left: auto; margin-right: auto;
         }
         .section-title {
             margin-top: 22px;
@@ -269,7 +297,29 @@
             </div>
 
             <div class="body">
-                <div class="student-name">@name</div>
+                @{
+                    var __studentInitials = string.Concat(
+                        (name ?? "?")
+                            .Trim()
+                            .Split(' ')
+                            .Where(p => !string.IsNullOrEmpty(p))
+                            .Take(2)
+                            .Select(p => p[0]))
+                        .ToUpperInvariant();
+                }
+                <div class="student-block">
+                    <div class="student-avatar">@__studentInitials</div>
+                    <div class="student-tag">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+                        @(isAr ? "بطاقة طالب" : "Student card")
+                    </div>
+                    <div class="student-name">@name</div>
+                    <div class="student-help">
+                        @(isAr
+                            ? "إذا عثرت على هذا الطالب، يُرجى التواصل أدناه لإرجاعه بأمان."
+                            : "If you found this student, please use the contacts below to help return them safely.")
+                    </div>
+                </div>
 
                 <div class="section-title">@(isAr ? "تواصل" : "Contact")</div>
                 <div class="row-list">
