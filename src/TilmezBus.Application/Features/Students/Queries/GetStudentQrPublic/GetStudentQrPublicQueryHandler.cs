@@ -20,39 +20,63 @@ public class GetStudentQrPublicQueryHandler
         if (token.Length == 0)
             return Result<PublicStudentQrDto>.Failure("QR token is required.");
 
-        // Single round-trip: join token → student → parent + school. We
-        // intentionally return a not-found result when the token isn't
-        // linked yet so the public page can render a friendly "this QR
-        // hasn't been registered" instead of leaking the bare token.
-        var row = await _context.StudentQrTokens
+        // Three small indexed lookups instead of one big EF Join. The
+        // School lookup needs Guid.Parse on a `string` SchoolId column;
+        // Npgsql can't translate that inside a server-side Join (it
+        // silently returns no rows), so we resolve the StudentId first,
+        // pull the Student + Parent in one trip, parse the SchoolId on
+        // the client, then fetch the School.
+        var studentId = await _context.StudentQrTokens
             .Where(t => t.Token == token
                      && t.IsRegistered
                      && t.StudentId != null)
-            .Join(_context.Students.Where(s => !s.IsDeleted),
-                t => t.StudentId, s => s.Id, (t, s) => new { t, s })
-            .Join(_context.Schools.Where(s => !s.IsDeleted),
-                ts => Guid.Parse(ts.s.SchoolId), sc => sc.Id,
-                (ts, sc) => new { ts.s, sc })
+            .Select(t => t.StudentId)
+            .FirstOrDefaultAsync(ct);
+        if (studentId is null)
+            return Result<PublicStudentQrDto>.Failure(
+                "QR not found or not registered.");
+
+        var s = await _context.Students
+            .Where(x => x.Id == studentId.Value && !x.IsDeleted)
             .Select(x => new
             {
-                Student = x.s,
-                School  = x.sc,
-                Parent  = x.s.Parent,
+                x.FullName,
+                x.FullNameEn,
+                x.Grade,
+                x.SchoolId,
+                ParentName  = x.Parent != null ? x.Parent.FullName    : null,
+                ParentPhone = x.Parent != null ? x.Parent.PhoneNumber : null,
             })
             .FirstOrDefaultAsync(ct);
+        if (s is null)
+            return Result<PublicStudentQrDto>.Failure("Student not found.");
 
-        if (row is null)
-            return Result<PublicStudentQrDto>.Failure("QR not found or not registered.");
+        if (!Guid.TryParse(s.SchoolId, out var schoolGuid))
+            return Result<PublicStudentQrDto>.Failure(
+                "Student's school is not configured correctly.");
+
+        var sc = await _context.Schools
+            .Where(x => x.Id == schoolGuid && !x.IsDeleted)
+            .Select(x => new
+            {
+                x.Name,
+                x.PhoneNumber,
+                x.LogoUrl,
+                x.City,
+            })
+            .FirstOrDefaultAsync(ct);
+        if (sc is null)
+            return Result<PublicStudentQrDto>.Failure("School not found.");
 
         return Result<PublicStudentQrDto>.Success(new PublicStudentQrDto(
-            StudentName:   row.Student.FullName,
-            StudentNameEn: row.Student.FullNameEn,
-            Grade:         row.Student.Grade,
-            ParentName:    row.Parent?.FullName,
-            ParentPhone:   row.Parent?.PhoneNumber,
-            SchoolName:    row.School.Name,
-            SchoolPhone:   row.School.PhoneNumber,
-            SchoolLogoUrl: row.School.LogoUrl,
-            City:          row.School.City));
+            StudentName:   s.FullName,
+            StudentNameEn: s.FullNameEn,
+            Grade:         s.Grade,
+            ParentName:    s.ParentName,
+            ParentPhone:   s.ParentPhone,
+            SchoolName:    sc.Name,
+            SchoolPhone:   sc.PhoneNumber,
+            SchoolLogoUrl: sc.LogoUrl,
+            City:          sc.City));
     }
 }
