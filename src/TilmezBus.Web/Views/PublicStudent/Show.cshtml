@@ -48,13 +48,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
             margin-bottom: 18px;
-            color: var(--yellow-deep);
-            font-weight: 800;
-            letter-spacing: -0.3px;
         }
-        .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 12px var(--yellow); }
+        .brand img {
+            height: 36px;
+            width: auto;
+            display: block;
+        }
         .card {
             background: #FFFFFF;
             border-radius: 22px;
@@ -78,9 +78,17 @@
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
             flex-shrink: 0;
+            padding: 8px;
             box-shadow: 0 6px 14px -6px rgba(217, 119, 6, 0.45);
         }
-        .school-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .school-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
         .school-logo-fallback {
             font-weight: 800; font-size: 22px; color: var(--yellow-deep);
         }
@@ -191,8 +199,7 @@
 <body>
 <div class="shell">
     <div class="brand">
-        <span class="brand-dot"></span>
-        TilmezBus
+        <img src="/img/tilmez_bus_logo.png" alt="TilmezBus">
     </div>
 
     @if (Model is null)
@@ -217,12 +224,29 @@
                 .Take(2)
                 .Select(p => p[0]))
             .ToUpperInvariant();
+        // Normalise the stored logo URL: absolute (http/https) URLs and
+        // root-relative paths pass through, but a bare "uploads/..."
+        // path would resolve against /q/{token} on the public route
+        // and 404 — so prepend a leading slash to keep it under the
+        // app root.
+        string? __logoUrl = null;
+        if (!string.IsNullOrWhiteSpace(Model.SchoolLogoUrl))
+        {
+            var raw = Model.SchoolLogoUrl!.Trim();
+            __logoUrl = (raw.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                      || raw.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                      || raw.StartsWith("/"))
+                ? raw
+                : "/" + raw;
+        }
         <div class="card">
             <div class="hero">
                 <div class="school-logo">
-                    @if (!string.IsNullOrWhiteSpace(Model.SchoolLogoUrl))
+                    @if (__logoUrl != null)
                     {
-                        <img src="@Model.SchoolLogoUrl" alt="@Model.SchoolName"
+                        <img src="@__logoUrl" alt="@Model.SchoolName"
+                             loading="eager"
+                             referrerpolicy="no-referrer"
                              data-initials="@__initials"
                              onerror="this.outerHTML='<span class=&quot;school-logo-fallback&quot;>'+this.dataset.initials+'</span>';">
                     }
@@ -246,10 +270,6 @@
 
             <div class="body">
                 <div class="student-name">@name</div>
-                <div class="student-grade">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                    @(isAr ? "الصف" : "Grade") @Model.Grade
-                </div>
 
                 <div class="section-title">@(isAr ? "تواصل" : "Contact")</div>
                 <div class="row-list">
