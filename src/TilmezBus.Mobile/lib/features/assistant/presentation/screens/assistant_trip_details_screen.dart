@@ -132,9 +132,12 @@ class _TripBody extends ConsumerWidget {
   }
 
   void _onNfcTap(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l.assistantNfcUnavailable)),
-    );
+    // Open the dedicated NFC scanner — works the same way as the
+    // student QR camera scanner but uses Core NFC / Android NFC to
+    // read the card UID. The endpoint that flips boarding state
+    // accepts any token string, so NFC and QR resolve through the
+    // same /students/scan path on the API side.
+    context.push(AppRoute.assistantNfcScanFor(details.tripId));
   }
 }
 

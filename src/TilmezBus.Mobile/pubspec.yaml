@@ -51,6 +51,11 @@ dependencies:
   # firebase_messaging's transitive GoogleUtilities>=8 requirement.
   mobile_scanner: ^7.0.1
 
+  # NFC reading (assistant taps student's NFC card to mark pickup).
+  # 4.x is the current stable line; iOS NFC needs the Core NFC capability
+  # enabled on the App ID + NFCReaderUsageDescription in Info.plist.
+  nfc_manager: ^4.0.2
+
   # Models / serialization
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0

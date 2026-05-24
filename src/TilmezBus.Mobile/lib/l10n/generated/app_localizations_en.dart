@@ -929,6 +929,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantNfcUnavailable => 'NFC isn\'t available on this device.';
 
   @override
+  String get assistantNfcUnsupported => 'This device doesn\'t support NFC.';
+
+  @override
+  String get assistantNfcDisabled =>
+      'NFC is turned off. Enable it from settings to scan.';
+
+  @override
+  String get assistantNfcHint =>
+      'Hold the student\'s NFC card near the top of the phone.';
+
+  @override
   String get assistantScanQr => 'Scan QR';
 
   @override

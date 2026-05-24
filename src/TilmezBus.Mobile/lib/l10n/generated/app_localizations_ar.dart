@@ -922,6 +922,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantNfcUnavailable => 'الـ NFC غير متاح على هذا الجهاز.';
 
   @override
+  String get assistantNfcUnsupported => 'هذا الجهاز لا يدعم تقنية NFC.';
+
+  @override
+  String get assistantNfcDisabled =>
+      'خاصية الـ NFC مغلقة. فعّلها من الإعدادات للمسح.';
+
+  @override
+  String get assistantNfcHint => 'قرّب بطاقة الطالب من أعلى الهاتف.';
+
+  @override
   String get assistantScanQr => 'مسح QR';
 
   @override

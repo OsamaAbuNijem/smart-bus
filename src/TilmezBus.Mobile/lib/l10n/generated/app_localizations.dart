@@ -1856,6 +1856,24 @@ abstract class AppLocalizations {
   /// **'NFC isn\'t available on this device.'**
   String get assistantNfcUnavailable;
 
+  /// No description provided for @assistantNfcUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This device doesn\'t support NFC.'**
+  String get assistantNfcUnsupported;
+
+  /// No description provided for @assistantNfcDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'NFC is turned off. Enable it from settings to scan.'**
+  String get assistantNfcDisabled;
+
+  /// No description provided for @assistantNfcHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the student\'s NFC card near the top of the phone.'**
+  String get assistantNfcHint;
+
   /// No description provided for @assistantScanQr.
   ///
   /// In en, this message translates to:

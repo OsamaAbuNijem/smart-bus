@@ -10,6 +10,7 @@ import 'package:tilmez_bus/features/auth/presentation/screens/login_screen.dart'
 import 'package:tilmez_bus/features/auth/presentation/screens/otp_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_qr_scan_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_settings_screen.dart';
+import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_nfc_scan_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_student_scan_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_trip_details_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_trip_setup_screen.dart';
@@ -42,6 +43,7 @@ abstract class AppRoute {
   static const assistantManualSetup = '/assistant/manual-setup';
   static const assistantTripDetails = '/assistant/trips/:tripId';
   static const assistantStudentScan = '/assistant/trips/:tripId/scan-student';
+  static const assistantNfcScan = '/assistant/trips/:tripId/scan-nfc';
   static const assistantSettings = '/assistant/settings';
   static const driverTripMap = '/driver/trips/:tripId/map';
   static const driverSettings = '/driver/settings';
@@ -55,6 +57,9 @@ abstract class AppRoute {
 
   static String assistantStudentScanFor(String tripId) =>
       '/assistant/trips/$tripId/scan-student';
+
+  static String assistantNfcScanFor(String tripId) =>
+      '/assistant/trips/$tripId/scan-nfc';
 
   /// Trip-setup screen in edit mode — preloads the existing scheduled
   /// trip's bus/driver/students; saving replaces the old trip with the
@@ -194,6 +199,12 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoute.assistantStudentScan,
         builder: (context, state) => AssistantStudentScanScreen(
+          tripId: state.pathParameters['tripId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.assistantNfcScan,
+        builder: (context, state) => AssistantNfcScanScreen(
           tripId: state.pathParameters['tripId']!,
         ),
       ),
