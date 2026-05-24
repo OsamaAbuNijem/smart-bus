@@ -1065,6 +1065,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSchoolMissing => 'No school linked yet.';
 
   @override
+  String get assistantScanStudentHint =>
+      'Hold the student\'s QR inside the frame.';
+
+  @override
   String get settingsProfile => 'Profile';
 
   @override

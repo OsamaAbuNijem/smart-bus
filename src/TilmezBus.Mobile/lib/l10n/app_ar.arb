@@ -377,6 +377,7 @@
   "settingsSchoolCity": "المنطقة",
   "settingsSchoolPhone": "الهاتف",
   "settingsSchoolMissing": "لا توجد مدرسة مرتبطة بعد.",
+  "assistantScanStudentHint": "وجِّه كاميرا الهاتف نحو رمز QR للطالب داخل الإطار.",
   "settingsProfile": "الملف الشخصي",
   "settingsFullName": "الاسم الكامل",
   "settingsFullNameHint": "اكتب اسمك الكامل",

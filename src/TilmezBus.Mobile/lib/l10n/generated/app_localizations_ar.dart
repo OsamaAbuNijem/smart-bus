@@ -1059,6 +1059,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsSchoolMissing => 'لا توجد مدرسة مرتبطة بعد.';
 
   @override
+  String get assistantScanStudentHint =>
+      'وجِّه كاميرا الهاتف نحو رمز QR للطالب داخل الإطار.';
+
+  @override
   String get settingsProfile => 'الملف الشخصي';
 
   @override

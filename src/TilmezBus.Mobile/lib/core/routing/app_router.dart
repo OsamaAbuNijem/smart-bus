@@ -10,6 +10,7 @@ import 'package:tilmez_bus/features/auth/presentation/screens/login_screen.dart'
 import 'package:tilmez_bus/features/auth/presentation/screens/otp_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_qr_scan_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_settings_screen.dart';
+import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_student_scan_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_trip_details_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_trip_setup_screen.dart';
 import 'package:tilmez_bus/features/assistant/presentation/screens/driver_trip_map_screen.dart';
@@ -40,6 +41,7 @@ abstract class AppRoute {
   static const assistantTripSetup = '/assistant/trip-setup';
   static const assistantManualSetup = '/assistant/manual-setup';
   static const assistantTripDetails = '/assistant/trips/:tripId';
+  static const assistantStudentScan = '/assistant/trips/:tripId/scan-student';
   static const assistantSettings = '/assistant/settings';
   static const driverTripMap = '/driver/trips/:tripId/map';
   static const driverSettings = '/driver/settings';
@@ -50,6 +52,9 @@ abstract class AppRoute {
 
   static String assistantTripDetailsFor(String tripId) =>
       '/assistant/trips/$tripId';
+
+  static String assistantStudentScanFor(String tripId) =>
+      '/assistant/trips/$tripId/scan-student';
 
   /// Trip-setup screen in edit mode — preloads the existing scheduled
   /// trip's bus/driver/students; saving replaces the old trip with the
@@ -183,6 +188,12 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoute.assistantTripDetails,
         builder: (context, state) => AssistantTripDetailsScreen(
+          tripId: state.pathParameters['tripId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.assistantStudentScan,
+        builder: (context, state) => AssistantStudentScanScreen(
           tripId: state.pathParameters['tripId']!,
         ),
       ),

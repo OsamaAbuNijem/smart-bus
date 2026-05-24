@@ -2114,6 +2114,12 @@ abstract class AppLocalizations {
   /// **'No school linked yet.'**
   String get settingsSchoolMissing;
 
+  /// No description provided for @assistantScanStudentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the student\'s QR inside the frame.'**
+  String get assistantScanStudentHint;
+
   /// No description provided for @settingsProfile.
   ///
   /// In en, this message translates to:

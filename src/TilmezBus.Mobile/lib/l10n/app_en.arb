@@ -395,6 +395,7 @@
   "settingsSchoolCity": "Area",
   "settingsSchoolPhone": "Phone",
   "settingsSchoolMissing": "No school linked yet.",
+  "assistantScanStudentHint": "Hold the student's QR inside the frame.",
   "settingsProfile": "Profile",
   "settingsFullName": "Full name",
   "settingsFullNameHint": "Your full name",

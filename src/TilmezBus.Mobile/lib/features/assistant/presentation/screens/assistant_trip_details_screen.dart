@@ -122,51 +122,13 @@ class _TripBody extends ConsumerWidget {
     return map;
   }
 
-  Future<void> _onScanQr(BuildContext context, WidgetRef ref) async {
-    final raw = await _promptToken(context, l.assistantScanStudentTitle);
-    if (raw == null || raw.isEmpty) return;
-    // The printed student QR encodes a full URL (https://<host>/q/<token>)
-    // so anyone scanning with a phone camera lands on the public lost-and-
-    // found page. The assistant scans the SAME QR for pickup attendance —
-    // extract the trailing token segment here so the API call works
-    // whether the input is a URL or the raw token pasted manually.
-    final token = _extractStudentQrToken(raw);
-    if (token.isEmpty) return;
-    try {
-      await ref.read(tripActionsProvider(details.tripId)).scanStudent(token);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.assistantScanStudentOk)),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is Failure ? e.message : '$e')),
-      );
-    }
-  }
-
-  /// Normalises whatever the camera / paste produced into a bare token.
-  /// Accepts:
-  ///   • a raw 32-char hex token (legacy stickers)         → returned as-is
-  ///   • a URL of shape `https://<host>/q/<token>[?...]`   → trailing segment
-  /// Anything else falls back to the trimmed input so the API can still
-  /// surface a "not found" error instead of silently failing.
-  static String _extractStudentQrToken(String raw) {
-    final trimmed = raw.trim();
-    if (trimmed.isEmpty) return trimmed;
-    final uri = Uri.tryParse(trimmed);
-    if (uri == null || !uri.hasScheme) return trimmed;
-    final segments =
-        uri.pathSegments.where((s) => s.isNotEmpty).toList();
-    if (segments.isEmpty) return trimmed;
-    // Look for the `/q/<token>` pattern; otherwise fall back to the last
-    // non-empty segment so the same logic survives a future URL shape change.
-    final qIdx = segments.indexOf('q');
-    if (qIdx >= 0 && qIdx + 1 < segments.length) {
-      return segments[qIdx + 1];
-    }
-    return segments.last;
+  void _onScanQr(BuildContext context, WidgetRef ref) {
+    // Skip the legacy "paste the token" dialog and drop the assistant
+    // straight into the camera scanner. The scan screen handles URL →
+    // token extraction, calls the API, and shows inline success / error
+    // feedback so the assistant can rattle through students without
+    // bouncing back to this screen between each scan.
+    context.push(AppRoute.assistantStudentScanFor(details.tripId));
   }
 
   void _onNfcTap(BuildContext context) {
@@ -2055,37 +2017,6 @@ class _ErrorView extends StatelessWidget {
     );
   }
 }
-
-// ─── Token-prompt dialog (used by Scan QR until camera lands) ───────────
-
-Future<String?> _promptToken(BuildContext context, String title) async {
-  final ctrl = TextEditingController();
-  return showDialog<String>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text(title, style: const TextStyle(fontSize: 15)),
-      content: TextField(
-        controller: ctrl,
-        autofocus: true,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9\-_]')),
-        ],
-        decoration: const InputDecoration(hintText: 'Token'),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(ctrl.text.trim()),
-          child: const Text('Use'),
-        ),
-      ],
-    ),
-  );
-}
-
 
 // ─── Scheduled-trip start bar ────────────────────────────────────────────
 // Step 2 of the two-step new-trip flow. The trip was already materialised
