@@ -123,8 +123,15 @@ class _TripBody extends ConsumerWidget {
   }
 
   Future<void> _onScanQr(BuildContext context, WidgetRef ref) async {
-    final token = await _promptToken(context, l.assistantScanStudentTitle);
-    if (token == null || token.isEmpty) return;
+    final raw = await _promptToken(context, l.assistantScanStudentTitle);
+    if (raw == null || raw.isEmpty) return;
+    // The printed student QR encodes a full URL (https://<host>/q/<token>)
+    // so anyone scanning with a phone camera lands on the public lost-and-
+    // found page. The assistant scans the SAME QR for pickup attendance —
+    // extract the trailing token segment here so the API call works
+    // whether the input is a URL or the raw token pasted manually.
+    final token = _extractStudentQrToken(raw);
+    if (token.isEmpty) return;
     try {
       await ref.read(tripActionsProvider(details.tripId)).scanStudent(token);
       if (!context.mounted) return;
@@ -137,6 +144,29 @@ class _TripBody extends ConsumerWidget {
         SnackBar(content: Text(e is Failure ? e.message : '$e')),
       );
     }
+  }
+
+  /// Normalises whatever the camera / paste produced into a bare token.
+  /// Accepts:
+  ///   • a raw 32-char hex token (legacy stickers)         → returned as-is
+  ///   • a URL of shape `https://<host>/q/<token>[?...]`   → trailing segment
+  /// Anything else falls back to the trimmed input so the API can still
+  /// surface a "not found" error instead of silently failing.
+  static String _extractStudentQrToken(String raw) {
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) return trimmed;
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null || !uri.hasScheme) return trimmed;
+    final segments =
+        uri.pathSegments.where((s) => s.isNotEmpty).toList();
+    if (segments.isEmpty) return trimmed;
+    // Look for the `/q/<token>` pattern; otherwise fall back to the last
+    // non-empty segment so the same logic survives a future URL shape change.
+    final qIdx = segments.indexOf('q');
+    if (qIdx >= 0 && qIdx + 1 < segments.length) {
+      return segments[qIdx + 1];
+    }
+    return segments.last;
   }
 
   void _onNfcTap(BuildContext context) {

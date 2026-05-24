@@ -58,6 +58,9 @@ public interface IApiClient
     Task<bool> DeleteStudentAsync(Guid id);
     Task<(bool Ok, TilmezBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentsResult? Result, string? Error)>
         BulkUpsertStudentsAsync(IReadOnlyList<TilmezBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentRow> rows);
+    Task<string?> GetStudentQrTokenAsync(Guid id);
+    Task<TilmezBus.Application.Features.Students.Queries.GetStudentQrPublic.PublicStudentQrDto?>
+        ResolveStudentQrPublicAsync(string token);
 
     // Buses
     Task<PagedResult<BusDto>?> GetBusesAsync(int pageNumber = 1, int pageSize = 10,

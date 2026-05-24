@@ -1,6 +1,8 @@
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using QRCoder;
 using TilmezBus.Web.Models;
 using TilmezBus.Web.Resources;
 using TilmezBus.Web.Services;
@@ -294,5 +296,33 @@ public class StudentsController : AdminControllerBase
         var data = await ApiClient.GetStudentsAsync(page, 10, name, grade, homeArea);
         var html = await RenderPartialAsync("_List", data);
         return Json(new { result = message, html, page });
+    }
+
+    /// <summary>
+    /// Returns a PNG QR code that encodes the public lost-and-found URL
+    /// for [id] — `https://<host>/q/{token}`. Generated server-side via
+    /// QRCoder so the grid doesn't depend on a JS QR library + so the
+    /// printable image is one click away. Cached for an hour because
+    /// the token is stable.
+    /// </summary>
+    [HttpGet]
+    [ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any)]
+    public async Task<IActionResult> Qr(Guid id, int size = 6)
+    {
+        var token = await ApiClient.GetStudentQrTokenAsync(id);
+        if (string.IsNullOrEmpty(token)) return NotFound();
+        if (size < 1 || size > 20) size = 6;
+
+        // Encode the full public URL so the QR works the same whether
+        // scanned by an anonymous phone camera (→ lost-and-found page)
+        // or by the assistant app (which strips the trailing token).
+        var origin = $"{Request.Scheme}://{Request.Host.ToUriComponent()}";
+        var url = $"{origin}/q/{token}";
+
+        using var gen   = new QRCodeGenerator();
+        using var data  = gen.CreateQrCode(url, QRCodeGenerator.ECCLevel.M);
+        using var png   = new PngByteQRCode(data);
+        var bytes       = png.GetGraphic(size);
+        return File(bytes, "image/png");
     }
 }

@@ -12,17 +12,20 @@ public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand,
     private readonly IApplicationDbContext _context;
     private readonly IParentUpsertService _parentUpsert;
     private readonly IActiveSubscriptionService _activeSubscription;
+    private readonly IStudentQrMintService _qrMint;
 
     public CreateStudentCommandHandler(
         IUnitOfWork unitOfWork,
         IApplicationDbContext context,
         IParentUpsertService parentUpsert,
-        IActiveSubscriptionService activeSubscription)
+        IActiveSubscriptionService activeSubscription,
+        IStudentQrMintService qrMint)
     {
         _unitOfWork         = unitOfWork;
         _context            = context;
         _parentUpsert       = parentUpsert;
         _activeSubscription = activeSubscription;
+        _qrMint             = qrMint;
     }
 
     public async Task<Result<Guid>> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
@@ -77,6 +80,11 @@ public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand,
             SubscriptionId = activeSubId.Value,
             StudentId      = student.Id
         });
+
+        // Mint a QR token immediately so the student is ready to be
+        // scanned from day one — both for the public lost-and-found
+        // page and for assistant pickup attendance.
+        await _qrMint.MintForStudentAsync(student.Id, schoolGuid, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Result<Guid>.Success(student.Id);

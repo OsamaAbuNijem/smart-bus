@@ -13,17 +13,20 @@ public class BulkUpsertStudentsHandler
     private readonly IApplicationDbContext _context;
     private readonly IParentUpsertService _parentUpsert;
     private readonly IActiveSubscriptionService _activeSubscription;
+    private readonly IStudentQrMintService _qrMint;
 
     public BulkUpsertStudentsHandler(
         IUnitOfWork unitOfWork,
         IApplicationDbContext context,
         IParentUpsertService parentUpsert,
-        IActiveSubscriptionService activeSubscription)
+        IActiveSubscriptionService activeSubscription,
+        IStudentQrMintService qrMint)
     {
         _unitOfWork         = unitOfWork;
         _context            = context;
         _parentUpsert       = parentUpsert;
         _activeSubscription = activeSubscription;
+        _qrMint             = qrMint;
     }
 
     public async Task<Result<BulkUpsertStudentsResult>> Handle(
@@ -176,6 +179,10 @@ public class BulkUpsertStudentsHandler
                     SubscriptionId = activeSubId.Value,
                     StudentId      = student.Id
                 });
+                // Mint the per-student QR token so the row is ready to be
+                // scanned (public page + assistant pickup) the moment the
+                // import commits.
+                await _qrMint.MintForStudentAsync(student.Id, schoolGuid, cancellationToken);
                 // Record this student as already-linked so a second row in the
                 // same batch with the same NationalNumber doesn't try to add a
                 // duplicate (SubscriptionId, StudentId) — Postgres would reject

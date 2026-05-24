@@ -183,6 +183,43 @@ const students = {
     SB.openModal('modal-students-import');
   },
 
+  // ── QR sticker modal ──────────────────────────────────────────────────────
+  // Pulls a server-rendered PNG (encoding the public /q/<token> URL) into the
+  // modal so the admin can view and print the student's QR.
+  openQr(id, displayName) {
+    const img  = document.getElementById('students-qr-img');
+    const name = document.getElementById('students-qr-student-name');
+    // Cache-buster so a freshly-rotated token (future feature) doesn't get
+    // pinned by the browser cache.
+    img.src    = `/Students/Qr?id=${encodeURIComponent(id)}&size=8&t=${Date.now()}`;
+    name.textContent = displayName || '';
+    img.dataset.studentName = displayName || '';
+    SB.openModal('modal-students-qr');
+  },
+
+  printQr() {
+    const img  = document.getElementById('students-qr-img');
+    const name = img?.dataset?.studentName || '';
+    if (!img?.src) return;
+    const w = window.open('', '_blank', 'width=420,height=560');
+    if (!w) return;
+    w.document.open();
+    w.document.write(`
+<!doctype html>
+<html><head><meta charset="utf-8"><title>${name || 'Student QR'}</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; text-align: center; padding: 32px 16px; }
+  .name { font-size: 18px; font-weight: 800; color: #0F172A; margin-bottom: 14px; }
+  img { width: 320px; height: 320px; border: 1px solid #E2E8F0; padding: 14px; border-radius: 16px; }
+  @media print { @page { size: A6; margin: 12mm; } }
+</style></head>
+<body onload="setTimeout(()=>{window.print();window.close();}, 300)">
+  <div class="name">${name}</div>
+  <img src="${img.src}" alt="Student QR"/>
+</body></html>`);
+    w.document.close();
+  },
+
   async submitImport() {
     const input = document.getElementById('students-import-file');
     const file  = input.files?.[0];

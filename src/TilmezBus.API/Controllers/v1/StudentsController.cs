@@ -13,6 +13,8 @@ using TilmezBus.Application.Features.Students.Commands.ScanQr;
 using TilmezBus.Application.Features.Students.Commands.UpdateStudent;
 using TilmezBus.Application.Features.Students.Queries.GetAllStudents;
 using TilmezBus.Application.Features.Students.Queries.GetStudentById;
+using TilmezBus.Application.Features.Students.Queries.GetStudentQrPublic;
+using TilmezBus.Application.Features.Students.Queries.GetStudentQrToken;
 using TilmezBus.Application.Features.Students.Queries.GetStudentRegistrationToken;
 using TilmezBus.Application.Features.Students.Queries.ResolveStudentQr;
 
@@ -183,6 +185,39 @@ public class StudentsController : ControllerBase
     {
         var result = await _mediator.Send(new ScanStudentQrCommand(request.Token, request.TripId), cancellationToken);
         return result.IsSuccess ? Ok(result.Data) : BadRequest(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Public lookup — resolves a printed QR token to a lost-and-found
+    /// card (student name + parent contact + school contact + logo).
+    /// Anonymous so anyone who scans the sticker with their phone
+    /// camera can reunite the kid without needing an account.
+    /// </summary>
+    [HttpGet("qr/{token}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResolveQrPublic(string token, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetStudentQrPublicQuery(token), cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Data)
+            : NotFound(new { error = result.Error });
+    }
+
+    /// <summary>
+    /// Admin only — returns the registered QR token bound to [id] so the
+    /// Web admin can render / print the student's QR sticker. Returns
+    /// null when no token is bound (legacy rows pre-auto-mint).
+    /// </summary>
+    [HttpGet("{id:guid}/qr-token")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
+    public async Task<IActionResult> GetQrToken(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetStudentQrTokenQuery(id), cancellationToken);
+        return result.IsSuccess
+            ? Ok(new { token = result.Data })
+            : BadRequest(new { error = result.Error });
     }
 
     /// <summary>

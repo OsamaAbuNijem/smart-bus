@@ -184,6 +184,44 @@ public class ApiClient : IApiClient
 
     public Task<bool> DeleteStudentAsync(Guid id) => DeleteAsync($"api/v1/students/{id}");
 
+    public async Task<string?> GetStudentQrTokenAsync(Guid id)
+    {
+        using var req = AuthorizedRequest(HttpMethod.Get, $"api/v1/students/{id}/qr-token", null);
+        using var response = await _httpClient.SendAsync(req);
+        if (!response.IsSuccessStatusCode) return null;
+        var body = await response.Content.ReadAsStringAsync();
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.TryGetProperty("token", out var t) &&
+                t.ValueKind == JsonValueKind.String)
+            {
+                return t.GetString();
+            }
+        }
+        catch
+        {
+            // Bad payload — treat as missing token.
+        }
+        return null;
+    }
+
+    /// <summary>Anonymous resolver for the public lost-and-found page.
+    /// Hits the API with no auth (the token IS the credential), returns
+    /// null on 404 so the public Razor view can render a friendly
+    /// "QR not registered" empty state.</summary>
+    public async Task<TilmezBus.Application.Features.Students.Queries.GetStudentQrPublic.PublicStudentQrDto?>
+        ResolveStudentQrPublicAsync(string token)
+    {
+        using var req = new HttpRequestMessage(HttpMethod.Get,
+            $"api/v1/students/qr/{Uri.EscapeDataString(token)}");
+        using var response = await _httpClient.SendAsync(req);
+        if (!response.IsSuccessStatusCode) return null;
+        var body = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<TilmezBus.Application.Features.Students.Queries.GetStudentQrPublic.PublicStudentQrDto>(
+            body, _jsonOptions);
+    }
+
     public async Task<(bool Ok, TilmezBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentsResult? Result, string? Error)>
         BulkUpsertStudentsAsync(IReadOnlyList<TilmezBus.Application.Features.Students.Commands.BulkUpsertStudents.BulkUpsertStudentRow> rows)
     {

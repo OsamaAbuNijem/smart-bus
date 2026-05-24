@@ -1,0 +1,304 @@
+@model TilmezBus.Application.Features.Students.Queries.GetStudentQrPublic.PublicStudentQrDto
+@{
+    Layout = null;
+    var isAr = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var dir  = isAr ? "rtl" : "ltr";
+    var name = Model is null ? null : (isAr || string.IsNullOrWhiteSpace(Model.StudentNameEn)
+        ? Model.StudentName
+        : Model.StudentNameEn);
+}
+<!DOCTYPE html>
+<html lang="@(isAr ? "ar" : "en")" dir="@dir">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#F5C518">
+    <title>@(Model?.StudentName ?? "TilmezBus") · TilmezBus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@@500;700;800&family=Tajawal:wght@@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0F172A;
+            --slate-500: #64748B;
+            --slate-300: #CBD5E1;
+            --slate-100: #F1F5F9;
+            --slate-50: #F8FAFC;
+            --yellow: #F5C518;
+            --yellow-deep: #D97706;
+            --emerald: #10B981;
+            --blue: #2563EB;
+            --rose: #E11D48;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; min-height: 100%; }
+        body {
+            font-family: @(isAr ? "'Tajawal'" : "'Inter'"), system-ui, -apple-system, sans-serif;
+            color: var(--ink);
+            background: linear-gradient(180deg, #FFFBEB 0%, #FFFFFF 50%, #FFFFFF 100%);
+            min-height: 100dvh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 24px 16px 64px;
+        }
+        .shell { width: 100%; max-width: 460px; }
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 18px;
+            color: var(--yellow-deep);
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 12px var(--yellow); }
+        .card {
+            background: #FFFFFF;
+            border-radius: 22px;
+            border: 1px solid var(--slate-100);
+            box-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.18), 0 8px 16px -8px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+        .hero {
+            background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+            padding: 28px 22px 22px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .school-logo {
+            width: 64px; height: 64px;
+            border-radius: 18px;
+            background: #FFFFFF;
+            border: 1px solid #FDE68A;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 6px 14px -6px rgba(217, 119, 6, 0.45);
+        }
+        .school-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .school-logo-fallback {
+            font-weight: 800; font-size: 22px; color: var(--yellow-deep);
+        }
+        .school-meta { flex: 1; min-width: 0; }
+        .school-label {
+            font-size: 10.5px; font-weight: 800;
+            color: var(--yellow-deep);
+            letter-spacing: 1.5px; text-transform: uppercase;
+        }
+        .school-name {
+            font-size: 17px; font-weight: 800; color: var(--ink);
+            letter-spacing: -0.4px; margin-top: 3px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .school-city {
+            font-size: 12px; color: var(--slate-500); margin-top: 2px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .body { padding: 22px 22px 26px; }
+        .student-name {
+            font-size: 24px; font-weight: 800; color: var(--ink);
+            letter-spacing: -0.6px; line-height: 1.2;
+        }
+        .student-grade {
+            margin-top: 6px;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 11px;
+            background: var(--slate-50);
+            border: 1px solid var(--slate-100);
+            border-radius: 100px;
+            font-size: 12px; font-weight: 700; color: var(--slate-500);
+        }
+        .section-title {
+            margin-top: 22px;
+            font-size: 10.5px; font-weight: 800;
+            color: var(--slate-500); letter-spacing: 1.3px;
+            text-transform: uppercase;
+        }
+        .row-list {
+            margin-top: 8px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 13px 14px;
+            border: 1px solid var(--slate-100);
+            border-radius: 14px;
+            background: #FFFFFF;
+            text-decoration: none; color: inherit;
+            transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+        }
+        .row:active { transform: scale(0.985); }
+        .row.contact:hover {
+            border-color: var(--yellow);
+            box-shadow: 0 4px 14px -6px rgba(245, 197, 24, 0.55);
+        }
+        .row-icon {
+            width: 38px; height: 38px;
+            border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .row-icon svg { width: 18px; height: 18px; }
+        .row-icon.parent { background: #DBEAFE; color: #1E40AF; }
+        .row-icon.phone-parent { background: #DCFCE7; color: #15803D; }
+        .row-icon.phone-school { background: #FEF3C7; color: var(--yellow-deep); }
+        .row-text { flex: 1; min-width: 0; }
+        .row-label {
+            font-size: 10.5px; font-weight: 700;
+            color: var(--slate-500); letter-spacing: 0.7px;
+            text-transform: uppercase;
+        }
+        .row-value {
+            font-size: 14px; font-weight: 700; color: var(--ink);
+            letter-spacing: -0.2px; margin-top: 2px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .ltr-value { direction: ltr; unicode-bidi: isolate; text-align: start; }
+        .row-chevron {
+            color: var(--slate-300); flex-shrink: 0;
+        }
+        .empty {
+            text-align: center; padding: 40px 20px;
+        }
+        .empty-icon {
+            width: 56px; height: 56px;
+            margin: 0 auto 14px;
+            background: var(--slate-100);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--slate-500);
+        }
+        .empty h2 {
+            margin: 0 0 6px; font-size: 17px; font-weight: 800;
+            color: var(--ink);
+        }
+        .empty p {
+            margin: 0; font-size: 13px; color: var(--slate-500);
+        }
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 11px; color: var(--slate-500);
+        }
+        .footer a { color: var(--yellow-deep); text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <div class="brand">
+        <span class="brand-dot"></span>
+        TilmezBus
+    </div>
+
+    @if (Model is null)
+    {
+        <div class="card">
+            <div class="empty">
+                <div class="empty-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <h2>@(isAr ? "هذا الرمز غير مسجّل" : "This QR isn't registered yet")</h2>
+                <p>@(isAr ? "إذا كنت قد وجدت هذه البطاقة، تواصل مع المدرسة." : "If you found this card, please contact the school directly.")</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        var __initials = string.Concat(
+            (Model.SchoolName ?? "?")
+                .Trim()
+                .Split(' ')
+                .Where(p => !string.IsNullOrEmpty(p))
+                .Take(2)
+                .Select(p => p[0]))
+            .ToUpperInvariant();
+        <div class="card">
+            <div class="hero">
+                <div class="school-logo">
+                    @if (!string.IsNullOrWhiteSpace(Model.SchoolLogoUrl))
+                    {
+                        <img src="@Model.SchoolLogoUrl" alt="@Model.SchoolName"
+                             data-initials="@__initials"
+                             onerror="this.outerHTML='<span class=&quot;school-logo-fallback&quot;>'+this.dataset.initials+'</span>';">
+                    }
+                    else
+                    {
+                        <span class="school-logo-fallback">@__initials</span>
+                    }
+                </div>
+                <div class="school-meta">
+                    <div class="school-label">@(isAr ? "المدرسة" : "School")</div>
+                    <div class="school-name">@Model.SchoolName</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.City))
+                    {
+                        <div class="school-city">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            @Model.City
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="body">
+                <div class="student-name">@name</div>
+                <div class="student-grade">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    @(isAr ? "الصف" : "Grade") @Model.Grade
+                </div>
+
+                <div class="section-title">@(isAr ? "تواصل" : "Contact")</div>
+                <div class="row-list">
+                    @if (!string.IsNullOrWhiteSpace(Model.ParentName))
+                    {
+                        <div class="row">
+                            <div class="row-icon parent">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div class="row-text">
+                                <div class="row-label">@(isAr ? "ولي الأمر" : "Parent")</div>
+                                <div class="row-value">@Model.ParentName</div>
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.ParentPhone))
+                    {
+                        <a class="row contact" href="tel:@Model.ParentPhone">
+                            <div class="row-icon phone-parent">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            </div>
+                            <div class="row-text">
+                                <div class="row-label">@(isAr ? "هاتف ولي الأمر" : "Parent phone")</div>
+                                <div class="row-value ltr-value">@Model.ParentPhone</div>
+                            </div>
+                            <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.SchoolPhone))
+                    {
+                        <a class="row contact" href="tel:@Model.SchoolPhone">
+                            <div class="row-icon phone-school">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
+                            </div>
+                            <div class="row-text">
+                                <div class="row-label">@(isAr ? "هاتف المدرسة" : "School phone")</div>
+                                <div class="row-value ltr-value">@Model.SchoolPhone</div>
+                            </div>
+                            <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="footer">
+        @(isAr ? "صفحة عامة آمنة لإعادة الطالب إلى المدرسة." : "Public safety page · Help return this student to school.")
+    </div>
+</div>
+</body>
+</html>

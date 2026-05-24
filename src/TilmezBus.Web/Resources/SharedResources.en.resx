@@ -479,6 +479,10 @@
   <data name="Student_ColStudent"  xml:space="preserve"><value>Student</value></data>
   <data name="Student_ColNationalNumber" xml:space="preserve"><value>National No.</value></data>
   <data name="Student_ColLocation" xml:space="preserve"><value>Location</value></data>
+  <data name="Student_AriaQr" xml:space="preserve"><value>Show QR for {0}</value></data>
+  <data name="Student_QrTitle" xml:space="preserve"><value>Student QR</value></data>
+  <data name="Student_QrHint" xml:space="preserve"><value>Scan with any phone camera to open the public student page. Print and attach to bag or uniform.</value></data>
+  <data name="Student_QrPrint" xml:space="preserve"><value>Print</value></data>
   <data name="Student_LocationAriaOpen" xml:space="preserve"><value>Open {0}'s home in Google Maps</value></data>
   <data name="Student_ColGrade"    xml:space="preserve"><value>Grade</value></data>
   <data name="Student_ColParent"   xml:space="preserve"><value>Parent</value></data>
