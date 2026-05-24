@@ -194,13 +194,17 @@
             letter-spacing: -0.2px; margin-top: 2px;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
-        /* Isolate the bidi context so a phone number like +962... renders
-           digits left-to-right, but DON'T override `direction` outright —
-           that pins the row to the left edge in Arabic while the row's
-           label sits on the right, breaking the column. Letting text-align
-           inherit from the row keeps the value flush against the same edge
-           as the label in both locales. */
-        .ltr-value { unicode-bidi: isolate; }
+        /* Force LTR + isolate the bidi context on the inline phone span
+           so `+962…` always renders with the leading `+` on the visual
+           left (the leading `+` is bidi-neutral; without direction:ltr,
+           an RTL parent flips it to the right). The wrapping .row-value
+           div doesn't get this — its text-align inherits from the row
+           so the whole cell still aligns flush with the row label. */
+        .ltr-value {
+            direction: ltr;
+            unicode-bidi: isolate;
+            display: inline-block;
+        }
         .row-chevron {
             color: var(--slate-300); flex-shrink: 0;
         }
@@ -349,7 +353,7 @@
                             </div>
                             <div class="row-text">
                                 <div class="row-label">@(isAr ? "هاتف ولي الأمر" : "Parent phone")</div>
-                                <div class="row-value ltr-value">@Model.ParentPhone</div>
+                                <div class="row-value"><span class="ltr-value">@Model.ParentPhone</span></div>
                             </div>
                             <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                         </a>
@@ -362,7 +366,7 @@
                             </div>
                             <div class="row-text">
                                 <div class="row-label">@(isAr ? "هاتف المدرسة" : "School phone")</div>
-                                <div class="row-value ltr-value">@Model.SchoolPhone</div>
+                                <div class="row-value"><span class="ltr-value">@Model.SchoolPhone</span></div>
                             </div>
                             <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                         </a>
