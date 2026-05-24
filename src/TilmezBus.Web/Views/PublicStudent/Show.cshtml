@@ -194,7 +194,13 @@
             letter-spacing: -0.2px; margin-top: 2px;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
-        .ltr-value { direction: ltr; unicode-bidi: isolate; text-align: start; }
+        /* Isolate the bidi context so a phone number like +962... renders
+           digits left-to-right, but DON'T override `direction` outright —
+           that pins the row to the left edge in Arabic while the row's
+           label sits on the right, breaking the column. Letting text-align
+           inherit from the row keeps the value flush against the same edge
+           as the label in both locales. */
+        .ltr-value { unicode-bidi: isolate; }
         .row-chevron {
             color: var(--slate-300); flex-shrink: 0;
         }
