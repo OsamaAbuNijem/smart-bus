@@ -19,13 +19,22 @@ namespace TilmezBus.Infrastructure.Persistence.Migrations
             //   to uuid for the StudentQrTokens.SchoolId FK.
             // - 16 random bytes → 32-char lowercase hex matches the legacy
             //   sticker token shape so URLs stay stable across the cutover.
+            // NOTE on RNG: we deliberately avoid gen_random_bytes() here —
+            // it lives in the pgcrypto extension which isn't installed on
+            // every target environment (prod hit a 42883 on first run).
+            // md5(random()::text || clock_timestamp()::text || student id)
+            // returns a 32-char hex string with no extension dependency
+            // and is unique-enough for our use case (the column has a
+            // UNIQUE index so any improbable collision would fail loudly
+            // here, not silently land a duplicate token).
+            // gen_random_uuid() is in core Postgres 13+, fine to use.
             migrationBuilder.Sql(@"
 INSERT INTO ""StudentQrTokens""
     (""Id"", ""Token"", ""SchoolId"", ""StudentId"",
      ""IsRegistered"", ""RegisteredAt"", ""CreatedAt"", ""IsDeleted"")
 SELECT
     gen_random_uuid(),
-    LOWER(ENCODE(gen_random_bytes(16), 'hex')),
+    LOWER(MD5(random()::text || clock_timestamp()::text || s.""Id""::text)),
     s.""SchoolId""::uuid,
     s.""Id"",
     true,
