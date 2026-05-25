@@ -780,6 +780,60 @@
   <data name="Home_NFC_ScanSchoolPhone"      xml:space="preserve"><value>+962 6 555 0100</value></data>
   <data name="Home_NFC_ScanHelp"        xml:space="preserve"><value>If you found this student, please contact us.</value></data>
 
+  <!-- ── Showcase section: real app mockups with demo data ─── -->
+  <data name="Home_Showcase_Eyebrow"     xml:space="preserve"><value>See it in action</value></data>
+  <data name="Home_Showcase_Title"       xml:space="preserve"><value>Three screens, one calm day.</value></data>
+  <data name="Home_Showcase_Lead"        xml:space="preserve"><value>The same trip seen from the bus, the home, and the office. Real flows, with demo data.</value></data>
+  <data name="Home_Showcase_Driver_Tag"   xml:space="preserve"><value>Driver + assistant</value></data>
+  <data name="Home_Showcase_Driver_Title" xml:space="preserve"><value>Live route, next stop, one tap to mark each student.</value></data>
+  <data name="Home_Showcase_Parent_Tag"   xml:space="preserve"><value>Parent app</value></data>
+  <data name="Home_Showcase_Parent_Title" xml:space="preserve"><value>Calm status at a glance, with a live snackbar.</value></data>
+  <data name="Home_Showcase_Admin_Tag"    xml:space="preserve"><value>Admin web</value></data>
+  <data name="Home_Showcase_Admin_Title"  xml:space="preserve"><value>Operations dashboard, every trip in one view.</value></data>
+  <!-- Driver mockup -->
+  <data name="Home_SC_Driver_TripLabel"  xml:space="preserve"><value>Morning · Bus 14</value></data>
+  <data name="Home_SC_Driver_TripName"   xml:space="preserve"><value>Bright Minds · 18 students</value></data>
+  <data name="Home_SC_Driver_Live"       xml:space="preserve"><value>Live</value></data>
+  <data name="Home_SC_Driver_NextStop"   xml:space="preserve"><value>Next stop</value></data>
+  <data name="Home_SC_Driver_StopName"   xml:space="preserve"><value>Layan Al-Saleh</value></data>
+  <data name="Home_SC_Driver_StopEta"    xml:space="preserve"><value>0.4 km · ~2 min</value></data>
+  <data name="Home_SC_Driver_Boarded"    xml:space="preserve"><value>Boarded</value></data>
+  <!-- Parent mockup -->
+  <data name="Home_SC_Parent_Greet"      xml:space="preserve"><value>Good morning,</value></data>
+  <data name="Home_SC_Parent_GreetName"  xml:space="preserve"><value>Mr Al-Saleh</value></data>
+  <data name="Home_SC_Parent_SnackTitle" xml:space="preserve"><value>Adam is on the bus</value></data>
+  <data name="Home_SC_Parent_SnackSub"   xml:space="preserve"><value>Drop-off at school in ~3 min</value></data>
+  <data name="Home_SC_Parent_Section"    xml:space="preserve"><value>Your children</value></data>
+  <data name="Home_SC_Parent_Child1Name"  xml:space="preserve"><value>Adam</value></data>
+  <data name="Home_SC_Parent_Child1Meta"  xml:space="preserve"><value>Bright Minds · Grade 3</value></data>
+  <data name="Home_SC_Parent_Child2Name"  xml:space="preserve"><value>Sara</value></data>
+  <data name="Home_SC_Parent_Child2Meta"  xml:space="preserve"><value>Bright Minds · Grade 6</value></data>
+  <data name="Home_SC_Parent_StatusBus"   xml:space="preserve"><value>On the bus</value></data>
+  <data name="Home_SC_Parent_StatusSchool" xml:space="preserve"><value>At school</value></data>
+  <data name="Home_SC_Parent_ActionLive"  xml:space="preserve"><value>Live track</value></data>
+  <data name="Home_SC_Parent_ActionAbsence" xml:space="preserve"><value>Report absence</value></data>
+  <!-- Admin mockup -->
+  <data name="Home_SC_Admin_Page"        xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Home_SC_Admin_Nav1"        xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Home_SC_Admin_Nav2"        xml:space="preserve"><value>Buses</value></data>
+  <data name="Home_SC_Admin_Nav3"        xml:space="preserve"><value>Students</value></data>
+  <data name="Home_SC_Admin_Nav4"        xml:space="preserve"><value>Drivers</value></data>
+  <data name="Home_SC_Admin_Nav5"        xml:space="preserve"><value>Reports</value></data>
+  <data name="Home_SC_Admin_School"      xml:space="preserve"><value>Bright Minds School</value></data>
+  <data name="Home_SC_Admin_KpiActive"   xml:space="preserve"><value>Active trips</value></data>
+  <data name="Home_SC_Admin_KpiStudents" xml:space="preserve"><value>Students</value></data>
+  <data name="Home_SC_Admin_KpiOnTime"   xml:space="preserve"><value>On-time</value></data>
+  <data name="Home_SC_Admin_KpiBuses"    xml:space="preserve"><value>Buses</value></data>
+  <data name="Home_SC_Admin_KpiIdle"     xml:space="preserve"><value>2 idle</value></data>
+  <data name="Home_SC_Admin_TableTitle"  xml:space="preserve"><value>Live trips · this morning</value></data>
+  <data name="Home_SC_Admin_TableLink"   xml:space="preserve"><value>View all</value></data>
+  <data name="Home_SC_Admin_StatusOnRoute" xml:space="preserve"><value>On route</value></data>
+  <data name="Home_SC_Admin_StatusBoarding" xml:space="preserve"><value>Boarding</value></data>
+  <data name="Home_SC_Admin_StatusArrived"  xml:space="preserve"><value>Arrived</value></data>
+  <data name="Home_SC_Admin_Driver1"     xml:space="preserve"><value>Khaled · Layla (assistant)</value></data>
+  <data name="Home_SC_Admin_Driver2"     xml:space="preserve"><value>Tareq · Hala (assistant)</value></data>
+  <data name="Home_SC_Admin_Driver3"     xml:space="preserve"><value>Salem · Sami (assistant)</value></data>
+
   <data name="Home_FeaturesEyebrow"  xml:space="preserve"><value>What's inside</value></data>
   <data name="Home_FeaturesTitle"    xml:space="preserve"><value>Everything a school transport day needs</value></data>
   <data name="Home_FeaturesLead"     xml:space="preserve"><value>One platform for the people who run the route, the people who ride it, and the people waiting at home.</value></data>

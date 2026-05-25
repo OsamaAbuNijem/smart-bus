@@ -780,6 +780,60 @@
   <data name="Home_NFC_ScanSchoolPhone"      xml:space="preserve"><value>‎+962 6 555 0100</value></data>
   <data name="Home_NFC_ScanHelp"        xml:space="preserve"><value>إذا عثرت على هذا الطالب، يرجى التواصل.</value></data>
 
+  <!-- ── Showcase section: real app mockups with demo data ─── -->
+  <data name="Home_Showcase_Eyebrow"     xml:space="preserve"><value>التطبيق أثناء العمل</value></data>
+  <data name="Home_Showcase_Title"       xml:space="preserve"><value>ثلاث شاشات، يومٌ هادئ واحد.</value></data>
+  <data name="Home_Showcase_Lead"        xml:space="preserve"><value>الرحلة ذاتها من زاوية الباص، البيت، والإدارة. تدفّقات حقيقيّة ببيانات تجريبيّة.</value></data>
+  <data name="Home_Showcase_Driver_Tag"   xml:space="preserve"><value>السائق + المرافق</value></data>
+  <data name="Home_Showcase_Driver_Title" xml:space="preserve"><value>مسار مباشر، المحطّة التالية، ولمسة لتسجيل كل طالب.</value></data>
+  <data name="Home_Showcase_Parent_Tag"   xml:space="preserve"><value>تطبيق ولي الأمر</value></data>
+  <data name="Home_Showcase_Parent_Title" xml:space="preserve"><value>حالةٌ هادئة بنظرة واحدة، مع شريط مباشر.</value></data>
+  <data name="Home_Showcase_Admin_Tag"    xml:space="preserve"><value>الإدارة (ويب)</value></data>
+  <data name="Home_Showcase_Admin_Title"  xml:space="preserve"><value>لوحة العمليّات، جميع الرحلات في مكان واحد.</value></data>
+  <!-- Driver mockup -->
+  <data name="Home_SC_Driver_TripLabel"  xml:space="preserve"><value>صباحًا · باص 14</value></data>
+  <data name="Home_SC_Driver_TripName"   xml:space="preserve"><value>مدارس العقول النيّرة · 18 طالبًا</value></data>
+  <data name="Home_SC_Driver_Live"       xml:space="preserve"><value>مباشر</value></data>
+  <data name="Home_SC_Driver_NextStop"   xml:space="preserve"><value>المحطّة التالية</value></data>
+  <data name="Home_SC_Driver_StopName"   xml:space="preserve"><value>ليان الصالح</value></data>
+  <data name="Home_SC_Driver_StopEta"    xml:space="preserve"><value>0.4 كم · ~2 دقيقة</value></data>
+  <data name="Home_SC_Driver_Boarded"    xml:space="preserve"><value>صعد</value></data>
+  <!-- Parent mockup -->
+  <data name="Home_SC_Parent_Greet"      xml:space="preserve"><value>صباح الخير،</value></data>
+  <data name="Home_SC_Parent_GreetName"  xml:space="preserve"><value>السيّد الصالح</value></data>
+  <data name="Home_SC_Parent_SnackTitle" xml:space="preserve"><value>آدم على متن الباص</value></data>
+  <data name="Home_SC_Parent_SnackSub"   xml:space="preserve"><value>الوصول إلى المدرسة بعد ~3 دقائق</value></data>
+  <data name="Home_SC_Parent_Section"    xml:space="preserve"><value>أبناؤك</value></data>
+  <data name="Home_SC_Parent_Child1Name"  xml:space="preserve"><value>آدم</value></data>
+  <data name="Home_SC_Parent_Child1Meta"  xml:space="preserve"><value>مدارس العقول النيّرة · الصف 3</value></data>
+  <data name="Home_SC_Parent_Child2Name"  xml:space="preserve"><value>سارة</value></data>
+  <data name="Home_SC_Parent_Child2Meta"  xml:space="preserve"><value>مدارس العقول النيّرة · الصف 6</value></data>
+  <data name="Home_SC_Parent_StatusBus"   xml:space="preserve"><value>على الباص</value></data>
+  <data name="Home_SC_Parent_StatusSchool" xml:space="preserve"><value>في المدرسة</value></data>
+  <data name="Home_SC_Parent_ActionLive"  xml:space="preserve"><value>تتبّع مباشر</value></data>
+  <data name="Home_SC_Parent_ActionAbsence" xml:space="preserve"><value>إبلاغ غياب</value></data>
+  <!-- Admin mockup -->
+  <data name="Home_SC_Admin_Page"        xml:space="preserve"><value>اللوحة</value></data>
+  <data name="Home_SC_Admin_Nav1"        xml:space="preserve"><value>اللوحة</value></data>
+  <data name="Home_SC_Admin_Nav2"        xml:space="preserve"><value>الباصات</value></data>
+  <data name="Home_SC_Admin_Nav3"        xml:space="preserve"><value>الطلاب</value></data>
+  <data name="Home_SC_Admin_Nav4"        xml:space="preserve"><value>السائقون</value></data>
+  <data name="Home_SC_Admin_Nav5"        xml:space="preserve"><value>التقارير</value></data>
+  <data name="Home_SC_Admin_School"      xml:space="preserve"><value>مدارس العقول النيّرة</value></data>
+  <data name="Home_SC_Admin_KpiActive"   xml:space="preserve"><value>رحلات نشطة</value></data>
+  <data name="Home_SC_Admin_KpiStudents" xml:space="preserve"><value>الطلاب</value></data>
+  <data name="Home_SC_Admin_KpiOnTime"   xml:space="preserve"><value>الالتزام بالموعد</value></data>
+  <data name="Home_SC_Admin_KpiBuses"    xml:space="preserve"><value>الباصات</value></data>
+  <data name="Home_SC_Admin_KpiIdle"     xml:space="preserve"><value>2 متوقّف</value></data>
+  <data name="Home_SC_Admin_TableTitle"  xml:space="preserve"><value>الرحلات المباشرة · هذا الصباح</value></data>
+  <data name="Home_SC_Admin_TableLink"   xml:space="preserve"><value>عرض الكل</value></data>
+  <data name="Home_SC_Admin_StatusOnRoute" xml:space="preserve"><value>على الطريق</value></data>
+  <data name="Home_SC_Admin_StatusBoarding" xml:space="preserve"><value>صعود</value></data>
+  <data name="Home_SC_Admin_StatusArrived"  xml:space="preserve"><value>وصل</value></data>
+  <data name="Home_SC_Admin_Driver1"     xml:space="preserve"><value>خالد · ليلى (مرافقة)</value></data>
+  <data name="Home_SC_Admin_Driver2"     xml:space="preserve"><value>طارق · هلا (مرافقة)</value></data>
+  <data name="Home_SC_Admin_Driver3"     xml:space="preserve"><value>سالم · سامي (مرافق)</value></data>
+
   <data name="Home_FeaturesEyebrow"  xml:space="preserve"><value>ما يحتويه باص التلميذ</value></data>
   <data name="Home_FeaturesTitle"    xml:space="preserve"><value>كل ما يلزم يوم النقل المدرسي</value></data>
   <data name="Home_FeaturesLead"     xml:space="preserve"><value>منصّة واحدة لمن يدير الرحلة، ومن يستقلّها، ومن ينتظر في البيت.</value></data>
