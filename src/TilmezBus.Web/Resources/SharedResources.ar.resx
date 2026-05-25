@@ -762,7 +762,7 @@
   <data name="Home_NFC_Bullet3_Desc"  xml:space="preserve"><value>يستطيع أيّ شخص — مارّ، صاحب محل، معلّم — قراءة البطاقة بأيّ هاتف ليرى اسم الطالب ومدرسته ورقم تواصل مباشر مع وليّ الأمر.</value></data>
 
   <data name="Home_NFC_AvatarInitials" xml:space="preserve"><value>سا</value></data>
-  <data name="Home_NFC_CardName"     xml:space="preserve"><value>سارة الهاشمي</value></data>
+  <data name="Home_NFC_CardName"     xml:space="preserve"><value>آدم</value></data>
   <data name="Home_NFC_CardMeta"     xml:space="preserve"><value>الصف الرابع · مدارس العقول النيّرة</value></data>
   <data name="Home_NFC_CardIdLabel"  xml:space="preserve"><value>رقم الطالب</value></data>
   <data name="Home_NFC_ScanTitle"    xml:space="preserve"><value>نتيجة القراءة</value></data>

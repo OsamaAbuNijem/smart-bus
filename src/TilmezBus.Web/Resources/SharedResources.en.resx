@@ -762,7 +762,7 @@
   <data name="Home_NFC_Bullet3_Desc"  xml:space="preserve"><value>Anyone — a passer-by, a shopkeeper, a teacher — can scan the card with any phone to see the student's name, school, and a direct contact number for the parent.</value></data>
 
   <data name="Home_NFC_AvatarInitials" xml:space="preserve"><value>SA</value></data>
-  <data name="Home_NFC_CardName"     xml:space="preserve"><value>Sara Al-Hashimi</value></data>
+  <data name="Home_NFC_CardName"     xml:space="preserve"><value>Adam</value></data>
   <data name="Home_NFC_CardMeta"     xml:space="preserve"><value>Grade 4 · Bright Minds School</value></data>
   <data name="Home_NFC_CardIdLabel"  xml:space="preserve"><value>Student ID</value></data>
   <data name="Home_NFC_ScanTitle"    xml:space="preserve"><value>Scan result</value></data>
