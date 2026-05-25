@@ -772,6 +772,10 @@
   <data name="Home_NFC_ScanParent"   xml:space="preserve"><value>Mr Al-Saleh · +962 79 555 0123</value></data>
   <data name="Home_NFC_ScanCTA"      xml:space="preserve"><value>Call parent</value></data>
   <data name="Home_NFC_StudentCardLabel" xml:space="preserve"><value>Student Card</value></data>
+  <data name="Home_NFC_ScanSchoolLabel" xml:space="preserve"><value>School</value></data>
+  <data name="Home_NFC_ScanSchoolName"  xml:space="preserve"><value>Bright Minds School</value></data>
+  <data name="Home_NFC_ScanParentLabel" xml:space="preserve"><value>Parent phone</value></data>
+  <data name="Home_NFC_ScanHelp"        xml:space="preserve"><value>If you found this student, please contact us.</value></data>
 
   <data name="Home_FeaturesEyebrow"  xml:space="preserve"><value>What's inside</value></data>
   <data name="Home_FeaturesTitle"    xml:space="preserve"><value>Everything a school transport day needs</value></data>

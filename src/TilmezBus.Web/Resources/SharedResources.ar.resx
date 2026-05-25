@@ -772,6 +772,10 @@
   <data name="Home_NFC_ScanParent"   xml:space="preserve"><value>السيّد الصالح · ‎+962 79 555 0123</value></data>
   <data name="Home_NFC_ScanCTA"      xml:space="preserve"><value>اتصل بولي الأمر</value></data>
   <data name="Home_NFC_StudentCardLabel" xml:space="preserve"><value>بطاقة طالب</value></data>
+  <data name="Home_NFC_ScanSchoolLabel" xml:space="preserve"><value>المدرسة</value></data>
+  <data name="Home_NFC_ScanSchoolName"  xml:space="preserve"><value>مدارس العقول النيّرة</value></data>
+  <data name="Home_NFC_ScanParentLabel" xml:space="preserve"><value>هاتف ولي الأمر</value></data>
+  <data name="Home_NFC_ScanHelp"        xml:space="preserve"><value>إذا عثرت على هذا الطالب، يرجى التواصل.</value></data>
 
   <data name="Home_FeaturesEyebrow"  xml:space="preserve"><value>ما يحتويه باص التلميذ</value></data>
   <data name="Home_FeaturesTitle"    xml:space="preserve"><value>كل ما يلزم يوم النقل المدرسي</value></data>

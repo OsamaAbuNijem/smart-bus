@@ -455,22 +455,92 @@ img{max-width:100%;display:block;}
 }
 .nfc-phone-screen{
   flex:1;background:#FFFFFF;border-radius:22px;
-  padding:14px 12px;display:flex;flex-direction:column;gap:8px;
-  color:#0F172A;
+  padding:10px;display:flex;flex-direction:column;gap:10px;
+  color:#0F172A;overflow:hidden;
 }
-.nfc-phone-head{display:flex;align-items:center;gap:7px;padding:0 2px 8px;border-bottom:1px dashed #E2E8F0;}
-.nfc-phone-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,.2);}
-.nfc-phone-title{font-size:11px;font-weight:800;color:#0F172A;letter-spacing:-.1px;}
-.nfc-phone-row{display:flex;flex-direction:column;gap:1px;}
-.nfc-phone-label{font-size:9px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;}
-.nfc-phone-val{font-size:12px;font-weight:700;color:#0F172A;line-height:1.3;}
-.nfc-phone-btn{
-  margin-top:auto;
-  background:#F5B400;color:#0F172A;
-  font-size:11px;font-weight:800;letter-spacing:.02em;
-  padding:8px 10px;border-radius:9px;text-align:center;
-  box-shadow:0 4px 10px rgba(245,180,0,.4);
+
+/* Mini school hero — yellow gradient header */
+.nfc-mini-hero{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 10px;border-radius:12px;
+  background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%);
 }
+.nfc-mini-logo{
+  width:32px;height:32px;border-radius:9px;
+  background:#FFFFFF;border:1px solid #FDE68A;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 4px 8px -4px rgba(217,119,6,.45);
+}
+.nfc-mini-logo svg{width:18px;height:18px;color:#D97706;}
+.nfc-mini-meta{flex:1;min-width:0;}
+.nfc-mini-eyebrow{
+  font-size:7.5px;font-weight:800;letter-spacing:.12em;
+  color:#D97706;text-transform:uppercase;
+}
+.nfc-mini-school{
+  font-size:11px;font-weight:800;color:#0F172A;
+  letter-spacing:-.2px;margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* Student block */
+.nfc-mini-student{
+  position:relative;
+  padding:14px 8px 10px;border-radius:12px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFF 100%);
+  border:1px solid #F1F5F9;
+  text-align:center;
+  margin-top:14px;
+}
+.nfc-mini-avatar{
+  width:38px;height:38px;border-radius:11px;
+  margin:-32px auto 6px;
+  background:linear-gradient(135deg,#DBEAFE 0%,#93C5FD 100%);
+  border:3px solid #FFFFFF;
+  box-shadow:0 5px 12px -5px rgba(37,99,235,.45);
+  display:flex;align-items:center;justify-content:center;
+  color:#1E40AF;
+}
+.nfc-mini-avatar svg{width:20px;height:20px;}
+.nfc-mini-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 7px;border-radius:100px;
+  background:#EFF6FF;border:1px solid #BFDBFE;
+  color:#1E40AF;
+  font-size:7.5px;font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;
+}
+.nfc-mini-tag svg{width:8px;height:8px;}
+.nfc-mini-name{
+  margin-top:5px;
+  font-size:14px;font-weight:800;color:#0F172A;
+  letter-spacing:-.3px;line-height:1.2;
+}
+
+/* Contact row */
+.nfc-mini-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 9px;border-radius:10px;
+  border:1px solid #F1F5F9;background:#FFFFFF;
+  box-shadow:0 2px 6px -3px rgba(15,23,42,.08);
+}
+.nfc-mini-row-icon{
+  width:28px;height:28px;border-radius:8px;
+  background:#DCFCE7;color:#15803D;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.nfc-mini-row-icon svg{width:14px;height:14px;}
+.nfc-mini-row-text{flex:1;min-width:0;}
+.nfc-mini-row-label{
+  font-size:7.5px;font-weight:800;letter-spacing:.08em;
+  color:#64748B;text-transform:uppercase;
+}
+.nfc-mini-row-value{
+  font-size:10px;font-weight:700;color:#0F172A;
+  letter-spacing:-.1px;margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.nfc-mini-row-chev{width:11px;height:11px;color:#CBD5E1;flex-shrink:0;}
 
 
 /* ── Differentiators (auto-routing + QR) ────────────────── */
@@ -916,27 +986,45 @@ img{max-width:100%;display:block;}
             </div>
           </div>
 
-          <!-- Hovering phone / scanner -->
+          <!-- Hovering phone / scanner — mirrors public lost-and-found page -->
           <div class="nfc-phone">
             <div class="nfc-phone-notch"></div>
             <div class="nfc-phone-screen">
-              <div class="nfc-phone-head">
-                <span class="nfc-phone-dot"></span>
-                <span class="nfc-phone-title">@L["Home_NFC_ScanTitle"]</span>
+              <div class="nfc-mini-hero">
+                <div class="nfc-mini-logo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 10v6"/>
+                    <path d="M2 10l10-5 10 5-10 5z"/>
+                    <path d="M6 12v4c0 1.7 3 3 6 3s6-1.3 6-3v-4"/>
+                  </svg>
+                </div>
+                <div class="nfc-mini-meta">
+                  <div class="nfc-mini-eyebrow">@L["Home_NFC_ScanSchoolLabel"]</div>
+                  <div class="nfc-mini-school">@L["Home_NFC_ScanSchoolName"]</div>
+                </div>
               </div>
-              <div class="nfc-phone-row">
-                <span class="nfc-phone-label">@L["Home_NFC_ScanField1"]</span>
-                <span class="nfc-phone-val">@L["Home_NFC_CardName"]</span>
+              <div class="nfc-mini-student">
+                <div class="nfc-mini-avatar" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>
+                  </svg>
+                </div>
+                <div class="nfc-mini-tag">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+                  <span>@L["Home_NFC_StudentCardLabel"]</span>
+                </div>
+                <div class="nfc-mini-name">@L["Home_NFC_CardName"]</div>
               </div>
-              <div class="nfc-phone-row">
-                <span class="nfc-phone-label">@L["Home_NFC_ScanField2"]</span>
-                <span class="nfc-phone-val">@L["Home_NFC_CardMeta"]</span>
+              <div class="nfc-mini-row">
+                <div class="nfc-mini-row-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <div class="nfc-mini-row-text">
+                  <div class="nfc-mini-row-label">@L["Home_NFC_ScanParentLabel"]</div>
+                  <div class="nfc-mini-row-value">@L["Home_NFC_ScanParent"]</div>
+                </div>
+                <svg class="nfc-mini-row-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
-              <div class="nfc-phone-row">
-                <span class="nfc-phone-label">@L["Home_NFC_ScanField3"]</span>
-                <span class="nfc-phone-val">@L["Home_NFC_ScanParent"]</span>
-              </div>
-              <div class="nfc-phone-btn">@L["Home_NFC_ScanCTA"]</div>
             </div>
           </div>
 
