@@ -350,15 +350,16 @@ img{max-width:100%;display:block;}
   position:relative;height:440px;display:flex;align-items:center;justify-content:center;
 }
 
-/* The student card */
+/* The student card (vertical ID) */
 .nfc-card{
   position:absolute;
-  width:320px;height:200px;border-radius:18px;
-  background:linear-gradient(135deg,#F5B400 0%,#FFA500 65%,#F59E0B 100%);
+  width:220px;height:320px;border-radius:18px;
+  background:linear-gradient(160deg,#F5B400 0%,#FFA500 65%,#F59E0B 100%);
   color:#0F172A;
-  padding:18px;display:flex;flex-direction:column;justify-content:space-between;
+  padding:18px 16px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  text-align:center;
   box-shadow:0 28px 60px -18px rgba(245,180,0,.55),0 12px 24px -10px rgba(15,23,42,.45);
-  inset-inline-start:8%;bottom:18%;transform:rotate(-8deg);
+  inset-inline-start:6%;bottom:8%;transform:rotate(-8deg);
   border:1px solid rgba(255,255,255,.4);
   overflow:hidden;
   animation:nfcFloat 6s ease-in-out infinite;
@@ -374,28 +375,34 @@ img{max-width:100%;display:block;}
   0%,100%{transform:rotate(-8deg) translateY(0);}
   50%{transform:rotate(-8deg) translateY(-6px);}
 }
-.nfc-card-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1;}
-.nfc-card-logo{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:-.1px;color:#0F172A;}
-.nfc-card-logo svg{color:#0F172A;}
-.nfc-card-chip{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
-  width:34px;height:24px;background:rgba(15,23,42,.85);border-radius:5px;padding:3px;
+.nfc-card-top{display:flex;align-items:center;justify-content:center;width:100%;position:relative;z-index:1;}
+.nfc-card-logo-img{
+  height:28px;width:auto;display:block;
+  filter:drop-shadow(0 1px 2px rgba(15,23,42,.25));
 }
-.nfc-card-chip span{background:#FCD34D;border-radius:1px;}
-.nfc-card-body{display:flex;align-items:center;gap:10px;position:relative;z-index:1;}
+.nfc-card-body{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  position:relative;z-index:1;width:100%;
+}
 .nfc-card-avatar{
-  width:44px;height:44px;border-radius:50%;
+  width:48px;height:48px;border-radius:50%;
   background:rgba(15,23,42,.92);color:#FCD34D;
   display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:800;letter-spacing:.5px;
+  font-size:15px;font-weight:800;letter-spacing:.5px;
   flex-shrink:0;
   border:2px solid rgba(255,255,255,.6);
 }
-.nfc-card-name{font-size:17px;font-weight:900;line-height:1.1;color:#0F172A;letter-spacing:-.3px;}
-.nfc-card-meta{font-size:11px;color:rgba(15,23,42,.7);font-weight:600;margin-top:2px;}
-.nfc-card-bottom{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
-.nfc-card-id{font-size:10px;font-weight:700;color:rgba(15,23,42,.6);letter-spacing:.04em;text-transform:uppercase;}
-.nfc-card-wave{width:24px;height:24px;color:rgba(15,23,42,.6);}
+.nfc-card-name{font-size:16px;font-weight:900;line-height:1.1;color:#0F172A;letter-spacing:-.3px;}
+.nfc-card-qr{
+  width:96px;height:96px;border-radius:10px;
+  background:#FFFFFF;padding:6px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(15,23,42,.18),inset 0 0 0 1px rgba(15,23,42,.08);
+  margin-top:2px;
+}
+.nfc-card-qr svg{width:100%;height:100%;display:block;}
+.nfc-card-bottom{display:flex;align-items:center;justify-content:center;width:100%;position:relative;z-index:1;}
+.nfc-card-wave{width:24px;height:24px;color:rgba(15,23,42,.65);}
 
 /* Hovering phone / scanner readout */
 .nfc-phone{
@@ -611,7 +618,11 @@ img{max-width:100%;display:block;}
   .float-card.tl,.float-card.br{display:none;}
   .nfc-title{font-size:26px;}
   .nfc-stage{height:340px;}
-  .nfc-card{width:260px;height:170px;inset-inline-start:2%;}
+  .nfc-card{width:180px;height:260px;inset-inline-start:2%;bottom:4%;padding:14px 12px;}
+  .nfc-card-logo-img{height:22px;}
+  .nfc-card-avatar{width:40px;height:40px;font-size:13px;}
+  .nfc-card-name{font-size:14px;}
+  .nfc-card-qr{width:76px;height:76px;border-radius:8px;padding:5px;}
   .nfc-phone{width:170px;height:300px;inset-inline-end:2%;}
   .nfc-waves{inset-inline-start:36%;}
 }
@@ -823,25 +834,55 @@ img{max-width:100%;display:block;}
           <!-- Student NFC card -->
           <div class="nfc-card">
             <div class="nfc-card-top">
-              <div class="nfc-card-logo">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/>
-                  <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-                </svg>
-                <span>@L["Home_BrandName"]</span>
-              </div>
-              <div class="nfc-card-chip">
-                <span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span>
-              </div>
+              <img class="nfc-card-logo-img" src="~/img/tilmez_bus_logo.png" alt="@L["Home_BrandName"]" />
             </div>
             <div class="nfc-card-body">
               <div class="nfc-card-avatar">@L["Home_NFC_AvatarInitials"]</div>
               <div class="nfc-card-name">@L["Home_NFC_CardName"]</div>
-              <div class="nfc-card-meta">@L["Home_NFC_CardMeta"]</div>
+              <div class="nfc-card-qr" aria-hidden="true">
+                <svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+                  <rect width="21" height="21" fill="#FFFFFF"/>
+                  <g fill="#0F172A">
+                    <rect x="0" y="0"  width="7" height="1"/>
+                    <rect x="0" y="6"  width="7" height="1"/>
+                    <rect x="0" y="0"  width="1" height="7"/>
+                    <rect x="6" y="0"  width="1" height="7"/>
+                    <rect x="2" y="2"  width="3" height="3"/>
+                    <rect x="14" y="0" width="7" height="1"/>
+                    <rect x="14" y="6" width="7" height="1"/>
+                    <rect x="14" y="0" width="1" height="7"/>
+                    <rect x="20" y="0" width="1" height="7"/>
+                    <rect x="16" y="2" width="3" height="3"/>
+                    <rect x="0" y="14" width="7" height="1"/>
+                    <rect x="0" y="20" width="7" height="1"/>
+                    <rect x="0" y="14" width="1" height="7"/>
+                    <rect x="6" y="14" width="1" height="7"/>
+                    <rect x="2" y="16" width="3" height="3"/>
+                    <rect x="8"  y="6" width="1" height="1"/>
+                    <rect x="10" y="6" width="1" height="1"/>
+                    <rect x="12" y="6" width="1" height="1"/>
+                    <rect x="6" y="8"  width="1" height="1"/>
+                    <rect x="6" y="10" width="1" height="1"/>
+                    <rect x="6" y="12" width="1" height="1"/>
+                    <rect x="8"  y="8"  width="1" height="1"/><rect x="10" y="8"  width="1" height="1"/><rect x="13" y="8"  width="1" height="1"/><rect x="15" y="8"  width="1" height="1"/><rect x="17" y="8"  width="1" height="1"/><rect x="19" y="8"  width="1" height="1"/>
+                    <rect x="8"  y="9"  width="1" height="1"/><rect x="11" y="9"  width="1" height="1"/><rect x="14" y="9"  width="1" height="1"/><rect x="16" y="9"  width="1" height="1"/><rect x="18" y="9"  width="1" height="1"/>
+                    <rect x="9"  y="10" width="1" height="1"/><rect x="11" y="10" width="1" height="1"/><rect x="13" y="10" width="1" height="1"/><rect x="15" y="10" width="1" height="1"/><rect x="17" y="10" width="1" height="1"/><rect x="20" y="10" width="1" height="1"/>
+                    <rect x="8"  y="11" width="1" height="1"/><rect x="10" y="11" width="1" height="1"/><rect x="12" y="11" width="1" height="1"/><rect x="14" y="11" width="1" height="1"/><rect x="16" y="11" width="1" height="1"/><rect x="19" y="11" width="1" height="1"/>
+                    <rect x="9"  y="12" width="1" height="1"/><rect x="11" y="12" width="1" height="1"/><rect x="13" y="12" width="1" height="1"/><rect x="15" y="12" width="1" height="1"/><rect x="18" y="12" width="1" height="1"/><rect x="20" y="12" width="1" height="1"/>
+                    <rect x="8"  y="13" width="1" height="1"/><rect x="11" y="13" width="1" height="1"/><rect x="14" y="13" width="1" height="1"/><rect x="16" y="13" width="1" height="1"/><rect x="19" y="13" width="1" height="1"/>
+                    <rect x="8"  y="14" width="1" height="1"/><rect x="10" y="14" width="1" height="1"/><rect x="12" y="14" width="1" height="1"/><rect x="14" y="14" width="1" height="1"/><rect x="17" y="14" width="1" height="1"/><rect x="20" y="14" width="1" height="1"/>
+                    <rect x="8"  y="15" width="1" height="1"/><rect x="11" y="15" width="1" height="1"/><rect x="13" y="15" width="1" height="1"/><rect x="15" y="15" width="1" height="1"/><rect x="18" y="15" width="1" height="1"/><rect x="20" y="15" width="1" height="1"/>
+                    <rect x="9"  y="16" width="1" height="1"/><rect x="12" y="16" width="1" height="1"/><rect x="14" y="16" width="1" height="1"/><rect x="17" y="16" width="1" height="1"/><rect x="19" y="16" width="1" height="1"/>
+                    <rect x="8"  y="17" width="1" height="1"/><rect x="10" y="17" width="1" height="1"/><rect x="13" y="17" width="1" height="1"/><rect x="15" y="17" width="1" height="1"/><rect x="17" y="17" width="1" height="1"/><rect x="20" y="17" width="1" height="1"/>
+                    <rect x="9"  y="18" width="1" height="1"/><rect x="11" y="18" width="1" height="1"/><rect x="14" y="18" width="1" height="1"/><rect x="16" y="18" width="1" height="1"/><rect x="18" y="18" width="1" height="1"/>
+                    <rect x="8"  y="19" width="1" height="1"/><rect x="12" y="19" width="1" height="1"/><rect x="14" y="19" width="1" height="1"/><rect x="16" y="19" width="1" height="1"/><rect x="19" y="19" width="1" height="1"/>
+                    <rect x="9"  y="20" width="1" height="1"/><rect x="11" y="20" width="1" height="1"/><rect x="13" y="20" width="1" height="1"/><rect x="15" y="20" width="1" height="1"/><rect x="17" y="20" width="1" height="1"/><rect x="20" y="20" width="1" height="1"/>
+                    <rect x="8"  y="7" width="1" height="1"/><rect x="11" y="7" width="1" height="1"/><rect x="13" y="7" width="1" height="1"/><rect x="16" y="7" width="1" height="1"/><rect x="18" y="7" width="1" height="1"/><rect x="20" y="7" width="1" height="1"/>
+                  </g>
+                </svg>
+              </div>
             </div>
             <div class="nfc-card-bottom">
-              <span class="nfc-card-id">@L["Home_NFC_CardIdLabel"] · NFC-04821</span>
               <svg class="nfc-card-wave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 12a9 9 0 0 1 18 0"/>
                 <path d="M6.5 12a5.5 5.5 0 0 1 11 0"/>
