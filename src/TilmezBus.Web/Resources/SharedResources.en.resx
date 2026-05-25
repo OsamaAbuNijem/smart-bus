@@ -41,7 +41,7 @@
   <data name="Login_SABack"   xml:space="preserve"><value>Back to school login</value></data>
   <data name="Login_SASubmit" xml:space="preserve"><value>Super Admin Login</value></data>
 
-  <!-- Login — school admin (redesigned split layout) -->
+  <!-- Login, school admin (redesigned split layout) -->
   <data name="Login_BrandTagline" xml:space="preserve"><value>Smart school transport</value></data>
   <data name="Login_BrandLead"    xml:space="preserve"><value>Track every trip in real time and run your fleet from a single dashboard.</value></data>
   <data name="Login_Feature1"     xml:space="preserve"><value>Real-time trip &amp; bus tracking</value></data>
@@ -57,7 +57,7 @@
   <data name="Login_FooterPowered" xml:space="preserve"><value>Powered by</value></data>
   <data name="Login_BrandName"    xml:space="preserve"><value>Tilmez Bus Platform</value></data>
   <data name="Login_BrandShort"   xml:space="preserve"><value>Tilmez</value></data>
-  <data name="Login_PageTitle"    xml:space="preserve"><value>Tilmez — Sign In</value></data>
+  <data name="Login_PageTitle"    xml:space="preserve"><value>Tilmez, Sign In</value></data>
   <data name="Login_BackToHome"   xml:space="preserve"><value>Back to home</value></data>
   <data name="Login_DemoLiveTrip" xml:space="preserve"><value>Live Trip</value></data>
   <data name="Login_DemoRoute"    xml:space="preserve"><value>Route #3</value></data>
@@ -75,7 +75,7 @@
   <data name="SA_School_Name_PH"        xml:space="preserve"><value>e.g. Al-Noor Primary School</value></data>
   <data name="SA_School_Name_Required"  xml:space="preserve"><value>Name is required</value></data>
   <data name="SA_School_ContactName"     xml:space="preserve"><value>Contact name</value></data>
-  <data name="SA_School_ContactName_PH"  xml:space="preserve"><value>e.g. Sarah — school registrar</value></data>
+  <data name="SA_School_ContactName_PH"  xml:space="preserve"><value>e.g. Sarah, school registrar</value></data>
   <data name="SA_Currency_JD"            xml:space="preserve"><value>JD</value></data>
   <data name="SA_Status_Active"          xml:space="preserve"><value>Active</value></data>
   <data name="SA_Status_Inactive"        xml:space="preserve"><value>Inactive</value></data>
@@ -138,7 +138,7 @@
   <data name="SA_Sub_Payments_Add"        xml:space="preserve"><value>Add payment</value></data>
   <data name="SA_Sub_Payments_Empty"      xml:space="preserve"><value>No payments recorded yet.</value></data>
   <data name="SA_Sub_Payments_LoadFailed" xml:space="preserve"><value>Failed to load payments.</value></data>
-  <data name="SA_Sub_Payments_FullyPaid"  xml:space="preserve"><value>Subscription is fully paid — no further payments accepted.</value></data>
+  <data name="SA_Sub_Payments_FullyPaid"  xml:space="preserve"><value>Subscription is fully paid, no further payments accepted.</value></data>
   <data name="SA_Sub_Payments_Exceeds"    xml:space="preserve"><value>Payment exceeds the remaining amount ({0}).</value></data>
   <data name="SA_Pay_Method_Cash"         xml:space="preserve"><value>Cash</value></data>
   <data name="SA_Pay_Method_Transfer"     xml:space="preserve"><value>Bank transfer</value></data>
@@ -336,7 +336,7 @@
   <data name="SA_Settings_ChangePwdSub" xml:space="preserve"><value>Update super-admin sign-in credentials</value></data>
 
   <!-- Super-admin login page extras -->
-  <data name="SA_Login_PageTitle"      xml:space="preserve"><value>Super Admin — Sign in</value></data>
+  <data name="SA_Login_PageTitle"      xml:space="preserve"><value>Super Admin, Sign in</value></data>
   <data name="SA_Login_Footer"         xml:space="preserve"><value>For authorized super-admins only</value></data>
 
   <!-- Student modal labels -->
@@ -383,7 +383,7 @@
   <data name="Std_SectionStudent"     xml:space="preserve"><value>Student Information</value></data>
   <data name="Std_SectionStudent_Sub" xml:space="preserve"><value>Name, national number, and grade</value></data>
   <data name="Std_SectionParent"      xml:space="preserve"><value>Parent Information</value></data>
-  <data name="Std_SectionParent_Sub"  xml:space="preserve"><value>Name and phone — an account is created automatically</value></data>
+  <data name="Std_SectionParent_Sub"  xml:space="preserve"><value>Name and phone, an account is created automatically</value></data>
   <data name="Std_SectionHome"        xml:space="preserve"><value>Home Address</value></data>
   <data name="Std_SectionHome_Sub"    xml:space="preserve"><value>Pick the location on the map</value></data>
   <data name="Std_BuildingHint" xml:space="preserve"><value>e.g. 12 / B</value></data>
@@ -426,7 +426,7 @@
   <data name="Driver_EditTitle"   xml:space="preserve"><value>Edit Driver</value></data>
   <data name="Driver_PageTitle"   xml:space="preserve"><value>Drivers &amp; Assistants</value></data>
   <data name="Driver_None"        xml:space="preserve"><value>No drivers registered</value></data>
-  <data name="Driver_PagerInfo"   xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Driver_PagerInfo"   xml:space="preserve"><value>Showing {0} of {1}, Page {2} of {3}</value></data>
   <data name="Driver_TotalLabel"  xml:space="preserve"><value>Total staff</value></data>
   <data name="Driver_ColNumber"   xml:space="preserve"><value>#</value></data>
   <data name="Driver_ColName"     xml:space="preserve"><value>Employee</value></data>
@@ -439,7 +439,7 @@
   <data name="Driver_Template"    xml:space="preserve"><value>Download Template</value></data>
   <data name="Driver_ImportTitle" xml:space="preserve"><value>Import Staff from Excel</value></data>
   <data name="Driver_ImportHint"  xml:space="preserve"><value>File must contain columns: FullName, PhoneNumber, DriverType</value></data>
-  <data name="Driver_ImportResult" xml:space="preserve"><value>Imported {0} — {1} failed</value></data>
+  <data name="Driver_ImportResult" xml:space="preserve"><value>Imported {0}, {1} failed</value></data>
   <data name="Driver_ImportNoFile" xml:space="preserve"><value>Please choose a file</value></data>
 
   <!-- Validation messages (shared) -->
@@ -471,7 +471,7 @@
   <!-- Students page -->
   <data name="Student_PageTitle"   xml:space="preserve"><value>Students</value></data>
   <data name="Student_None"        xml:space="preserve"><value>No students registered</value></data>
-  <data name="Student_PagerInfo"   xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Student_PagerInfo"   xml:space="preserve"><value>Showing {0} of {1}, Page {2} of {3}</value></data>
   <data name="Student_TypeLabel"   xml:space="preserve"><value>student</value></data>
   <data name="Student_AddBtn"      xml:space="preserve"><value>Add Student</value></data>
   <data name="Student_Loading"     xml:space="preserve"><value>Loading...</value></data>
@@ -503,7 +503,7 @@
   <data name="Push_SendBtn"         xml:space="preserve"><value>Send</value></data>
   <data name="Push_TitleBodyRequired" xml:space="preserve"><value>Title and message are required.</value></data>
   <data name="Push_Sent"            xml:space="preserve"><value>Push delivered to {0} device(s).</value></data>
-  <data name="Push_SentNoDevices"   xml:space="preserve"><value>Sent — but the parent has no registered devices.</value></data>
+  <data name="Push_SentNoDevices"   xml:space="preserve"><value>Sent, but the parent has no registered devices.</value></data>
   <data name="Push_Failed"          xml:space="preserve"><value>Failed to send push.</value></data>
   <data name="Student_AriaAdd"     xml:space="preserve"><value>Add new student</value></data>
   <data name="Student_AriaTable"   xml:space="preserve"><value>Students table</value></data>
@@ -511,7 +511,7 @@
   <data name="Student_Import"      xml:space="preserve"><value>Import Excel</value></data>
   <data name="Student_ImportTitle" xml:space="preserve"><value>Import Students from Excel</value></data>
   <data name="Student_ImportHint"  xml:space="preserve"><value>First row must contain columns: FullName, Grade, ParentName, ParentPhone</value></data>
-  <data name="Student_ImportResult" xml:space="preserve"><value>Imported {0} students — {1} failed</value></data>
+  <data name="Student_ImportResult" xml:space="preserve"><value>Imported {0} students, {1} failed</value></data>
   <data name="Student_ImportNoFile" xml:space="preserve"><value>Please choose a file</value></data>
   <data name="Student_Template"     xml:space="preserve"><value>Download Template</value></data>
   <data name="Student_TemplateHint" xml:space="preserve"><value>An empty Excel template with the columns required for import</value></data>
@@ -523,7 +523,7 @@
   <!-- Buses page -->
   <data name="Bus_PageTitle"      xml:space="preserve"><value>Buses</value></data>
   <data name="Bus_None"           xml:space="preserve"><value>No buses registered</value></data>
-  <data name="Bus_PagerInfo"      xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Bus_PagerInfo"      xml:space="preserve"><value>Showing {0} of {1}, Page {2} of {3}</value></data>
   <data name="Bus_ColNumber"      xml:space="preserve"><value>#</value></data>
   <data name="Bus_TotalLabel"     xml:space="preserve"><value>Total Buses</value></data>
   <data name="Bus_Loading"        xml:space="preserve"><value>Loading...</value></data>
@@ -550,12 +550,12 @@
   <data name="Bus_StatusInactive" xml:space="preserve"><value>Inactive</value></data>
   <data name="Bus_Driver"         xml:space="preserve"><value>Driver</value></data>
   <data name="Bus_Assistant"      xml:space="preserve"><value>Assistant</value></data>
-  <data name="Bus_NoneSelected"   xml:space="preserve"><value>— Select —</value></data>
+  <data name="Bus_NoneSelected"   xml:space="preserve"><value>, Select ,</value></data>
   <data name="Bus_SaveBtn"        xml:space="preserve"><value>💾 Save Bus</value></data>
 
   <!-- Trips page -->
   <data name="Trip_None"          xml:space="preserve"><value>No trips</value></data>
-  <data name="Trip_PagerInfo"     xml:space="preserve"><value>Showing {0} of {1} — Page {2} of {3}</value></data>
+  <data name="Trip_PagerInfo"     xml:space="preserve"><value>Showing {0} of {1}, Page {2} of {3}</value></data>
   <data name="Trip_TypeLabel"     xml:space="preserve"><value>trip</value></data>
   <data name="Trip_StudentsTitle" xml:space="preserve"><value>Trip Students</value></data>
   <data name="Trip_StudentsNone"  xml:space="preserve"><value>No students on this trip</value></data>
@@ -717,8 +717,8 @@
   <data name="Dash_Total"              xml:space="preserve"><value>Total</value></data>
 
   <!-- Public landing page (Home/Index) -->
-  <data name="Home_PageTitle"          xml:space="preserve"><value>TilmezBus — School transport, simplified.</value></data>
-  <data name="Home_MetaDescription"    xml:space="preserve"><value>TilmezBus is a school-bus operations platform: live trip tracking, parent notifications, attendance, and roster management — built for schools, drivers, and parents.</value></data>
+  <data name="Home_PageTitle"          xml:space="preserve"><value>TilmezBus, School transport, simplified.</value></data>
+  <data name="Home_MetaDescription"    xml:space="preserve"><value>TilmezBus is a school-bus operations platform: live trip tracking, parent notifications, attendance, and roster management, built for schools, drivers, and parents.</value></data>
   <data name="Home_BrandName"          xml:space="preserve"><value>TilmezBus</value></data>
   <data name="Home_NavLogin"           xml:space="preserve"><value>School login</value></data>
 
@@ -753,14 +753,14 @@
   <data name="Home_NFC_Badge"        xml:space="preserve"><value>Signature feature · NFC</value></data>
   <data name="Home_NFC_Title1"       xml:space="preserve"><value>One tap is the whole</value></data>
   <data name="Home_NFC_TitleAccent"  xml:space="preserve"><value>roll call</value></data>
-  <data name="Home_NFC_Title2"       xml:space="preserve"><value>— and a safety net for every student.</value></data>
-  <data name="Home_NFC_Lead"         xml:space="preserve"><value>Every student carries a personalised NFC card. Assistants tap it to board or drop off in a single gesture — no typing, no roll call. If the card is ever lost or a stranger finds the student, anyone with a phone can scan it and instantly see who they belong to and how to reach the school and parent.</value></data>
+  <data name="Home_NFC_Title2"       xml:space="preserve"><value>, and a safety net for every student.</value></data>
+  <data name="Home_NFC_Lead"         xml:space="preserve"><value>Every student carries a personalised NFC card. Assistants tap it to board or drop off in a single gesture, no typing, no roll call. If the card is ever lost or a stranger finds the student, anyone with a phone can scan it and instantly see who they belong to and how to reach the school and parent.</value></data>
   <data name="Home_NFC_Bullet1_Title" xml:space="preserve"><value>Tap to board, tap to drop off</value></data>
-  <data name="Home_NFC_Bullet1_Desc"  xml:space="preserve"><value>Attendance for the whole bus in seconds — boarding and drop-off events stream live to the school dashboard and to parents.</value></data>
+  <data name="Home_NFC_Bullet1_Desc"  xml:space="preserve"><value>Attendance for the whole bus in seconds, boarding and drop-off events stream live to the school dashboard and to parents.</value></data>
   <data name="Home_NFC_Bullet2_Title" xml:space="preserve"><value>Parents notified the moment they're off</value></data>
-  <data name="Home_NFC_Bullet2_Desc"  xml:space="preserve"><value>Every tap pings the right parent with name, time, and bus — no follow-up calls, no "did they make it?" texts.</value></data>
+  <data name="Home_NFC_Bullet2_Desc"  xml:space="preserve"><value>Every tap pings the right parent with name, time, and bus, no follow-up calls, no "did they make it?" texts.</value></data>
   <data name="Home_NFC_Bullet3_Title" xml:space="preserve"><value>Lost-and-found safety</value></data>
-  <data name="Home_NFC_Bullet3_Desc"  xml:space="preserve"><value>Anyone — a passer-by, a shopkeeper, a teacher — can scan the card with any phone to see the student's name, school, and a direct contact number for the parent.</value></data>
+  <data name="Home_NFC_Bullet3_Desc"  xml:space="preserve"><value>Anyone, a passer-by, a shopkeeper, a teacher, can scan the card with any phone to see the student's name, school, and a direct contact number for the parent.</value></data>
 
   <data name="Home_NFC_AvatarInitials" xml:space="preserve"><value>SA</value></data>
   <data name="Home_NFC_CardName"     xml:space="preserve"><value>Adam</value></data>
@@ -793,7 +793,7 @@
   <data name="Home_F4_Title"         xml:space="preserve"><value>Zero-config trips</value></data>
   <data name="Home_F4_Desc"          xml:space="preserve"><value>You don't draw routes or build trips by hand. The system studies each school's homes, picks the shortest path per student, and spins up the daily trips on its own.</value></data>
   <data name="Home_F5_Title"         xml:space="preserve"><value>Driver + assistant app</value></data>
-  <data name="Home_F5_Desc"          xml:space="preserve"><value>Scan the bus's QR sticker to start the day — the app picks up where the last trip left off, loads the right roster, and walks the team from boarding to drop-off.</value></data>
+  <data name="Home_F5_Desc"          xml:space="preserve"><value>Scan the bus's QR sticker to start the day, the app picks up where the last trip left off, loads the right roster, and walks the team from boarding to drop-off.</value></data>
   <data name="Home_F6_Title"         xml:space="preserve"><value>Multi-school ready</value></data>
   <data name="Home_F6_Desc"          xml:space="preserve"><value>One platform, many tenants. SuperAdmins onboard schools and manage subscriptions; each school sees only its own data.</value></data>
 
@@ -803,17 +803,17 @@
   <data name="Home_Diff_Lead"        xml:space="preserve"><value>Two design choices keep the day-to-day painless: routes draw themselves from the student roster, and a sticker on the bus is the whole "start the trip" workflow.</value></data>
   <data name="Home_Diff_Card1_Tag"   xml:space="preserve"><value>Smart auto-routing</value></data>
   <data name="Home_Diff_Card1_Title" xml:space="preserve"><value>No routes to draw. Ever.</value></data>
-  <data name="Home_Diff_Card1_Desc"  xml:space="preserve"><value>The school doesn't enter its own location, and doesn't enter students' locations either — the system deduces both automatically. TilmezBus picks up each student's home location from the parent's device, and the school's location from the moment it's onboarded, then studies the geometry, groups students by area, and draws the shortest realistic path on its own.</value></data>
-  <data name="Home_Diff_Card1_B1"    xml:space="preserve"><value>Student homes + school location are detected automatically — no admin input needed</value></data>
+  <data name="Home_Diff_Card1_Desc"  xml:space="preserve"><value>The school doesn't enter its own location, and doesn't enter students' locations either, the system deduces both automatically. TilmezBus picks up each student's home location from the parent's device, and the school's location from the moment it's onboarded, then studies the geometry, groups students by area, and draws the shortest realistic path on its own.</value></data>
+  <data name="Home_Diff_Card1_B1"    xml:space="preserve"><value>Student homes + school location are detected automatically, no admin input needed</value></data>
   <data name="Home_Diff_Card1_B2"    xml:space="preserve"><value>Shortest-path routing picked for each student, end to end</value></data>
   <data name="Home_Diff_Card1_B3"    xml:space="preserve"><value>Re-balances on its own when students are added, moved, or absent</value></data>
 
   <data name="Home_Diff_Card2_Tag"   xml:space="preserve"><value>Tap-to-start QR</value></data>
   <data name="Home_Diff_Card2_Title" xml:space="preserve"><value>One sticker. The trip starts itself.</value></data>
-  <data name="Home_Diff_Card2_Desc"  xml:space="preserve"><value>Every bus has a QR sticker. The driver or assistant scans it once at the start of the day — the app identifies the bus, loads the right roster, and resumes the last trip that was running on it. No menus, no manual selection.</value></data>
+  <data name="Home_Diff_Card2_Desc"  xml:space="preserve"><value>Every bus has a QR sticker. The driver or assistant scans it once at the start of the day, the app identifies the bus, loads the right roster, and resumes the last trip that was running on it. No menus, no manual selection.</value></data>
   <data name="Home_Diff_Card2_B1"    xml:space="preserve"><value>Scan the bus → trip begins instantly</value></data>
   <data name="Home_Diff_Card2_B2"    xml:space="preserve"><value>Automatically picks up the last roster on that bus</value></data>
-  <data name="Home_Diff_Card2_B3"    xml:space="preserve"><value>Same flow every morning — no app screen to memorise</value></data>
+  <data name="Home_Diff_Card2_B3"    xml:space="preserve"><value>Same flow every morning, no app screen to memorise</value></data>
   <data name="Home_Diff_Card2_ToastTitle" xml:space="preserve"><value>Trip resumed</value></data>
   <data name="Home_Diff_Card2_ToastDesc"  xml:space="preserve"><value>BUS-1042 · 22 students loaded</value></data>
 
@@ -821,7 +821,7 @@
   <data name="Home_StepsTitle"       xml:space="preserve"><value>Three steps to a calmer morning</value></data>
   <data name="Home_StepsLead"        xml:space="preserve"><value>Onboarding is a one-evening job. The day-to-day fits into a single app per role.</value></data>
   <data name="Home_Step1_Title"      xml:space="preserve"><value>Add buses + students</value></data>
-  <data name="Home_Step1_Desc"       xml:space="preserve"><value>That's the whole setup. No drawing routes, no scheduling trips — the system studies the homes and picks the shortest path per student on its own.</value></data>
+  <data name="Home_Step1_Desc"       xml:space="preserve"><value>That's the whole setup. No drawing routes, no scheduling trips, the system studies the homes and picks the shortest path per student on its own.</value></data>
   <data name="Home_Step2_Title"      xml:space="preserve"><value>Scan the bus, run the trip</value></data>
   <data name="Home_Step2_Desc"       xml:space="preserve"><value>Drivers scan the QR sticker on the bus. The app picks up the right roster (resuming the last trip on that bus), then walks the team through boarding and drop-off.</value></data>
   <data name="Home_Step3_Title"      xml:space="preserve"><value>Stay in sync</value></data>
@@ -829,10 +829,10 @@
 
   <data name="Home_AudEyebrow"       xml:space="preserve"><value>Built for everyone in the trip</value></data>
   <data name="Home_AudTitle"         xml:space="preserve"><value>Three roles, one source of truth</value></data>
-  <data name="Home_AudLead"          xml:space="preserve"><value>Each role gets exactly the view it needs — nothing more, nothing less.</value></data>
+  <data name="Home_AudLead"          xml:space="preserve"><value>Each role gets exactly the view it needs, nothing more, nothing less.</value></data>
   <data name="Home_Aud1_Tag"         xml:space="preserve"><value>For schools</value></data>
   <data name="Home_Aud1_Title"       xml:space="preserve"><value>Admin control room</value></data>
-  <data name="Home_Aud1_Desc"        xml:space="preserve"><value>Run the whole transport operation from one dashboard — buses, students, drivers, schedules, and live trip status.</value></data>
+  <data name="Home_Aud1_Desc"        xml:space="preserve"><value>Run the whole transport operation from one dashboard, buses, students, drivers, schedules, and live trip status.</value></data>
   <data name="Home_Aud1_Bullet1"     xml:space="preserve"><value>Live + today + roster metrics at a glance</value></data>
   <data name="Home_Aud1_Bullet2"     xml:space="preserve"><value>Bulk student import and roster editing</value></data>
   <data name="Home_Aud1_Bullet3"     xml:space="preserve"><value>Subscription + seat-limit awareness</value></data>
@@ -859,7 +859,7 @@
   <!-- Request-a-demo section (landing page) -->
   <data name="Home_Request_Eyebrow"  xml:space="preserve"><value>Get in touch</value></data>
   <data name="Home_Request_Title"    xml:space="preserve"><value>Request a demo for your school</value></data>
-  <data name="Home_Request_Lead"     xml:space="preserve"><value>Tell us a bit about your school and we'll set up a personalised walkthrough — usually within one business day.</value></data>
+  <data name="Home_Request_Lead"     xml:space="preserve"><value>Tell us a bit about your school and we'll set up a personalised walkthrough, usually within one business day.</value></data>
   <data name="Home_Request_Bullet1"  xml:space="preserve"><value>Live walkthrough of the admin dashboard with your own data</value></data>
   <data name="Home_Request_Bullet2"  xml:space="preserve"><value>Driver + assistant app demo on a real phone</value></data>
   <data name="Home_Request_Bullet3"  xml:space="preserve"><value>Pricing tailored to your fleet and student roster</value></data>
@@ -876,7 +876,7 @@
   <data name="Home_Request_Optional"     xml:space="preserve"><value>(optional)</value></data>
   <data name="Home_Request_Submit"       xml:space="preserve"><value>Send request</value></data>
   <data name="Home_Request_FinePrint"    xml:space="preserve"><value>We'll only use your details to schedule the demo and won't share them with anyone else.</value></data>
-  <data name="Home_Request_Success"      xml:space="preserve"><value>Thanks — your request was received. We'll be in touch within one business day.</value></data>
+  <data name="Home_Request_Success"      xml:space="preserve"><value>Thanks, your request was received. We'll be in touch within one business day.</value></data>
   <data name="Home_Request_ErrMissing"   xml:space="preserve"><value>Please fill in school, contact name, and email.</value></data>
   <data name="Home_Request_ErrGeneric"   xml:space="preserve"><value>Something went wrong while submitting. Please try again in a moment.</value></data>
 

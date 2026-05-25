@@ -41,7 +41,7 @@
   <data name="Login_SABack"   xml:space="preserve"><value>العودة لتسجيل دخول المدرسة</value></data>
   <data name="Login_SASubmit" xml:space="preserve"><value>دخول المشرف العام</value></data>
 
-  <!-- Login — school admin (redesigned split layout) -->
+  <!-- Login، school admin (redesigned split layout) -->
   <data name="Login_BrandTagline" xml:space="preserve"><value>النقل المدرسي الذكي</value></data>
   <data name="Login_BrandLead"    xml:space="preserve"><value>تابع رحلات طلابك لحظة بلحظة، وأدر أسطولك بسلاسة من لوحة واحدة.</value></data>
   <data name="Login_Feature1"     xml:space="preserve"><value>تتبع مباشر للرحلات والباصات</value></data>
@@ -57,7 +57,7 @@
   <data name="Login_FooterPowered" xml:space="preserve"><value>مدعوم بواسطة</value></data>
   <data name="Login_BrandName"    xml:space="preserve"><value>منصة باص التلميذ</value></data>
   <data name="Login_BrandShort"   xml:space="preserve"><value>تلمز</value></data>
-  <data name="Login_PageTitle"    xml:space="preserve"><value>تلمز — تسجيل الدخول</value></data>
+  <data name="Login_PageTitle"    xml:space="preserve"><value>تلمز، تسجيل الدخول</value></data>
   <data name="Login_BackToHome"   xml:space="preserve"><value>العودة للصفحة الرئيسية</value></data>
   <data name="Login_DemoLiveTrip" xml:space="preserve"><value>رحلة مباشرة</value></data>
   <data name="Login_DemoRoute"    xml:space="preserve"><value>المسار رقم ٣</value></data>
@@ -75,7 +75,7 @@
   <data name="SA_School_Name_PH"        xml:space="preserve"><value>مثال: مدرسة النور الابتدائية</value></data>
   <data name="SA_School_Name_Required"  xml:space="preserve"><value>الاسم مطلوب</value></data>
   <data name="SA_School_ContactName"     xml:space="preserve"><value>اسم جهة الاتصال</value></data>
-  <data name="SA_School_ContactName_PH"  xml:space="preserve"><value>مثلاً: سارة — مسجلة المدرسة</value></data>
+  <data name="SA_School_ContactName_PH"  xml:space="preserve"><value>مثلاً: سارة، مسجلة المدرسة</value></data>
   <data name="SA_Currency_JD"            xml:space="preserve"><value>د.أ</value></data>
   <data name="SA_Status_Active"          xml:space="preserve"><value>نشط</value></data>
   <data name="SA_Status_Inactive"        xml:space="preserve"><value>غير نشط</value></data>
@@ -138,7 +138,7 @@
   <data name="SA_Sub_Payments_Add"        xml:space="preserve"><value>إضافة دفعة</value></data>
   <data name="SA_Sub_Payments_Empty"      xml:space="preserve"><value>لا توجد دفعات مسجَّلة بعد.</value></data>
   <data name="SA_Sub_Payments_LoadFailed" xml:space="preserve"><value>تعذَّر تحميل الدفعات.</value></data>
-  <data name="SA_Sub_Payments_FullyPaid"  xml:space="preserve"><value>الاشتراك مدفوع بالكامل — لا تُقبل دفعات إضافية.</value></data>
+  <data name="SA_Sub_Payments_FullyPaid"  xml:space="preserve"><value>الاشتراك مدفوع بالكامل، لا تُقبل دفعات إضافية.</value></data>
   <data name="SA_Sub_Payments_Exceeds"    xml:space="preserve"><value>الدفعة تتجاوز المبلغ المتبقي ({0}).</value></data>
   <data name="SA_Pay_Method_Cash"         xml:space="preserve"><value>نقداً</value></data>
   <data name="SA_Pay_Method_Transfer"     xml:space="preserve"><value>حوالة بنكية</value></data>
@@ -336,7 +336,7 @@
   <data name="SA_Settings_ChangePwdSub" xml:space="preserve"><value>تحديث بيانات الدخول للمشرف العام</value></data>
 
   <!-- Super-admin login page extras -->
-  <data name="SA_Login_PageTitle"      xml:space="preserve"><value>المشرف العام — تسجيل الدخول</value></data>
+  <data name="SA_Login_PageTitle"      xml:space="preserve"><value>المشرف العام، تسجيل الدخول</value></data>
   <data name="SA_Login_Footer"         xml:space="preserve"><value>للمشرفين المعتمدين فقط</value></data>
 
   <!-- Student modal labels -->
@@ -383,7 +383,7 @@
   <data name="Std_SectionStudent"     xml:space="preserve"><value>بيانات الطالب</value></data>
   <data name="Std_SectionStudent_Sub" xml:space="preserve"><value>الاسم والرقم الوطني والصف الدراسي</value></data>
   <data name="Std_SectionParent"      xml:space="preserve"><value>بيانات ولي الأمر</value></data>
-  <data name="Std_SectionParent_Sub"  xml:space="preserve"><value>الاسم ورقم الهاتف — يُنشأ حساب تلقائياً</value></data>
+  <data name="Std_SectionParent_Sub"  xml:space="preserve"><value>الاسم ورقم الهاتف، يُنشأ حساب تلقائياً</value></data>
   <data name="Std_SectionHome"        xml:space="preserve"><value>عنوان المنزل</value></data>
   <data name="Std_SectionHome_Sub"    xml:space="preserve"><value>اختر الموقع على الخريطة</value></data>
   <data name="Std_BuildingHint" xml:space="preserve"><value>مثال: 12 / B</value></data>
@@ -426,7 +426,7 @@
   <data name="Driver_EditTitle"   xml:space="preserve"><value>تعديل بيانات سائق</value></data>
   <data name="Driver_PageTitle"   xml:space="preserve"><value>السائقون والمساعدون</value></data>
   <data name="Driver_None"        xml:space="preserve"><value>لا يوجد سائقون مسجلون</value></data>
-  <data name="Driver_PagerInfo"   xml:space="preserve"><value>عرض {0} من {1} موظف — الصفحة {2} من {3}</value></data>
+  <data name="Driver_PagerInfo"   xml:space="preserve"><value>عرض {0} من {1} موظف، الصفحة {2} من {3}</value></data>
   <data name="Driver_TotalLabel"  xml:space="preserve"><value>إجمالي الموظفين</value></data>
   <data name="Driver_ColNumber"   xml:space="preserve"><value>#</value></data>
   <data name="Driver_ColName"     xml:space="preserve"><value>الموظف</value></data>
@@ -438,8 +438,8 @@
   <data name="Driver_Import"      xml:space="preserve"><value>استيراد Excel</value></data>
   <data name="Driver_Template"    xml:space="preserve"><value>تحميل القالب</value></data>
   <data name="Driver_ImportTitle" xml:space="preserve"><value>استيراد الموظفين من Excel</value></data>
-  <data name="Driver_ImportHint"  xml:space="preserve"><value>يجب أن يحتوي الملف على الأعمدة: FullName, PhoneNumber, DriverType</value></data>
-  <data name="Driver_ImportResult" xml:space="preserve"><value>تم استيراد {0} موظف — فشل {1}</value></data>
+  <data name="Driver_ImportHint"  xml:space="preserve"><value>يجب أن يحتوي الملف على الأعمدة: FullName، PhoneNumber، DriverType</value></data>
+  <data name="Driver_ImportResult" xml:space="preserve"><value>تم استيراد {0} موظف، فشل {1}</value></data>
   <data name="Driver_ImportNoFile" xml:space="preserve"><value>الرجاء اختيار ملف</value></data>
 
   <!-- Validation messages (shared) -->
@@ -471,7 +471,7 @@
   <!-- Students page -->
   <data name="Student_PageTitle"   xml:space="preserve"><value>الطلاب</value></data>
   <data name="Student_None"        xml:space="preserve"><value>لا يوجد طلاب مسجلون</value></data>
-  <data name="Student_PagerInfo"   xml:space="preserve"><value>عرض {0} من {1} طالب — الصفحة {2} من {3}</value></data>
+  <data name="Student_PagerInfo"   xml:space="preserve"><value>عرض {0} من {1} طالب، الصفحة {2} من {3}</value></data>
   <data name="Student_TypeLabel"   xml:space="preserve"><value>طالب</value></data>
   <data name="Student_AddBtn"      xml:space="preserve"><value>إضافة طالب</value></data>
   <data name="Student_Loading"     xml:space="preserve"><value>جاري التحميل...</value></data>
@@ -503,15 +503,15 @@
   <data name="Push_SendBtn"         xml:space="preserve"><value>إرسال</value></data>
   <data name="Push_TitleBodyRequired" xml:space="preserve"><value>العنوان والرسالة مطلوبان.</value></data>
   <data name="Push_Sent"            xml:space="preserve"><value>تم الإرسال إلى {0} جهاز.</value></data>
-  <data name="Push_SentNoDevices"   xml:space="preserve"><value>تم الإرسال — ولكن لا توجد أجهزة مسجلة لولي الأمر.</value></data>
+  <data name="Push_SentNoDevices"   xml:space="preserve"><value>تم الإرسال، ولكن لا توجد أجهزة مسجلة لولي الأمر.</value></data>
   <data name="Push_Failed"          xml:space="preserve"><value>فشل إرسال الإشعار.</value></data>
   <data name="Student_AriaAdd"     xml:space="preserve"><value>إضافة طالب جديد</value></data>
   <data name="Student_AriaTable"   xml:space="preserve"><value>جدول الطلاب</value></data>
   <data name="Student_Export"      xml:space="preserve"><value>تصدير Excel</value></data>
   <data name="Student_Import"      xml:space="preserve"><value>استيراد Excel</value></data>
   <data name="Student_ImportTitle" xml:space="preserve"><value>استيراد الطلاب من Excel</value></data>
-  <data name="Student_ImportHint"  xml:space="preserve"><value>يجب أن يحتوي الملف على الأعمدة التالية في الصف الأول: FullName, Grade, ParentName, ParentPhone</value></data>
-  <data name="Student_ImportResult" xml:space="preserve"><value>تم استيراد {0} طالب — فشل {1}</value></data>
+  <data name="Student_ImportHint"  xml:space="preserve"><value>يجب أن يحتوي الملف على الأعمدة التالية في الصف الأول: FullName، Grade، ParentName، ParentPhone</value></data>
+  <data name="Student_ImportResult" xml:space="preserve"><value>تم استيراد {0} طالب، فشل {1}</value></data>
   <data name="Student_ImportNoFile" xml:space="preserve"><value>الرجاء اختيار ملف</value></data>
   <data name="Student_Template"     xml:space="preserve"><value>تحميل القالب</value></data>
   <data name="Student_TemplateHint" xml:space="preserve"><value>قالب Excel فارغ بالأعمدة المطلوبة للاستيراد</value></data>
@@ -523,7 +523,7 @@
   <!-- Buses page -->
   <data name="Bus_PageTitle"      xml:space="preserve"><value>الباصات</value></data>
   <data name="Bus_None"           xml:space="preserve"><value>لا توجد باصات مسجلة</value></data>
-  <data name="Bus_PagerInfo"      xml:space="preserve"><value>عرض {0} من {1} باص — الصفحة {2} من {3}</value></data>
+  <data name="Bus_PagerInfo"      xml:space="preserve"><value>عرض {0} من {1} باص، الصفحة {2} من {3}</value></data>
   <data name="Bus_ColNumber"      xml:space="preserve"><value>#</value></data>
   <data name="Bus_TotalLabel"     xml:space="preserve"><value>إجمالي الباصات</value></data>
   <data name="Bus_Loading"        xml:space="preserve"><value>جاري التحميل...</value></data>
@@ -550,12 +550,12 @@
   <data name="Bus_StatusInactive" xml:space="preserve"><value>غير نشط</value></data>
   <data name="Bus_Driver"         xml:space="preserve"><value>السائق</value></data>
   <data name="Bus_Assistant"      xml:space="preserve"><value>المساعد</value></data>
-  <data name="Bus_NoneSelected"   xml:space="preserve"><value>— اختر —</value></data>
+  <data name="Bus_NoneSelected"   xml:space="preserve"><value>، اختر ,</value></data>
   <data name="Bus_SaveBtn"        xml:space="preserve"><value>💾 حفظ الباص</value></data>
 
   <!-- Trips page -->
   <data name="Trip_None"          xml:space="preserve"><value>لا توجد رحلات</value></data>
-  <data name="Trip_PagerInfo"     xml:space="preserve"><value>عرض {0} من {1} رحلة — الصفحة {2} من {3}</value></data>
+  <data name="Trip_PagerInfo"     xml:space="preserve"><value>عرض {0} من {1} رحلة، الصفحة {2} من {3}</value></data>
   <data name="Trip_TypeLabel"     xml:space="preserve"><value>رحلة</value></data>
   <data name="Trip_StudentsTitle" xml:space="preserve"><value>طلاب الرحلة</value></data>
   <data name="Trip_StudentsNone"  xml:space="preserve"><value>لا يوجد طلاب مسجلون في هذه الرحلة</value></data>
@@ -717,8 +717,8 @@
   <data name="Dash_Total"              xml:space="preserve"><value>إجمالي</value></data>
 
   <!-- Public landing page (Home/Index) -->
-  <data name="Home_PageTitle"          xml:space="preserve"><value>باص التلميذ — نقل مدرسي أبسط</value></data>
-  <data name="Home_MetaDescription"    xml:space="preserve"><value>منصة باص التلميذ لإدارة الباصات المدرسية: تتبّع مباشر للرحلات، إشعارات لأولياء الأمور، حضور وغياب، وإدارة قوائم الطلاب — مصمَّمة للمدارس والسائقين وأولياء الأمور.</value></data>
+  <data name="Home_PageTitle"          xml:space="preserve"><value>باص التلميذ، نقل مدرسي أبسط</value></data>
+  <data name="Home_MetaDescription"    xml:space="preserve"><value>منصة باص التلميذ لإدارة الباصات المدرسية: تتبّع مباشر للرحلات، إشعارات لأولياء الأمور، حضور وغياب، وإدارة قوائم الطلاب، مصمَّمة للمدارس والسائقين وأولياء الأمور.</value></data>
   <data name="Home_BrandName"          xml:space="preserve"><value>باص التلميذ</value></data>
   <data name="Home_NavLogin"           xml:space="preserve"><value>دخول المدرسة</value></data>
 
@@ -753,14 +753,14 @@
   <data name="Home_NFC_Badge"        xml:space="preserve"><value>الميزة الأبرز · بطاقة NFC</value></data>
   <data name="Home_NFC_Title1"       xml:space="preserve"><value>لمسة واحدة تساوي</value></data>
   <data name="Home_NFC_TitleAccent"  xml:space="preserve"><value>قائمة حضور كاملة</value></data>
-  <data name="Home_NFC_Title2"       xml:space="preserve"><value>— وأمانًا حقيقيًّا لكل طالب.</value></data>
-  <data name="Home_NFC_Lead"         xml:space="preserve"><value>يحمل كل طالب بطاقة NFC شخصيّة. يمرِّر المرافق البطاقةَ على الهاتف لتسجيل الصعود أو النزول بحركة واحدة — دون كتابة ودون نداء أسماء. وإذا ضاعت البطاقة أو وجد أحدٌ طفلًا تائهًا، يستطيع أيّ شخص بهاتفه أن يقرأها فيرى فورًا اسم الطالب ومدرسته وكيف يتواصل مع المدرسة وولي الأمر.</value></data>
+  <data name="Home_NFC_Title2"       xml:space="preserve"><value>، وأمانًا حقيقيًّا لكل طالب.</value></data>
+  <data name="Home_NFC_Lead"         xml:space="preserve"><value>يحمل كل طالب بطاقة NFC شخصيّة. يمرِّر المرافق البطاقةَ على الهاتف لتسجيل الصعود أو النزول بحركة واحدة، دون كتابة ودون نداء أسماء. وإذا ضاعت البطاقة أو وجد أحدٌ طفلًا تائهًا، يستطيع أيّ شخص بهاتفه أن يقرأها فيرى فورًا اسم الطالب ومدرسته وكيف يتواصل مع المدرسة وولي الأمر.</value></data>
   <data name="Home_NFC_Bullet1_Title" xml:space="preserve"><value>تسجيل الصعود والنزول بلمسة</value></data>
-  <data name="Home_NFC_Bullet1_Desc"  xml:space="preserve"><value>حضور الباص بأكمله في ثوانٍ — تتدفّق أحداث الصعود والنزول مباشرةً إلى لوحة المدرسة وإلى أولياء الأمور.</value></data>
+  <data name="Home_NFC_Bullet1_Desc"  xml:space="preserve"><value>حضور الباص بأكمله في ثوانٍ، تتدفّق أحداث الصعود والنزول مباشرةً إلى لوحة المدرسة وإلى أولياء الأمور.</value></data>
   <data name="Home_NFC_Bullet2_Title" xml:space="preserve"><value>إشعار فوريّ لولي الأمر</value></data>
-  <data name="Home_NFC_Bullet2_Desc"  xml:space="preserve"><value>تَصِل كل لمسة لولي أمر الطالب باسم وتوقيت ورقم الباص — لا اتصالات لاحقة ولا رسائل "هل وصل؟".</value></data>
+  <data name="Home_NFC_Bullet2_Desc"  xml:space="preserve"><value>تَصِل كل لمسة لولي أمر الطالب باسم وتوقيت ورقم الباص، لا اتصالات لاحقة ولا رسائل "هل وصل؟".</value></data>
   <data name="Home_NFC_Bullet3_Title" xml:space="preserve"><value>أمان عند الفقدان</value></data>
-  <data name="Home_NFC_Bullet3_Desc"  xml:space="preserve"><value>يستطيع أيّ شخص — مارّ، صاحب محل، معلّم — قراءة البطاقة بأيّ هاتف ليرى اسم الطالب ومدرسته ورقم تواصل مباشر مع وليّ الأمر.</value></data>
+  <data name="Home_NFC_Bullet3_Desc"  xml:space="preserve"><value>يستطيع أيّ شخص، مارّ، صاحب محل، معلّم، قراءة البطاقة بأيّ هاتف ليرى اسم الطالب ومدرسته ورقم تواصل مباشر مع وليّ الأمر.</value></data>
 
   <data name="Home_NFC_AvatarInitials" xml:space="preserve"><value>سا</value></data>
   <data name="Home_NFC_CardName"     xml:space="preserve"><value>آدم</value></data>
@@ -793,27 +793,27 @@
   <data name="Home_F4_Title"         xml:space="preserve"><value>رحلات بلا إعداد</value></data>
   <data name="Home_F4_Desc"          xml:space="preserve"><value>لا ترسم خطوط سير ولا تنشئ رحلات يدويًّا. يدرس النظام عناوين الطلاب لكل مدرسة، ويختار أقصر مسار لكلٍّ منهم، ويولِّد رحلات اليوم تلقائيًّا.</value></data>
   <data name="Home_F5_Title"         xml:space="preserve"><value>تطبيق السائق والمرافق</value></data>
-  <data name="Home_F5_Desc"          xml:space="preserve"><value>امسح ملصق QR على الباص لتبدأ اليوم — يستأنف التطبيق من حيث انتهت آخر رحلة، ويحمِّل قائمة الطلاب الصحيحة، ويقود الطاقم من الصعود حتى آخر تنزيل.</value></data>
+  <data name="Home_F5_Desc"          xml:space="preserve"><value>امسح ملصق QR على الباص لتبدأ اليوم، يستأنف التطبيق من حيث انتهت آخر رحلة، ويحمِّل قائمة الطلاب الصحيحة، ويقود الطاقم من الصعود حتى آخر تنزيل.</value></data>
   <data name="Home_F6_Title"         xml:space="preserve"><value>متعدد المدارس</value></data>
   <data name="Home_F6_Desc"          xml:space="preserve"><value>منصّة واحدة لعدّة مدارس. يدير المدير العامّ التعاقدات والاشتراكات، وترى كل مدرسة بيانات نفسها فقط.</value></data>
 
   <!-- Differentiator spotlight (auto-routing + QR) -->
   <data name="Home_Diff_Eyebrow"     xml:space="preserve"><value>الإعداد ليلة واحدة</value></data>
-  <data name="Home_Diff_Title"       xml:space="preserve"><value>النظام يتكفّل بالعمل الروتيني — أنت تؤكِّد فقط.</value></data>
+  <data name="Home_Diff_Title"       xml:space="preserve"><value>النظام يتكفّل بالعمل الروتيني، أنت تؤكِّد فقط.</value></data>
   <data name="Home_Diff_Lead"        xml:space="preserve"><value>قراران تصميميّان يبسِّطان اليوم: تُرسم خطوط السير من قائمة الطلاب وحدها، وملصق QR على الباص هو مجمل "بدء الرحلة".</value></data>
   <data name="Home_Diff_Card1_Tag"   xml:space="preserve"><value>توجيه ذكي تلقائي</value></data>
   <data name="Home_Diff_Card1_Title" xml:space="preserve"><value>لا خطوط سير ترسمها يدويًّا. أبدًا.</value></data>
-  <data name="Home_Diff_Card1_Desc"  xml:space="preserve"><value>لا تُدخل المدرسةُ موقعَها ولا مواقع منازل الطلاب — يستنتجها النظام تلقائيًّا. يلتقط باص التلميذ موقع منزل كل طالب من جهاز وليّ الأمر، وموقع المدرسة منذ لحظة تسجيلها، ثم يحلِّل الهندسة، ويجمِّع الطلاب حسب المناطق، ويرسم أقصر مسار واقعي وحده.</value></data>
-  <data name="Home_Diff_Card1_B1"    xml:space="preserve"><value>مواقع منازل الطلاب وموقع المدرسة تُكتشف تلقائيًّا — دون أي إدخال من المدير</value></data>
+  <data name="Home_Diff_Card1_Desc"  xml:space="preserve"><value>لا تُدخل المدرسةُ موقعَها ولا مواقع منازل الطلاب، يستنتجها النظام تلقائيًّا. يلتقط باص التلميذ موقع منزل كل طالب من جهاز وليّ الأمر، وموقع المدرسة منذ لحظة تسجيلها، ثم يحلِّل الهندسة، ويجمِّع الطلاب حسب المناطق، ويرسم أقصر مسار واقعي وحده.</value></data>
+  <data name="Home_Diff_Card1_B1"    xml:space="preserve"><value>مواقع منازل الطلاب وموقع المدرسة تُكتشف تلقائيًّا، دون أي إدخال من المدير</value></data>
   <data name="Home_Diff_Card1_B2"    xml:space="preserve"><value>أقصر مسار لكل طالب يُختار من البداية إلى النهاية</value></data>
   <data name="Home_Diff_Card1_B3"    xml:space="preserve"><value>إعادة موازنة ذاتية فور إضافة أو نقل أو غياب أي طالب</value></data>
 
   <data name="Home_Diff_Card2_Tag"   xml:space="preserve"><value>بدء الرحلة بـ QR</value></data>
   <data name="Home_Diff_Card2_Title" xml:space="preserve"><value>ملصق واحد. والرحلة تبدأ نفسها.</value></data>
-  <data name="Home_Diff_Card2_Desc"  xml:space="preserve"><value>لكلّ باص ملصق QR. يمسحه السائق أو المرافق مرّةً في بداية اليوم — فيتعرّف التطبيق على الباص، ويُحمِّل قائمة الركّاب الصحيحة، ويستأنف آخر رحلة كانت تجري عليه. لا قوائم ولا اختيار يدوي.</value></data>
+  <data name="Home_Diff_Card2_Desc"  xml:space="preserve"><value>لكلّ باص ملصق QR. يمسحه السائق أو المرافق مرّةً في بداية اليوم، فيتعرّف التطبيق على الباص، ويُحمِّل قائمة الركّاب الصحيحة، ويستأنف آخر رحلة كانت تجري عليه. لا قوائم ولا اختيار يدوي.</value></data>
   <data name="Home_Diff_Card2_B1"    xml:space="preserve"><value>مسح الباص → تبدأ الرحلة فورًا</value></data>
   <data name="Home_Diff_Card2_B2"    xml:space="preserve"><value>يلتقط آخر قائمة ركاب على هذا الباص تلقائيًّا</value></data>
-  <data name="Home_Diff_Card2_B3"    xml:space="preserve"><value>التدفّق نفسه كل صباح — لا شاشات تحفظها</value></data>
+  <data name="Home_Diff_Card2_B3"    xml:space="preserve"><value>التدفّق نفسه كل صباح، لا شاشات تحفظها</value></data>
   <data name="Home_Diff_Card2_ToastTitle" xml:space="preserve"><value>تمّ استئناف الرحلة</value></data>
   <data name="Home_Diff_Card2_ToastDesc"  xml:space="preserve"><value>باص-1042 · حُمِّل 22 طالبًا</value></data>
 
@@ -821,7 +821,7 @@
   <data name="Home_StepsTitle"       xml:space="preserve"><value>ثلاث خطوات لصباح أهدأ</value></data>
   <data name="Home_StepsLead"        xml:space="preserve"><value>الإعداد عمل ليلة واحدة، والاستخدام اليومي يتلخّص في تطبيق واحد لكل دور.</value></data>
   <data name="Home_Step1_Title"      xml:space="preserve"><value>أضف الباصات والطلاب</value></data>
-  <data name="Home_Step1_Desc"       xml:space="preserve"><value>هذا هو الإعداد كلّه. لا ترسم خطوطًا ولا تجدول رحلات — يحلّل النظام عناوين الطلاب ويختار أقصر مسار لكلٍّ منهم تلقائيًّا.</value></data>
+  <data name="Home_Step1_Desc"       xml:space="preserve"><value>هذا هو الإعداد كلّه. لا ترسم خطوطًا ولا تجدول رحلات، يحلّل النظام عناوين الطلاب ويختار أقصر مسار لكلٍّ منهم تلقائيًّا.</value></data>
   <data name="Home_Step2_Title"      xml:space="preserve"><value>امسح الباص، وابدأ الرحلة</value></data>
   <data name="Home_Step2_Desc"       xml:space="preserve"><value>يمسح السائق ملصق QR على الباص؛ فيُحمِّل التطبيق قائمة الركّاب الصحيحة (ويستأنف آخر رحلة جرت على هذا الباص)، ثم يقود الطاقم خطوةً بخطوة.</value></data>
   <data name="Home_Step3_Title"      xml:space="preserve"><value>الجميع على اطّلاع</value></data>
@@ -829,10 +829,10 @@
 
   <data name="Home_AudEyebrow"       xml:space="preserve"><value>مصمَّم لكل أطراف الرحلة</value></data>
   <data name="Home_AudTitle"         xml:space="preserve"><value>ثلاثة أدوار، مصدر بيانات واحد</value></data>
-  <data name="Home_AudLead"          xml:space="preserve"><value>كل دور يرى ما يحتاجه تمامًا — لا أكثر ولا أقلّ.</value></data>
+  <data name="Home_AudLead"          xml:space="preserve"><value>كل دور يرى ما يحتاجه تمامًا، لا أكثر ولا أقلّ.</value></data>
   <data name="Home_Aud1_Tag"         xml:space="preserve"><value>للمدارس</value></data>
   <data name="Home_Aud1_Title"       xml:space="preserve"><value>غرفة تحكّم الإدارة</value></data>
-  <data name="Home_Aud1_Desc"        xml:space="preserve"><value>أدِر عمليّات النقل بالكامل من لوحة واحدة — الباصات، الطلاب، السائقون، الجداول، وحالة الرحلات المباشرة.</value></data>
+  <data name="Home_Aud1_Desc"        xml:space="preserve"><value>أدِر عمليّات النقل بالكامل من لوحة واحدة، الباصات، الطلاب، السائقون، الجداول، وحالة الرحلات المباشرة.</value></data>
   <data name="Home_Aud1_Bullet1"     xml:space="preserve"><value>مؤشّرات مباشرة وأخرى ليوم العمل والقوائم بنظرة واحدة</value></data>
   <data name="Home_Aud1_Bullet2"     xml:space="preserve"><value>استيراد جماعي للطلاب وتعديل القوائم</value></data>
   <data name="Home_Aud1_Bullet3"     xml:space="preserve"><value>تكامل مع الاشتراك وحدود المقاعد</value></data>
@@ -859,7 +859,7 @@
   <!-- Request-a-demo section (landing page) -->
   <data name="Home_Request_Eyebrow"  xml:space="preserve"><value>تواصل معنا</value></data>
   <data name="Home_Request_Title"    xml:space="preserve"><value>اطلب تجربة المنصّة لمدرستك</value></data>
-  <data name="Home_Request_Lead"     xml:space="preserve"><value>أخبرنا قليلًا عن مدرستك، وسنرتِّب لك جولةً مخصَّصة — عادةً خلال يوم عمل واحد.</value></data>
+  <data name="Home_Request_Lead"     xml:space="preserve"><value>أخبرنا قليلًا عن مدرستك، وسنرتِّب لك جولةً مخصَّصة، عادةً خلال يوم عمل واحد.</value></data>
   <data name="Home_Request_Bullet1"  xml:space="preserve"><value>عرض مباشر للوحة الإدارة ببياناتك أنت</value></data>
   <data name="Home_Request_Bullet2"  xml:space="preserve"><value>تجربة تطبيق السائق والمرافق على هاتف حقيقي</value></data>
   <data name="Home_Request_Bullet3"  xml:space="preserve"><value>تسعيرة مخصَّصة لأسطولك وعدد طلابك</value></data>
@@ -876,7 +876,7 @@
   <data name="Home_Request_Optional"     xml:space="preserve"><value>(اختياري)</value></data>
   <data name="Home_Request_Submit"       xml:space="preserve"><value>إرسال الطلب</value></data>
   <data name="Home_Request_FinePrint"    xml:space="preserve"><value>سنستخدم بياناتك لجدولة الجولة فقط ولن نشاركها مع أي طرف آخر.</value></data>
-  <data name="Home_Request_Success"      xml:space="preserve"><value>شكراً — وصلنا طلبك. سنتواصل معك خلال يوم عمل واحد.</value></data>
+  <data name="Home_Request_Success"      xml:space="preserve"><value>شكراً، وصلنا طلبك. سنتواصل معك خلال يوم عمل واحد.</value></data>
   <data name="Home_Request_ErrMissing"   xml:space="preserve"><value>الرجاء تعبئة اسم المدرسة وجهة الاتصال والبريد الإلكتروني.</value></data>
   <data name="Home_Request_ErrGeneric"   xml:space="preserve"><value>حدث خطأ أثناء الإرسال. الرجاء المحاولة بعد قليل.</value></data>
 
