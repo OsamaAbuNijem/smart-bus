@@ -771,6 +771,7 @@
   <data name="Home_NFC_ScanField3"   xml:space="preserve"><value>Parent contact</value></data>
   <data name="Home_NFC_ScanParent"   xml:space="preserve"><value>Mr Al-Hashimi · +962 79 555 0123</value></data>
   <data name="Home_NFC_ScanCTA"      xml:space="preserve"><value>Call parent</value></data>
+  <data name="Home_NFC_StudentCardLabel" xml:space="preserve"><value>Student Card</value></data>
 
   <data name="Home_FeaturesEyebrow"  xml:space="preserve"><value>What's inside</value></data>
   <data name="Home_FeaturesTitle"    xml:space="preserve"><value>Everything a school transport day needs</value></data>

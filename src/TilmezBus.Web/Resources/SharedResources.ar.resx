@@ -771,6 +771,7 @@
   <data name="Home_NFC_ScanField3"   xml:space="preserve"><value>ولي الأمر</value></data>
   <data name="Home_NFC_ScanParent"   xml:space="preserve"><value>السيّد الهاشمي · ‎+962 79 555 0123</value></data>
   <data name="Home_NFC_ScanCTA"      xml:space="preserve"><value>اتصل بولي الأمر</value></data>
+  <data name="Home_NFC_StudentCardLabel" xml:space="preserve"><value>بطاقة طالب</value></data>
 
   <data name="Home_FeaturesEyebrow"  xml:space="preserve"><value>ما يحتويه باص التلميذ</value></data>
   <data name="Home_FeaturesTitle"    xml:space="preserve"><value>كل ما يلزم يوم النقل المدرسي</value></data>

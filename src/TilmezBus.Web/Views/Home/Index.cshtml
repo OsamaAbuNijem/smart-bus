@@ -375,11 +375,18 @@ img{max-width:100%;display:block;}
   50%{transform:rotate(-8deg) translateY(-6px);}
 }
 .nfc-card-top{
-  display:flex;align-items:center;justify-content:center;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
   width:100%;padding-top:4px;position:relative;z-index:1;
 }
 .nfc-card-logo-img{
-  height:26px;width:auto;display:block;
+  height:24px;width:auto;display:block;
+}
+.nfc-card-pill{
+  font-size:8.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:#0F172A;
+  background:#F5B400;
+  padding:3px 9px;border-radius:999px;
+  border:1px solid rgba(15,23,42,.1);
 }
 .nfc-card-body{
   display:flex;flex-direction:column;align-items:center;gap:8px;
@@ -387,12 +394,13 @@ img{max-width:100%;display:block;}
 }
 .nfc-card-avatar{
   width:58px;height:58px;border-radius:50%;
-  background:#0F172A;color:#FCD34D;
+  background:#FFFFFF;color:#0F172A;
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;font-weight:800;letter-spacing:.5px;
   flex-shrink:0;
   border:3px solid #F5B400;
+  box-shadow:inset 0 0 0 2px #FFFFFF;
 }
+.nfc-card-avatar svg{width:30px;height:30px;color:#0F172A;}
 .nfc-card-name{font-size:15px;font-weight:900;line-height:1.1;color:#0F172A;letter-spacing:-.3px;}
 .nfc-card-qr{
   width:104px;height:104px;border-radius:8px;
@@ -620,8 +628,10 @@ img{max-width:100%;display:block;}
   .nfc-title{font-size:26px;}
   .nfc-stage{height:340px;}
   .nfc-card{width:160px;height:254px;inset-inline-start:2%;bottom:4%;padding:14px 10px 10px;}
-  .nfc-card-logo-img{height:22px;}
-  .nfc-card-avatar{width:48px;height:48px;font-size:14px;border-width:2px;}
+  .nfc-card-logo-img{height:20px;}
+  .nfc-card-pill{font-size:7.5px;padding:2px 7px;}
+  .nfc-card-avatar{width:48px;height:48px;border-width:2px;}
+  .nfc-card-avatar svg{width:24px;height:24px;}
   .nfc-card-name{font-size:13px;}
   .nfc-card-qr{width:84px;height:84px;border-radius:7px;padding:3px;}
   .nfc-phone{width:170px;height:300px;inset-inline-end:2%;}
@@ -836,9 +846,16 @@ img{max-width:100%;display:block;}
           <div class="nfc-card">
             <div class="nfc-card-top">
               <img class="nfc-card-logo-img" src="~/img/tilmez_bus_logo.png" alt="@L["Home_BrandName"]" />
+              <span class="nfc-card-pill">@L["Home_NFC_StudentCardLabel"]</span>
             </div>
             <div class="nfc-card-body">
-              <div class="nfc-card-avatar">@L["Home_NFC_AvatarInitials"]</div>
+              <div class="nfc-card-avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 10v6"/>
+                  <path d="M2 10l10-5 10 5-10 5z"/>
+                  <path d="M6 12v4c0 1.7 3 3 6 3s6-1.3 6-3v-4"/>
+                </svg>
+              </div>
               <div class="nfc-card-name">@L["Home_NFC_CardName"]</div>
               <div class="nfc-card-qr" aria-hidden="true">
                 <svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
