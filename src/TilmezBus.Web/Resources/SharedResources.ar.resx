@@ -663,6 +663,8 @@
   <data name="Dash_SectionAlerts"      xml:space="preserve"><value>آخر التنبيهات</value></data>
   <data name="Dash_Stat_Students"      xml:space="preserve"><value>إجمالي الطلاب</value></data>
   <data name="Dash_Stat_StudentsSub"   xml:space="preserve"><value>مسجلون في النظام</value></data>
+  <data name="Dash_Stat_Parents"       xml:space="preserve"><value>إجمالي أولياء الأمور</value></data>
+  <data name="Dash_Stat_ParentsSub"    xml:space="preserve"><value>مرتبطون بطلاب نشطين</value></data>
   <data name="Dash_Stat_Buses"         xml:space="preserve"><value>إجمالي الباصات</value></data>
   <data name="Dash_Stat_BusesSub"      xml:space="preserve"><value>باصات في الأسطول</value></data>
   <data name="Dash_Stat_Trips"         xml:space="preserve"><value>الرحلات المسجلة</value></data>

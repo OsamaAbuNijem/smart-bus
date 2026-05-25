@@ -12,6 +12,7 @@ public record GetAdminDashboardStatsQuery(Guid SchoolId) : IRequest<AdminDashboa
 
 public record AdminDashboardStatsDto(
     int TotalStudents,
+    int TotalParents,
     int TotalBuses,
     int TotalDrivers,
     int TotalAssistants,

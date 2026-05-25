@@ -60,6 +60,7 @@ const dashboard = {
     };
     const t = stats.totals || {};
     set('stat-students',   t.students);
+    set('stat-parents',    t.parents);
     set('stat-buses',      t.buses);
     set('stat-drivers',    t.drivers);
     set('stat-assistants', t.assistants);

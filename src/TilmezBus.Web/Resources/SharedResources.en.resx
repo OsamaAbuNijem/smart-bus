@@ -663,6 +663,8 @@
   <data name="Dash_SectionAlerts"      xml:space="preserve"><value>LATEST ALERTS</value></data>
   <data name="Dash_Stat_Students"      xml:space="preserve"><value>Total Students</value></data>
   <data name="Dash_Stat_StudentsSub"   xml:space="preserve"><value>Registered in system</value></data>
+  <data name="Dash_Stat_Parents"       xml:space="preserve"><value>Total Parents</value></data>
+  <data name="Dash_Stat_ParentsSub"    xml:space="preserve"><value>Linked to active students</value></data>
   <data name="Dash_Stat_Buses"         xml:space="preserve"><value>Total Buses</value></data>
   <data name="Dash_Stat_BusesSub"      xml:space="preserve"><value>Buses in fleet</value></data>
   <data name="Dash_Stat_Trips"         xml:space="preserve"><value>Registered Trips</value></data>

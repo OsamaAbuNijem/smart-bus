@@ -38,6 +38,17 @@ public class GetAdminDashboardStatsQueryHandler
             .Where(s => activeStudentIds.Contains(s.Id))
             .CountAsync(cancellationToken);
 
+        // Distinct parents of those same active-subscription students — keeps
+        // the tile in sync with the students tile. Parents without a current
+        // subscription roster are excluded from this school's count.
+        var totalParents = await _context.Students
+            .Where(s => !s.IsDeleted && s.SchoolId == schoolIdString)
+            .Where(s => activeStudentIds.Contains(s.Id))
+            .Where(s => s.ParentId != null)
+            .Select(s => s.ParentId!.Value)
+            .Distinct()
+            .CountAsync(cancellationToken);
+
         var totalBuses      = await _context.Buses
             .CountAsync(b => !b.IsDeleted && b.SchoolId == schoolId, cancellationToken);
         var totalDrivers    = await _context.Drivers
@@ -76,6 +87,7 @@ public class GetAdminDashboardStatsQueryHandler
 
         return new AdminDashboardStatsDto(
             TotalStudents:   totalStudents,
+            TotalParents:    totalParents,
             TotalBuses:      totalBuses,
             TotalDrivers:    totalDrivers,
             TotalAssistants: totalAssistants,

@@ -20,6 +20,7 @@ public class DashboardController : AdminControllerBase
         var vm = await PopulateAsync(new DashboardPageViewModel
         {
             TotalStudents   = stats?.TotalStudents   ?? 0,
+            TotalParents    = stats?.TotalParents    ?? 0,
             TotalBuses      = stats?.TotalBuses      ?? 0,
             TotalDrivers    = stats?.TotalDrivers    ?? 0,
             TotalAssistants = stats?.TotalAssistants ?? 0,
@@ -51,6 +52,7 @@ public class DashboardController : AdminControllerBase
             totals = new
             {
                 students   = stats?.TotalStudents   ?? 0,
+                parents    = stats?.TotalParents    ?? 0,
                 buses      = stats?.TotalBuses      ?? 0,
                 drivers    = stats?.TotalDrivers    ?? 0,
                 assistants = stats?.TotalAssistants ?? 0,

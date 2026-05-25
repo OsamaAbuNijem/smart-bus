@@ -34,12 +34,18 @@
 
 <div class="section-head"><span>@L["Dash_SectionKPI"]</span></div>
 
-<div class="stats-grid stats-grid-5">
+<div class="stats-grid stats-grid-6">
   @await Component.InvokeAsync("StatCard", new {
       color   = "blue",
       iconSvg = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#3B82F6\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M23 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg>",
       iconBgClass = "icon-bg-blue", number = Model.TotalStudents, label = L["Dash_Stat_Students"].Value,
       change  = L["Dash_Stat_StudentsSub"].Value, changeDir = "up", numberId = "stat-students"
+  })
+  @await Component.InvokeAsync("StatCard", new {
+      color   = "pink",
+      iconSvg = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#EC4899\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/></svg>",
+      iconBgClass = "icon-bg-pink", number = Model.TotalParents, label = L["Dash_Stat_Parents"].Value,
+      change  = L["Dash_Stat_ParentsSub"].Value, changeDir = "up", numberId = "stat-parents"
   })
   @await Component.InvokeAsync("StatCard", new {
       color   = "green",

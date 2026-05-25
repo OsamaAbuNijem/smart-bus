@@ -239,6 +239,6 @@
   .content .card > .table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 @media (max-width: 480px) {
-  .stats-grid, .stats-grid-5 { grid-template-columns: 1fr; }
+  .stats-grid, .stats-grid-5, .stats-grid-6 { grid-template-columns: 1fr; }
 }
 
