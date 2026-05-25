@@ -721,6 +721,7 @@
   <data name="Home_MetaDescription"    xml:space="preserve"><value>TilmezBus is a school-bus operations platform for Jordan and the region: live trip tracking, parent notifications via WhatsApp, NFC + QR student cards, attendance, and roster management. Built for schools, drivers, and parents.</value></data>
   <data name="Home_MetaKeywords"       xml:space="preserve"><value>school bus tracking, school transport software, parent notifications, student attendance, NFC student card, QR student card, bus route optimization, school bus app, TilmezBus, Jordan, Amman</value></data>
   <data name="Home_BrandName"          xml:space="preserve"><value>TilmezBus</value></data>
+  <data name="Nav_Menu"                xml:space="preserve"><value>Menu</value></data>
   <data name="Home_NavLogin"           xml:space="preserve"><value>School login</value></data>
 
   <data name="Home_HeroEyebrow"        xml:space="preserve"><value>Live trips, every morning</value></data>

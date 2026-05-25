@@ -42,6 +42,7 @@
 }
 
 @await Html.PartialAsync("_AdminSidebar", Model)
+<div class="sb-backdrop" data-action="close-sidebar" aria-hidden="true"></div>
 
 <div class="main">
   @await Html.PartialAsync("_AdminTopbar", Model)
@@ -67,6 +68,40 @@
                     schoolCity: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SchoolCity)) };
 </script>
 
+<script>
+  // Off-canvas sidebar toggle for mobile. Sidebar slides in via a CSS
+  // .open class; backdrop catches outside clicks; ESC closes; navigating
+  // to any link inside the sidebar auto-closes so the page transition
+  // doesn't leave the menu hanging open on the new view.
+  (function () {
+    var sb = document.querySelector('.sidebar');
+    var bd = document.querySelector('.sb-backdrop');
+    if (!sb || !bd) return;
+    function open()  { sb.classList.add('open');  bd.classList.add('open');
+                       document.body.style.overflow = 'hidden';
+                       var b = document.querySelector('[data-action="open-sidebar"]');
+                       if (b) b.setAttribute('aria-expanded', 'true'); }
+    function close() { sb.classList.remove('open'); bd.classList.remove('open');
+                       document.body.style.overflow = '';
+                       var b = document.querySelector('[data-action="open-sidebar"]');
+                       if (b) b.setAttribute('aria-expanded', 'false'); }
+    document.addEventListener('click', function (e) {
+      var openBtn = e.target.closest && e.target.closest('[data-action="open-sidebar"]');
+      if (openBtn) { e.preventDefault(); open(); return; }
+      var closeBtn = e.target.closest && e.target.closest('[data-action="close-sidebar"]');
+      if (closeBtn) { close(); return; }
+      // auto-close when a nav link inside the sidebar is tapped on mobile
+      if (window.matchMedia('(max-width: 900px)').matches
+          && sb.classList.contains('open')
+          && e.target.closest('.sidebar a')) {
+        close();
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && sb.classList.contains('open')) close();
+    });
+  })();
+</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="~/js/admin/api.js"      asp-append-version="true"></script>
 <script src="~/js/admin/utils.js"    asp-append-version="true"></script>

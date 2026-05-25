@@ -721,6 +721,7 @@
   <data name="Home_MetaDescription"    xml:space="preserve"><value>منصة باص التلميذ لإدارة الباصات المدرسية في الأردن والمنطقة: تتبّع مباشر للرحلات، إشعارات لأولياء الأمور عبر واتساب، بطاقات NFC وQR للطلاب، الحضور والغياب، وإدارة قوائم الطلاب. مصمَّمة للمدارس والسائقين وأولياء الأمور.</value></data>
   <data name="Home_MetaKeywords"       xml:space="preserve"><value>تتبع الباصات المدرسية، برنامج النقل المدرسي، إشعارات أولياء الأمور، حضور الطلاب، بطاقة NFC للطلاب، بطاقة QR، تطبيق الباص المدرسي، باص التلميذ، الأردن، عمّان</value></data>
   <data name="Home_BrandName"          xml:space="preserve"><value>باص التلميذ</value></data>
+  <data name="Nav_Menu"                xml:space="preserve"><value>القائمة</value></data>
   <data name="Home_NavLogin"           xml:space="preserve"><value>دخول المدرسة</value></data>
 
   <data name="Home_HeroEyebrow"        xml:space="preserve"><value>رحلات مباشرة كل صباح</value></data>

@@ -166,3 +166,75 @@
 .lang-btn { height: 32px; min-width: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 12px; font-weight: 700; font-family: 'Cairo', sans-serif; color: var(--text2); cursor: pointer; padding: 0 10px; transition: all .15s; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .lang-btn:hover { background: var(--y); border-color: var(--yd); color: #111; }
 
+/* ══ Hamburger (mobile only) + backdrop ══ */
+.tb-menu {
+  display: none;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  align-items: center; justify-content: center;
+  padding: 0; cursor: pointer;
+  margin-inline-end: 10px;
+}
+.tb-menu:hover { background: var(--y); border-color: var(--yd); }
+.sb-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, .45);
+  z-index: 95;
+  animation: sbBackdropIn .18s ease-out;
+}
+.sb-backdrop.open { display: block; }
+@keyframes sbBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ══ MOBILE LAYOUT (≤ 900px) ══════════════════════════════ */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 280px;
+    transform: translateX(-110%);
+    transition: transform .22s ease-out;
+    box-shadow: 0 20px 50px -10px rgba(15, 23, 42, .35);
+  }
+  html[dir="rtl"] .sidebar { transform: translateX(110%); }
+  .sidebar.open { transform: translateX(0); }
+
+  .main { margin-inline-start: 0; }
+
+  .topbar { padding: 0 14px; }
+  .topbar-title { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar-right { gap: 6px; }
+  .tb-menu { display: inline-flex; }
+  .tb-search { min-width: 0; padding: 6px 10px; }
+  .date-chip { display: none; }
+  .lang-btn span { display: none; }
+  .lang-btn { padding: 0; width: 36px; min-width: 36px; }
+
+  .content { padding: 16px 14px; }
+}
+
+/* Phones (≤ 480px) — tighten everything one more notch */
+@media (max-width: 480px) {
+  .topbar { height: 54px; }
+  .topbar-title { font-size: 14px; }
+  .tb-btn { width: 34px; height: 34px; }
+  .content { padding: 12px 12px; }
+}
+
+/* ══ Common admin content responsive rules ════════════════ */
+/* Keep flex children of .main shrinkable so tables don't blow it out. */
+.main { min-width: 0; }
+
+@media (max-width: 720px) {
+  /* 4-col stat grids drop to 2 */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  /* Any direct table inside .content can scroll horizontally without
+     forcing the whole page off-canvas. */
+  .content > .table,
+  .content .card > .table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+@media (max-width: 480px) {
+  .stats-grid, .stats-grid-5 { grid-template-columns: 1fr; }
+}
+
