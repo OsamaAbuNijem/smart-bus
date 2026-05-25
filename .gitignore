@@ -35,6 +35,7 @@ appsettings.Development.json
 appsettings.Production.json
 **/secrets.json
 deploy/hetzner/.env
+*.p8
 
 ## macOS text clippings (Finder drag drops)
 *.textClipping

@@ -26,23 +26,19 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>TilmezBus reads the student's NFC card on the bus to mark them as picked up.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>TilmezBus connects to a development API on the local network for testing.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>TilmezBus uses the camera to scan the bus QR code at the start of a trip.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>TilmezBus connects to a development API on the local network for testing.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>TilmezBus uses your location to record student pickup points during morning trips.</string>
-	<key>NFCReaderUsageDescription</key>
-	<string>TilmezBus reads the student's NFC card on the bus to mark them as picked up.</string>
-	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-	<array>
-		<string>A0000002471001</string>
-	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nfc_manager/nfc_manager.dart';
@@ -32,8 +33,11 @@ class _AssistantNfcScanScreenState
   NfcAvailability? _availability;
   bool _busy = false;
   String? _lastUid;
-  String? _lastResult;
-  bool _lastOk = false;
+  // True while we're between our own `stopSession` and the next
+  // `startSession`. iOS reports both user-cancel and our intentional
+  // invalidation with the same error code, so we use this flag to tell
+  // them apart: user cancels close the screen; our cycle does not.
+  bool _intentionalStop = false;
 
   @override
   void initState() {
@@ -68,16 +72,27 @@ class _AssistantNfcScanScreenState
       pollingOptions: const {
         NfcPollingOption.iso14443,
         NfcPollingOption.iso15693,
-        NfcPollingOption.iso18092,
       },
       alertMessageIos: l.assistantScanStudentHint,
       invalidateAfterFirstReadIos: false,
       onSessionErrorIos: (err) {
         if (!mounted) return;
-        setState(() {
-          _lastOk = false;
-          _lastResult = err.message;
-        });
+        // Ignore the invalidation that comes from our own `stopSession`
+        // call inside the scan handler — we re-open a fresh session right
+        // after the native ✓ animation completes.
+        if (_intentionalStop) return;
+        // User dismissed the popup OR iOS timed it out → close the
+        // scan screen so the assistant returns to the trip details.
+        const closeCodes = {
+          nfci.NfcReaderErrorCodeIos
+              .readerSessionInvalidationErrorUserCanceled,
+          nfci.NfcReaderErrorCodeIos
+              .readerSessionInvalidationErrorSessionTimeout,
+        };
+        if (closeCodes.contains(err.code)) {
+          if (context.canPop()) context.pop();
+          return;
+        }
       },
       onDiscovered: _onDiscovered,
     );
@@ -88,30 +103,41 @@ class _AssistantNfcScanScreenState
     final uid = _extractUid(tag);
     if (uid == null || uid.isEmpty || uid == _lastUid) return;
     _lastUid = uid;
-    setState(() => _busy = true);
+    // Immediate haptic so the assistant feels the tap landed even before
+    // iOS plays its native session-end chime.
+    unawaited(HapticFeedback.heavyImpact());
+    _busy = true;
     final l = AppLocalizations.of(context);
+    String? successMsg;
+    String? errorMsg;
     try {
-      await ref
+      final name = await ref
           .read(tripActionsProvider(widget.tripId))
           .scanStudent(uid);
-      if (!mounted) return;
-      setState(() {
-        _lastOk = true;
-        _lastResult = l.assistantScanStudentOk;
-      });
+      successMsg = name != null && name.isNotEmpty
+          ? '${l.assistantScanStudentOk} — $name'
+          : l.assistantScanStudentOk;
     } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _lastOk = false;
-        _lastResult = e is Failure ? e.message : '$e';
-      });
+      errorMsg = e is Failure ? e.message : '$e';
     }
+    // End the session so iOS plays its native ✓ / ✗ animation + chime on
+    // the popup. Flag the stop as intentional so the error callback above
+    // doesn't close the screen — we'll re-open the session in a moment.
+    _intentionalStop = true;
+    await NfcManager.instance.stopSession(
+      alertMessageIos: successMsg,
+      errorMessageIos: errorMsg,
+    );
+    // Let iOS's native animation play before reopening the sheet.
     await Future<void>.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-    setState(() {
-      _busy = false;
-      _lastUid = null;
-    });
+    if (!mounted) {
+      _intentionalStop = false;
+      return;
+    }
+    _busy = false;
+    _lastUid = null;
+    await _startSession();
+    _intentionalStop = false;
   }
 
   /// Extract the tag UID as colon-separated uppercase hex
@@ -151,7 +177,8 @@ class _AssistantNfcScanScreenState
               ),
             ),
           ),
-          Center(
+          Align(
+            alignment: const Alignment(0, -0.35),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
@@ -174,12 +201,6 @@ class _AssistantNfcScanScreenState
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  _StatusPill(
-                    ok: _lastOk,
-                    result: _lastResult,
-                    busy: _busy,
-                  ),
                 ],
               ),
             ),
@@ -190,23 +211,28 @@ class _AssistantNfcScanScreenState
               bottom: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _GlassBtn(
-                      icon: Icons.arrow_back_rounded,
-                      onTap: () => context.pop(),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        l.assistantScanStudentTitle,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.3,
+                    Row(
+                      children: [
+                        _GlassBtn(
+                          icon: Icons.arrow_back_rounded,
+                          onTap: () => context.pop(),
                         ),
-                      ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            l.assistantScanStudentTitle,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -310,72 +336,6 @@ class _GlassBtn extends StatelessWidget {
           border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
         ),
         child: Icon(icon, size: 18, color: Colors.white),
-      ),
-    );
-  }
-}
-
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({
-    required this.ok,
-    required this.result,
-    required this.busy,
-  });
-  final bool ok;
-  final String? result;
-  final bool busy;
-
-  @override
-  Widget build(BuildContext context) {
-    if (result == null && !busy) return const SizedBox.shrink();
-    final bg = busy
-        ? Colors.white
-        : (ok ? AppColors.emerald : AppColors.red);
-    final fg = busy ? AppColors.ink : Colors.white;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (busy)
-            SizedBox(
-              width: 18, height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.2,
-                color: fg,
-              ),
-            )
-          else
-            Icon(
-              ok ? Icons.check_rounded : Icons.error_outline_rounded,
-              size: 18,
-              color: fg,
-            ),
-          const SizedBox(width: 10),
-          Flexible(
-            child: Text(
-              result ?? '',
-              style: TextStyle(
-                color: fg,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.1,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

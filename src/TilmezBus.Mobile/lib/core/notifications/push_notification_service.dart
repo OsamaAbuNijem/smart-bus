@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -79,7 +80,19 @@ class PushNotificationService {
         settings.authorizationStatus == AuthorizationStatus.provisional;
   }
 
-  Future<String?> getDeviceToken() => _messaging.getToken();
+  Future<String?> getDeviceToken() async {
+    // On iOS, FirebaseMessaging.getToken() throws "APNS token has not been
+    // set yet" if Apple hasn't returned the APNs device token in time.
+    // Poll briefly so the FCM token request lands once iOS is ready.
+    if (Platform.isIOS) {
+      for (var i = 0; i < 20; i++) {
+        final apns = await _messaging.getAPNSToken();
+        if (apns != null) break;
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+      }
+    }
+    return _messaging.getToken();
+  }
 
   Stream<String> get tokenRefreshStream => _messaging.onTokenRefresh;
 
