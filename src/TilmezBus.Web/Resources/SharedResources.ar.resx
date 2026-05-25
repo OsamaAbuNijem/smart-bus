@@ -769,7 +769,7 @@
   <data name="Home_NFC_ScanField1"   xml:space="preserve"><value>الطالب</value></data>
   <data name="Home_NFC_ScanField2"   xml:space="preserve"><value>المدرسة + الصف</value></data>
   <data name="Home_NFC_ScanField3"   xml:space="preserve"><value>ولي الأمر</value></data>
-  <data name="Home_NFC_ScanParent"   xml:space="preserve"><value>السيّد الهاشمي · ‎+962 79 555 0123</value></data>
+  <data name="Home_NFC_ScanParent"   xml:space="preserve"><value>السيّد الصالح · ‎+962 79 555 0123</value></data>
   <data name="Home_NFC_ScanCTA"      xml:space="preserve"><value>اتصل بولي الأمر</value></data>
   <data name="Home_NFC_StudentCardLabel" xml:space="preserve"><value>بطاقة طالب</value></data>
 
