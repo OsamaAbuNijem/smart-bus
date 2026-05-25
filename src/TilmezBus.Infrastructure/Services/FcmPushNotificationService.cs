@@ -81,13 +81,18 @@ public class FcmPushNotificationService : IPushNotificationService
             return 0;
         }
 
-        // Prune tokens FCM rejected as permanently invalid.
+        // Prune tokens FCM rejected as permanently invalid, and log the
+        // error code for any other rejection so we can diagnose delivery
+        // issues (third-party auth, sender-id mismatch, etc.).
         var stale = new List<string>();
         for (var i = 0; i < response.Responses.Count; i++)
         {
             var r = response.Responses[i];
             if (r.IsSuccess) continue;
             var code = r.Exception?.MessagingErrorCode;
+            _logger.LogWarning(
+                "FCM rejected token for user {UserId}: code={Code} message={Message}",
+                userId, code, r.Exception?.Message);
             if (code == MessagingErrorCode.Unregistered ||
                 code == MessagingErrorCode.InvalidArgument)
             {
