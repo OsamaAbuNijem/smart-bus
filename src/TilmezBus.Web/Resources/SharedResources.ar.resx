@@ -729,9 +729,10 @@
   <data name="Home_HeroSub"            xml:space="preserve"><value>يمنح باص التلميذ المدارس رؤيةً لحظيّةً لكل باص، ويُبقي أولياء الأمور مطمئنّين بإشعارات مباشرة، ويوفِّر للسائقين والمرافقين تطبيقًا بسيطًا لإدارة اليوم.</value></data>
   <data name="Home_HeroCTAPrimary"    xml:space="preserve"><value>الدخول إلى لوحة التحكم</value></data>
   <data name="Home_HeroCTASecondary"  xml:space="preserve"><value>تعرَّف على المزايا</value></data>
-  <data name="Home_HeroBadge1"        xml:space="preserve"><value>دون الحاجة إلى تطبيق لأولياء الأمور</value></data>
-  <data name="Home_HeroBadge2"        xml:space="preserve"><value>عربي + إنجليزي</value></data>
-  <data name="Home_HeroBadge3"        xml:space="preserve"><value>سحابي ومتاح دائمًا</value></data>
+  <data name="Home_HeroBadge1"        xml:space="preserve"><value>سحابي ومتاح دائمًا</value></data>
+  <data name="Home_HeroBadge2"        xml:space="preserve"><value>بطاقات NFC للطلاب</value></data>
+  <data name="Home_HeroBadge3"        xml:space="preserve"><value>QR لإعادة الفاقد</value></data>
+  <data name="Home_HeroBadge4"        xml:space="preserve"><value>تحقّق عبر واتساب</value></data>
 
   <data name="Home_DemoBoarded"       xml:space="preserve"><value>ركب ١٨ من ٢٢</value></data>
   <data name="Home_DemoEta"           xml:space="preserve"><value>الوصول خلال ٧ دقائق</value></data>

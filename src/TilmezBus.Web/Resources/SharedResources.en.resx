@@ -729,9 +729,10 @@
   <data name="Home_HeroSub"            xml:space="preserve"><value>TilmezBus gives schools real-time visibility into every bus, keeps parents calm with live notifications, and gives drivers and assistants a simple mobile app to run the day.</value></data>
   <data name="Home_HeroCTAPrimary"    xml:space="preserve"><value>Sign in to dashboard</value></data>
   <data name="Home_HeroCTASecondary"  xml:space="preserve"><value>See what's included</value></data>
-  <data name="Home_HeroBadge1"        xml:space="preserve"><value>No app for parents required</value></data>
-  <data name="Home_HeroBadge2"        xml:space="preserve"><value>Arabic + English</value></data>
-  <data name="Home_HeroBadge3"        xml:space="preserve"><value>Cloud-hosted, always on</value></data>
+  <data name="Home_HeroBadge1"        xml:space="preserve"><value>Cloud-hosted, always on</value></data>
+  <data name="Home_HeroBadge2"        xml:space="preserve"><value>NFC student cards</value></data>
+  <data name="Home_HeroBadge3"        xml:space="preserve"><value>QR lost-and-found</value></data>
+  <data name="Home_HeroBadge4"        xml:space="preserve"><value>WhatsApp OTP</value></data>
 
   <data name="Home_DemoBoarded"       xml:space="preserve"><value>18 / 22 boarded</value></data>
   <data name="Home_DemoEta"           xml:space="preserve"><value>ETA 7 min</value></data>
