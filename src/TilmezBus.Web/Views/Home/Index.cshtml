@@ -410,8 +410,24 @@ img{max-width:100%;display:block;}
   margin-top:2px;
 }
 .nfc-card-qr svg{width:100%;height:100%;display:block;}
-.nfc-card-bottom{display:flex;align-items:center;justify-content:center;width:100%;position:relative;z-index:1;}
-.nfc-card-wave{width:22px;height:22px;color:rgba(15,23,42,.55);}
+.nfc-card-bottom{display:flex;align-items:center;justify-content:center;width:100%;height:34px;position:relative;z-index:1;}
+.nfc-card-waves{
+  position:relative;
+  width:18px;height:18px;
+  display:flex;align-items:center;justify-content:center;
+}
+.nfc-card-waves span{
+  position:absolute;border:2px solid #F5B400;border-radius:50%;
+  width:18px;height:18px;opacity:0;
+  animation:nfcCardPing 2.4s ease-out infinite;
+}
+.nfc-card-waves span:nth-child(2){animation-delay:.6s;}
+.nfc-card-waves span:nth-child(3){animation-delay:1.2s;}
+@@keyframes nfcCardPing{
+  0%{transform:scale(.55);opacity:.9;}
+  80%{transform:scale(2.1);opacity:0;}
+  100%{transform:scale(2.1);opacity:0;}
+}
 
 /* Hovering phone / scanner readout */
 .nfc-phone{
@@ -450,25 +466,6 @@ img{max-width:100%;display:block;}
   box-shadow:0 4px 10px rgba(245,180,0,.4);
 }
 
-/* NFC waves emanating between phone and card */
-.nfc-waves{
-  position:absolute;
-  inset-inline-start:42%;top:42%;
-  width:120px;height:120px;pointer-events:none;
-  display:flex;align-items:center;justify-content:center;
-}
-.nfc-waves span{
-  position:absolute;border:2px solid #F5B400;border-radius:50%;
-  width:24px;height:24px;opacity:0;
-  animation:nfcPing 2.4s ease-out infinite;
-}
-.nfc-waves span:nth-child(2){animation-delay:.6s;}
-.nfc-waves span:nth-child(3){animation-delay:1.2s;}
-@@keyframes nfcPing{
-  0%{transform:scale(.6);opacity:.9;}
-  80%{transform:scale(3.2);opacity:0;}
-  100%{transform:scale(3.2);opacity:0;}
-}
 
 /* ── Differentiators (auto-routing + QR) ────────────────── */
 .diff-section{background:linear-gradient(180deg,#F8FAFC 0%,#FFFFFF 100%);}
@@ -635,7 +632,6 @@ img{max-width:100%;display:block;}
   .nfc-card-name{font-size:13px;}
   .nfc-card-qr{width:84px;height:84px;border-radius:7px;padding:3px;}
   .nfc-phone{width:170px;height:300px;inset-inline-end:2%;}
-  .nfc-waves{inset-inline-start:36%;}
 }
 </style>
 </head>
@@ -901,11 +897,9 @@ img{max-width:100%;display:block;}
               </div>
             </div>
             <div class="nfc-card-bottom">
-              <svg class="nfc-card-wave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12a9 9 0 0 1 18 0"/>
-                <path d="M6.5 12a5.5 5.5 0 0 1 11 0"/>
-                <path d="M10 12a2 2 0 0 1 4 0"/>
-              </svg>
+              <div class="nfc-card-waves" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </div>
             </div>
           </div>
 
@@ -933,10 +927,6 @@ img{max-width:100%;display:block;}
             </div>
           </div>
 
-          <!-- NFC waves between the two -->
-          <div class="nfc-waves" aria-hidden="true">
-            <span></span><span></span><span></span>
-          </div>
         </div>
       </div>
     </div>
