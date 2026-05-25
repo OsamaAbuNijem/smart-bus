@@ -717,8 +717,9 @@
   <data name="Dash_Total"              xml:space="preserve"><value>Total</value></data>
 
   <!-- Public landing page (Home/Index) -->
-  <data name="Home_PageTitle"          xml:space="preserve"><value>TilmezBus, School transport, simplified.</value></data>
-  <data name="Home_MetaDescription"    xml:space="preserve"><value>TilmezBus is a school-bus operations platform: live trip tracking, parent notifications, attendance, and roster management, built for schools, drivers, and parents.</value></data>
+  <data name="Home_PageTitle"          xml:space="preserve"><value>TilmezBus | School Bus Tracking, Attendance &amp; Parent Notifications</value></data>
+  <data name="Home_MetaDescription"    xml:space="preserve"><value>TilmezBus is a school-bus operations platform for Jordan and the region: live trip tracking, parent notifications via WhatsApp, NFC + QR student cards, attendance, and roster management. Built for schools, drivers, and parents.</value></data>
+  <data name="Home_MetaKeywords"       xml:space="preserve"><value>school bus tracking, school transport software, parent notifications, student attendance, NFC student card, QR student card, bus route optimization, school bus app, TilmezBus, Jordan, Amman</value></data>
   <data name="Home_BrandName"          xml:space="preserve"><value>TilmezBus</value></data>
   <data name="Home_NavLogin"           xml:space="preserve"><value>School login</value></data>
 

@@ -15,6 +15,26 @@
     <meta name="color-scheme" content="light dark">
     <meta name="theme-color" content="#F5C518">
     <title>@(Model?.StudentName ?? "TilmezBus") · TilmezBus</title>
+    @{
+        var _pubScheme = Context.Request.Scheme;
+        var _pubHost   = Context.Request.Host.Value;
+        var _pubUrl    = $"{_pubScheme}://{_pubHost}{Context.Request.Path}";
+        var _pubDesc   = isAr
+            ? "صفحة عامة آمنة لمساعدة الطالب على العودة إلى المدرسة"
+            : "Public safety page · help return this student to school.";
+    }
+    <meta name="description" content="@_pubDesc">
+    <meta name="robots"      content="noindex, follow">
+    <link rel="canonical"    href="@_pubUrl">
+    <meta property="og:type"        content="website">
+    <meta property="og:site_name"   content="TilmezBus">
+    <meta property="og:title"       content="@(Model?.StudentName ?? "TilmezBus") · TilmezBus">
+    <meta property="og:description" content="@_pubDesc">
+    <meta property="og:url"         content="@_pubUrl">
+    <meta property="og:image"       content="@_pubScheme://@_pubHost/apple-touch-icon.png">
+    <meta name="twitter:card"  content="summary">
+    <meta name="twitter:title" content="@(Model?.StudentName ?? "TilmezBus") · TilmezBus">
+    <meta name="twitter:image" content="@_pubScheme://@_pubHost/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="~/favicon.png" asp-append-version="true">
     <link rel="apple-touch-icon" href="~/apple-touch-icon.png" asp-append-version="true">
     <link rel="preconnect" href="https://fonts.googleapis.com">

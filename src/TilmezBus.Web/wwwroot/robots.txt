@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /super/
+Disallow: /superadmin/
+Disallow: /api/
+Disallow: /hubs/
+Disallow: /hangfire/
+Disallow: /q/
+
+Sitemap: https://tilmezbus.com/sitemap.xml
