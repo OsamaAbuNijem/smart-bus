@@ -191,14 +191,18 @@
 
 /* ══ MOBILE LAYOUT (≤ 900px) ══════════════════════════════ */
 @media (max-width: 900px) {
+  /* Off-canvas via explicit left/right so it works in both LTR and RTL
+     without specificity fights from a logical-property override. */
   .sidebar {
     width: 280px;
-    transform: translateX(-110%);
-    transition: transform .22s ease-out;
+    left:  -320px;
+    right: auto;
+    transition: left .22s ease-out, right .22s ease-out;
     box-shadow: 0 20px 50px -10px rgba(15, 23, 42, .35);
   }
-  html[dir="rtl"] .sidebar { transform: translateX(110%); }
-  .sidebar.open { transform: translateX(0); }
+  html[dir="rtl"] .sidebar { left: auto; right: -320px; }
+  .sidebar.open { left: 0; }
+  html[dir="rtl"] .sidebar.open { left: auto; right: 0; }
 
   .main { margin-inline-start: 0; }
 

@@ -77,25 +77,28 @@
     var sb = document.querySelector('.sidebar');
     var bd = document.querySelector('.sb-backdrop');
     if (!sb || !bd) return;
-    function open()  { sb.classList.add('open');  bd.classList.add('open');
-                       document.body.style.overflow = 'hidden';
-                       var b = document.querySelector('[data-action="open-sidebar"]');
-                       if (b) b.setAttribute('aria-expanded', 'true'); }
-    function close() { sb.classList.remove('open'); bd.classList.remove('open');
-                       document.body.style.overflow = '';
-                       var b = document.querySelector('[data-action="open-sidebar"]');
-                       if (b) b.setAttribute('aria-expanded', 'false'); }
+    var menuBtn = document.querySelector('[data-action="open-sidebar"]');
+    function open()  {
+      sb.classList.add('open'); bd.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
+    }
+    function close() {
+      sb.classList.remove('open'); bd.classList.remove('open');
+      document.body.style.overflow = '';
+      if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+    }
+    // Direct binding on the button so no other handler can swallow it.
+    if (menuBtn) {
+      menuBtn.addEventListener('click', function (e) { e.preventDefault(); open(); });
+    }
+    // Backdrop tap closes.
+    bd.addEventListener('click', close);
+    // Delegated fallback (also handles sidebar link auto-close + ESC).
     document.addEventListener('click', function (e) {
-      var openBtn = e.target.closest && e.target.closest('[data-action="open-sidebar"]');
-      if (openBtn) { e.preventDefault(); open(); return; }
-      var closeBtn = e.target.closest && e.target.closest('[data-action="close-sidebar"]');
-      if (closeBtn) { close(); return; }
-      // auto-close when a nav link inside the sidebar is tapped on mobile
-      if (window.matchMedia('(max-width: 900px)').matches
-          && sb.classList.contains('open')
-          && e.target.closest('.sidebar a')) {
-        close();
-      }
+      if (!sb.classList.contains('open')) return;
+      if (!window.matchMedia('(max-width: 900px)').matches) return;
+      if (e.target.closest && e.target.closest('.sidebar a')) close();
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && sb.classList.contains('open')) close();
