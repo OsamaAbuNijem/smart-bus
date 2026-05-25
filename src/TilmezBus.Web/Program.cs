@@ -22,6 +22,24 @@ try
     // (by default UseStaticWebAssets only runs in Development; this makes it work under IIS Production too)
     builder.WebHost.UseStaticWebAssets();
 
+    // Gzip + Brotli for HTML / CSS / JSON / SVG responses. Cuts transfer
+    // size dramatically on the marketing page (lots of inline CSS) and
+    // is what PageSpeed Insights expects to see on production.
+    builder.Services.AddResponseCompression(o =>
+    {
+        o.EnableForHttps = true;
+        o.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
+        o.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+        o.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults
+            .MimeTypes.Concat(new[] {
+                "image/svg+xml",
+                "application/manifest+json",
+                "application/ld+json",
+                "application/xml",
+                "text/xml"
+            });
+    });
+
     builder.Services.AddLocalization();
     builder.Services.AddControllersWithViews(options =>
         {
@@ -89,7 +107,33 @@ try
         app.UseHsts();
         app.UseHttpsRedirection();
     }
-    app.UseStaticFiles();
+    app.UseResponseCompression();
+
+    // Long-cache fingerprinted static assets (asp-append-version adds
+    // ?v=… so we can safely tell the browser to hold them for a year).
+    // Non-fingerprinted fetches still bypass the cache as soon as the
+    // file mtime changes — IIS / Kestrel revalidate via ETag.
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = ctx =>
+        {
+            var headers = ctx.Context.Response.Headers;
+            var path    = ctx.Context.Request.Path.Value ?? string.Empty;
+            // Anything with a ?v= query (asp-append-version) is immutable.
+            if (ctx.Context.Request.Query.ContainsKey("v"))
+            {
+                headers["Cache-Control"] = "public, max-age=31536000, immutable";
+            }
+            else if (path.StartsWith("/img/") || path.StartsWith("/css/")
+                  || path.StartsWith("/js/")  || path.StartsWith("/lib/")
+                  || path.EndsWith(".png") || path.EndsWith(".jpg")
+                  || path.EndsWith(".jpeg") || path.EndsWith(".webp")
+                  || path.EndsWith(".svg")  || path.EndsWith(".ico"))
+            {
+                headers["Cache-Control"] = "public, max-age=2592000";  // 30 days
+            }
+        }
+    });
     app.UseSerilogRequestLogging();
     app.UseRouting();
 

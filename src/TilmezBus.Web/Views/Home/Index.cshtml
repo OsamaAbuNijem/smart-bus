@@ -99,7 +99,8 @@
 <link rel="apple-touch-icon" href="~/apple-touch-icon.png" asp-append-version="true"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@@400;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -809,7 +810,7 @@ img{max-width:100%;display:block;}
   <nav class="nav">
     <div class="nav-inner">
       <a class="nav-logo" href="/">
-        <img src="~/img/tilmez_bus_logo.png" alt="@L["Home_BrandName"]"/>
+        <img src="~/img/tilmez_bus_logo.png" alt="@L["Home_BrandName"]" width="140" height="36" decoding="async" fetchpriority="high"/>
         <span>@L["Home_BrandName"]</span>
       </a>
       <div class="nav-actions">
@@ -1010,7 +1011,7 @@ img{max-width:100%;display:block;}
           <!-- Student NFC card -->
           <div class="nfc-card">
             <div class="nfc-card-top">
-              <img class="nfc-card-logo-img" src="~/img/tilmez_bus_logo.png" alt="@L["Home_BrandName"]" />
+              <img class="nfc-card-logo-img" src="~/img/tilmez_bus_logo.png" alt="@L["Home_BrandName"]" width="93" height="24" loading="lazy" decoding="async" />
               <span class="nfc-card-pill">@L["Home_NFC_StudentCardLabel"]</span>
             </div>
             <div class="nfc-card-body">
