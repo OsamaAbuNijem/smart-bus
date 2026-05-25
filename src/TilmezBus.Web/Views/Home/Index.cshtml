@@ -517,19 +517,21 @@ img{max-width:100%;display:block;}
   letter-spacing:-.3px;line-height:1.2;
 }
 
-/* Contact row */
+/* Contact rows */
+.nfc-mini-rows{display:flex;flex-direction:column;gap:6px;}
 .nfc-mini-row{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 9px;border-radius:10px;
+  display:flex;align-items:center;gap:7px;
+  padding:7px 8px;border-radius:10px;
   border:1px solid #F1F5F9;background:#FFFFFF;
   box-shadow:0 2px 6px -3px rgba(15,23,42,.08);
 }
 .nfc-mini-row-icon{
-  width:28px;height:28px;border-radius:8px;
-  background:#DCFCE7;color:#15803D;
+  width:26px;height:26px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.nfc-mini-row-icon svg{width:14px;height:14px;}
+.nfc-mini-row-icon svg{width:13px;height:13px;}
+.nfc-mini-row-icon.phone-parent{background:#DCFCE7;color:#15803D;}
+.nfc-mini-row-icon.phone-school{background:#FEF3C7;color:#D97706;}
 .nfc-mini-row-text{flex:1;min-width:0;}
 .nfc-mini-row-label{
   font-size:7.5px;font-weight:800;letter-spacing:.08em;
@@ -1015,15 +1017,27 @@ img{max-width:100%;display:block;}
                 </div>
                 <div class="nfc-mini-name">@L["Home_NFC_CardName"]</div>
               </div>
-              <div class="nfc-mini-row">
-                <div class="nfc-mini-row-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <div class="nfc-mini-rows">
+                <div class="nfc-mini-row">
+                  <div class="nfc-mini-row-icon phone-parent">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </div>
+                  <div class="nfc-mini-row-text">
+                    <div class="nfc-mini-row-label">@L["Home_NFC_ScanParentLabel"]</div>
+                    <div class="nfc-mini-row-value">@L["Home_NFC_ScanParent"]</div>
+                  </div>
+                  <svg class="nfc-mini-row-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
-                <div class="nfc-mini-row-text">
-                  <div class="nfc-mini-row-label">@L["Home_NFC_ScanParentLabel"]</div>
-                  <div class="nfc-mini-row-value">@L["Home_NFC_ScanParent"]</div>
+                <div class="nfc-mini-row">
+                  <div class="nfc-mini-row-icon phone-school">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
+                  </div>
+                  <div class="nfc-mini-row-text">
+                    <div class="nfc-mini-row-label">@L["Home_NFC_ScanSchoolPhoneLabel"]</div>
+                    <div class="nfc-mini-row-value">@L["Home_NFC_ScanSchoolPhone"]</div>
+                  </div>
+                  <svg class="nfc-mini-row-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
-                <svg class="nfc-mini-row-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
             </div>
           </div>

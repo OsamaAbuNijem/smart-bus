@@ -775,6 +775,8 @@
   <data name="Home_NFC_ScanSchoolLabel" xml:space="preserve"><value>المدرسة</value></data>
   <data name="Home_NFC_ScanSchoolName"  xml:space="preserve"><value>مدارس العقول النيّرة</value></data>
   <data name="Home_NFC_ScanParentLabel" xml:space="preserve"><value>هاتف ولي الأمر</value></data>
+  <data name="Home_NFC_ScanSchoolPhoneLabel" xml:space="preserve"><value>هاتف المدرسة</value></data>
+  <data name="Home_NFC_ScanSchoolPhone"      xml:space="preserve"><value>‎+962 6 555 0100</value></data>
   <data name="Home_NFC_ScanHelp"        xml:space="preserve"><value>إذا عثرت على هذا الطالب، يرجى التواصل.</value></data>
 
   <data name="Home_FeaturesEyebrow"  xml:space="preserve"><value>ما يحتويه باص التلميذ</value></data>
