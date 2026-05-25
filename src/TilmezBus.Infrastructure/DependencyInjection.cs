@@ -92,7 +92,18 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IJwtService, JwtService>();
-        services.AddScoped<IOtpSender, DevOtpSender>();
+        // OTP delivery: route through Twilio WhatsApp when an AccountSid
+        // is configured, otherwise fall back to the dev logger so local
+        // dev / CI keep working without a live SMS/WhatsApp account.
+        if (!string.IsNullOrWhiteSpace(configuration["Twilio:AccountSid"]))
+        {
+            services.AddHttpClient<IOtpSender, TwilioWhatsAppOtpSender>(c =>
+                c.BaseAddress = new Uri("https://api.twilio.com/"));
+        }
+        else
+        {
+            services.AddScoped<IOtpSender, DevOtpSender>();
+        }
 
         // Redis
         var redisConnection = configuration.GetConnectionString("Redis") ?? "localhost:6379";
