@@ -62,23 +62,16 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
                 T("يرجى الانتظار دقيقة قبل طلب رمز جديد.",
                   "Please wait a minute before requesting a new code."));
 
-        var otp = GenerateOtp();
-
-        var cacheKey = $"otp:{role.ToLower()}:{phone}";
-        var record   = new OtpRecord(otp, DateTime.UtcNow, 0);
-        await _cache.SetAsync(cacheKey, record, TimeSpan.FromSeconds(OtpTtlSeconds), cancellationToken);
+        // Twilio Verify owns OTP generation, storage, expiry, and attempt
+        // counting. We only persist the resend cooldown so re-requests
+        // are throttled at the app boundary.
         await _cache.SetAsync(cooldownKey, true, TimeSpan.FromSeconds(MaxResendSeconds), cancellationToken);
 
-        await _sender.SendAsync(phone, otp, cancellationToken);
+        await _sender.SendAsync(phone, cancellationToken);
 
         return Result<RequestOtpResponse>.Success(
             new RequestOtpResponse(
                 T("تم إرسال رمز التحقق بنجاح.", "Verification code sent successfully."),
-                OtpTtlSeconds, role, otp));
+                OtpTtlSeconds, role, null));
     }
-
-    private static string GenerateOtp()
-        => Random.Shared.Next(1000, 10_000).ToString();
 }
-
-internal record OtpRecord(string Code, DateTime CreatedAt, int Attempts);

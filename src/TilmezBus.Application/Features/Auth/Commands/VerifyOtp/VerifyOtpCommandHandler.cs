@@ -9,7 +9,6 @@ namespace TilmezBus.Application.Features.Auth.Commands.VerifyOtp;
 
 public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<OtpLoginResponse>>
 {
-    private const int    MaxAttempts  = 5;
     private const string MasterDevOtp = "1234";
 
     private static bool IsDevEnvironment()
@@ -18,19 +17,21 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
             "Development",
             StringComparison.OrdinalIgnoreCase);
 
-    private readonly IUnitOfWork  _unitOfWork;
+    private readonly IUnitOfWork   _unitOfWork;
     private readonly ICacheService _cache;
     private readonly IJwtService   _jwt;
     private readonly IUserStore    _userStore;
+    private readonly IOtpSender    _otp;
 
     public VerifyOtpCommandHandler(
         IUnitOfWork unitOfWork, ICacheService cache,
-        IJwtService jwt, IUserStore userStore)
+        IJwtService jwt, IUserStore userStore, IOtpSender otp)
     {
         _unitOfWork = unitOfWork;
         _cache      = cache;
         _jwt        = jwt;
         _userStore  = userStore;
+        _otp        = otp;
     }
 
     private static string T(string ar, string en) =>
@@ -49,48 +50,27 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
                 T("لم يتم العثور على رقم الجوال في النظام.",
                   "Phone number not found in the system."));
 
-        var cacheKey    = $"otp:{resolvedRole.ToLower()}:{phone}";
         var cooldownKey = $"otp:cooldown:{resolvedRole.ToLower()}:{phone}";
 
         // Master OTP for development testing only.
         if (IsDevEnvironment() && otp == MasterDevOtp)
         {
-            await _cache.RemoveAsync(cacheKey, cancellationToken);
             await _cache.RemoveAsync(cooldownKey, cancellationToken);
             return await DispatchAsync(resolvedRole, phone, cancellationToken);
         }
 
-        var record = await _cache.GetAsync<OtpRecord>(cacheKey, cancellationToken);
-        if (record is null)
-            return Result<OtpLoginResponse>.Failure(
-                T("رمز التحقق منتهي الصلاحية أو غير موجود. يرجى طلب رمز جديد.",
-                  "Verification code expired or not found. Please request a new code."));
-
-        if (record.Attempts >= MaxAttempts)
+        // Delegate validation, expiry, and attempt-count enforcement to
+        // Twilio Verify; we only see approved / not-approved.
+        var approved = await _otp.VerifyAsync(phone, otp, cancellationToken);
+        if (!approved)
         {
-            await _cache.RemoveAsync(cacheKey, cancellationToken);
             return Result<OtpLoginResponse>.Failure(
-                T("تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.",
-                  "Maximum attempts exceeded. Please request a new code."));
+                T("رمز التحقق غير صحيح أو منتهي الصلاحية.",
+                  "Invalid or expired verification code."));
         }
 
-        if (record.Code != otp)
-        {
-            var updated = record with { Attempts = record.Attempts + 1 };
-            // Must mirror OtpTtlSeconds in RequestOtpCommandHandler.
-            var remaining = (int)(record.CreatedAt.AddSeconds(120) - DateTime.UtcNow).TotalSeconds;
-            if (remaining > 0)
-                await _cache.SetAsync(cacheKey, updated, TimeSpan.FromSeconds(remaining), cancellationToken);
-
-            var attemptsLeft = MaxAttempts - updated.Attempts;
-            return Result<OtpLoginResponse>.Failure(
-                T($"رمز التحقق غير صحيح. المحاولات المتبقية: {attemptsLeft}",
-                  $"Invalid verification code. Remaining attempts: {attemptsLeft}"));
-        }
-
-        // OTP consumed → drop both the code and the resend cooldown so a
-        // post-logout re-login can request a fresh code immediately.
-        await _cache.RemoveAsync(cacheKey, cancellationToken);
+        // OTP consumed → drop the resend cooldown so a post-logout
+        // re-login can request a fresh code immediately.
         await _cache.RemoveAsync(cooldownKey, cancellationToken);
         return await DispatchAsync(resolvedRole, phone, cancellationToken);
     }

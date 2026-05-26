@@ -92,13 +92,13 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IJwtService, JwtService>();
-        // OTP delivery: route through Twilio WhatsApp when an AccountSid
-        // is configured, otherwise fall back to the dev logger so local
-        // dev / CI keep working without a live SMS/WhatsApp account.
-        if (!string.IsNullOrWhiteSpace(configuration["Twilio:AccountSid"]))
+        // OTP delivery + verification via Twilio Verify v2 when a
+        // VerifySid is configured; otherwise the dev logger accepts the
+        // master code 1234 so local dev / CI keep working.
+        if (!string.IsNullOrWhiteSpace(configuration["Twilio:VerifySid"]))
         {
-            services.AddHttpClient<IOtpSender, TwilioWhatsAppOtpSender>(c =>
-                c.BaseAddress = new Uri("https://api.twilio.com/"));
+            services.AddHttpClient<IOtpSender, TwilioVerifyOtpSender>(c =>
+                c.BaseAddress = new Uri("https://verify.twilio.com/"));
         }
         else
         {
