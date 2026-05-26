@@ -28,6 +28,7 @@ public sealed class TwilioWhatsAppOtpSender : IOtpSender
     private readonly string _accountSid;
     private readonly string? _from;
     private readonly string? _messagingServiceSid;
+    private readonly string? _contentSid;
 
     public TwilioWhatsAppOtpSender(
         HttpClient http,
@@ -57,6 +58,12 @@ public sealed class TwilioWhatsAppOtpSender : IOtpSender
                 + "(preferred) or Twilio:WhatsAppFrom.");
         }
 
+        // Approved WhatsApp authentication template SID (HX…). Required
+        // for business-initiated messages outside the 24-hour conversation
+        // window — Meta drops freeform text in that case. When unset, we
+        // fall back to a bilingual freeform body (sandbox / in-window use).
+        _contentSid = config["Twilio:ContentSid"];
+
         // Twilio uses HTTP Basic auth: AccountSid : AuthToken.
         var creds = Convert.ToBase64String(
             Encoding.ASCII.GetBytes($"{_accountSid}:{authToken}"));
@@ -78,19 +85,30 @@ public sealed class TwilioWhatsAppOtpSender : IOtpSender
             ? phoneNumber
             : $"whatsapp:{phoneNumber}";
 
-        // Bilingual body — we don't know the recipient's locale at
-        // OTP-request time, so include both. Same digits in both halves
-        // so a misread always lands on the right code.
-        var body =
-            $"رمز التحقق الخاص بك في تلمز باص: {otp}\n" +
-            $"Your TilmezBus verification code: {otp}\n" +
-            "(صالح لـ 5 دقائق · valid for 5 minutes)";
-
         var formData = new Dictionary<string, string>
         {
-            ["To"]   = to,
-            ["Body"] = body,
+            ["To"] = to,
         };
+        if (!string.IsNullOrWhiteSpace(_contentSid))
+        {
+            // Template-driven send: the body lives in the approved Meta
+            // template referenced by ContentSid; we only fill in the OTP
+            // variable. Authentication templates are single-variable —
+            // {"1": "<otp>"} maps to {{1}} in the template body.
+            formData["ContentSid"] = _contentSid;
+            formData["ContentVariables"] = $"{{\"1\":\"{otp}\"}}";
+        }
+        else
+        {
+            // Freeform fallback for sandbox or within the 24-hour window.
+            // Bilingual body — we don't know the recipient's locale at
+            // OTP-request time, so include both. Same digits in both
+            // halves so a misread always lands on the right code.
+            formData["Body"] =
+                $"رمز التحقق الخاص بك في تلمز باص: {otp}\n" +
+                $"Your TilmezBus verification code: {otp}\n" +
+                "(صالح لـ 5 دقائق · valid for 5 minutes)";
+        }
         if (!string.IsNullOrWhiteSpace(_messagingServiceSid))
             formData["MessagingServiceSid"] = _messagingServiceSid;
         else

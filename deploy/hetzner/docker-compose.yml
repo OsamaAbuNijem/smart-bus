@@ -73,6 +73,7 @@ services:
       Twilio__AuthToken:           ${TWILIO_AUTH_TOKEN}
       Twilio__MessagingServiceSid: ${TWILIO_MESSAGING_SERVICE_SID}
       Twilio__WhatsAppFrom:        ${TWILIO_WHATSAPP_FROM}
+      Twilio__ContentSid:          ${TWILIO_CONTENT_SID}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health > /dev/null || exit 1"]
       interval: 20s
