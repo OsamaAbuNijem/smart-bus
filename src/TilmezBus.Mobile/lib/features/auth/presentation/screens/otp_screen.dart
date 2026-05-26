@@ -12,7 +12,7 @@ import 'package:tilmez_bus/features/auth/presentation/providers/otp_controller.d
 import 'package:tilmez_bus/features/auth/presentation/screens/login_screen.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
-const int _otpLength = 4;
+const int _otpLength = 6;
 
 class OtpScreen extends ConsumerStatefulWidget {
   const OtpScreen({super.key});
@@ -358,7 +358,7 @@ class _OtpCard extends StatelessWidget {
           const SizedBox(height: 16),
           _OtpRow(controller: controller, focusNode: focusNode),
           const SizedBox(height: 14),
-          // Verify button enables itself when the controller has 4 digits.
+          // Verify button enables itself when the controller is full.
           AnimatedBuilder(
             animation: controller,
             builder: (_, _) => _VerifyButton(
