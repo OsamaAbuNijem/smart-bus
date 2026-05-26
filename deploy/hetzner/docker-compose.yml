@@ -67,6 +67,12 @@ services:
       AllowedOrigins__1: "https://www.${DOMAIN}"
       Seq__ServerUrl: "http://seq:5341"
       Firebase__CredentialsJson: ${FIREBASE_CREDENTIALS_JSON}
+      # Twilio — WhatsApp OTP delivery. Leave blank to fall back to the
+      # dev-mode console logger.
+      Twilio__AccountSid:          ${TWILIO_ACCOUNT_SID}
+      Twilio__AuthToken:           ${TWILIO_AUTH_TOKEN}
+      Twilio__MessagingServiceSid: ${TWILIO_MESSAGING_SERVICE_SID}
+      Twilio__WhatsAppFrom:        ${TWILIO_WHATSAPP_FROM}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health > /dev/null || exit 1"]
       interval: 20s

@@ -26,7 +26,8 @@ public sealed class TwilioWhatsAppOtpSender : IOtpSender
     private readonly HttpClient _http;
     private readonly ILogger<TwilioWhatsAppOtpSender> _logger;
     private readonly string _accountSid;
-    private readonly string _from;
+    private readonly string? _from;
+    private readonly string? _messagingServiceSid;
 
     public TwilioWhatsAppOtpSender(
         HttpClient http,
@@ -42,9 +43,19 @@ public sealed class TwilioWhatsAppOtpSender : IOtpSender
         var authToken = config["Twilio:AuthToken"]
             ?? throw new InvalidOperationException(
                 "Twilio:AuthToken is not configured.");
-        _from = config["Twilio:WhatsAppFrom"]
-            ?? throw new InvalidOperationException(
-                "Twilio:WhatsAppFrom is not configured (e.g. whatsapp:+14155238886 for sandbox).");
+        // Prefer a Messaging Service when configured (Twilio picks the
+        // approved WhatsApp sender from the service's pool). Falls back
+        // to a bare WhatsApp From number for sandbox / single-sender
+        // setups.
+        _messagingServiceSid = config["Twilio:MessagingServiceSid"];
+        _from = config["Twilio:WhatsAppFrom"];
+        if (string.IsNullOrWhiteSpace(_messagingServiceSid)
+            && string.IsNullOrWhiteSpace(_from))
+        {
+            throw new InvalidOperationException(
+                "Twilio sender not configured: set Twilio:MessagingServiceSid "
+                + "(preferred) or Twilio:WhatsAppFrom.");
+        }
 
         // Twilio uses HTTP Basic auth: AccountSid : AuthToken.
         var creds = Convert.ToBase64String(
@@ -75,12 +86,16 @@ public sealed class TwilioWhatsAppOtpSender : IOtpSender
             $"Your TilmezBus verification code: {otp}\n" +
             "(صالح لـ 5 دقائق · valid for 5 minutes)";
 
-        var form = new FormUrlEncodedContent(new Dictionary<string, string>
+        var formData = new Dictionary<string, string>
         {
-            ["From"] = _from,
             ["To"]   = to,
             ["Body"] = body,
-        });
+        };
+        if (!string.IsNullOrWhiteSpace(_messagingServiceSid))
+            formData["MessagingServiceSid"] = _messagingServiceSid;
+        else
+            formData["From"] = _from!;
+        var form = new FormUrlEncodedContent(formData);
 
         var url = $"2010-04-01/Accounts/{_accountSid}/Messages.json";
         using var resp = await _http.PostAsync(url, form, cancellationToken);
