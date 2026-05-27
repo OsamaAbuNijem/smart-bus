@@ -46,13 +46,14 @@ public sealed class TwilioVerifyOtpSender : IOtpSender
 
     public async Task SendAsync(string phoneNumber, CancellationToken ct = default)
     {
-        // WhatsApp first — cheaper than SMS and renders the OTP with the
-        // brand sender, but it can be unavailable for a given number; fall
-        // back to SMS so the user can always log in.
-        if (await TryCreateVerification(phoneNumber, "whatsapp", ct)) return;
+        // SMS first — the WhatsApp channel needs a per-Verify-Service
+        // configuration with an approved WhatsApp sender, which we don't
+        // yet have. Without it Twilio silently substitutes SMS anyway.
+        // Flip the order back once the WhatsApp sender is provisioned.
         if (await TryCreateVerification(phoneNumber, "sms", ct)) return;
+        if (await TryCreateVerification(phoneNumber, "whatsapp", ct)) return;
         throw new InvalidOperationException(
-            $"Twilio Verify create failed on both WhatsApp and SMS for {phoneNumber}.");
+            $"Twilio Verify create failed on both SMS and WhatsApp for {phoneNumber}.");
     }
 
     public async Task<bool> VerifyAsync(string phoneNumber, string code, CancellationToken ct = default)
