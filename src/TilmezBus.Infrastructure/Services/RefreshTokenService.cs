@@ -9,9 +9,9 @@ namespace TilmezBus.Infrastructure.Services;
 
 public sealed class RefreshTokenService : IRefreshTokenService
 {
-    /// <summary>Refresh tokens are good for 30 days; after that the user
+    /// <summary>Refresh tokens are good for 90 days; after that the user
     /// goes back through the OTP flow once.</summary>
-    public static readonly TimeSpan Lifetime = TimeSpan.FromDays(30);
+    public static readonly TimeSpan Lifetime = TimeSpan.FromDays(90);
 
     private readonly ApplicationDbContext _db;
     private readonly ILogger<RefreshTokenService> _logger;
