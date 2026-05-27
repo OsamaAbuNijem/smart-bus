@@ -20,6 +20,7 @@ public sealed class TwilioVerifyOtpSender : IOtpSender
     private readonly HttpClient _http;
     private readonly ILogger<TwilioVerifyOtpSender> _logger;
     private readonly string _verifySid;
+    private readonly string? _templateSid;
 
     public TwilioVerifyOtpSender(
         HttpClient http,
@@ -35,6 +36,11 @@ public sealed class TwilioVerifyOtpSender : IOtpSender
             ?? throw new InvalidOperationException("Twilio:AuthToken is not configured.");
         _verifySid = config["Twilio:VerifySid"]
             ?? throw new InvalidOperationException("Twilio:VerifySid is not configured (VA…).");
+        // Optional custom Verification Template (HJ…). When set, Twilio
+        // delivers the OTP using this exact template body — used to get
+        // a plain "TilmezBus code:NNNNNN" message instead of Twilio's
+        // default boilerplate.
+        _templateSid = config["Twilio:VerifyTemplateSid"];
 
         var creds = Convert.ToBase64String(
             Encoding.ASCII.GetBytes($"{accountSid}:{authToken}"));
@@ -92,11 +98,14 @@ public sealed class TwilioVerifyOtpSender : IOtpSender
     private async Task<bool> TryCreateVerification(string phoneNumber, string channel, CancellationToken ct)
     {
         var url = $"v2/Services/{_verifySid}/Verifications";
-        var form = new FormUrlEncodedContent(new Dictionary<string, string>
+        var fields = new Dictionary<string, string>
         {
             ["To"]      = phoneNumber,
             ["Channel"] = channel,
-        });
+        };
+        if (!string.IsNullOrWhiteSpace(_templateSid))
+            fields["TemplateSid"] = _templateSid;
+        var form = new FormUrlEncodedContent(fields);
 
         using var resp = await _http.PostAsync(url, form, ct);
         var body = await resp.Content.ReadAsStringAsync(ct);

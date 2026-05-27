@@ -69,9 +69,10 @@ services:
       Firebase__CredentialsJson: ${FIREBASE_CREDENTIALS_JSON}
       # Twilio Verify v2 — OTP delivery and check. Leave VerifySid blank
       # to fall back to the dev-mode console logger (master code 1234).
-      Twilio__AccountSid: ${TWILIO_ACCOUNT_SID}
-      Twilio__AuthToken:  ${TWILIO_AUTH_TOKEN}
-      Twilio__VerifySid:  ${TWILIO_VERIFY_SID}
+      Twilio__AccountSid:        ${TWILIO_ACCOUNT_SID}
+      Twilio__AuthToken:         ${TWILIO_AUTH_TOKEN}
+      Twilio__VerifySid:         ${TWILIO_VERIFY_SID}
+      Twilio__VerifyTemplateSid: ${TWILIO_VERIFY_TEMPLATE_SID}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health > /dev/null || exit 1"]
       interval: 20s
