@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OtpLoginResponse {
 
- String get token; DateTime get expiresAt; String get role; String get fullName; String get phoneNumber; String get entityId;
+ String get token; DateTime get expiresAt; String get role; String get fullName; String get phoneNumber; String get entityId; String get refreshToken;
 /// Create a copy of OtpLoginResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $OtpLoginResponseCopyWith<OtpLoginResponse> get copyWith => _$OtpLoginResponseCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpLoginResponse&&(identical(other.token, token) || other.token == token)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.role, role) || other.role == role)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.entityId, entityId) || other.entityId == entityId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OtpLoginResponse&&(identical(other.token, token) || other.token == token)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.role, role) || other.role == role)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.entityId, entityId) || other.entityId == entityId)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,token,expiresAt,role,fullName,phoneNumber,entityId);
+int get hashCode => Object.hash(runtimeType,token,expiresAt,role,fullName,phoneNumber,entityId,refreshToken);
 
 @override
 String toString() {
-  return 'OtpLoginResponse(token: $token, expiresAt: $expiresAt, role: $role, fullName: $fullName, phoneNumber: $phoneNumber, entityId: $entityId)';
+  return 'OtpLoginResponse(token: $token, expiresAt: $expiresAt, role: $role, fullName: $fullName, phoneNumber: $phoneNumber, entityId: $entityId, refreshToken: $refreshToken)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $OtpLoginResponseCopyWith<$Res>  {
   factory $OtpLoginResponseCopyWith(OtpLoginResponse value, $Res Function(OtpLoginResponse) _then) = _$OtpLoginResponseCopyWithImpl;
 @useResult
 $Res call({
- String token, DateTime expiresAt, String role, String fullName, String phoneNumber, String entityId
+ String token, DateTime expiresAt, String role, String fullName, String phoneNumber, String entityId, String refreshToken
 });
 
 
@@ -65,7 +65,7 @@ class _$OtpLoginResponseCopyWithImpl<$Res>
 
 /// Create a copy of OtpLoginResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? token = null,Object? expiresAt = null,Object? role = null,Object? fullName = null,Object? phoneNumber = null,Object? entityId = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? token = null,Object? expiresAt = null,Object? role = null,Object? fullName = null,Object? phoneNumber = null,Object? entityId = null,Object? refreshToken = null,}) {
   return _then(_self.copyWith(
 token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
@@ -73,6 +73,7 @@ as DateTime,role: null == role ? _self.role : role // ignore: cast_nullable_to_n
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
 as String,entityId: null == entityId ? _self.entityId : entityId // ignore: cast_nullable_to_non_nullable
+as String,refreshToken: null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -158,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String token,  DateTime expiresAt,  String role,  String fullName,  String phoneNumber,  String entityId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String token,  DateTime expiresAt,  String role,  String fullName,  String phoneNumber,  String entityId,  String refreshToken)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OtpLoginResponse() when $default != null:
-return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phoneNumber,_that.entityId);case _:
+return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phoneNumber,_that.entityId,_that.refreshToken);case _:
   return orElse();
 
 }
@@ -179,10 +180,10 @@ return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phon
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String token,  DateTime expiresAt,  String role,  String fullName,  String phoneNumber,  String entityId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String token,  DateTime expiresAt,  String role,  String fullName,  String phoneNumber,  String entityId,  String refreshToken)  $default,) {final _that = this;
 switch (_that) {
 case _OtpLoginResponse():
-return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phoneNumber,_that.entityId);case _:
+return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phoneNumber,_that.entityId,_that.refreshToken);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +200,10 @@ return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phon
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String token,  DateTime expiresAt,  String role,  String fullName,  String phoneNumber,  String entityId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String token,  DateTime expiresAt,  String role,  String fullName,  String phoneNumber,  String entityId,  String refreshToken)?  $default,) {final _that = this;
 switch (_that) {
 case _OtpLoginResponse() when $default != null:
-return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phoneNumber,_that.entityId);case _:
+return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phoneNumber,_that.entityId,_that.refreshToken);case _:
   return null;
 
 }
@@ -214,7 +215,7 @@ return $default(_that.token,_that.expiresAt,_that.role,_that.fullName,_that.phon
 @JsonSerializable()
 
 class _OtpLoginResponse implements OtpLoginResponse {
-  const _OtpLoginResponse({required this.token, required this.expiresAt, required this.role, required this.fullName, required this.phoneNumber, required this.entityId});
+  const _OtpLoginResponse({required this.token, required this.expiresAt, required this.role, required this.fullName, required this.phoneNumber, required this.entityId, required this.refreshToken});
   factory _OtpLoginResponse.fromJson(Map<String, dynamic> json) => _$OtpLoginResponseFromJson(json);
 
 @override final  String token;
@@ -223,6 +224,7 @@ class _OtpLoginResponse implements OtpLoginResponse {
 @override final  String fullName;
 @override final  String phoneNumber;
 @override final  String entityId;
+@override final  String refreshToken;
 
 /// Create a copy of OtpLoginResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpLoginResponse&&(identical(other.token, token) || other.token == token)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.role, role) || other.role == role)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.entityId, entityId) || other.entityId == entityId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OtpLoginResponse&&(identical(other.token, token) || other.token == token)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.role, role) || other.role == role)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.entityId, entityId) || other.entityId == entityId)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,token,expiresAt,role,fullName,phoneNumber,entityId);
+int get hashCode => Object.hash(runtimeType,token,expiresAt,role,fullName,phoneNumber,entityId,refreshToken);
 
 @override
 String toString() {
-  return 'OtpLoginResponse(token: $token, expiresAt: $expiresAt, role: $role, fullName: $fullName, phoneNumber: $phoneNumber, entityId: $entityId)';
+  return 'OtpLoginResponse(token: $token, expiresAt: $expiresAt, role: $role, fullName: $fullName, phoneNumber: $phoneNumber, entityId: $entityId, refreshToken: $refreshToken)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$OtpLoginResponseCopyWith<$Res> implements $OtpLoginRespon
   factory _$OtpLoginResponseCopyWith(_OtpLoginResponse value, $Res Function(_OtpLoginResponse) _then) = __$OtpLoginResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String token, DateTime expiresAt, String role, String fullName, String phoneNumber, String entityId
+ String token, DateTime expiresAt, String role, String fullName, String phoneNumber, String entityId, String refreshToken
 });
 
 
@@ -274,7 +276,7 @@ class __$OtpLoginResponseCopyWithImpl<$Res>
 
 /// Create a copy of OtpLoginResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? token = null,Object? expiresAt = null,Object? role = null,Object? fullName = null,Object? phoneNumber = null,Object? entityId = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? token = null,Object? expiresAt = null,Object? role = null,Object? fullName = null,Object? phoneNumber = null,Object? entityId = null,Object? refreshToken = null,}) {
   return _then(_OtpLoginResponse(
 token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
@@ -282,6 +284,7 @@ as DateTime,role: null == role ? _self.role : role // ignore: cast_nullable_to_n
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
 as String,entityId: null == entityId ? _self.entityId : entityId // ignore: cast_nullable_to_non_nullable
+as String,refreshToken: null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

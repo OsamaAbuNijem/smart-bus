@@ -29,6 +29,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<StudentQrToken>  StudentQrTokens  => Set<StudentQrToken>();
     public DbSet<UserDeviceToken> UserDeviceTokens => Set<UserDeviceToken>();
     public DbSet<DemoRequest> DemoRequests => Set<DemoRequest>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -213,6 +214,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             .HasIndex(t => new { t.UserId, t.Token })
             .IsUnique()
             .HasFilter("\"IsDeleted\" = false");
+
+        // Refresh tokens — looked up by hash on every /auth/refresh call,
+        // so a unique index on TokenHash makes that a constant-time check.
+        // We also need to list active tokens per user for revoke-all on
+        // logout, hence the UserId index. Hash is the SHA-256 hex string
+        // (64 chars).
+        builder.Entity<RefreshToken>().HasQueryFilter(t => !t.IsDeleted);
+        builder.Entity<RefreshToken>().Property(t => t.UserId).HasMaxLength(450).IsRequired();
+        builder.Entity<RefreshToken>().Property(t => t.TokenHash).HasMaxLength(64).IsRequired();
+        builder.Entity<RefreshToken>().HasIndex(t => t.TokenHash).IsUnique();
+        builder.Entity<RefreshToken>().HasIndex(t => t.UserId);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

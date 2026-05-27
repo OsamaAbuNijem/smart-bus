@@ -68,6 +68,7 @@ class AuthRepositoryImpl implements AuthRepository {
     );
     await Future.wait([
       _storage.writeAccessToken(dto.token),
+      _storage.writeRefreshToken(dto.refreshToken),
       _storage.writeTokenExpiresAt(dto.expiresAt),
       _storage.writeFullName(dto.fullName),
       _storage.writePhoneNumber(dto.phoneNumber),
@@ -84,7 +85,11 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> logout() => _storage.clearAuth();
+  Future<void> logout() async {
+    // Tell the server to revoke our refresh tokens before we drop them.
+    await _remote.logout();
+    await _storage.clearAuth();
+  }
 }
 
 @Riverpod(keepAlive: true)

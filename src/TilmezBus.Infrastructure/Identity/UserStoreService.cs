@@ -23,6 +23,12 @@ public class UserStoreService : IUserStore
         return user is null ? null : new AppUser(user.Id, user.Email!, user.FullName);
     }
 
+    public async Task<AppUser?> FindByIdAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        return user is null ? null : new AppUser(user.Id, user.Email!, user.FullName);
+    }
+
     public async Task<bool> CheckPasswordAsync(string userId, string password, CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByIdAsync(userId);

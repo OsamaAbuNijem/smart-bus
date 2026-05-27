@@ -42,6 +42,16 @@ class AuthRemoteDataSource {
       throw mapDioErrorToFailure(e);
     }
   }
+
+  /// Revoke the user's active refresh tokens on the server. Swallows
+  /// errors — the local sign-out happens either way.
+  Future<void> logout() async {
+    try {
+      await _dio.post<void>('/auth/logout');
+    } on DioException {
+      // best-effort; not fatal if the network is down
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)

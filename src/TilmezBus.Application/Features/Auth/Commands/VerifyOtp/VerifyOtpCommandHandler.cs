@@ -17,21 +17,24 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
             "Development",
             StringComparison.OrdinalIgnoreCase);
 
-    private readonly IUnitOfWork   _unitOfWork;
-    private readonly ICacheService _cache;
-    private readonly IJwtService   _jwt;
-    private readonly IUserStore    _userStore;
-    private readonly IOtpSender    _otp;
+    private readonly IUnitOfWork           _unitOfWork;
+    private readonly ICacheService         _cache;
+    private readonly IJwtService           _jwt;
+    private readonly IUserStore            _userStore;
+    private readonly IOtpSender            _otp;
+    private readonly IRefreshTokenService  _refresh;
 
     public VerifyOtpCommandHandler(
         IUnitOfWork unitOfWork, ICacheService cache,
-        IJwtService jwt, IUserStore userStore, IOtpSender otp)
+        IJwtService jwt, IUserStore userStore,
+        IOtpSender otp, IRefreshTokenService refresh)
     {
         _unitOfWork = unitOfWork;
         _cache      = cache;
         _jwt        = jwt;
         _userStore  = userStore;
         _otp        = otp;
+        _refresh    = refresh;
     }
 
     private static string T(string ar, string en) =>
@@ -113,7 +116,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
             await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        return BuildResponse(userId!, phone, parent.FullName, "Parent", parent.Id);
+        return await BuildResponseAsync(userId!, phone, parent.FullName, "Parent", parent.Id, ct);
     }
 
     private async Task<Result<OtpLoginResponse>> HandleDriverAsync(
@@ -131,7 +134,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
             await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        return BuildResponse(userId!, phone, driver.FullName, "Driver", driver.Id);
+        return await BuildResponseAsync(userId!, phone, driver.FullName, "Driver", driver.Id, ct);
     }
 
     private async Task<Result<OtpLoginResponse>> HandleAssistantAsync(
@@ -151,7 +154,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
             await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        return BuildResponse(userId!, phone, driver.FullName, "Assistant", driver.Id);
+        return await BuildResponseAsync(userId!, phone, driver.FullName, "Assistant", driver.Id, ct);
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────
@@ -182,14 +185,18 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         return user is not null ? (user.Id, null) : (null, T("فشل إنشاء حساب المستخدم.", "Failed to create user account."));
     }
 
-    private Result<OtpLoginResponse> BuildResponse(
-        string userId, string phone, string fullName, string role, Guid entityId)
+    private async Task<Result<OtpLoginResponse>> BuildResponseAsync(
+        string userId, string phone, string fullName, string role, Guid entityId,
+        CancellationToken ct)
     {
         var email = PhoneToEmail(phone);
         var token = _jwt.GenerateToken(userId, email, [role]);
-        var exp   = DateTime.UtcNow.AddHours(24);
+        // Mirror JwtService.AccessTokenLifetime (1h). Kept literal here so
+        // Application doesn't take an Infrastructure dependency.
+        var exp   = DateTime.UtcNow.AddHours(1);
+        var refresh = await _refresh.IssueAsync(userId, ct);
         return Result<OtpLoginResponse>.Success(
-            new OtpLoginResponse(token, exp, role, fullName, phone, entityId));
+            new OtpLoginResponse(token, exp, role, fullName, phone, entityId, refresh));
     }
 
     private static string PhoneToEmail(string phone)

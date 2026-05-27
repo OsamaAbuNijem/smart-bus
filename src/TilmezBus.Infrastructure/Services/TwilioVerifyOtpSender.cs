@@ -46,13 +46,13 @@ public sealed class TwilioVerifyOtpSender : IOtpSender
 
     public async Task SendAsync(string phoneNumber, CancellationToken ct = default)
     {
-        // WhatsApp first; if Twilio rejects the create (e.g. the number
-        // isn't on WhatsApp, or the channel is misconfigured) retry once
-        // over SMS so the user can still log in.
-        if (await TryCreateVerification(phoneNumber, "whatsapp", ct)) return;
+        // SMS first — most reliable channel with the broadest delivery
+        // (geo-permission gates are SMS-keyed in Twilio Verify). WhatsApp
+        // is kept as a best-effort fallback.
         if (await TryCreateVerification(phoneNumber, "sms", ct)) return;
+        if (await TryCreateVerification(phoneNumber, "whatsapp", ct)) return;
         throw new InvalidOperationException(
-            $"Twilio Verify create failed on both WhatsApp and SMS for {phoneNumber}.");
+            $"Twilio Verify create failed on both SMS and WhatsApp for {phoneNumber}.");
     }
 
     public async Task<bool> VerifyAsync(string phoneNumber, string code, CancellationToken ct = default)

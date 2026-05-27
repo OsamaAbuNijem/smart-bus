@@ -23,6 +23,7 @@ public interface IApplicationDbContext
     DbSet<StudentQrToken>  StudentQrTokens  { get; }
     DbSet<UserDeviceToken> UserDeviceTokens { get; }
     DbSet<DemoRequest> DemoRequests { get; }
+    DbSet<RefreshToken> RefreshTokens { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

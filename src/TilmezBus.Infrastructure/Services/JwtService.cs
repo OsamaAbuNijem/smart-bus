@@ -9,6 +9,11 @@ namespace TilmezBus.Infrastructure.Services;
 
 public class JwtService : IJwtService
 {
+    /// <summary>Access tokens live 1h; the refresh-token pipeline silently
+    /// renews them so the user only sees the OTP screen when their
+    /// 30-day refresh window expires or is revoked.</summary>
+    public static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromHours(1);
+
     private readonly IConfiguration _configuration;
 
     public JwtService(IConfiguration configuration)
@@ -31,7 +36,7 @@ public class JwtService : IJwtService
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(24),
+            expires: DateTime.UtcNow.Add(AccessTokenLifetime),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

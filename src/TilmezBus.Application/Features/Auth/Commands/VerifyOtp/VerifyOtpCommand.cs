@@ -13,5 +13,6 @@ public record OtpLoginResponse(
     string Role,
     string FullName,
     string PhoneNumber,
-    Guid   EntityId    // Driver / Parent / Assistant table Id
+    Guid   EntityId,    // Driver / Parent / Assistant table Id
+    string RefreshToken
 );

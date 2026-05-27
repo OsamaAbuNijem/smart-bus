@@ -7,7 +7,7 @@ part of 'device_token_registrar.dart';
 // **************************************************************************
 
 String _$deviceTokenRegistrarHash() =>
-    r'e69f248a426cdd0885b0d09e3ec4c413471f068b';
+    r'da33fd5499433a916692c91d27e6e9004124f744';
 
 /// Registers the current FCM token with the backend whenever the user is
 /// authenticated. Idempotent — the API treats it as upsert. Re-registers on

@@ -13,6 +13,7 @@ abstract class OtpLoginResponse with _$OtpLoginResponse {
     required String fullName,
     required String phoneNumber,
     required String entityId,
+    required String refreshToken,
   }) = _OtpLoginResponse;
 
   factory OtpLoginResponse.fromJson(Map<String, dynamic> json) =>

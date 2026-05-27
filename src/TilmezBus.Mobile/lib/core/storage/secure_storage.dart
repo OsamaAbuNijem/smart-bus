@@ -8,6 +8,7 @@ class SecureStorage {
   SecureStorage(this._storage);
 
   static const _kAccessToken = 'auth.access_token';
+  static const _kRefreshToken = 'auth.refresh_token';
   static const _kTokenExpiresAt = 'auth.expires_at';
   static const _kFullName = 'auth.full_name';
   static const _kPhoneNumber = 'auth.phone_number';
@@ -21,6 +22,10 @@ class SecureStorage {
   Future<String?> readAccessToken() => _storage.read(key: _kAccessToken);
   Future<void> writeAccessToken(String value) =>
       _storage.write(key: _kAccessToken, value: value);
+
+  Future<String?> readRefreshToken() => _storage.read(key: _kRefreshToken);
+  Future<void> writeRefreshToken(String value) =>
+      _storage.write(key: _kRefreshToken, value: value);
 
   Future<DateTime?> readTokenExpiresAt() async {
     final raw = await _storage.read(key: _kTokenExpiresAt);
@@ -59,6 +64,7 @@ class SecureStorage {
   Future<void> clearAuth() async {
     await Future.wait([
       _storage.delete(key: _kAccessToken),
+      _storage.delete(key: _kRefreshToken),
       _storage.delete(key: _kTokenExpiresAt),
       _storage.delete(key: _kFullName),
       _storage.delete(key: _kPhoneNumber),

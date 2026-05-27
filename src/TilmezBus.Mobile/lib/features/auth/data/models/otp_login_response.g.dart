@@ -14,6 +14,7 @@ _OtpLoginResponse _$OtpLoginResponseFromJson(Map<String, dynamic> json) =>
       fullName: json['fullName'] as String,
       phoneNumber: json['phoneNumber'] as String,
       entityId: json['entityId'] as String,
+      refreshToken: json['refreshToken'] as String,
     );
 
 Map<String, dynamic> _$OtpLoginResponseToJson(_OtpLoginResponse instance) =>
@@ -24,4 +25,5 @@ Map<String, dynamic> _$OtpLoginResponseToJson(_OtpLoginResponse instance) =>
       'fullName': instance.fullName,
       'phoneNumber': instance.phoneNumber,
       'entityId': instance.entityId,
+      'refreshToken': instance.refreshToken,
     };

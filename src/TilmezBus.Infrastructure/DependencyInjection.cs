@@ -92,6 +92,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         // OTP delivery + verification via Twilio Verify v2 when a
         // VerifySid is configured; otherwise the dev logger accepts the
         // master code 1234 so local dev / CI keep working.
