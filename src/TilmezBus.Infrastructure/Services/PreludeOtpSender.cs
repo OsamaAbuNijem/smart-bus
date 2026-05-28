@@ -57,7 +57,28 @@ public sealed class PreludeOtpSender : IOtpSender
             throw new InvalidOperationException(
                 $"Prelude verification create failed: {resp.StatusCode}.");
         }
-        _logger.LogInformation("Prelude verification created for {Phone}.", phoneNumber);
+        // A 2xx response is not enough — Prelude returns status="retry"
+        // or "blocked" with HTTP 200 when its fraud guard / rate limit
+        // refuses to actually deliver. Only "success" means an OTP is
+        // being sent.
+        string? status = null;
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.TryGetProperty("status", out var s)) status = s.GetString();
+        }
+        catch (JsonException) { /* fall through to status-check below */ }
+
+        if (status == "success")
+        {
+            _logger.LogInformation("Prelude verification created for {Phone}.", phoneNumber);
+            return;
+        }
+        _logger.LogWarning(
+            "Prelude refused to deliver for {Phone}: status={PreludeStatus} body={Body}",
+            phoneNumber, status, body);
+        throw new InvalidOperationException(
+            $"Prelude verification not sent: status='{status ?? "unknown"}'.");
     }
 
     public async Task<bool> VerifyAsync(string phoneNumber, string code, CancellationToken ct = default)
