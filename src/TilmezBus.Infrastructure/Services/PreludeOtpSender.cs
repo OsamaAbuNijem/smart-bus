@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using TilmezBus.Application.Common.Exceptions;
 using TilmezBus.Application.Common.Interfaces;
 
 namespace TilmezBus.Infrastructure.Services;
@@ -77,6 +78,14 @@ public sealed class PreludeOtpSender : IOtpSender
         _logger.LogWarning(
             "Prelude refused to deliver for {Phone}: status={PreludeStatus} body={Body}",
             phoneNumber, status, body);
+        // retry / blocked are normal anti-fraud responses, not server errors —
+        // signal them with a dedicated exception type so the command handler
+        // can map them to a 429 instead of a 500.
+        if (status is "retry" or "blocked")
+        {
+            throw new OtpDeliveryRateLimitedException(
+                $"Prelude declined to deliver (status='{status}').");
+        }
         throw new InvalidOperationException(
             $"Prelude verification not sent: status='{status ?? "unknown"}'.");
     }

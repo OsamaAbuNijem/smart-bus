@@ -1,4 +1,5 @@
 using MediatR;
+using TilmezBus.Application.Common.Exceptions;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
 using TilmezBus.Application.Common.Utilities;
@@ -62,12 +63,26 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
                 T("يرجى الانتظار دقيقة قبل طلب رمز جديد.",
                   "Please wait a minute before requesting a new code."));
 
-        // Twilio Verify owns OTP generation, storage, expiry, and attempt
+        // Provider owns OTP generation, storage, expiry, and attempt
         // counting. We only persist the resend cooldown so re-requests
         // are throttled at the app boundary.
         await _cache.SetAsync(cooldownKey, true, TimeSpan.FromSeconds(MaxResendSeconds), cancellationToken);
 
-        await _sender.SendAsync(phone, cancellationToken);
+        try
+        {
+            await _sender.SendAsync(phone, cancellationToken);
+        }
+        catch (OtpDeliveryRateLimitedException)
+        {
+            // Provider's anti-fraud refused to deliver. Roll back the
+            // cooldown so the user can retry sooner (the provider is
+            // already gating the retry on its side).
+            await _cache.RemoveAsync(cooldownKey, cancellationToken);
+            return Result<RequestOtpResponse>.Failure(
+                T("لا يمكن إرسال الرمز إلى هذا الرقم حالياً. يرجى المحاولة بعد قليل.",
+                  "We can't send a code to this number right now. Please try again shortly."),
+                statusCode: 429);
+        }
 
         return Result<RequestOtpResponse>.Success(
             new RequestOtpResponse(

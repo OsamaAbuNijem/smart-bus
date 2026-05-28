@@ -52,7 +52,14 @@ public class OtpController : ControllerBase
             new RequestOtpCommand(dto.PhoneNumber), cancellationToken);
 
         if (!result.IsSuccess)
-            return BadRequest(new { error = result.Error });
+        {
+            // Honor any explicit status the handler asked for (e.g. 429
+            // when the upstream OTP provider is rate-limiting this
+            // number); otherwise fall back to 400.
+            return StatusCode(
+                result.StatusCode ?? StatusCodes.Status400BadRequest,
+                new { error = result.Error });
+        }
 
         var data = _env.IsDevelopment()
             ? result.Data
