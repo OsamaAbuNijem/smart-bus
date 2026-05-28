@@ -47,6 +47,10 @@ public sealed class PreludeOtpSender : IOtpSender
         var payload = new
         {
             target = new { type = "phone_number", value = phoneNumber },
+            // Prefer WhatsApp; pair this with a dashboard dispatch rule
+            // that doesn't fall back to SMS to get a true single-channel
+            // delivery (cheaper and avoids the user getting two messages).
+            options = new { preferred_channel = "whatsapp" },
         };
         using var resp = await _http.PostAsJsonAsync("v2/verification", payload, JsonOpts, ct);
         var body = await resp.Content.ReadAsStringAsync(ct);
