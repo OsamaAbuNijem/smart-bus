@@ -93,14 +93,19 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
-        // OTP delivery via Prelude when its API key is set; otherwise
-        // the dev logger prints the code so local dev / CI keep working.
-        // Verification happens locally against Redis — no provider is
-        // involved in the check.
+        // OTP delivery + verification. Prelude wins when its API key is
+        // set (cheaper, simpler API); falls back to Twilio Verify when
+        // its VerifySid is set; otherwise the dev logger accepts the
+        // master code 1234 so local dev / CI keep working.
         if (!string.IsNullOrWhiteSpace(configuration["Prelude:ApiKey"]))
         {
             services.AddHttpClient<IOtpSender, PreludeOtpSender>(c =>
                 c.BaseAddress = new Uri("https://api.prelude.dev/"));
+        }
+        else if (!string.IsNullOrWhiteSpace(configuration["Twilio:VerifySid"]))
+        {
+            services.AddHttpClient<IOtpSender, TwilioVerifyOtpSender>(c =>
+                c.BaseAddress = new Uri("https://verify.twilio.com/"));
         }
         else
         {
