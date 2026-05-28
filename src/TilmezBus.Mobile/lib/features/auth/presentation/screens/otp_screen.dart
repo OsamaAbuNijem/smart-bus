@@ -12,7 +12,7 @@ import 'package:tilmez_bus/features/auth/presentation/providers/otp_controller.d
 import 'package:tilmez_bus/features/auth/presentation/screens/login_screen.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
-const int _otpLength = 6;
+const int _otpLength = 4;
 
 class OtpScreen extends ConsumerStatefulWidget {
   const OtpScreen({super.key});
