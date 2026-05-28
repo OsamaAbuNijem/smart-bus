@@ -3,6 +3,7 @@ using TilmezBus.Application.Common.Exceptions;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
 using TilmezBus.Application.Common.Utilities;
+using TilmezBus.Application.Features.Auth.Common;
 using TilmezBus.Domain.Enums;
 
 namespace TilmezBus.Application.Features.Auth.Commands.RequestOtp;
@@ -63,20 +64,28 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
                 T("يرجى الانتظار دقيقة قبل طلب رمز جديد.",
                   "Please wait a minute before requesting a new code."));
 
-        // Provider owns OTP generation, storage, expiry, and attempt
-        // counting. We only persist the resend cooldown so re-requests
-        // are throttled at the app boundary.
-        await _cache.SetAsync(cooldownKey, true, TimeSpan.FromSeconds(MaxResendSeconds), cancellationToken);
+        // We generate the OTP ourselves and cache it in Redis; the
+        // sender (Prelude) just delivers our code as the message body.
+        // Verification then runs locally — no /verification/check call.
+        var otp = GenerateOtp();
+        var cacheKey = $"otp:{role.ToLower()}:{phone}";
+        await _cache.SetAsync(
+            cacheKey, new OtpRecord(otp, DateTime.UtcNow, 0),
+            TimeSpan.FromSeconds(OtpTtlSeconds), cancellationToken);
+        await _cache.SetAsync(
+            cooldownKey, true,
+            TimeSpan.FromSeconds(MaxResendSeconds), cancellationToken);
 
         try
         {
-            await _sender.SendAsync(phone, cancellationToken);
+            await _sender.SendAsync(phone, otp, cancellationToken);
         }
         catch (OtpDeliveryRateLimitedException)
         {
             // Provider's anti-fraud refused to deliver. Roll back the
-            // cooldown so the user can retry sooner (the provider is
-            // already gating the retry on its side).
+            // cooldown AND the cached code so a retry isn't stuck with
+            // a stale otp the user will never receive.
+            await _cache.RemoveAsync(cacheKey, cancellationToken);
             await _cache.RemoveAsync(cooldownKey, cancellationToken);
             return Result<RequestOtpResponse>.Failure(
                 T("لا يمكن إرسال الرمز إلى هذا الرقم حالياً. يرجى المحاولة بعد قليل.",
@@ -89,4 +98,9 @@ public class RequestOtpCommandHandler : IRequestHandler<RequestOtpCommand, Resul
                 T("تم إرسال رمز التحقق بنجاح.", "Verification code sent successfully."),
                 OtpTtlSeconds, role, null));
     }
+
+    /// <summary>4-digit numeric code (the OTP screen on the mobile app
+    /// expects exactly four digits).</summary>
+    private static string GenerateOtp()
+        => Random.Shared.Next(1000, 10_000).ToString();
 }

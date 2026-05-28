@@ -42,11 +42,16 @@ public sealed class PreludeOtpSender : IOtpSender
             _http.BaseAddress = new Uri("https://api.prelude.dev/");
     }
 
-    public async Task SendAsync(string phoneNumber, CancellationToken ct = default)
+    public async Task SendAsync(string phoneNumber, string code, CancellationToken ct = default)
     {
         var payload = new
         {
             target = new { type = "phone_number", value = phoneNumber },
+            // We generate the code locally; Prelude just delivers it
+            // through whatever dispatch rule is configured in their
+            // dashboard. The verify step happens against our Redis
+            // cache, so we don't need Prelude to remember the code.
+            options = new { custom_code = code },
         };
         // Channel selection (WhatsApp only vs WhatsApp+SMS fallback) is
         // controlled in the Prelude dashboard's Dispatch rule, not per
@@ -93,34 +98,4 @@ public sealed class PreludeOtpSender : IOtpSender
             $"Prelude verification not sent: status='{status ?? "unknown"}'.");
     }
 
-    public async Task<bool> VerifyAsync(string phoneNumber, string code, CancellationToken ct = default)
-    {
-        var payload = new
-        {
-            target = new { type = "phone_number", value = phoneNumber },
-            code   = code,
-        };
-        using var resp = await _http.PostAsJsonAsync("v2/verification/check", payload, JsonOpts, ct);
-        var body = await resp.Content.ReadAsStringAsync(ct);
-        if (!resp.IsSuccessStatusCode)
-        {
-            _logger.LogInformation(
-                "Prelude verification check non-success for {Phone}: status={Status} body={Body}",
-                phoneNumber, resp.StatusCode, body);
-            return false;
-        }
-        try
-        {
-            using var doc = JsonDocument.Parse(body);
-            // Prelude returns status="success" on a correct code; everything
-            // else (failure, expired_or_not_found, retry, blocked) is a no.
-            return doc.RootElement.TryGetProperty("status", out var s)
-                && s.GetString() == "success";
-        }
-        catch (JsonException)
-        {
-            _logger.LogWarning("Prelude check returned non-JSON body: {Body}", body);
-            return false;
-        }
-    }
 }

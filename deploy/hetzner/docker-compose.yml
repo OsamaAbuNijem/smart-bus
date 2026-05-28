@@ -67,15 +67,10 @@ services:
       AllowedOrigins__1: "https://www.${DOMAIN}"
       Seq__ServerUrl: "http://seq:5341"
       Firebase__CredentialsJson: ${FIREBASE_CREDENTIALS_JSON}
-      # Twilio Verify v2 — OTP delivery and check. Leave VerifySid blank
-      # to fall back to the dev-mode console logger (master code 1234).
-      Twilio__AccountSid:        ${TWILIO_ACCOUNT_SID}
-      Twilio__AuthToken:         ${TWILIO_AUTH_TOKEN}
-      Twilio__VerifySid:         ${TWILIO_VERIFY_SID}
-      Twilio__VerifyTemplateSid: ${TWILIO_VERIFY_TEMPLATE_SID}
-      # Prelude — primary OTP provider when configured. Falls back to
-      # Twilio when blank.
-      Prelude__ApiKey:           ${PRELUDE_API_KEY}
+      # Prelude — OTP delivery channel. We generate the code locally
+      # and pass it as options.custom_code; Prelude just routes the
+      # message (WhatsApp/SMS, per the dashboard dispatch rule).
+      Prelude__ApiKey: ${PRELUDE_API_KEY}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health > /dev/null || exit 1"]
       interval: 20s

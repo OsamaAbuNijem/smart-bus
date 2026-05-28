@@ -2,6 +2,7 @@ using MediatR;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
 using TilmezBus.Application.Common.Utilities;
+using TilmezBus.Application.Features.Auth.Common;
 using TilmezBus.Application.Features.Auth.Commands.RequestOtp;
 using TilmezBus.Domain.Entities;
 
@@ -10,6 +11,10 @@ namespace TilmezBus.Application.Features.Auth.Commands.VerifyOtp;
 public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<OtpLoginResponse>>
 {
     private const string MasterDevOtp = "1234";
+    private const int    MaxAttempts  = 5;
+    // Mirror OtpTtlSeconds in RequestOtpCommandHandler — we need it to
+    // recompute remaining TTL when persisting attempt increments.
+    private const int    OtpTtlSeconds = 300;
 
     private static bool IsDevEnvironment()
         => string.Equals(
@@ -21,19 +26,17 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
     private readonly ICacheService         _cache;
     private readonly IJwtService           _jwt;
     private readonly IUserStore            _userStore;
-    private readonly IOtpSender            _otp;
     private readonly IRefreshTokenService  _refresh;
 
     public VerifyOtpCommandHandler(
         IUnitOfWork unitOfWork, ICacheService cache,
         IJwtService jwt, IUserStore userStore,
-        IOtpSender otp, IRefreshTokenService refresh)
+        IRefreshTokenService refresh)
     {
         _unitOfWork = unitOfWork;
         _cache      = cache;
         _jwt        = jwt;
         _userStore  = userStore;
-        _otp        = otp;
         _refresh    = refresh;
     }
 
@@ -53,27 +56,50 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
                 T("لم يتم العثور على رقم الجوال في النظام.",
                   "Phone number not found in the system."));
 
+        var cacheKey    = $"otp:{resolvedRole.ToLower()}:{phone}";
         var cooldownKey = $"otp:cooldown:{resolvedRole.ToLower()}:{phone}";
 
         // Master OTP for development testing only.
         if (IsDevEnvironment() && otp == MasterDevOtp)
         {
+            await _cache.RemoveAsync(cacheKey, cancellationToken);
             await _cache.RemoveAsync(cooldownKey, cancellationToken);
             return await DispatchAsync(resolvedRole, phone, cancellationToken);
         }
 
-        // Delegate validation, expiry, and attempt-count enforcement to
-        // Twilio Verify; we only see approved / not-approved.
-        var approved = await _otp.VerifyAsync(phone, otp, cancellationToken);
-        if (!approved)
+        // Local check against the Redis-cached OtpRecord — we no longer
+        // call Prelude here (the send pipeline embedded our own code).
+        var record = await _cache.GetAsync<OtpRecord>(cacheKey, cancellationToken);
+        if (record is null)
         {
             return Result<OtpLoginResponse>.Failure(
-                T("رمز التحقق غير صحيح أو منتهي الصلاحية.",
-                  "Invalid or expired verification code."));
+                T("رمز التحقق منتهي الصلاحية أو غير موجود. يرجى طلب رمز جديد.",
+                  "Verification code expired or not found. Please request a new code."));
         }
 
-        // OTP consumed → drop the resend cooldown so a post-logout
-        // re-login can request a fresh code immediately.
+        if (record.Attempts >= MaxAttempts)
+        {
+            await _cache.RemoveAsync(cacheKey, cancellationToken);
+            return Result<OtpLoginResponse>.Failure(
+                T("تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.",
+                  "Maximum attempts exceeded. Please request a new code."));
+        }
+
+        if (record.Code != otp)
+        {
+            var updated = record with { Attempts = record.Attempts + 1 };
+            var remaining = (int)(record.CreatedAt.AddSeconds(OtpTtlSeconds) - DateTime.UtcNow).TotalSeconds;
+            if (remaining > 0)
+                await _cache.SetAsync(cacheKey, updated, TimeSpan.FromSeconds(remaining), cancellationToken);
+            var attemptsLeft = MaxAttempts - updated.Attempts;
+            return Result<OtpLoginResponse>.Failure(
+                T($"رمز التحقق غير صحيح. المحاولات المتبقية: {attemptsLeft}",
+                  $"Invalid verification code. Remaining attempts: {attemptsLeft}"));
+        }
+
+        // OTP consumed → drop the cache row AND the resend cooldown so a
+        // post-logout re-login can request a fresh code immediately.
+        await _cache.RemoveAsync(cacheKey, cancellationToken);
         await _cache.RemoveAsync(cooldownKey, cancellationToken);
         return await DispatchAsync(resolvedRole, phone, cancellationToken);
     }
