@@ -73,6 +73,9 @@ services:
       Twilio__AuthToken:         ${TWILIO_AUTH_TOKEN}
       Twilio__VerifySid:         ${TWILIO_VERIFY_SID}
       Twilio__VerifyTemplateSid: ${TWILIO_VERIFY_TEMPLATE_SID}
+      # Prelude — primary OTP provider when configured. Falls back to
+      # Twilio when blank.
+      Prelude__ApiKey:           ${PRELUDE_API_KEY}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health > /dev/null || exit 1"]
       interval: 20s
