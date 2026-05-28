@@ -17,12 +17,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User?> currentUser() async {
+    // We deliberately do NOT clear auth when the access token is past
+    // its 1 h expiry — the refresh token is good for 90 days, so the
+    // Dio interceptor will silently mint a new access token on the
+    // first 401 it sees. Clearing here would wipe the refresh token
+    // before that chance comes, forcing a real logout one hour after
+    // login.
     final token = await _storage.readAccessToken();
-    if (token == null || token.isEmpty) return null;
-
-    final expiresAt = await _storage.readTokenExpiresAt();
-    if (expiresAt != null && expiresAt.isBefore(DateTime.now().toUtc())) {
-      await _storage.clearAuth();
+    final refresh = await _storage.readRefreshToken();
+    if ((token == null || token.isEmpty) &&
+        (refresh == null || refresh.isEmpty)) {
       return null;
     }
 
@@ -34,6 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return null;
     }
 
+    final expiresAt = await _storage.readTokenExpiresAt();
     return User(
       fullName: fullName,
       phoneNumber: phone,
