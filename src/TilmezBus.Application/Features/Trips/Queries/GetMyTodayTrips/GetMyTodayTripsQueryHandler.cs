@@ -33,34 +33,28 @@ public class GetMyTodayTripsQueryHandler
             return Result<List<MyTodayTripDto>>.Failure("Unauthenticated.");
 
         // Drivers and Assistants both live in the Drivers table; DriverType
-        // disambiguates. We just need the school from whichever Drivers row
-        // is wired to this UserId.
+        // disambiguates. We use the row's Id to match Trip.DriverId /
+        // Trip.AssistantId, and the school to optionally widen the view.
         var driver = await _context.Drivers
             .FirstOrDefaultAsync(d => d.UserId == userId, ct);
-        Guid? schoolId = driver?.SchoolId;
-
-        // Visible buses = every bus in the caller's school. We used to also
-        // union in whatever BusSchedule slots referenced the driver, but
-        // BusSchedule has been removed; trips are created per-scan and the
-        // school filter is enough.
-        var busIds = schoolId is null
-            ? new List<Guid>()
-            : await _context.Buses
-                .Where(b => b.SchoolId == schoolId && !b.IsDeleted)
-                .Select(b => b.Id)
-                .ToListAsync(ct);
-        if (busIds.Count == 0)
+        if (driver is null)
             return Result<List<MyTodayTripDto>>.Success(new List<MyTodayTripDto>());
 
-        var schedulesByBus = await _context.Buses
-            .Where(b => busIds.Contains(b.Id))
-            .ToDictionaryAsync(b => b.Id, b => b.PlateNumber, ct);
+        var driverRowId = driver.Id;
+        var isAssistant = driver.DriverType == DriverType.Assistant;
 
-        // Most recent MaxTrips real trips on those buses. Date window
-        // dropped — the home card now surfaces the last 10 trips overall
-        // (live → scheduled → completed in the in-memory sort below).
-        var tripsRaw = await _context.Trips
-            .Where(t => !t.IsTemplate && busIds.Contains(t.BusId))
+        // Most recent MaxTrips trips assigned to THIS user (matched by the
+        // Drivers.Id pointed at by Trip.AssistantId or Trip.DriverId). The
+        // old filter looked at every bus in the school, which left an
+        // assistant with trips outside their school's bus pool seeing an
+        // empty home — and let them see other assistants' trips.
+        var assignedQuery = _context.Trips
+            .Where(t => !t.IsTemplate
+                     && (isAssistant
+                         ? t.AssistantId == driverRowId
+                         : t.DriverId    == driverRowId));
+
+        var tripsRaw = await assignedQuery
             .OrderByDescending(t => t.ScheduledDeparture)
             .Take(MaxTrips)
             .Select(t => new TripFacts(
@@ -74,6 +68,14 @@ public class GetMyTodayTripsQueryHandler
                 t.StudentTrips.Count(),
                 t.StudentTrips.Count(st => st.BoardingStatus == BoardingStatus.Boarded)))
             .ToListAsync(ct);
+
+        // Resolve bus plate numbers for whatever buses we ended up with.
+        var busIds = tripsRaw.Select(t => t.BusId).Distinct().ToList();
+        var schedulesByBus = busIds.Count == 0
+            ? new Dictionary<Guid, string>()
+            : await _context.Buses
+                .Where(b => busIds.Contains(b.Id))
+                .ToDictionaryAsync(b => b.Id, b => b.PlateNumber, ct);
 
         // Trip → plate. Live (InProgress) sorts first, then Scheduled, then
         // anything else (Completed). Newest within each bucket.
