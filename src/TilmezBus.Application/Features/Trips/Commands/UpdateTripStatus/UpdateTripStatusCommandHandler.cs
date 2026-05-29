@@ -144,6 +144,67 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
             }
         }
 
+        // Mirror of the Morning block for Return trips: any student still
+        // Boarded when the assistant taps Complete gets flipped to
+        // DroppedOff and their parent gets StudentArrived ("arrived home").
+        // Students manually marked DroppedOff earlier already fired the
+        // same push from UpdateBoardingStatusCommandHandler, so they're
+        // not in the `boarded` set we iterate here — no double banner.
+        if (request.NewStatus == TripStatus.Completed && trip.Type == TripType.Return)
+        {
+            var now = DateTime.UtcNow;
+            var boarded = await _context.StudentTrips
+                .Where(st => st.TripId == trip.Id
+                             && st.BoardingStatus == BoardingStatus.Boarded)
+                .ToListAsync(cancellationToken);
+            foreach (var st in boarded)
+            {
+                st.BoardingStatus = BoardingStatus.DroppedOff;
+                st.DropoffTime ??= now;
+            }
+            if (boarded.Count > 0)
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+
+                var studentIds = boarded.Select(b => b.StudentId).ToList();
+                var arrivals = await _context.Students
+                    .Where(s => studentIds.Contains(s.Id))
+                    .Select(s => new
+                    {
+                        s.FullName,
+                        ParentUserId = s.Parent != null ? s.Parent.UserId : null,
+                    })
+                    .ToListAsync(cancellationToken);
+
+                foreach (var a in arrivals)
+                {
+                    if (string.IsNullOrEmpty(a.ParentUserId)) continue;
+                    try
+                    {
+                        await _push.SendTemplatedToUserAsync(
+                            a.ParentUserId,
+                            NotificationType.StudentArrived,
+                            new Dictionary<string, string?>
+                            {
+                                ["studentName"] = a.FullName,
+                            },
+                            new Dictionary<string, string>
+                            {
+                                ["type"]   = "StudentArrived",
+                                ["tripId"] = trip.Id.ToString(),
+                            },
+                            cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex,
+                            "StudentArrived (return-completion) push failed for student={Student} parent={Parent}",
+                            a.FullName, a.ParentUserId);
+                    }
+                }
+            }
+        }
+
         // SignalR broadcasts are best-effort — a hub failure must not roll back a persisted status change.
         try
         {
