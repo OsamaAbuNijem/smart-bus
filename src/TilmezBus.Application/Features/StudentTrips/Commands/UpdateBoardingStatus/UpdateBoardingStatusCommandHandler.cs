@@ -104,24 +104,33 @@ public class UpdateBoardingStatusCommandHandler
         await _unitOfWork.SaveChangesAsync(ct);
 
         // Parent push: notify on the first meaningful transition only.
-        // Morning trips → pickup confirmation when the student boards.
-        // Return trips → drop-off confirmation when the student gets off.
-        var isMorningPickup =
+        // Boarded transition → "picked up" confirmation, on any trip type
+        //   (parents care about both the Morning school-pickup and the
+        //   Return school-pickup-for-going-home).
+        // DroppedOff transition on a Return trip → "arrived home" push.
+        // Morning trip completion sends its own StudentArrivedAtSchool
+        // push from UpdateTripStatusCommandHandler, so we don't duplicate
+        // a drop-off banner here for Morning.
+        var isPickup =
             request.Status == BoardingStatus.Boarded
             && previousStatus != BoardingStatus.Boarded;
-        var isReturnDropoff =
+        var isDropoff =
             request.Status == BoardingStatus.DroppedOff
             && previousStatus != BoardingStatus.DroppedOff;
-        if (isMorningPickup || isReturnDropoff)
+        if (isPickup || isDropoff)
         {
             var trip = await _context.Trips
                 .Where(t => t.Id == request.TripId)
                 .Select(t => new { t.Id, t.Type })
                 .FirstOrDefaultAsync(ct);
 
-            if (trip is not null &&
-                ((trip.Type == TripType.Morning && isMorningPickup) ||
-                 (trip.Type == TripType.Return  && isReturnDropoff)))
+            // Drop-off push is Return-only (Morning's recap fires from
+            // UpdateTripStatusCommand). Pickup push fires on either type.
+            var shouldNotify = trip is not null && (
+                isPickup
+                || (isDropoff && trip.Type == TripType.Return));
+
+            if (shouldNotify)
             {
                 var info = await _context.Students
                     .Where(s => s.Id == request.StudentId)
@@ -134,7 +143,7 @@ public class UpdateBoardingStatusCommandHandler
 
                 if (info?.ParentUserId is not null)
                 {
-                    var type = isMorningPickup
+                    var type = isPickup
                         ? NotificationType.StudentBoarded
                         : NotificationType.StudentArrived;
                     var (title, message) = await _templates.RenderAsync(
@@ -149,7 +158,7 @@ public class UpdateBoardingStatusCommandHandler
                     await _mediator.Send(
                         new SendNotificationCommand(
                             title, message, type,
-                            info.ParentUserId, trip.Id, null),
+                            info.ParentUserId, trip!.Id, null),
                         ct);
                 }
             }
