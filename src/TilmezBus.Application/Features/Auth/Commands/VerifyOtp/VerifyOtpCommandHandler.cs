@@ -63,7 +63,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, Result<
         }
 
         // Delegate validation, expiry, and attempt-count enforcement to
-        // Twilio Verify; we only see approved / not-approved.
+        // the OTP provider; we only see approved / not-approved.
         var approved = await _otp.VerifyAsync(phone, otp, cancellationToken);
         if (!approved)
         {

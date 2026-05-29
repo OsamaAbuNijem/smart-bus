@@ -1,9 +1,9 @@
 namespace TilmezBus.Application.Common.Interfaces;
 
 /// <summary>
-/// Abstraction over OTP delivery + verification. The provider owns code
-/// generation, storage, expiry, and attempt counting (e.g. Twilio Verify
-/// v2); the handler stays oblivious to the code value.
+/// Abstraction over OTP delivery + verification. The provider (Prelude
+/// in prod) owns code generation, storage, expiry, and attempt counting;
+/// the handler stays oblivious to the code value.
 /// </summary>
 public interface IOtpSender
 {

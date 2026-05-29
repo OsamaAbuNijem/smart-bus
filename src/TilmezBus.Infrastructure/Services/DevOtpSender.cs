@@ -6,7 +6,7 @@ namespace TilmezBus.Infrastructure.Services;
 /// <summary>
 /// Development / stub implementation — logs that an OTP "send" was
 /// requested and accepts the master code <c>1234</c> on verify. Used
-/// when Twilio Verify isn't configured so local dev / CI keep working.
+/// when no Prelude API key is configured so local dev / CI keep working.
 /// </summary>
 public sealed class DevOtpSender : IOtpSender
 {
