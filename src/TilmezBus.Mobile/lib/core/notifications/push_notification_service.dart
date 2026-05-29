@@ -54,18 +54,19 @@ class PushNotificationService {
       ),
     );
 
-    // iOS suppresses banners for foregrounded apps by default. Opt-in so
-    // arrived-at-school / trip-ended pushes still surface visually while
-    // the parent has the app open.
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    // Show banners while the app is foregrounded.
-    FirebaseMessaging.onMessage.listen(_showForegroundNotification);
+    // Foreground banner presentation is owned by AppDelegate's
+    // userNotificationCenter(_:willPresent:…) override on iOS — calling
+    // setForegroundNotificationPresentationOptions here on top of that
+    // produces a double notification (one iOS-native, one from this
+    // service). On Android the system handles foreground display from
+    // the FCM payload directly.
+    //
+    // The listener below is kept for in-app side effects only (debug
+    // log + the inbox stream provider that feeds the notifications
+    // page) — it deliberately does NOT call _localNotifications.show()
+    // anymore. Touch it carefully if you ever want to opt back into a
+    // custom in-app banner UI.
+    FirebaseMessaging.onMessage.listen(_logForegroundMessage);
   }
 
   /// Asks the OS for notification permission. On Android 13+ this is the
@@ -101,35 +102,15 @@ class PushNotificationService {
   Stream<RemoteMessage> get foregroundMessageStream =>
       FirebaseMessaging.onMessage;
 
-  void _showForegroundNotification(RemoteMessage message) {
-    final notification = message.notification;
-    if (kDebugMode) {
-      // ignore: avoid_print
-      print('[FCM] foreground message: title="${notification?.title}" '
-          'body="${notification?.body}" data=${message.data}');
-    }
-    if (notification == null) return;
-    _localNotifications.show(
-      notification.hashCode,
-      notification.title,
-      notification.body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channel.id,
-          _channel.name,
-          channelDescription: _channel.description,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-        ),
-        iOS: const DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      ),
-      payload: message.data.isEmpty ? null : message.data.toString(),
-    );
+  /// Logs the inbound FCM message in debug builds. Native handlers
+  /// (AppDelegate on iOS, Android's notification builder) present the
+  /// banner; this just keeps a paper trail of payloads while debugging.
+  void _logForegroundMessage(RemoteMessage message) {
+    if (!kDebugMode) return;
+    final n = message.notification;
+    // ignore: avoid_print
+    print('[FCM] foreground message: title="${n?.title}" '
+        'body="${n?.body}" data=${message.data}');
   }
 }
 
