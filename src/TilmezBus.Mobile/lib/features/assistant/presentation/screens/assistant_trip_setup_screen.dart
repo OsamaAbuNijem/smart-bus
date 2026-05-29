@@ -933,37 +933,43 @@ class _RosterEditorState extends ConsumerState<_RosterEditor> {
             ],
           ),
           const SizedBox(height: 12),
-          // Two tap-to-scan cards: QR opens the existing paste dialog (on
-          // a real device this would invoke the camera scanner with the
-          // same callback shape). NFC is wired to a "coming soon" message
-          // until the platform integration lands.
-          Row(
-            children: [
-              Expanded(
-                child: _ScanCard(
-                  icon: Icons.qr_code_scanner_rounded,
-                  label: l.assistantScanQr,
-                  color: AppColors.violet,
-                  colorSoft: AppColors.violetSoft,
-                  onTap: _openQrSheet,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _ScanCard(
-                  icon: Icons.nfc_rounded,
-                  label: l.assistantScanNfc,
-                  color: const Color(0xFF0EA5E9),
-                  colorSoft: const Color(0xFFE0F2FE),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l.assistantNfcUnavailable)),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+          // Two tap-to-scan cards, gated by the SuperAdmin feature flags
+          // on the school's active subscription. Hide either when the
+          // corresponding flag is off; collapse the section entirely
+          // when both are off so the name-search input sits flush.
+          Builder(builder: (context) {
+            final fleet = ref.watch(myFleetSchoolProvider).valueOrNull;
+            final showQr  = fleet?.enableQr  ?? true;
+            final showNfc = fleet?.enableNfc ?? true;
+            if (!showQr && !showNfc) return const SizedBox.shrink();
+            final qr = _ScanCard(
+              icon: Icons.qr_code_scanner_rounded,
+              label: l.assistantScanQr,
+              color: AppColors.violet,
+              colorSoft: AppColors.violetSoft,
+              onTap: _openQrSheet,
+            );
+            final nfc = _ScanCard(
+              icon: Icons.nfc_rounded,
+              label: l.assistantScanNfc,
+              color: const Color(0xFF0EA5E9),
+              colorSoft: const Color(0xFFE0F2FE),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l.assistantNfcUnavailable)),
+                );
+              },
+            );
+            if (showQr && !showNfc) return qr;
+            if (!showQr && showNfc) return nfc;
+            return Row(
+              children: [
+                Expanded(child: qr),
+                const SizedBox(width: 8),
+                Expanded(child: nfc),
+              ],
+            );
+          }),
           const SizedBox(height: 10),
           // Search by name — full-width input. Server-side LIKE matches
           // both FullName (Arabic) and FullNameEn so the same query works
