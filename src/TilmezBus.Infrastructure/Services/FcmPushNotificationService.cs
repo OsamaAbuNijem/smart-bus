@@ -47,6 +47,24 @@ public class FcmPushNotificationService : IPushNotificationService
         });
         await _db.SaveChangesAsync(cancellationToken);
 
+        return await SendFcmAsync(userId, title, body, data, cancellationToken);
+    }
+
+    public Task<int> SendFcmOnlyToUserAsync(
+        string userId,
+        string title,
+        string body,
+        IDictionary<string, string>? data = null,
+        CancellationToken cancellationToken = default)
+        => SendFcmAsync(userId, title, body, data, cancellationToken);
+
+    private async Task<int> SendFcmAsync(
+        string userId,
+        string title,
+        string body,
+        IDictionary<string, string>? data,
+        CancellationToken cancellationToken)
+    {
         var tokens = await _db.UserDeviceTokens
             .Where(t => t.UserId == userId)
             .Select(t => t.Token)

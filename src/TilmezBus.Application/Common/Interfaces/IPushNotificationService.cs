@@ -36,4 +36,17 @@ public interface IPushNotificationService
         IReadOnlyDictionary<string, string?> templateVars,
         IDictionary<string, string>? data = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Pushes the given title/body via FCM only — does NOT write to the
+    /// inbox. Used by SendNotificationCommandHandler which already
+    /// persists its own Notification row (with RelatedTripId etc.) and
+    /// just needs the FCM hop on top.
+    /// </summary>
+    Task<int> SendFcmOnlyToUserAsync(
+        string userId,
+        string title,
+        string body,
+        IDictionary<string, string>? data = null,
+        CancellationToken cancellationToken = default);
 }
