@@ -28,6 +28,25 @@ public interface IUserStore
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Generate a single-use, time-bound password-reset token for the
+    /// user identified by <paramref name="email"/>. Returns null when no
+    /// user with that email exists — callers should still surface a
+    /// generic success message to avoid leaking which addresses are
+    /// registered.
+    /// </summary>
+    Task<string?> GeneratePasswordResetTokenAsync(string email, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Validate a previously-issued reset token and, on success, set the
+    /// user's password. Wraps <c>UserManager.ResetPasswordAsync</c> so
+    /// the same password-policy validators that gate Create / Change
+    /// also gate Reset.
+    /// </summary>
+    Task<(bool Succeeded, string? Error)> ResetPasswordWithTokenAsync(
+        string email, string token, string newPassword,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Counts ApplicationUsers that are members of the given role AND have
     /// pinged the API within <paramref name="window"/> (their LastSeenAt is
     /// within that window). Powers the SuperAdmin dashboard's "currently

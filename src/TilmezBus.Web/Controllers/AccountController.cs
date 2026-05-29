@@ -64,4 +64,50 @@ public class AccountController : Controller
         HttpContext.Session.Clear();
         return RedirectToAction(nameof(Login));
     }
+
+    [HttpGet]
+    public IActionResult ForgotPassword() => View(new ForgotPasswordViewModel());
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+        // Always show the confirmation page — the API endpoint is
+        // deliberately anti-enumerating; we mirror that here so an
+        // attacker can't read whether the email exists from the UI.
+        if (ModelState.IsValid)
+            await _apiClient.ForgotPasswordAsync(model.Email);
+        return View("ForgotPasswordConfirmation", model);
+    }
+
+    [HttpGet]
+    public IActionResult ResetPassword(string? email, string? token)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+        {
+            ModelState.AddModelError(string.Empty,
+                "رابط إعادة تعيين كلمة المرور غير صالح. يرجى طلب رابط جديد.");
+        }
+        return View(new ResetPasswordViewModel
+        {
+            Email = email ?? string.Empty,
+            Token = token ?? string.Empty,
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+        var (ok, error) = await _apiClient.ResetPasswordAsync(model.Email, model.Token, model.NewPassword);
+        if (!ok)
+        {
+            ModelState.AddModelError(string.Empty,
+                error ?? "تعذرت إعادة تعيين كلمة المرور. حاول مجددًا أو اطلب رابطًا جديدًا.");
+            return View(model);
+        }
+        TempData["ResetPasswordSucceeded"] = "تم تغيير كلمة المرور بنجاح. سجّل الدخول الآن.";
+        return RedirectToAction(nameof(Login));
+    }
 }

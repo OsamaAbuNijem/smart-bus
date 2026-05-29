@@ -64,6 +64,44 @@ public class ApiClient : IApiClient
         return (result?.Token, result?.Roles ?? [], false);
     }
 
+    public async Task ForgotPasswordAsync(string email)
+    {
+        // No bearer; the API endpoint is AllowAnonymous and always
+        // returns 204 regardless of whether the email matches a real
+        // account — we don't surface anything beyond "done".
+        var content = new StringContent(
+            JsonSerializer.Serialize(new { email }), Encoding.UTF8, "application/json");
+        try
+        {
+            using var resp = await _httpClient.PostAsync("api/v1/auth/forgot-password", content);
+            // Swallow non-success — the UI shows the same confirmation
+            // message either way.
+            _ = resp;
+        }
+        catch
+        {
+            // Network errors are silent for the same anti-enumeration reason.
+        }
+    }
+
+    public async Task<(bool Ok, string? Error)> ResetPasswordAsync(string email, string token, string newPassword)
+    {
+        var content = new StringContent(
+            JsonSerializer.Serialize(new { email, token, newPassword }),
+            Encoding.UTF8, "application/json");
+        using var resp = await _httpClient.PostAsync("api/v1/auth/reset-password", content);
+        if (resp.IsSuccessStatusCode) return (true, null);
+        var body = await resp.Content.ReadAsStringAsync();
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(body);
+            if (doc.RootElement.TryGetProperty("error", out var err))
+                return (false, err.GetString());
+        }
+        catch { /* fall through */ }
+        return (false, $"HTTP {(int)resp.StatusCode}");
+    }
+
     // ── Generic HTTP helpers ───────────────────────────────────────────────
     private async Task<T?> GetAsync<T>(string url)
     {

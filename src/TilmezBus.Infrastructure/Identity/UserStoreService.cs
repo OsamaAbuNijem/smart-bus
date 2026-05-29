@@ -99,6 +99,33 @@ public class UserStoreService : IUserStore
         return (true, null);
     }
 
+    public async Task<string?> GeneratePasswordResetTokenAsync(
+        string email, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user is null) return null;
+        // Default token provider is data-protected (signed + bound to
+        // user.SecurityStamp + a short TTL configured on Identity).
+        return await _userManager.GeneratePasswordResetTokenAsync(user);
+    }
+
+    public async Task<(bool Succeeded, string? Error)> ResetPasswordWithTokenAsync(
+        string email, string token, string newPassword,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user is null)
+            return (false, "Invalid or expired reset link.");
+
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+        if (!result.Succeeded)
+            return (false, string.Join(" ", result.Errors.Select(e => e.Description)));
+        // Rotate SecurityStamp so any other in-flight reset tokens for
+        // this user become invalid.
+        await _userManager.UpdateSecurityStampAsync(user);
+        return (true, null);
+    }
+
     public async Task<int> CountActiveUsersByRoleAsync(
         string role, TimeSpan window,
         CancellationToken cancellationToken = default)

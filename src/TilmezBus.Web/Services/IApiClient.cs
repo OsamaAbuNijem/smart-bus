@@ -18,6 +18,15 @@ public interface IApiClient
 {
     Task<(string? Token, IEnumerable<string> Roles, bool RateLimited)> LoginAsync(string email, string password);
 
+    /// <summary>Kick off a password reset; the API always returns success
+    /// regardless of whether the email exists.</summary>
+    Task ForgotPasswordAsync(string email);
+
+    /// <summary>Complete a reset using the email-link token. Returns
+    /// (true, null) on success or (false, message) when Identity rejects
+    /// the token / password.</summary>
+    Task<(bool Ok, string? Error)> ResetPasswordAsync(string email, string token, string newPassword);
+
     // Schools
     Task<SchoolDto?> GetMySchoolAsync();
 

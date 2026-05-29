@@ -8,6 +8,8 @@ using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Features.Auth.Commands.ChangePassword;
 using TilmezBus.Application.Features.Auth.Commands.Login;
 using TilmezBus.Application.Features.Auth.Commands.RefreshToken;
+using TilmezBus.Application.Features.Auth.Commands.RequestPasswordReset;
+using TilmezBus.Application.Features.Auth.Commands.ResetPassword;
 
 namespace TilmezBus.API.Controllers.v1;
 
@@ -89,7 +91,43 @@ public class AuthController : ControllerBase
             await _refresh.RevokeAllForUserAsync(userId, cancellationToken);
         return NoContent();
     }
+
+    /// <summary>
+    /// Start a password reset for an admin email. Always returns 204
+    /// regardless of whether the email exists, so attackers can't use
+    /// this endpoint to enumerate registered accounts. When the email
+    /// matches, an email with a tokenised reset link is sent.
+    /// </summary>
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ForgotPassword(
+        [FromBody] ForgotPasswordRequest request, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new RequestPasswordResetCommand(request.Email), cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Complete a password reset using the token from the email link.
+    /// </summary>
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPassword(
+        [FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new ResetPasswordCommand(request.Email, request.Token, request.NewPassword),
+            cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(new { error = result.Error });
+    }
 }
 
 public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
 public record RefreshTokenRequest(string RefreshToken);
+public record ForgotPasswordRequest(string Email);
+public record ResetPasswordRequest(string Email, string Token, string NewPassword);

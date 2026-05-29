@@ -70,6 +70,17 @@ services:
       # Prelude — OTP provider (delivers + verifies). Leave blank to use
       # the dev console logger (master code 1234).
       Prelude__ApiKey: ${PRELUDE_API_KEY}
+      # Transactional email — used by the admin forgot-password flow.
+      # Leave Email__Host blank to fall back to the dev console-log sender.
+      Email__Host:         ${EMAIL_HOST}
+      Email__Port:         ${EMAIL_PORT}
+      Email__User:         ${EMAIL_USER}
+      Email__Password:     ${EMAIL_PASSWORD}
+      Email__From:         ${EMAIL_FROM}
+      Email__FromDisplay:  ${EMAIL_FROM_DISPLAY}
+      Email__UseSsl:       ${EMAIL_USE_SSL}
+      # Base URL used to build the reset link emailed to the admin.
+      App__BaseUrl:        ${APP_BASE_URL}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health > /dev/null || exit 1"]
       interval: 20s

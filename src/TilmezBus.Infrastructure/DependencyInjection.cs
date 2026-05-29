@@ -93,6 +93,13 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        // Email transport — SMTP when a host is configured, otherwise a
+        // logging stub so local dev / CI still exercises the
+        // forgot-password flow end-to-end.
+        if (!string.IsNullOrWhiteSpace(configuration["Email:Host"]))
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
+        else
+            services.AddScoped<IEmailSender, NullEmailSender>();
         // OTP delivery + verification via Prelude when an API key is
         // configured; otherwise the dev logger accepts the master code
         // 1234 so local dev / CI keep working.
