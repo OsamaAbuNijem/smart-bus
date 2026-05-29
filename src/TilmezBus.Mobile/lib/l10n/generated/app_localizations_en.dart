@@ -814,6 +814,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantManualSetupCta => 'Or set up manually';
 
   @override
+  String get assistantCreateNewTrip => 'Create new trip';
+
+  @override
   String get assistantMorningPickup => 'Morning Pickup';
 
   @override

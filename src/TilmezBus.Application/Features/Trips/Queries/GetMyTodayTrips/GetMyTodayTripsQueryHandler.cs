@@ -9,9 +9,10 @@ namespace TilmezBus.Application.Features.Trips.Queries.GetMyTodayTrips;
 public class GetMyTodayTripsQueryHandler
     : IRequestHandler<GetMyTodayTripsQuery, Result<List<MyTodayTripDto>>>
 {
-    /// <summary>How many calendar days of past completed trips to surface
-    /// on the assistant home alongside today's live + scheduled rows.</summary>
-    private const int LookbackDays = 2;
+    /// <summary>Hard cap on rows returned to the assistant home. The card
+    /// list shows the most recent N trips for this fleet, status-sorted so
+    /// live + scheduled bubble to the top.</summary>
+    private const int MaxTrips = 10;
 
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
@@ -38,10 +39,6 @@ public class GetMyTodayTripsQueryHandler
             .FirstOrDefaultAsync(d => d.UserId == userId, ct);
         Guid? schoolId = driver?.SchoolId;
 
-        var today     = DateTime.UtcNow.Date;
-        var tomorrow  = today.AddDays(1);
-        var rangeFrom = today.AddDays(-LookbackDays);
-
         // Visible buses = every bus in the caller's school. We used to also
         // union in whatever BusSchedule slots referenced the driver, but
         // BusSchedule has been removed; trips are created per-scan and the
@@ -59,12 +56,13 @@ public class GetMyTodayTripsQueryHandler
             .Where(b => busIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, b => b.PlateNumber, ct);
 
-        // Real trips on those buses across the window.
+        // Most recent MaxTrips real trips on those buses. Date window
+        // dropped — the home card now surfaces the last 10 trips overall
+        // (live → scheduled → completed in the in-memory sort below).
         var tripsRaw = await _context.Trips
-            .Where(t => !t.IsTemplate
-                        && busIds.Contains(t.BusId)
-                        && t.ScheduledDeparture >= rangeFrom
-                        && t.ScheduledDeparture <  tomorrow)
+            .Where(t => !t.IsTemplate && busIds.Contains(t.BusId))
+            .OrderByDescending(t => t.ScheduledDeparture)
+            .Take(MaxTrips)
             .Select(t => new TripFacts(
                 t.Id,
                 t.BusId,

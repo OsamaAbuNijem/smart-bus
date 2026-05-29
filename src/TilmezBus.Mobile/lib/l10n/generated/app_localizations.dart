@@ -1634,6 +1634,12 @@ abstract class AppLocalizations {
   /// **'Or set up manually'**
   String get assistantManualSetupCta;
 
+  /// No description provided for @assistantCreateNewTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Create new trip'**
+  String get assistantCreateNewTrip;
+
   /// No description provided for @assistantMorningPickup.
   ///
   /// In en, this message translates to:

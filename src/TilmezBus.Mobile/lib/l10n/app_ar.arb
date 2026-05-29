@@ -296,6 +296,7 @@
   "assistantScanBusQr": "مسح رمز الحافلة",
   "assistantScanBusQrSub": "امسح لبدء رحلة جديدة",
   "assistantManualSetupCta": "أو الإعداد يدويًا",
+  "assistantCreateNewTrip": "إنشاء رحلة جديدة",
   "assistantMorningPickup": "رحلة الصباح",
   "assistantAfternoonDropoff": "رحلة العودة",
   "assistantStartedAt": "بدأت",

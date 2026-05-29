@@ -422,7 +422,10 @@ class _StartCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 9),
                 Text(
-                  l.assistantManualSetupCta,
+                  // When QR is disabled, the manual button is the only
+                  // entry point — relabel it from "Or set up manually" to
+                  // "Create new trip" so the affordance reads as primary.
+                  showScan ? l.assistantManualSetupCta : l.assistantCreateNewTrip,
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,

@@ -807,6 +807,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantManualSetupCta => 'أو الإعداد يدويًا';
 
   @override
+  String get assistantCreateNewTrip => 'إنشاء رحلة جديدة';
+
+  @override
   String get assistantMorningPickup => 'رحلة الصباح';
 
   @override

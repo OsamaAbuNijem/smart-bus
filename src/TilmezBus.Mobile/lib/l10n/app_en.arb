@@ -308,6 +308,7 @@
   "assistantScanBusQr": "Scan Bus QR",
   "assistantScanBusQrSub": "Scan to start a new trip",
   "assistantManualSetupCta": "Or set up manually",
+  "assistantCreateNewTrip": "Create new trip",
   "assistantMorningPickup": "Morning Pickup",
   "assistantAfternoonDropoff": "Afternoon Drop-off",
   "assistantStartedAt": "Started",
