@@ -65,6 +65,18 @@ public class FcmPushNotificationService : IPushNotificationService
                 Notification = new AndroidNotification
                 {
                     ChannelId = "smartbus_default",
+                    Sound     = "default",
+                },
+            },
+            // iOS needs aps.sound on the APNs payload — without it the
+            // notification surfaces silently regardless of the device's
+            // ringer state. Default sound + the same alert title/body
+            // FCM derives from the top-level Notification block.
+            Apns = new ApnsConfig
+            {
+                Aps = new Aps
+                {
+                    Sound = "default",
                 },
             },
         };
