@@ -7,11 +7,12 @@ part of 'device_token_registrar.dart';
 // **************************************************************************
 
 String _$deviceTokenRegistrarHash() =>
-    r'da33fd5499433a916692c91d27e6e9004124f744';
+    r'2953111ff8b4e9c9f9b0eeeafc44096033b4419a';
 
 /// Registers the current FCM token with the backend whenever the user is
 /// authenticated. Idempotent — the API treats it as upsert. Re-registers on
-/// token rotation (Firebase issues a fresh token periodically).
+/// FCM token rotation AND on in-app locale changes so the server has the
+/// up-to-date `language` to render notification templates against.
 ///
 /// Copied from [DeviceTokenRegistrar].
 @ProviderFor(DeviceTokenRegistrar)
