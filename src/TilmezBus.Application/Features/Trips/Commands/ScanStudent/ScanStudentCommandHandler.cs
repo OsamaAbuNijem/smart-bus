@@ -1,7 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
+using TilmezBus.Application.Features.Notifications.Commands.SendNotification;
 using TilmezBus.Domain.Entities;
 using TilmezBus.Domain.Enums;
 
@@ -11,9 +13,21 @@ public class ScanStudentCommandHandler
     : IRequestHandler<ScanStudentCommand, Result<ScanStudentResponse>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IMediator _mediator;
+    private readonly INotificationTemplateService _templates;
+    private readonly ILogger<ScanStudentCommandHandler> _logger;
 
-    public ScanStudentCommandHandler(IApplicationDbContext context)
-        => _context = context;
+    public ScanStudentCommandHandler(
+        IApplicationDbContext context,
+        IMediator mediator,
+        INotificationTemplateService templates,
+        ILogger<ScanStudentCommandHandler> logger)
+    {
+        _context   = context;
+        _mediator  = mediator;
+        _templates = templates;
+        _logger    = logger;
+    }
 
     public async Task<Result<ScanStudentResponse>> Handle(
         ScanStudentCommand request, CancellationToken ct)
@@ -46,6 +60,11 @@ public class ScanStudentCommandHandler
 
         var addedToRoster = false;
         var now = DateTime.UtcNow;
+        // Snapshot the previous boarding state so we don't re-fire the
+        // parent push when the assistant scans the same card twice in a
+        // row (or scans after a long press on the row in the UI).
+        var previouslyBoarded =
+            st is not null && st.BoardingStatus == BoardingStatus.Boarded;
 
         if (st is null)
         {
@@ -79,8 +98,58 @@ public class ScanStudentCommandHandler
 
         await _context.SaveChangesAsync(ct);
 
+        // Parent push: only on the Waiting → Boarded transition (or the
+        // first-time addToRoster scan). Skips re-scans that don't change
+        // status so a stuttery NFC tap doesn't double-banner the parent.
+        // Mirrors UpdateBoardingStatusCommandHandler's behaviour for the
+        // manual roster-tap path.
+        var firstBoardingThisTrip = !previouslyBoarded;
+        if (firstBoardingThisTrip)
+        {
+            await NotifyParentStudentBoardedAsync(student, trip.Id, ct);
+        }
+
         return Result<ScanStudentResponse>.Success(new ScanStudentResponse(
             student.Id, student.FullName,
             st.BoardingStatus.ToString(), now, addedToRoster));
+    }
+
+    /// <summary>
+    /// Fire-and-forget parent push using the existing StudentBoarded
+    /// template (template service picks language per device). Mirrors
+    /// the manual-tap path in UpdateBoardingStatusCommandHandler so the
+    /// QR/NFC scan UX surfaces the same notification.
+    /// </summary>
+    private async Task NotifyParentStudentBoardedAsync(
+        Student student, Guid tripId, CancellationToken ct)
+    {
+        try
+        {
+            var parentUserId = await _context.Students
+                .Where(s => s.Id == student.Id && s.Parent != null)
+                .Select(s => s.Parent!.UserId)
+                .FirstOrDefaultAsync(ct);
+            if (string.IsNullOrEmpty(parentUserId)) return;
+
+            var (title, message) = await _templates.RenderAsync(
+                NotificationType.StudentBoarded,
+                "ar",
+                new Dictionary<string, string?>
+                {
+                    ["studentName"] = student.FullName,
+                },
+                ct);
+            await _mediator.Send(
+                new SendNotificationCommand(
+                    title, message, NotificationType.StudentBoarded,
+                    parentUserId, tripId, null),
+                ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "[ScanStudent] StudentBoarded push failed for student={Student} trip={Trip}",
+                student.Id, tripId);
+        }
     }
 }
