@@ -17,6 +17,7 @@ public class StartTripCommandHandler
     private readonly ICurrentUserService _currentUser;
     private readonly IMediator _mediator;
     private readonly INotificationTemplateService _templates;
+    private readonly IPushNotificationService _push;
     private readonly ILogger<StartTripCommandHandler> _logger;
 
     public StartTripCommandHandler(
@@ -25,6 +26,7 @@ public class StartTripCommandHandler
         ICurrentUserService currentUser,
         IMediator mediator,
         INotificationTemplateService templates,
+        IPushNotificationService push,
         ILogger<StartTripCommandHandler> logger)
     {
         _unitOfWork  = unitOfWork;
@@ -32,6 +34,7 @@ public class StartTripCommandHandler
         _currentUser = currentUser;
         _mediator    = mediator;
         _templates   = templates;
+        _push        = push;
         _logger      = logger;
     }
 
@@ -245,8 +248,83 @@ public class StartTripCommandHandler
             }
         }
 
+        // Notify parents only when the trip is going live now (not when
+        // it's being scheduled for later — the Scheduled → InProgress
+        // transition fires the same push from UpdateTripStatusCommand).
+        if (!request.Scheduled && studentIds.Count > 0)
+        {
+            await NotifyParentsTripStartedAsync(
+                studentIds, trip, bus.PlateNumber, ct);
+        }
+
         return Result<StartTripResponse>.Success(new StartTripResponse(
             trip.Id, bus.Id, bus.PlateNumber,
             request.TripType.ToString(), studentIds.Count));
+    }
+
+    /// <summary>
+    /// Send ParentTripStarted to the parent of every student on the
+    /// roster. Per-parent failures are swallowed so a single dead device
+    /// can't block the others (and certainly can't fail the trip start).
+    /// </summary>
+    private async Task NotifyParentsTripStartedAsync(
+        List<Guid> studentIds, Trip trip, string busPlateNumber, CancellationToken ct)
+    {
+        var parents = await _context.Students
+            .Where(s => studentIds.Contains(s.Id) && s.Parent != null)
+            .Select(s => new
+            {
+                StudentId = s.Id,
+                ParentUserId = s.Parent!.UserId,
+            })
+            .Where(x => x.ParentUserId != null)
+            .Distinct()
+            .ToListAsync(ct);
+
+        // Deduplicate by parent — one parent with multiple kids on this
+        // trip should only see one banner, not one per kid.
+        var distinctParents = parents
+            .Select(p => p.ParentUserId!)
+            .Distinct()
+            .ToList();
+
+        var tripTypeLabelAr = trip.Type == TripType.Morning
+            ? "رحلة الصباح" : "رحلة العودة";
+        var tripTypeLabelEn = trip.Type == TripType.Morning
+            ? "Morning trip" : "Return trip";
+
+        foreach (var parentUserId in distinctParents)
+        {
+            try
+            {
+                // SendTemplatedToUserAsync picks the right language per
+                // registered device, writes the inbox row, and pushes
+                // via FCM. {tripType} is rendered per-language inside
+                // the template service — we hand both labels through
+                // and the active locale chooses one.
+                await _push.SendTemplatedToUserAsync(
+                    parentUserId,
+                    NotificationType.ParentTripStarted,
+                    new Dictionary<string, string?>
+                    {
+                        ["busPlateNumber"] = busPlateNumber,
+                        ["tripType"]       = tripTypeLabelAr,
+                        ["tripTypeEn"]     = tripTypeLabelEn,
+                    },
+                    new Dictionary<string, string>
+                    {
+                        ["type"]   = "ParentTripStarted",
+                        ["tripId"] = trip.Id.ToString(),
+                        ["busId"]  = trip.BusId.ToString(),
+                    },
+                    ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "[StartTrip] ParentTripStarted push failed for parent={Parent} trip={Trip}",
+                    parentUserId, trip.Id);
+            }
+        }
     }
 }

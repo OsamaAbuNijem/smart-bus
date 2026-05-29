@@ -67,6 +67,16 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                 await _context.SaveChangesAsync(cancellationToken);
         }
 
+        // Scheduled → InProgress on either trip type: notify every parent
+        // on the roster that the bus is rolling. The immediate-start path
+        // (StartTripCommand with Scheduled=false) emits the same push
+        // there; together they cover both ways a trip flips to live.
+        if (fromStatus == TripStatus.Scheduled
+            && request.NewStatus == TripStatus.InProgress)
+        {
+            await NotifyParentsTripStartedAsync(trip, cancellationToken);
+        }
+
         // Morning trips end at the school, so completing the trip is the
         // same event as "all boarded students have arrived". Flip them to
         // DroppedOff so the recap reflects who actually made it, then
@@ -145,5 +155,61 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
         }
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// ParentTripStarted fan-out: one push per parent of any student on
+    /// this trip's roster. Per-parent failures are swallowed so a single
+    /// dead device can't block the others.
+    /// </summary>
+    private async Task NotifyParentsTripStartedAsync(
+        Domain.Entities.Trip trip, CancellationToken ct)
+    {
+        var plate = await _context.Buses
+            .Where(b => b.Id == trip.BusId)
+            .Select(b => b.PlateNumber)
+            .FirstOrDefaultAsync(ct) ?? string.Empty;
+
+        var parentUserIds = await _context.StudentTrips
+            .Where(st => st.TripId == trip.Id)
+            .Join(_context.Students,
+                st => st.StudentId, s => s.Id,
+                (st, s) => s)
+            .Where(s => s.Parent != null && s.Parent.UserId != null)
+            .Select(s => s.Parent!.UserId!)
+            .Distinct()
+            .ToListAsync(ct);
+
+        var tripTypeLabelAr = trip.Type == TripType.Morning ? "رحلة الصباح" : "رحلة العودة";
+        var tripTypeLabelEn = trip.Type == TripType.Morning ? "Morning trip" : "Return trip";
+
+        foreach (var parentUserId in parentUserIds)
+        {
+            try
+            {
+                await _push.SendTemplatedToUserAsync(
+                    parentUserId,
+                    NotificationType.ParentTripStarted,
+                    new Dictionary<string, string?>
+                    {
+                        ["busPlateNumber"] = plate,
+                        ["tripType"]       = tripTypeLabelAr,
+                        ["tripTypeEn"]     = tripTypeLabelEn,
+                    },
+                    new Dictionary<string, string>
+                    {
+                        ["type"]   = "ParentTripStarted",
+                        ["tripId"] = trip.Id.ToString(),
+                        ["busId"]  = trip.BusId.ToString(),
+                    },
+                    ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "[UpdateTripStatus] ParentTripStarted push failed for parent={Parent} trip={Trip}",
+                    parentUserId, trip.Id);
+            }
+        }
     }
 }
