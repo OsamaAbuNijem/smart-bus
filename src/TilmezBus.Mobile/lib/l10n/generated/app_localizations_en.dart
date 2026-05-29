@@ -802,7 +802,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantGreetEvening => 'Good evening';
 
   @override
-  String get assistantTodaysTrips => 'Today\'s trips';
+  String get assistantTodaysTrips => 'Last trips';
 
   @override
   String get assistantScanBusQr => 'Scan Bus QR';

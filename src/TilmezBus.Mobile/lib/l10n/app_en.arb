@@ -304,7 +304,7 @@
   "assistantGreetMorning": "Good morning",
   "assistantGreetAfternoon": "Good afternoon",
   "assistantGreetEvening": "Good evening",
-  "assistantTodaysTrips": "Today's trips",
+  "assistantTodaysTrips": "Last trips",
   "assistantScanBusQr": "Scan Bus QR",
   "assistantScanBusQrSub": "Scan to start a new trip",
   "assistantManualSetupCta": "Or set up manually",

@@ -292,7 +292,7 @@
   "assistantGreetMorning": "صباح الخير",
   "assistantGreetAfternoon": "مساء الخير",
   "assistantGreetEvening": "مساء النور",
-  "assistantTodaysTrips": "رحلات اليوم",
+  "assistantTodaysTrips": "آخر الرحلات",
   "assistantScanBusQr": "مسح رمز الحافلة",
   "assistantScanBusQrSub": "امسح لبدء رحلة جديدة",
   "assistantManualSetupCta": "أو الإعداد يدويًا",

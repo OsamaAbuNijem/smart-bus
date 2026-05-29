@@ -1613,7 +1613,7 @@ abstract class AppLocalizations {
   /// No description provided for @assistantTodaysTrips.
   ///
   /// In en, this message translates to:
-  /// **'Today\'s trips'**
+  /// **'Last trips'**
   String get assistantTodaysTrips;
 
   /// No description provided for @assistantScanBusQr.

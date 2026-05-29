@@ -795,7 +795,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantGreetEvening => 'مساء النور';
 
   @override
-  String get assistantTodaysTrips => 'رحلات اليوم';
+  String get assistantTodaysTrips => 'آخر الرحلات';
 
   @override
   String get assistantScanBusQr => 'مسح رمز الحافلة';

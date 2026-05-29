@@ -37,7 +37,13 @@ class AssistantHomeScreen extends ConsumerWidget {
               child: ColoredBox(
                 color: const Color(0xFFF4F4F5),
                 child: RefreshIndicator(
-                onRefresh: () async => ref.invalidate(myTodayTripsProvider),
+                onRefresh: () async {
+                  // Also re-pull the school's subscription flags so a
+                  // SuperAdmin toggle of EnableQr / EnableNfc takes
+                  // effect on the next swipe without forcing a logout.
+                  ref.invalidate(myFleetSchoolProvider);
+                  ref.invalidate(myTodayTripsProvider);
+                },
                 color: AppColors.yellowDeep,
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
