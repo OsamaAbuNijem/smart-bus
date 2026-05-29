@@ -37,6 +37,20 @@ public interface IUserStore
     Task<string?> GeneratePasswordResetTokenAsync(string email, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Re-assign a user's email + username so login + forgot-password
+    /// keep working after the SuperAdmin edits the matching school's
+    /// AdminEmail. Returns:
+    ///   * (true, null) when the old user was renamed successfully,
+    ///   * (true, null) when no user exists for the old email (nothing
+    ///     to do — caller still persists the school's new AdminEmail),
+    ///   * (false, message) when the new email is already taken by
+    ///     another account or Identity rejects the change.
+    /// </summary>
+    Task<(bool Succeeded, string? Error)> ChangeEmailAsync(
+        string oldEmail, string newEmail,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Validate a previously-issued reset token and, on success, set the
     /// user's password. Wraps <c>UserManager.ResetPasswordAsync</c> so
     /// the same password-policy validators that gate Create / Change

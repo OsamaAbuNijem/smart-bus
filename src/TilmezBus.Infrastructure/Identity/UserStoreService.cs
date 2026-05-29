@@ -126,6 +126,43 @@ public class UserStoreService : IUserStore
         return (true, null);
     }
 
+    public async Task<(bool Succeeded, string? Error)> ChangeEmailAsync(
+        string oldEmail, string newEmail,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(newEmail))
+            return (false, "New email is required.");
+        // No-op when the email didn't actually change — treat as success.
+        if (string.Equals(oldEmail, newEmail, StringComparison.OrdinalIgnoreCase))
+            return (true, null);
+
+        var user = await _userManager.FindByEmailAsync(oldEmail);
+        if (user is null)
+            // School row had an AdminEmail with no matching Identity row
+            // (e.g. the admin was never created yet). Nothing to rename;
+            // caller will persist the new value on the school regardless.
+            return (true, null);
+
+        var conflict = await _userManager.FindByEmailAsync(newEmail);
+        if (conflict is not null && conflict.Id != user.Id)
+            return (false, "That email is already used by another account.");
+
+        var setEmail = await _userManager.SetEmailAsync(user, newEmail);
+        if (!setEmail.Succeeded)
+            return (false, string.Join(" ", setEmail.Errors.Select(e => e.Description)));
+
+        // Identity uses UserName as the primary login key; school admins
+        // were created with UserName == Email, so keep them in sync.
+        var setName = await _userManager.SetUserNameAsync(user, newEmail);
+        if (!setName.Succeeded)
+            return (false, string.Join(" ", setName.Errors.Select(e => e.Description)));
+
+        // Rotate the security stamp so any in-flight reset tokens or
+        // cached login cookies for the old identity become invalid.
+        await _userManager.UpdateSecurityStampAsync(user);
+        return (true, null);
+    }
+
     public async Task<int> CountActiveUsersByRoleAsync(
         string role, TimeSpan window,
         CancellationToken cancellationToken = default)
