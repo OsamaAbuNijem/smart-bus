@@ -345,6 +345,8 @@
   "assistantNoLastRoster": "No prior trip on this bus + type. Trip will start with an empty roster.",
   "assistantScanStudentTitle": "Scan student QR",
   "assistantScanStudentOk": "Student boarded.",
+  "assistantScanStudentNotFound": "No student linked to this code.",
+  "assistantScanLooking": "Looking up student…",
   "assistantNfcUnavailable": "NFC isn't available on this device.",
   "assistantNfcUnsupported": "This device doesn't support NFC.",
   "assistantNfcDisabled": "NFC is turned off. Enable it from settings to scan.",

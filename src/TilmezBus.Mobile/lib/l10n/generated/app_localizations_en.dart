@@ -929,6 +929,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantScanStudentOk => 'Student boarded.';
 
   @override
+  String get assistantScanStudentNotFound => 'No student linked to this code.';
+
+  @override
+  String get assistantScanLooking => 'Looking up student…';
+
+  @override
   String get assistantNfcUnavailable => 'NFC isn\'t available on this device.';
 
   @override

@@ -333,6 +333,8 @@
   "assistantNoLastRoster": "لا توجد رحلة سابقة لهذه الحافلة + النوع. ستبدأ الرحلة بقائمة فارغة.",
   "assistantScanStudentTitle": "مسح رمز الطالب",
   "assistantScanStudentOk": "تم تسجيل الطالب.",
+  "assistantScanStudentNotFound": "لا يوجد طالب مرتبط بهذا الرمز.",
+  "assistantScanLooking": "جاري البحث عن الطالب…",
   "assistantNfcUnavailable": "الـ NFC غير متاح على هذا الجهاز.",
   "assistantNfcUnsupported": "هذا الجهاز لا يدعم تقنية NFC.",
   "assistantNfcDisabled": "خاصية الـ NFC مغلقة. فعّلها من الإعدادات للمسح.",

@@ -1856,6 +1856,18 @@ abstract class AppLocalizations {
   /// **'Student boarded.'**
   String get assistantScanStudentOk;
 
+  /// No description provided for @assistantScanStudentNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No student linked to this code.'**
+  String get assistantScanStudentNotFound;
+
+  /// No description provided for @assistantScanLooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking up student…'**
+  String get assistantScanLooking;
+
   /// No description provided for @assistantNfcUnavailable.
   ///
   /// In en, this message translates to:

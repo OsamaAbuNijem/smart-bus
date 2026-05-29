@@ -11,6 +11,8 @@ import 'package:tilmez_bus/features/assistant/data/models/driver_summary_dto.dar
 import 'package:tilmez_bus/features/assistant/data/models/roster_student_dto.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/trip_details_controllers.dart';
+import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_setup_nfc_scan_screen.dart';
+import 'package:tilmez_bus/features/assistant/presentation/screens/assistant_setup_qr_scan_screen.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 /// State 2 (post-QR) and State 3 (manual) trip-setup screen.
@@ -849,14 +851,28 @@ class _RosterEditorState extends ConsumerState<_RosterEditor> {
     super.dispose();
   }
 
-  /// Opens a minimal dialog to paste a QR / NFC token. Implementation is a
-  /// dedicated [_QrAddDialog] StatefulWidget so the TextEditingController
-  /// and busy/error state are owned by the dialog itself and disposed when
-  /// the dialog unmounts. Returns a [RosterStudentDto] on success.
+  /// Open the camera-based QR scanner. Resolves the scanned token to a
+  /// student via /students/resolve-qr and appends to the roster. The
+  /// scan screen handles permission / not-found errors itself.
   Future<void> _openQrSheet() async {
-    final picked = await showDialog<RosterStudentDto>(
-      context: context,
-      builder: (_) => const _QrAddDialog(),
+    final picked = await Navigator.of(context).push<RosterStudentDto>(
+      MaterialPageRoute(
+        builder: (_) => const AssistantSetupQrScanScreen(),
+        fullscreenDialog: true,
+      ),
+    );
+    if (picked != null) widget.onAdd(picked);
+  }
+
+  /// Open the NFC scanner. Same resolve endpoint as QR — the API accepts
+  /// any token string, so an NFC UID round-trips to a RosterStudentDto
+  /// exactly like a QR sticker token would.
+  Future<void> _openNfcScanner() async {
+    final picked = await Navigator.of(context).push<RosterStudentDto>(
+      MaterialPageRoute(
+        builder: (_) => const AssistantSetupNfcScanScreen(),
+        fullscreenDialog: true,
+      ),
     );
     if (picked != null) widget.onAdd(picked);
   }
@@ -954,11 +970,7 @@ class _RosterEditorState extends ConsumerState<_RosterEditor> {
               label: l.assistantScanNfc,
               color: const Color(0xFF0EA5E9),
               colorSoft: const Color(0xFFE0F2FE),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l.assistantNfcUnavailable)),
-                );
-              },
+              onTap: _openNfcScanner,
             );
             if (showQr && !showNfc) return qr;
             if (!showQr && showNfc) return nfc;

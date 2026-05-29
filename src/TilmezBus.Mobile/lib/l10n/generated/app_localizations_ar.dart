@@ -922,6 +922,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantScanStudentOk => 'تم تسجيل الطالب.';
 
   @override
+  String get assistantScanStudentNotFound => 'لا يوجد طالب مرتبط بهذا الرمز.';
+
+  @override
+  String get assistantScanLooking => 'جاري البحث عن الطالب…';
+
+  @override
   String get assistantNfcUnavailable => 'الـ NFC غير متاح على هذا الجهاز.';
 
   @override
