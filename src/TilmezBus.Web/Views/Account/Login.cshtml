@@ -409,7 +409,10 @@ body{
         <div class="field">
           <div class="field-head">
             <label>@L["Login_Password"]</label>
-            <a asp-action="ForgotPassword" class="field-link">@L["Login_ForgotPwd"]</a>
+            @* Forgot-password link hidden until the production SMTP
+               relay is fully verified — re-enable by restoring the
+               `<a asp-action="ForgotPassword">` element below. *@
+            @*<a asp-action="ForgotPassword" class="field-link">@L["Login_ForgotPwd"]</a>*@
           </div>
           <div class="field-wrap">
             <span class="field-icon">
