@@ -317,7 +317,9 @@ public class StartTripCommandHandler
                         ["tripId"] = trip.Id.ToString(),
                         ["busId"]  = trip.BusId.ToString(),
                     },
-                    ct);
+                    relatedTripId: trip.Id,
+                    relatedBusId:  trip.BusId,
+                    cancellationToken: ct);
             }
             catch (Exception ex)
             {

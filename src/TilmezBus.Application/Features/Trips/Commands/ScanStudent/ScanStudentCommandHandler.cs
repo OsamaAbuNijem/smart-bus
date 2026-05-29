@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
-using TilmezBus.Application.Features.Notifications.Commands.SendNotification;
 using TilmezBus.Domain.Entities;
 using TilmezBus.Domain.Enums;
 
@@ -13,20 +12,17 @@ public class ScanStudentCommandHandler
     : IRequestHandler<ScanStudentCommand, Result<ScanStudentResponse>>
 {
     private readonly IApplicationDbContext _context;
-    private readonly IMediator _mediator;
-    private readonly INotificationTemplateService _templates;
+    private readonly IPushNotificationService _push;
     private readonly ILogger<ScanStudentCommandHandler> _logger;
 
     public ScanStudentCommandHandler(
         IApplicationDbContext context,
-        IMediator mediator,
-        INotificationTemplateService templates,
+        IPushNotificationService push,
         ILogger<ScanStudentCommandHandler> logger)
     {
-        _context   = context;
-        _mediator  = mediator;
-        _templates = templates;
-        _logger    = logger;
+        _context = context;
+        _push    = push;
+        _logger  = logger;
     }
 
     public async Task<Result<ScanStudentResponse>> Handle(
@@ -115,10 +111,11 @@ public class ScanStudentCommandHandler
     }
 
     /// <summary>
-    /// Fire-and-forget parent push using the existing StudentBoarded
-    /// template (template service picks language per device). Mirrors
-    /// the manual-tap path in UpdateBoardingStatusCommandHandler so the
-    /// QR/NFC scan UX surfaces the same notification.
+    /// Fire-and-forget parent push using the StudentBoarded template.
+    /// SendTemplatedToUserAsync picks the language per registered device
+    /// so a parent with a phone set to English sees the English copy and
+    /// one set to Arabic sees the Arabic copy — without us hardcoding
+    /// either.
     /// </summary>
     private async Task NotifyParentStudentBoardedAsync(
         Student student, Guid tripId, CancellationToken ct)
@@ -131,19 +128,20 @@ public class ScanStudentCommandHandler
                 .FirstOrDefaultAsync(ct);
             if (string.IsNullOrEmpty(parentUserId)) return;
 
-            var (title, message) = await _templates.RenderAsync(
+            await _push.SendTemplatedToUserAsync(
+                parentUserId,
                 NotificationType.StudentBoarded,
-                "ar",
                 new Dictionary<string, string?>
                 {
                     ["studentName"] = student.FullName,
                 },
-                ct);
-            await _mediator.Send(
-                new SendNotificationCommand(
-                    title, message, NotificationType.StudentBoarded,
-                    parentUserId, tripId, null),
-                ct);
+                new Dictionary<string, string>
+                {
+                    ["type"]   = "StudentBoarded",
+                    ["tripId"] = tripId.ToString(),
+                },
+                relatedTripId: tripId,
+                cancellationToken: ct);
         }
         catch (Exception ex)
         {

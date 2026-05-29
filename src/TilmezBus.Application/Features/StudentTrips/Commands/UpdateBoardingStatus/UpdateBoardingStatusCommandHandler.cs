@@ -1,8 +1,8 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TilmezBus.Application.Common.Interfaces;
 using TilmezBus.Application.Common.Models;
-using TilmezBus.Application.Features.Notifications.Commands.SendNotification;
 using TilmezBus.Domain.Entities;
 using TilmezBus.Domain.Enums;
 
@@ -13,19 +13,19 @@ public class UpdateBoardingStatusCommandHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IApplicationDbContext _context;
-    private readonly IMediator _mediator;
-    private readonly INotificationTemplateService _templates;
+    private readonly IPushNotificationService _push;
+    private readonly ILogger<UpdateBoardingStatusCommandHandler> _logger;
 
     public UpdateBoardingStatusCommandHandler(
         IUnitOfWork unitOfWork,
         IApplicationDbContext context,
-        IMediator mediator,
-        INotificationTemplateService templates)
+        IPushNotificationService push,
+        ILogger<UpdateBoardingStatusCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _context    = context;
-        _mediator   = mediator;
-        _templates  = templates;
+        _push       = push;
+        _logger     = logger;
     }
 
     public async Task<Result> Handle(
@@ -146,20 +146,33 @@ public class UpdateBoardingStatusCommandHandler
                     var type = isPickup
                         ? NotificationType.StudentBoarded
                         : NotificationType.StudentArrived;
-                    var (title, message) = await _templates.RenderAsync(
-                        type,
-                        "ar",
-                        new Dictionary<string, string?>
-                        {
-                            ["studentName"] = info.FullName,
-                        },
-                        ct);
-
-                    await _mediator.Send(
-                        new SendNotificationCommand(
-                            title, message, type,
-                            info.ParentUserId, trip!.Id, null),
-                        ct);
+                    try
+                    {
+                        // Per-device language picking — each registered
+                        // phone sees the template rendered in the language
+                        // it last registered with. Inbox row + FCM push
+                        // both happen inside SendTemplatedToUserAsync.
+                        await _push.SendTemplatedToUserAsync(
+                            info.ParentUserId,
+                            type,
+                            new Dictionary<string, string?>
+                            {
+                                ["studentName"] = info.FullName,
+                            },
+                            new Dictionary<string, string>
+                            {
+                                ["type"]   = type.ToString(),
+                                ["tripId"] = trip!.Id.ToString(),
+                            },
+                            relatedTripId: trip!.Id,
+                            cancellationToken: ct);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _logger.LogWarning(ex,
+                            "[UpdateBoarding] {Type} push failed for student={Student} parent={Parent}",
+                            type, info.FullName, info.ParentUserId);
+                    }
                 }
             }
         }

@@ -132,7 +132,8 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                                 ["type"] = "StudentArrivedAtSchool",
                                 ["tripId"] = trip.Id.ToString(),
                             },
-                            cancellationToken);
+                            relatedTripId: trip.Id,
+                            cancellationToken: cancellationToken);
                     }
                     catch (Exception ex)
                     {
@@ -193,7 +194,8 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                                 ["type"]   = "StudentArrived",
                                 ["tripId"] = trip.Id.ToString(),
                             },
-                            cancellationToken);
+                            relatedTripId: trip.Id,
+                            cancellationToken: cancellationToken);
                     }
                     catch (Exception ex)
                     {
@@ -263,7 +265,9 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                         ["tripId"] = trip.Id.ToString(),
                         ["busId"]  = trip.BusId.ToString(),
                     },
-                    ct);
+                    relatedTripId: trip.Id,
+                    relatedBusId:  trip.BusId,
+                    cancellationToken: ct);
             }
             catch (Exception ex)
             {

@@ -35,6 +35,8 @@ public interface IPushNotificationService
         NotificationType type,
         IReadOnlyDictionary<string, string?> templateVars,
         IDictionary<string, string>? data = null,
+        Guid? relatedTripId = null,
+        Guid? relatedBusId = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

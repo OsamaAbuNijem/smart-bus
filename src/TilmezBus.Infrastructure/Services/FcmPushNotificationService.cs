@@ -150,6 +150,8 @@ public class FcmPushNotificationService : IPushNotificationService
         NotificationType type,
         IReadOnlyDictionary<string, string?> templateVars,
         IDictionary<string, string>? data = null,
+        Guid? relatedTripId = null,
+        Guid? relatedBusId = null,
         CancellationToken cancellationToken = default)
     {
         // Group the user's tokens by language so each device gets the
@@ -188,13 +190,16 @@ public class FcmPushNotificationService : IPushNotificationService
                 continue;
             }
 
-            // Inbox row (one per language group).
+            // Inbox row (one per language group). RelatedTripId/RelatedBusId
+            // carry through so the inbox tap can navigate to the trip.
             _db.Notifications.Add(new TilmezBus.Domain.Entities.Notification
             {
                 Title = title,
                 Message = body,
                 Type = type,
                 RecipientId = userId,
+                RelatedTripId = relatedTripId,
+                RelatedBusId  = relatedBusId,
                 IsRead = false,
             });
             await _db.SaveChangesAsync(cancellationToken);
@@ -211,7 +216,15 @@ public class FcmPushNotificationService : IPushNotificationService
                     Notification = new AndroidNotification
                     {
                         ChannelId = "smartbus_default",
+                        Sound     = "default",
                     },
+                },
+                // iOS needs aps.sound on the APNs payload to actually ring
+                // — same fix as SendToUserAsync. Without it the templated
+                // push lands silently on the device.
+                Apns = new ApnsConfig
+                {
+                    Aps = new Aps { Sound = "default" },
                 },
             };
 
