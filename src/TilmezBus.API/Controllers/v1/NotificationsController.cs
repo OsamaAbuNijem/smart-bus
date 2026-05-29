@@ -109,9 +109,31 @@ public class NotificationsController : ControllerBase
             lang = twoChar;
         }
 
+        var platform = string.IsNullOrWhiteSpace(request.Platform)
+            ? "android"
+            : request.Platform.ToLowerInvariant();
+
+        // Soft-delete every other token this user has on the same platform.
+        // Reinstalls / FCM token rotations keep generating fresh tokens, and
+        // FCM doesn't always report the old ones as UNREGISTERED in time —
+        // so without this prune one push ends up landing on the phone as
+        // multiple banners. Trade-off: a user with two iOS devices keeps
+        // only the most recently registered one active per platform; the
+        // other re-arms on next launch when that app POSTs again.
+        var now = DateTime.UtcNow;
+        await _db.UserDeviceTokens
+            .Where(t => t.UserId == userId
+                     && t.Platform == platform
+                     && t.Token != request.Token
+                     && !t.IsDeleted)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(t => t.IsDeleted, true)
+                .SetProperty(t => t.UpdatedAt, now), cancellationToken);
+
         // Upsert by (UserId, Token). EF Core 8 has no native upsert, so do a
         // find-or-insert; the unique index protects against races.
         var existing = await _db.UserDeviceTokens
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(t => t.UserId == userId && t.Token == request.Token, cancellationToken);
         if (existing is null)
         {
@@ -119,17 +141,21 @@ public class NotificationsController : ControllerBase
             {
                 UserId = userId,
                 Token = request.Token,
-                Platform = string.IsNullOrWhiteSpace(request.Platform) ? "android" : request.Platform.ToLowerInvariant(),
+                Platform = platform,
                 Language = lang,
-                LastSeenAt = DateTime.UtcNow,
+                LastSeenAt = now,
             });
         }
         else
         {
-            // Refresh language too — the user might have switched the app
-            // locale since the last registration of this token.
+            // Revive any soft-deleted row for the same (user, token) — the
+            // user re-installed and got the same FCM token back, so we don't
+            // need a fresh row.
+            existing.IsDeleted = false;
+            existing.Platform  = platform;
             if (lang is not null) existing.Language = lang;
-            existing.LastSeenAt = DateTime.UtcNow;
+            existing.LastSeenAt = now;
+            existing.UpdatedAt  = now;
         }
         await _db.SaveChangesAsync(cancellationToken);
         return NoContent();
