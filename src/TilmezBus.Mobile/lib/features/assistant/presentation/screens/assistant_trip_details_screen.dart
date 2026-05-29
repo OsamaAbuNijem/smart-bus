@@ -74,11 +74,23 @@ class _TripBody extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
               children: [
                 if (!readOnly) ...[
-                  _ScanActionRow(
-                    onQr: () => _onScanQr(context, ref),
-                    onNfc: () => _onNfcTap(context),
-                    l: l,
-                  ),
+                  () {
+                    // SuperAdmin-controlled feature flags from the
+                    // school's active subscription. Hide QR / NFC entry
+                    // points entirely when disabled. Default both to
+                    // true while the call is in-flight so we don't
+                    // briefly flash an empty bar on every screen entry.
+                    final fleet = ref.watch(myFleetSchoolProvider).valueOrNull;
+                    final showQr  = fleet?.enableQr  ?? true;
+                    final showNfc = fleet?.enableNfc ?? true;
+                    return _ScanActionRow(
+                      onQr: () => _onScanQr(context, ref),
+                      onNfc: () => _onNfcTap(context),
+                      showQr: showQr,
+                      showNfc: showNfc,
+                      l: l,
+                    );
+                  }(),
                   const SizedBox(height: 14),
                 ],
                 _SectionHeader(l: l),
@@ -428,35 +440,40 @@ class _ScanActionRow extends StatelessWidget {
   const _ScanActionRow({
     required this.onQr,
     required this.onNfc,
+    required this.showQr,
+    required this.showNfc,
     required this.l,
   });
   final VoidCallback onQr;
   final VoidCallback onNfc;
+  final bool showQr;
+  final bool showNfc;
   final AppLocalizations l;
 
   @override
   Widget build(BuildContext context) {
+    if (!showQr && !showNfc) return const SizedBox.shrink();
+    final qr = _ScanBtn(
+      icon: Icons.qr_code_scanner_rounded,
+      title: l.assistantScanQrShort,
+      subtitle: l.assistantScanQrSubShort,
+      onTap: onQr,
+      isQr: true,
+    );
+    final nfc = _ScanBtn(
+      icon: Icons.nfc_rounded,
+      title: l.assistantTapNfc,
+      subtitle: l.assistantTapNfcSub,
+      onTap: onNfc,
+      isQr: false,
+    );
+    if (showQr && !showNfc) return qr;
+    if (!showQr && showNfc) return nfc;
     return Row(
       children: [
-        Expanded(
-          child: _ScanBtn(
-            icon: Icons.qr_code_scanner_rounded,
-            title: l.assistantScanQrShort,
-            subtitle: l.assistantScanQrSubShort,
-            onTap: onQr,
-            isQr: true,
-          ),
-        ),
+        Expanded(child: qr),
         const SizedBox(width: 8),
-        Expanded(
-          child: _ScanBtn(
-            icon: Icons.nfc_rounded,
-            title: l.assistantTapNfc,
-            subtitle: l.assistantTapNfcSub,
-            onTap: onNfc,
-            isQr: false,
-          ),
-        ),
+        Expanded(child: nfc),
       ],
     );
   }

@@ -18,5 +18,7 @@ public record SubscriptionDto(
     decimal Price,
     PaymentStatus PaymentStatus,
     decimal RemainingAmount,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    bool EnableQr,
+    bool EnableNfc
 );

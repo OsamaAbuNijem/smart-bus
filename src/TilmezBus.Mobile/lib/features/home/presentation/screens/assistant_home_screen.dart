@@ -17,6 +17,11 @@ class AssistantHomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).valueOrNull;
     final tripsAsync = ref.watch(myTodayTripsProvider);
+    final fleet = ref.watch(myFleetSchoolProvider).valueOrNull;
+    // SuperAdmin can disable QR for the school via its subscription.
+    // Default true while the fetch is in flight so we don't briefly
+    // flash a smaller card on every cold start.
+    final enableQr = fleet?.enableQr ?? true;
     final l = AppLocalizations.of(context);
 
     return Scaffold(
@@ -41,6 +46,7 @@ class AssistantHomeScreen extends ConsumerWidget {
                       onScan: () => context.push(AppRoute.assistantQrScan),
                       onManual: () =>
                           context.push(AppRoute.assistantManualSetup),
+                      showScan: enableQr,
                       l: l,
                     ),
                     const SizedBox(height: 18),
@@ -311,16 +317,22 @@ class _StartCard extends StatelessWidget {
     required this.onScan,
     required this.onManual,
     required this.l,
+    this.showScan = true,
   });
   final VoidCallback onScan;
   final VoidCallback onManual;
   final AppLocalizations l;
+  /// When false, the prominent yellow "Scan bus QR" tile is hidden and
+  /// the manual entry stays as the only entry point. Controlled by the
+  /// school's subscription `EnableQr` flag.
+  final bool showScan;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (showScan)
         // Primary CTA — a single flat yellow tile. One icon, one headline,
         // one supporting line, and a plain chevron. No nested icon-in-icon,
         // no glow shadow — the colour alone carries the affordance.
@@ -376,7 +388,7 @@ class _StartCard extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        if (showScan) const SizedBox(height: 10),
         // Secondary action — quiet ghost button for the manual path.
         GestureDetector(
           onTap: onManual,

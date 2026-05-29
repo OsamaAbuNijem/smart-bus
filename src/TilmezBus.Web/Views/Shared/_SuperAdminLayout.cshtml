@@ -691,6 +691,24 @@
         </div>
         <div class="form-group"></div>
       </div>
+      @* Feature flags — control which mobile scan entry points the
+         assistant sees on devices belonging to this school. *@
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Enable QR</label>
+          <select id="sub-enable-qr" class="form-control">
+            <option value="true">@L["SA_Sub_Page_StatusActive_On"]</option>
+            <option value="false">@L["SA_Sub_Page_StatusActive_Off"]</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Enable NFC</label>
+          <select id="sub-enable-nfc" class="form-control">
+            <option value="true">@L["SA_Sub_Page_StatusActive_On"]</option>
+            <option value="false">@L["SA_Sub_Page_StatusActive_Off"]</option>
+          </select>
+        </div>
+      </div>
       @* Payments section — visible only when editing an existing sub. Lists
          every recorded payment instalment and offers an inline add form. *@
       <div id="sub-payments-section" class="u-hidden">

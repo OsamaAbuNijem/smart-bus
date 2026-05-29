@@ -88,6 +88,8 @@ const subscriptions = {
       setVal('sub-price',        '0');
       setVal('sub-paid',         'false');
       setVal('sub-remaining',    '0');
+      setVal('sub-enable-qr',    'true');
+      setVal('sub-enable-nfc',   'true');
       subscriptions._hideError();
       SB.openModal('modal-subscription');
     }
@@ -148,6 +150,8 @@ const subscriptions = {
     setVal('sub-price',        '0');
     setVal('sub-paid',         'false');
     setVal('sub-remaining',    '0');
+    setVal('sub-enable-qr',    'true');
+    setVal('sub-enable-nfc',   'true');
     subscriptions._hideError();
     SB.openModal('modal-subscription');
   },
@@ -173,6 +177,12 @@ const subscriptions = {
     // maps both the string form and any legacy int payloads.
     document.getElementById('sub-paid').value         = String(subscriptions._paymentToNum(s.paymentStatus));
     document.getElementById('sub-remaining').value    = s.remainingAmount ?? 0;
+    // EnableQr / EnableNfc default to true server-side; older rows from
+    // before the feature columns existed serialise these as undefined,
+    // which !!s.xxx maps to false. Coerce with `?? true` so the SuperAdmin
+    // sees the same effective state the mobile app sees.
+    document.getElementById('sub-enable-qr').value    = String(s.enableQr  ?? true);
+    document.getElementById('sub-enable-nfc').value   = String(s.enableNfc ?? true);
     subscriptions._hideError();
     SB.openModal('modal-subscription');
   },
@@ -196,6 +206,8 @@ const subscriptions = {
       price:            parseFloat(document.getElementById('sub-price').value) || 0,
       paymentStatus:    parseInt(document.getElementById('sub-paid').value, 10) || 0,
       remainingAmount:  parseFloat(document.getElementById('sub-remaining').value) || 0,
+      enableQr:         document.getElementById('sub-enable-qr').value  === 'true',
+      enableNfc:        document.getElementById('sub-enable-nfc').value === 'true',
     };
     const saveBtn = document.getElementById('sub-save-btn');
     if (saveBtn) saveBtn.disabled = true;

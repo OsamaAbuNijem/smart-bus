@@ -15,7 +15,9 @@ public record CreateSubscriptionCommand(
     bool IsActive,
     decimal Price,
     PaymentStatus PaymentStatus,
-    decimal RemainingAmount
+    decimal RemainingAmount,
+    bool EnableQr,
+    bool EnableNfc
 ) : IRequest<Result<Guid>>, ICacheInvalidator
 {
     public IEnumerable<string> CachePatternsToInvalidate => new[] { "students:page:*" };

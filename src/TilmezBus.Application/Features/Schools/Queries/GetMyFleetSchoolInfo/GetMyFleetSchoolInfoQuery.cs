@@ -15,4 +15,11 @@ public record GetMyFleetSchoolInfoQuery(string UserId)
 public record SchoolInfoDto(
     string Name,
     string? City,
-    string? PhoneNumber);
+    string? PhoneNumber,
+    // SuperAdmin-controlled feature flags from the school's currently
+    // active subscription. The mobile app uses these to hide QR / NFC
+    // entry points when the school's plan doesn't include them.
+    // Default to true when no active subscription is present so we
+    // don't accidentally lock the assistant out of every scan flow.
+    bool EnableQr,
+    bool EnableNfc);

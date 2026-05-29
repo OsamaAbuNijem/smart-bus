@@ -35,6 +35,13 @@ public class Subscription : BaseEntity
 
     public SubscriptionType SubscriptionType { get; set; } = SubscriptionType.Trial;
 
+    /// <summary>SuperAdmin-controlled feature flags. When false, the
+    /// corresponding scan/setup entries are hidden in the mobile app for
+    /// every user of this subscription's school. Default to enabled so
+    /// existing schools don't lose functionality on migration.</summary>
+    public bool EnableQr  { get; set; } = true;
+    public bool EnableNfc { get; set; } = true;
+
     public ICollection<SubscriptionStudent> StudentLinks { get; set; } = new List<SubscriptionStudent>();
 
     /// <summary>

@@ -40,7 +40,9 @@ public class SubscriptionsController : ControllerBase
             IsActive:         request.IsActive,
             Price:            request.Price,
             PaymentStatus:    request.PaymentStatus,
-            RemainingAmount:  request.RemainingAmount);
+            RemainingAmount:  request.RemainingAmount,
+            EnableQr:         request.EnableQr,
+            EnableNfc:        request.EnableNfc);
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
             ? Ok(new { id = result.Data })
@@ -61,7 +63,9 @@ public class SubscriptionsController : ControllerBase
             IsActive:         request.IsActive,
             Price:            request.Price,
             PaymentStatus:    request.PaymentStatus,
-            RemainingAmount:  request.RemainingAmount);
+            RemainingAmount:  request.RemainingAmount,
+            EnableQr:         request.EnableQr,
+            EnableNfc:        request.EnableNfc);
         var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess
             ? NoContent()
@@ -102,7 +106,9 @@ public record SubscriptionRequest(
     bool IsActive,
     decimal Price,
     PaymentStatus PaymentStatus,
-    decimal RemainingAmount);
+    decimal RemainingAmount,
+    bool EnableQr  = true,
+    bool EnableNfc = true);
 
 public record SubscriptionPaymentRequest(
     DateTime      PaymentDate,

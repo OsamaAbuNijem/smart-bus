@@ -30,7 +30,9 @@ public class GetSchoolSubscriptionsQueryHandler
                 s.Price,
                 s.PaymentStatus,
                 s.RemainingAmount,
-                s.CreatedAt))
+                s.CreatedAt,
+                s.EnableQr,
+                s.EnableNfc))
             .ToListAsync(cancellationToken);
     }
 }

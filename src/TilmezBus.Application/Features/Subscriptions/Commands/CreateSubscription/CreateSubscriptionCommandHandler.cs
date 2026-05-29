@@ -46,7 +46,9 @@ public class CreateSubscriptionCommandHandler : IRequestHandler<CreateSubscripti
             // RemainingAmount are derived from the payments log, so the
             // client's values are ignored here.
             PaymentStatus    = Domain.Enums.PaymentStatus.Unpaid,
-            RemainingAmount  = request.Price
+            RemainingAmount  = request.Price,
+            EnableQr         = request.EnableQr,
+            EnableNfc        = request.EnableNfc
         };
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync(cancellationToken);

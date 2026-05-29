@@ -40,7 +40,9 @@ public class UpdateSubscriptionCommandHandler : IRequestHandler<UpdateSubscripti
         subscription.ActivationDate   = request.ActivationDate;
         subscription.ExpirationDate   = request.ExpirationDate;
         subscription.IsActive         = request.IsActive;
-        subscription.Price = request.Price;
+        subscription.Price            = request.Price;
+        subscription.EnableQr         = request.EnableQr;
+        subscription.EnableNfc        = request.EnableNfc;
 
         // RemainingAmount + PaymentStatus are server-derived from the
         // payments log so the client's values are ignored. A price edit
