@@ -10,6 +10,7 @@ import 'package:tilmez_bus/core/theme/app_theme.dart';
 import 'package:tilmez_bus/features/assistant/data/models/my_today_trip_dto.dart';
 import 'package:tilmez_bus/features/assistant/presentation/providers/assistant_controllers.dart';
 import 'package:tilmez_bus/features/auth/presentation/providers/auth_controller.dart';
+import 'package:tilmez_bus/features/notifications/presentation/providers/notifications_controller.dart';
 import 'package:tilmez_bus/l10n/generated/app_localizations.dart';
 
 /// Driver home — only shows in-progress trips. Tapping a trip opens the
@@ -146,7 +147,7 @@ class _Header extends ConsumerWidget {
           ),
           _GlassIconBtn(
             icon: Icons.notifications_none_rounded,
-            badge: true,
+            badge: ref.watch(notificationsUnreadCountProvider) > 0,
             onTap: () => context.push(AppRoute.notifications),
           ),
           const SizedBox(width: 8),
