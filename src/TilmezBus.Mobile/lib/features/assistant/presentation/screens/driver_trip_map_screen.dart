@@ -532,12 +532,12 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
     final coords = waypoints
         .map((p) => '${p.longitude},${p.latitude}')
         .join(';');
-    // alternatives=3 asks OSRM for up to three viable routes; we pick
-    // the one with the smallest `distance` so the driver gets the
-    // SHORTEST path (metres) after re-routing off-route, rather than
-    // the default route which optimises for duration. Especially
-    // important on detours where the fastest option might take the
-    // bus a few kilometres around to skip a small congestion zone.
+    // alternatives=3 asks OSRM for up to three viable routes; we then
+    // pick the FASTEST (smallest duration) via _bestRoute. Important
+    // for wrong-turn rerouting where the driver wants to get back on
+    // track quickly — picking the shortest by distance can suggest a
+    // path that's a few hundred metres shorter but actually takes
+    // longer through slower streets.
     final uri = Uri.parse(
       '${Env.osrmBaseUrl}/route/v1/driving/$coords'
       '?overview=full&geometries=geojson&alternatives=3',
@@ -558,7 +558,7 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
       if (routes == null || routes.isEmpty) {
         throw const FormatException('no route');
       }
-      final first = _shortestRoute(routes);
+      final first = _bestRoute(routes);
       final geometry = first['geometry'] as Map<String, dynamic>;
       final raw = geometry['coordinates'] as List<dynamic>;
       final pts = raw
@@ -687,11 +687,12 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                 for (var i = 0; i < _activeStops.length; i++)
                   Marker(
                     point: _activeStops[i].point,
-                    // Next pin uses a wider/taller marker to fit the
-                    // enlarged disc + glow without clipping at the edges.
-                    width: i == 0 ? 56 : 44,
-                    height: i == 0 ? 68 : 56,
-                    alignment: Alignment.topCenter,
+                    // Next pin is much wider/taller to fit the student
+                    // name label above the disc, plus the enlarged
+                    // disc + glow without clipping at the edges.
+                    width: i == 0 ? 160 : 44,
+                    height: i == 0 ? 96 : 56,
+                    alignment: Alignment.bottomCenter,
                     child: _PinMarker(
                       stop: _activeStops[i],
                       // Highlight the bus's next stop so the driver can
@@ -707,8 +708,10 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                 if (_currentPos != null)
                   Marker(
                     point: _currentPos!,
-                    width: 44,
-                    height: 44,
+                    // Larger bus marker so the driver can see it at a
+                    // glance against the underlying map tiles.
+                    width: 64,
+                    height: 64,
                     // Inherits MarkerLayer.rotate: true → stays
                     // screen-upright while the map auto-rotates
                     // heading-up below it. Screen-up therefore is the
@@ -1495,11 +1498,26 @@ double _haversineKm(LatLng a, LatLng b) {
 
 double _deg2rad(double d) => d * (math.pi / 180.0);
 
-/// Returns the OSRM route with the smallest `distance` (metres). Routes
-/// missing a numeric distance are skipped; if none has one we fall back
-/// to the first route in the array so the screen still renders.
-Map<String, dynamic> _shortestRoute(List<dynamic> routes) {
+/// Picks the BEST of the OSRM alternatives we just fetched. "Best" =
+/// smallest `duration` (seconds) — i.e. the fastest path to the next
+/// stop, which is what a driver actually wants after a wrong-turn
+/// reroute. Falls back to distance when none of the alternatives has a
+/// usable duration, and to the first route otherwise so the screen
+/// still renders.
+Map<String, dynamic> _bestRoute(List<dynamic> routes) {
   Map<String, dynamic>? best;
+  double bestSeconds = double.infinity;
+  for (final r in routes) {
+    if (r is! Map<String, dynamic>) continue;
+    final d = (r['duration'] as num?)?.toDouble();
+    if (d == null) continue;
+    if (d < bestSeconds) {
+      bestSeconds = d;
+      best = r;
+    }
+  }
+  if (best != null) return best;
+  // No durations — try by distance.
   double bestMeters = double.infinity;
   for (final r in routes) {
     if (r is! Map<String, dynamic>) continue;
@@ -1629,6 +1647,40 @@ class _PinMarker extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Name pill above the disc for the upcoming student. Tells the
+        // driver "who am I picking up next" without consulting the
+        // bottom-sheet list. Only the active student pin (not school,
+        // not already-dropped) gets the label.
+        if (isNext && !isSchool && !stop.dropped) ...[
+          Container(
+            constraints: const BoxConstraints(maxWidth: 140),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.slate100),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Text(
+              stop.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                color: AppColors.ink,
+                letterSpacing: -0.1,
+              ),
+            ),
+          ),
+          const SizedBox(height: 3),
+        ],
         Stack(
           alignment: Alignment.center,
           children: [
@@ -1698,8 +1750,8 @@ class _BusHeadingArrow extends StatelessWidget {
       children: [
         // Soft halo for visual weight against busy map tiles.
         Container(
-          width: 44,
-          height: 44,
+          width: 64,
+          height: 64,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.yellow.withValues(alpha: 0.30),
@@ -1708,16 +1760,16 @@ class _BusHeadingArrow extends StatelessWidget {
         // Arrowhead at the top of the marker (which is now screen-up
         // because the map is rotated heading-up).
         Positioned(
-          top: 6,
+          top: 4,
           child: CustomPaint(
-            size: const Size(14, 10),
+            size: const Size(18, 13),
             painter: _ArrowHeadPainter(color: AppColors.yellowDeep),
           ),
         ),
         // Bus disc.
         Container(
-          width: 24,
-          height: 24,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: const LinearGradient(
@@ -1725,19 +1777,19 @@ class _BusHeadingArrow extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [AppColors.yellow, AppColors.yellowDeep],
             ),
-            border: Border.all(color: Colors.white, width: 2.5),
+            border: Border.all(color: Colors.white, width: 3),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x40000000),
-                blurRadius: 6,
-                offset: Offset(0, 2),
+                blurRadius: 8,
+                offset: Offset(0, 3),
               ),
             ],
           ),
           alignment: Alignment.center,
           child: const Icon(
             Icons.directions_bus,
-            size: 14,
+            size: 20,
             color: AppColors.ink,
           ),
         ),
