@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:tilmez_bus/core/errors/failures.dart';
@@ -38,14 +42,108 @@ class AssistantTripDetailsScreen extends ConsumerWidget {
   }
 }
 
-class _TripBody extends ConsumerWidget {
+class _TripBody extends ConsumerStatefulWidget {
   const _TripBody({required this.details, required this.l});
   final TripDetailsDto details;
   final AppLocalizations l;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final groups = _groupByArea(details.students);
+  ConsumerState<_TripBody> createState() => _TripBodyState();
+}
+
+class _TripBodyState extends ConsumerState<_TripBody> {
+  /// First GPS fix observed on this screen. The sorted student order is
+  /// computed greedy-nearest-neighbour from this point — locked so the
+  /// list doesn't reshuffle every time the bus moves a few metres.
+  /// Mirrors the driver map's `_orderAnchor`, so both screens converge
+  /// on the same visit order when running on the same bus.
+  LatLng? _orderAnchor;
+  StreamSubscription<Position>? _posSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAnchorStream();
+  }
+
+  @override
+  void dispose() {
+    _posSub?.cancel();
+    super.dispose();
+  }
+
+  /// Tap a GPS fix to anchor the sort order. Permission was already
+  /// granted by `tripLocationBroadcasterProvider`; we just listen
+  /// passively to the OS stream. Once the anchor is locked we cancel
+  /// the subscription — re-sorting on every fix would defeat the
+  /// purpose of the anchor.
+  Future<void> _startAnchorStream() async {
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) return;
+      final perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied ||
+          perm == LocationPermission.deniedForever) {
+        return;
+      }
+      _posSub = Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 25,
+        ),
+      ).listen((p) {
+        if (!mounted || _orderAnchor != null) return;
+        setState(() => _orderAnchor = LatLng(p.latitude, p.longitude));
+        unawaited(_posSub?.cancel());
+        _posSub = null;
+      });
+    } catch (_) {
+      // Silent — list just stays in original order.
+    }
+  }
+
+  /// Students sorted by greedy nearest-neighbour from [_orderAnchor].
+  /// Falls back to the API's original order until the first GPS fix
+  /// has set the anchor. Same algorithm as
+  /// `_RoutedMapState._orderedStops` on the driver map, so the two
+  /// screens render the same student sequence on a shared bus.
+  List<TripStudentDetailDto> _sortedStudents() {
+    final all = widget.details.students;
+    final anchor = _orderAnchor;
+    if (anchor == null || all.isEmpty) return all;
+    // Students with coordinates participate in the NN sort; those
+    // without keep relative order and are appended at the end so they
+    // don't get lost.
+    final locatable = <TripStudentDetailDto>[];
+    final unlocatable = <TripStudentDetailDto>[];
+    for (final s in all) {
+      if (s.latitude != null && s.longitude != null) {
+        locatable.add(s);
+      } else {
+        unlocatable.add(s);
+      }
+    }
+    if (locatable.isEmpty) return all;
+    final ordered = <TripStudentDetailDto>[];
+    final remaining = [...locatable];
+    var cursor = anchor;
+    while (remaining.isNotEmpty) {
+      remaining.sort((a, b) {
+        final da = _sqDist(LatLng(a.latitude!, a.longitude!), cursor);
+        final db = _sqDist(LatLng(b.latitude!, b.longitude!), cursor);
+        return da.compareTo(db);
+      });
+      final next = remaining.removeAt(0);
+      ordered.add(next);
+      cursor = LatLng(next.latitude!, next.longitude!);
+    }
+    return [...ordered, ...unlocatable];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final details = widget.details;
+    final l = widget.l;
+    final groups = _groupByArea(_sortedStudents());
     final completed = details.status == 'Completed';
     final scheduled = details.status == 'Scheduled';
     // Scan + boarding actions only make sense once the trip is live. The
@@ -140,7 +238,7 @@ class _TripBody extends ConsumerWidget {
     // token extraction, calls the API, and shows inline success / error
     // feedback so the assistant can rattle through students without
     // bouncing back to this screen between each scan.
-    context.push(AppRoute.assistantStudentScanFor(details.tripId));
+    context.push(AppRoute.assistantStudentScanFor(widget.details.tripId));
   }
 
   Future<void> _onNfcTap(BuildContext context) async {
@@ -151,13 +249,23 @@ class _TripBody extends ConsumerWidget {
     // same /students/scan path on the API side. The scan screen
     // pops back with the rendered success message (e.g. "تم — أحمد")
     // so we surface that here as a snackbar.
-    final message =
-        await context.push<String>(AppRoute.assistantNfcScanFor(details.tripId));
+    final message = await context
+        .push<String>(AppRoute.assistantNfcScanFor(widget.details.tripId));
     if (message == null || !context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
     );
   }
+}
+
+/// Squared planar distance — fine for ranking nearest neighbours at
+/// city-scale. Hoisted to file scope so the trip-body state class can
+/// reuse it from `_sortedStudents`. Same metric the driver map uses,
+/// which is what keeps the two screens in agreement on visit order.
+double _sqDist(LatLng a, LatLng b) {
+  final dx = a.latitude - b.latitude;
+  final dy = a.longitude - b.longitude;
+  return dx * dx + dy * dy;
 }
 
 // ─── Header ─────────────────────────────────────────────────────────────
