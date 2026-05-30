@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -101,7 +103,23 @@ class _AssistantNfcScanScreenState
   Future<void> _onDiscovered(NfcTag tag) async {
     if (_busy) return;
     final uid = _extractUid(tag);
-    if (uid == null || uid.isEmpty || uid == _lastUid) return;
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print('[NFC] discovered tag → uid=$uid');
+    }
+    if (uid == null || uid.isEmpty) {
+      // Android has no native success/error popup, so without this the
+      // user just hears the OS beep and assumes the scanner is broken.
+      // iOS gets the same feedback via the system NFC popup.
+      if (Platform.isAndroid && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).assistantScanStudentNotFound)),
+        );
+        unawaited(HapticFeedback.heavyImpact());
+      }
+      return;
+    }
+    if (uid == _lastUid) return;
     _lastUid = uid;
     // Immediate haptic so the assistant feels the tap landed even before
     // iOS plays its native session-end chime.
@@ -128,6 +146,17 @@ class _AssistantNfcScanScreenState
       alertMessageIos: successMsg,
       errorMessageIos: errorMsg,
     );
+    // Android has no native session popup, so show the same outcome in
+    // a snackbar — without this the assistant doesn't know if the scan
+    // landed or failed at the backend.
+    if (Platform.isAndroid && mounted) {
+      final msg = errorMsg ?? successMsg;
+      if (msg != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+      }
+    }
     // Let iOS's native animation play before reopening the sheet.
     await Future<void>.delayed(const Duration(milliseconds: 900));
     if (!mounted) {
@@ -141,15 +170,20 @@ class _AssistantNfcScanScreenState
   }
 
   /// Extract the tag UID as colon-separated uppercase hex
-  /// (e.g. `04:11:8D:AA:36:67:81`). Handles iOS MiFare / ISO7816 /
-  /// ISO15693 and any Android tag (the platform exposes the raw `id`
-  /// bytes directly).
+  /// (e.g. `04:11:8D:AA:36:67:81`). Platform-gated: calling an iOS
+  /// extractor on Android throws TypeError on the underlying
+  /// `tag.data as TagPigeon?` cast — the Android plugin emits its own
+  /// `TagPigeon` class which doesn't satisfy the iOS-side cast — so we
+  /// only invoke extractors matching the current platform.
   static String? _extractUid(NfcTag tag) {
     Uint8List? bytes;
-    bytes ??= nfci.MiFareIos.from(tag)?.identifier;
-    bytes ??= nfci.Iso7816Ios.from(tag)?.identifier;
-    bytes ??= nfci.Iso15693Ios.from(tag)?.identifier;
-    bytes ??= nfca.NfcTagAndroid.from(tag)?.id;
+    if (Platform.isIOS) {
+      bytes ??= nfci.MiFareIos.from(tag)?.identifier;
+      bytes ??= nfci.Iso7816Ios.from(tag)?.identifier;
+      bytes ??= nfci.Iso15693Ios.from(tag)?.identifier;
+    } else if (Platform.isAndroid) {
+      bytes ??= nfca.NfcTagAndroid.from(tag)?.id;
+    }
     if (bytes == null || bytes.isEmpty) return null;
     return bytes
         .map((b) => b.toRadixString(16).padLeft(2, '0'))

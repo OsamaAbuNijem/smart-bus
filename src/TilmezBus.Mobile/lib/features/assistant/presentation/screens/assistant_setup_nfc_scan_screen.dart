@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -121,12 +122,17 @@ class _AssistantSetupNfcScanScreenState
     }
   }
 
+  /// See assistant_nfc_scan_screen.dart for why this is platform-gated:
+  /// iOS extractors throw TypeError on the Android-side TagPigeon.
   static String? _extractUid(NfcTag tag) {
     Uint8List? bytes;
-    bytes ??= nfci.MiFareIos.from(tag)?.identifier;
-    bytes ??= nfci.Iso7816Ios.from(tag)?.identifier;
-    bytes ??= nfci.Iso15693Ios.from(tag)?.identifier;
-    bytes ??= nfca.NfcTagAndroid.from(tag)?.id;
+    if (Platform.isIOS) {
+      bytes ??= nfci.MiFareIos.from(tag)?.identifier;
+      bytes ??= nfci.Iso7816Ios.from(tag)?.identifier;
+      bytes ??= nfci.Iso15693Ios.from(tag)?.identifier;
+    } else if (Platform.isAndroid) {
+      bytes ??= nfca.NfcTagAndroid.from(tag)?.id;
+    }
     if (bytes == null || bytes.isEmpty) return null;
     return bytes
         .map((b) => b.toRadixString(16).padLeft(2, '0'))
