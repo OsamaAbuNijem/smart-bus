@@ -138,15 +138,36 @@ class _AssistantNfcScanScreenState
     } catch (e) {
       errorMsg = e is Failure ? e.message : '$e';
     }
+
+    // Success: close the scan screen with the message so the parent
+    // trip-details screen renders the confirmation snackbar. Failure:
+    // stay on this screen so the assistant can retry without backing
+    // out of the flow.
+    if (successMsg != null) {
+      if (Platform.isIOS) {
+        // iOS: play the native ✓ animation + chime on the system popup
+        // before navigating away. The intentional flag stops the error
+        // callback from racing the pop.
+        _intentionalStop = true;
+        await NfcManager.instance.stopSession(alertMessageIos: successMsg);
+      }
+      // Android: leave Reader Mode running until dispose() — calling
+      // stopSession here while the card is still in range is what was
+      // firing the "No supported application for this NFC tag" toast.
+      if (!mounted) {
+        _intentionalStop = false;
+        return;
+      }
+      context.pop(successMsg);
+      return;
+    }
+
+    // Error path. Same idea — on iOS show the native ✗ first, on
+    // Android show an inline snackbar — then leave the scanner open
+    // for another attempt.
     if (Platform.isIOS) {
-      // iOS: end the session so the native ✓ / ✗ animation + chime plays
-      // on the system popup. Flag the stop as intentional so the error
-      // callback doesn't close the screen — we reopen the session below.
       _intentionalStop = true;
-      await NfcManager.instance.stopSession(
-        alertMessageIos: successMsg,
-        errorMessageIos: errorMsg,
-      );
+      await NfcManager.instance.stopSession(errorMessageIos: errorMsg);
       await Future<void>.delayed(const Duration(milliseconds: 900));
       if (!mounted) {
         _intentionalStop = false;
@@ -157,21 +178,13 @@ class _AssistantNfcScanScreenState
       await _startSession();
       _intentionalStop = false;
     } else {
-      // Android: keep Reader Mode active. Stopping + restarting opens a
-      // window where the OS default NDEF dispatch fires the system
-      // "No supported application for this NFC tag" toast if the card is
-      // still in range. Surface the outcome via a snackbar instead, and
-      // debounce the same UID briefly so a held card doesn't re-fire.
-      if (mounted) {
-        final msg = errorMsg ?? successMsg;
-        if (msg != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(msg),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
+      if (mounted && errorMsg != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            duration: const Duration(seconds: 2),
+          ),
+        );
       }
       await Future<void>.delayed(const Duration(milliseconds: 1200));
       if (!mounted) return;

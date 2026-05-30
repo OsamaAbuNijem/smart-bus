@@ -143,13 +143,20 @@ class _TripBody extends ConsumerWidget {
     context.push(AppRoute.assistantStudentScanFor(details.tripId));
   }
 
-  void _onNfcTap(BuildContext context) {
+  Future<void> _onNfcTap(BuildContext context) async {
     // Open the dedicated NFC scanner — works the same way as the
     // student QR camera scanner but uses Core NFC / Android NFC to
     // read the card UID. The endpoint that flips boarding state
     // accepts any token string, so NFC and QR resolve through the
-    // same /students/scan path on the API side.
-    context.push(AppRoute.assistantNfcScanFor(details.tripId));
+    // same /students/scan path on the API side. The scan screen
+    // pops back with the rendered success message (e.g. "تم — أحمد")
+    // so we surface that here as a snackbar.
+    final message =
+        await context.push<String>(AppRoute.assistantNfcScanFor(details.tripId));
+    if (message == null || !context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+    );
   }
 }
 

@@ -97,12 +97,20 @@ class _AssistantSetupNfcScanScreenState
       final student = await ref
           .read(assistantRemoteDataSourceProvider)
           .resolveStudentQr(uid);
-      await NfcManager.instance.stopSession(
-        alertMessageIos: student != null
-            ? l.assistantScanStudentOk
-            : l.assistantScanStudentNotFound,
-        errorMessageIos: student == null ? l.assistantScanStudentNotFound : null,
-      );
+      // iOS: end the session so the native popup plays its ✓ / ✗
+      // animation before navigation. On Android we leave Reader Mode
+      // running — dispose() will stop it after the screen pops, which
+      // prevents the "No supported application for this NFC tag" toast
+      // from firing while the card is still in range.
+      if (Platform.isIOS) {
+        await NfcManager.instance.stopSession(
+          alertMessageIos: student != null
+              ? l.assistantScanStudentOk
+              : l.assistantScanStudentNotFound,
+          errorMessageIos:
+              student == null ? l.assistantScanStudentNotFound : null,
+        );
+      }
       if (!mounted) return;
       if (student == null) {
         setState(() {
@@ -113,7 +121,9 @@ class _AssistantSetupNfcScanScreenState
       }
       Navigator.of(context).pop(student);
     } catch (e) {
-      await NfcManager.instance.stopSession();
+      if (Platform.isIOS) {
+        await NfcManager.instance.stopSession();
+      }
       if (!mounted) return;
       setState(() {
         _error = e is Failure ? e.message : '$e';
