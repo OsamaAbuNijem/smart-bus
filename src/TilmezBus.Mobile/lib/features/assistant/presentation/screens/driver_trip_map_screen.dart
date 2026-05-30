@@ -279,11 +279,6 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
   /// device reports an invalid / non-finite value so the on-map overlay
   /// can always render a number instead of a dash.
   double _currentSpeedMps = 0.0;
-  /// Compass heading from the GPS stream, degrees clockwise from true
-  /// north. Drives the rotation of the bus arrow marker so it always
-  /// points along the street the bus is travelling on. Null until the
-  /// device has a valid heading (stationary devices report -1 / NaN).
-  double? _currentHeadingDeg;
   /// Anchor used to sort the visit order of the active stops. Locked to
   /// the device's FIRST GPS fix on entering the screen so the order
   /// matches "from where the assistant / driver is standing when the
@@ -334,6 +329,21 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
     });
   }
 
+  /// Rotate the map so the bus's direction of travel is "up". flutter_map
+  /// rotation is in degrees clockwise from north, so the rotation we want
+  /// is `-heading` — that puts heading direction at screen-top. Skipped
+  /// when the rotation already matches (within 0.5°) to avoid a no-op
+  /// rebuild on every GPS tick.
+  void _rotateToHeading(double headingDeg) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final target = -headingDeg;
+      final current = _map.camera.rotation;
+      if ((target - current).abs() < 0.5) return;
+      _map.rotate(target);
+    });
+  }
+
   /// Re-engage follow mode and snap to the bus immediately. Bound to the
   /// recenter button at the right-edge of the map.
   void _recenterOnBus() {
@@ -370,12 +380,11 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
         // Geolocator reports heading in degrees [0, 360) when valid; -1
         // or NaN when the device is stationary or the heading sensor
         // hasn't locked. Keep the last good heading in that case so the
-        // arrow doesn't flicker back to north every time the bus stops.
-        final hadingValid = p.heading.isFinite && p.heading >= 0;
+        // map doesn't snap back to north every time the bus stops.
+        final headingValid = p.heading.isFinite && p.heading >= 0;
         setState(() {
           _currentPos = fix;
           _currentSpeedMps = speedMps;
-          if (hadingValid) _currentHeadingDeg = p.heading;
           // First GPS fix locks the route-ordering anchor — students
           // are visited in nearest-neighbour order starting from this
           // position. Both the assistant and the driver, who are on
@@ -397,6 +406,12 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
         // Skipped when the user has actively interacted (panned/zoomed)
         // since the last fix so we don't fight their gestures.
         if (_followBus) _centerOnBus(fix);
+        // Heading-up navigation: rotate the map so the bus's direction
+        // of travel is at the top of the screen. Posted post-frame so
+        // we don't compete with the same setState's build. Skipped if
+        // no valid heading yet (stationary device) — last rotation is
+        // kept so the view doesn't lurch back to north on every stop.
+        if (headingValid) _rotateToHeading(p.heading);
       });
     } catch (_) {
       // Silent — distance pills just won't update.
@@ -418,6 +433,18 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
     if (!_sameActiveStops(old.stops, widget.stops)) {
       _fetchRoute();
     }
+  }
+
+  /// The remaining-to-drive slice of [_route]. Projects the bus onto the
+  /// polyline and drops every vertex "behind" the bus along the line, so
+  /// the visible polyline always starts at the bus marker — matches the
+  /// parent live-tracking map behaviour. Falls back to [_route] when the
+  /// projection isn't computable (no GPS yet, or the line is too short).
+  List<LatLng> get _visibleRoute {
+    final bus = _currentPos;
+    if (bus == null || _route.length < 2) return _route;
+    final trimmed = _trimPolylineFrom(bus, _route);
+    return trimmed.isEmpty ? _route : trimmed;
   }
 
   /// The full stops list re-ordered by greedy nearest-neighbour starting
@@ -616,10 +643,11 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
             initialCenter: widget.stops.first.point,
             initialZoom: 13,
             interactionOptions: const InteractionOptions(
-              // Rotation enabled so the driver can swivel the map to
-              // match the heading of the bus / road they're on — easier
-              // to read at a glance than a fixed-north view.
-              flags: InteractiveFlag.all,
+              // User-driven rotation is disabled; the map auto-rotates
+              // to the bus's GPS heading on every fix (see
+              // _rotateToHeading). Letting the user pinch-rotate on top
+              // of that would fight the auto-rotation every tick.
+              flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
             ),
             // Any user-driven pan / zoom disengages follow mode so we
             // don't yank the map back as soon as the driver tries to
@@ -636,11 +664,11 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                   'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.smartbus',
             ),
-            if (_route.length >= 2)
+            if (_visibleRoute.length >= 2)
               PolylineLayer(
                 polylines: [
                   Polyline(
-                    points: _route,
+                    points: _visibleRoute,
                     color: AppColors.blue,
                     strokeWidth: 5,
                     borderStrokeWidth: 1.0,
@@ -649,6 +677,10 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                 ],
               ),
             MarkerLayer(
+              // Counter-rotate every marker against the map's rotation
+              // so labels stay readable. The bus marker overrides this
+              // back to false below — see comment there.
+              rotate: true,
               markers: [
                 // Only draw pins for stops the bus still has to visit —
                 // boarded students fall off the map (the bus has them).
@@ -677,9 +709,13 @@ class _RoutedMapState extends ConsumerState<_RoutedMap> {
                     point: _currentPos!,
                     width: 44,
                     height: 44,
-                    child: _BusHeadingArrow(
-                      headingDeg: _currentHeadingDeg,
-                    ),
+                    // Inherits MarkerLayer.rotate: true → stays
+                    // screen-upright while the map auto-rotates
+                    // heading-up below it. Screen-up therefore is the
+                    // bus's direction of travel, and the arrowhead
+                    // drawn at the top of the marker disc points
+                    // toward the road ahead.
+                    child: const _BusHeadingArrow(),
                   ),
               ],
             ),
@@ -1477,6 +1513,50 @@ Map<String, dynamic> _shortestRoute(List<dynamic> routes) {
   return best ?? routes.first as Map<String, dynamic>;
 }
 
+/// Trims [line] so it starts at the closest point to [p], dropping every
+/// vertex behind [p] along the polyline. Result is
+/// `[projected_bus, next_vertex, ..., destination]` — i.e., the remaining
+/// route to render. Empty when [line] is too short to project onto.
+/// Mirrors `_trimPolylineFrom` in the parent live-tracking map.
+List<LatLng> _trimPolylineFrom(LatLng p, List<LatLng> line) {
+  if (line.length < 2) return line;
+  final kx = math.cos(p.latitude * math.pi / 180.0);
+  int bestSegment = 0;
+  LatLng bestPoint = line.first;
+  var bestDistSq = double.infinity;
+  for (var i = 0; i < line.length - 1; i++) {
+    final candidate = _projectOntoSegment(p, line[i], line[i + 1], kx);
+    final dLat = p.latitude - candidate.latitude;
+    final dLng = (p.longitude - candidate.longitude) * kx;
+    final d = dLat * dLat + dLng * dLng;
+    if (d < bestDistSq) {
+      bestDistSq = d;
+      bestSegment = i;
+      bestPoint = candidate;
+    }
+  }
+  return <LatLng>[bestPoint, ...line.sublist(bestSegment + 1)];
+}
+
+/// Perpendicular foot of [p] on segment [a]→[b], clamped to the segment,
+/// computed in a local equirectangular frame so the result tracks the
+/// road instead of skewing in longitude at non-equatorial latitudes.
+LatLng _projectOntoSegment(LatLng p, LatLng a, LatLng b, double kx) {
+  final dx = (b.longitude - a.longitude) * kx;
+  final dy = b.latitude - a.latitude;
+  final lenSq = dx * dx + dy * dy;
+  if (lenSq < 1e-15) return a;
+  var t = ((p.longitude - a.longitude) * kx * dx +
+          (p.latitude - a.latitude) * dy) /
+      lenSq;
+  if (t < 0) t = 0;
+  if (t > 1) t = 1;
+  return LatLng(
+    a.latitude + t * dy,
+    a.longitude + t * dx / (kx == 0 ? 1 : kx),
+  );
+}
+
 /// Minimum distance in metres from [p] to any segment of [line].
 /// Returns infinity when the polyline is too short to project onto.
 /// Uses a local equirectangular frame (longitudes pre-scaled by
@@ -1600,23 +1680,21 @@ class _PinMarker extends StatelessWidget {
   }
 }
 
-/// Yellow heading-arrow marker at the bus's current GPS position. The
-/// arrow rotates to match [headingDeg] (degrees clockwise from north),
-/// so it visually points along the street the bus is travelling on.
-/// Falls back to a static yellow disc when no heading is available yet
-/// (stationary device, heading sensor not locked).
+/// Yellow heading-arrow marker at the bus's current GPS position.
+/// Heading-up navigation is handled at the map level: the map's
+/// rotation tracks `-headingDeg` so screen-up is the bus's direction
+/// of travel. This marker has `rotate: false` so it rotates with the
+/// map, which means the arrowhead at the top of the disc stays
+/// pointing toward the road ahead without any per-marker rotation
+/// math here.
 class _BusHeadingArrow extends StatelessWidget {
-  const _BusHeadingArrow({required this.headingDeg});
-  final double? headingDeg;
+  const _BusHeadingArrow();
 
   @override
   Widget build(BuildContext context) {
-    // Translucent halo + arrow disc + bus glyph. The Transform.rotate
-    // wraps only the arrow disc so the halo stays a round glow even
-    // when the bus is heading sideways.
-    final hasHeading = headingDeg != null;
     return Stack(
       alignment: Alignment.center,
+      clipBehavior: Clip.none,
       children: [
         // Soft halo for visual weight against busy map tiles.
         Container(
@@ -1627,55 +1705,41 @@ class _BusHeadingArrow extends StatelessWidget {
             color: AppColors.yellow.withValues(alpha: 0.30),
           ),
         ),
-        // Arrow + disc, rotated to the bus heading.
-        Transform.rotate(
-          angle: hasHeading ? headingDeg! * math.pi / 180.0 : 0,
-          child: SizedBox(
-            width: 32,
-            height: 32,
-            child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                if (hasHeading)
-                  Positioned(
-                    top: -3,
-                    child: CustomPaint(
-                      size: const Size(14, 10),
-                      painter: _ArrowHeadPainter(color: AppColors.yellowDeep),
-                    ),
-                  ),
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppColors.yellow, AppColors.yellowDeep],
-                    ),
-                    border: Border.all(color: Colors.white, width: 2.5),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x40000000),
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        // Arrowhead at the top of the marker (which is now screen-up
+        // because the map is rotated heading-up).
+        Positioned(
+          top: 6,
+          child: CustomPaint(
+            size: const Size(14, 10),
+            painter: _ArrowHeadPainter(color: AppColors.yellowDeep),
           ),
         ),
-        // Bus glyph stays upright regardless of heading — only the
-        // arrow + disc rotate, so the icon remains readable while the
-        // arrowhead does the directional work.
-        const Icon(
-          Icons.directions_bus,
-          size: 14,
-          color: AppColors.ink,
+        // Bus disc.
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.yellow, AppColors.yellowDeep],
+            ),
+            border: Border.all(color: Colors.white, width: 2.5),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x40000000),
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.directions_bus,
+            size: 14,
+            color: AppColors.ink,
+          ),
         ),
       ],
     );
