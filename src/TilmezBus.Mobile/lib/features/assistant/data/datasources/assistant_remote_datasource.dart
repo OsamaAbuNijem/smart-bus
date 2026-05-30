@@ -286,15 +286,17 @@ class AssistantRemoteDataSource {
   }
 
   /// Scan a student QR on the active trip. Marks them as boarded; adds them
-  /// to the roster if they weren't already on the trip.
-  Future<void> scanStudent({
+  /// to the roster if they weren't already on the trip. Returns the
+  /// student's full name from the response so the caller can render a
+  /// confirmation banner without re-polling the trip.
+  Future<String?> scanStudent({
     required String tripId,
     required String qrToken,
     double? latitude,
     double? longitude,
   }) async {
     try {
-      await _dio.post<void>(
+      final response = await _dio.post<Map<String, dynamic>>(
         '/trips/$tripId/scan-student',
         data: {
           'qrToken': qrToken,
@@ -302,6 +304,9 @@ class AssistantRemoteDataSource {
           if (longitude != null) 'longitude': longitude,
         },
       );
+      final body = response.data;
+      final name = body?['fullName'];
+      return name is String && name.isNotEmpty ? name : null;
     } on DioException catch (e) {
       throw mapDioErrorToFailure(e);
     }

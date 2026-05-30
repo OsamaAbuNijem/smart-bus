@@ -138,35 +138,46 @@ class _AssistantNfcScanScreenState
     } catch (e) {
       errorMsg = e is Failure ? e.message : '$e';
     }
-    // End the session so iOS plays its native ✓ / ✗ animation + chime on
-    // the popup. Flag the stop as intentional so the error callback above
-    // doesn't close the screen — we'll re-open the session in a moment.
-    _intentionalStop = true;
-    await NfcManager.instance.stopSession(
-      alertMessageIos: successMsg,
-      errorMessageIos: errorMsg,
-    );
-    // Android has no native session popup, so show the same outcome in
-    // a snackbar — without this the assistant doesn't know if the scan
-    // landed or failed at the backend.
-    if (Platform.isAndroid && mounted) {
-      final msg = errorMsg ?? successMsg;
-      if (msg != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg)),
-        );
+    if (Platform.isIOS) {
+      // iOS: end the session so the native ✓ / ✗ animation + chime plays
+      // on the system popup. Flag the stop as intentional so the error
+      // callback doesn't close the screen — we reopen the session below.
+      _intentionalStop = true;
+      await NfcManager.instance.stopSession(
+        alertMessageIos: successMsg,
+        errorMessageIos: errorMsg,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+      if (!mounted) {
+        _intentionalStop = false;
+        return;
       }
-    }
-    // Let iOS's native animation play before reopening the sheet.
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    if (!mounted) {
+      _busy = false;
+      _lastUid = null;
+      await _startSession();
       _intentionalStop = false;
-      return;
+    } else {
+      // Android: keep Reader Mode active. Stopping + restarting opens a
+      // window where the OS default NDEF dispatch fires the system
+      // "No supported application for this NFC tag" toast if the card is
+      // still in range. Surface the outcome via a snackbar instead, and
+      // debounce the same UID briefly so a held card doesn't re-fire.
+      if (mounted) {
+        final msg = errorMsg ?? successMsg;
+        if (msg != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(msg),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 1200));
+      if (!mounted) return;
+      _busy = false;
+      _lastUid = null;
     }
-    _busy = false;
-    _lastUid = null;
-    await _startSession();
-    _intentionalStop = false;
   }
 
   /// Extract the tag UID as colon-separated uppercase hex
