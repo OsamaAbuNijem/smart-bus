@@ -208,6 +208,48 @@ public class NotificationsController : ControllerBase
             cancellationToken: cancellationToken);
         return Ok(new { delivered = sent });
     }
+
+    /// <summary>
+    /// Assistant taps "Notify arrived" on a student's row in trip details.
+    /// Sends a BusArrived push to the parent, rendered per the parent's
+    /// registered device language — so the title/body match the language
+    /// the parent's phone is set to, not whatever the assistant's phone
+    /// happens to be in.
+    /// </summary>
+    [HttpPost("students/{studentId:guid}/notify-arrived")]
+    [Authorize(Roles = "Admin,SuperAdmin,Driver,Assistant")]
+    public async Task<IActionResult> NotifyParentArrived(
+        Guid studentId,
+        CancellationToken cancellationToken)
+    {
+        var student = await _db.Students
+            .Where(s => s.Id == studentId)
+            .Select(s => new { s.FullName, s.ParentId })
+            .FirstOrDefaultAsync(cancellationToken);
+        if (student is null) return NotFound(new { error = "Student not found." });
+
+        var parentUserId = await _db.Parents
+            .Where(p => p.Id == student.ParentId)
+            .Select(p => p.UserId)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (string.IsNullOrEmpty(parentUserId))
+            return Ok(new { delivered = 0, reason = "Parent has not registered any device yet." });
+
+        var sent = await _push.SendTemplatedToUserAsync(
+            parentUserId,
+            Domain.Enums.NotificationType.BusArrived,
+            new Dictionary<string, string?>
+            {
+                ["studentName"] = student.FullName,
+            },
+            new Dictionary<string, string>
+            {
+                ["type"]      = "BusArrived",
+                ["studentId"] = studentId.ToString(),
+            },
+            cancellationToken: cancellationToken);
+        return Ok(new { delivered = sent });
+    }
 }
 
 public record RegisterDeviceRequest(string Token, string? Platform, string? Language);

@@ -1064,7 +1064,12 @@ class _StudentRowState extends ConsumerState<_StudentRow> {
               // menu with Notify (bus-arrived push), WhatsApp, and Call so
               // the row stays compact.
               _ContactMenuBtn(
-                onNotify: _notifyArrived,
+                // Hide the "Notify arrived" menu item once the student
+                // is already checked off (Morning → boarded, Return →
+                // dropped). At that point the parent has already gotten
+                // a StudentBoarded / StudentArrived push from the
+                // boarding flip, so a manual notify is redundant.
+                onNotify: highlight ? null : _notifyArrived,
                 onWhatsapp: _whatsapp,
                 onCall: _call,
                 l: l,
@@ -1736,7 +1741,10 @@ class _ContactMenuBtn extends StatelessWidget {
     required this.onCall,
     required this.l,
   });
-  final VoidCallback onNotify;
+  // Nullable so the call site can hide the Notify item — e.g. once the
+  // student is already checked off, telling the parent "the bus is here"
+  // is redundant. When null we skip the menu entry entirely.
+  final VoidCallback? onNotify;
   final VoidCallback onWhatsapp;
   final VoidCallback onCall;
   final AppLocalizations l;
@@ -1755,21 +1763,22 @@ class _ContactMenuBtn extends StatelessWidget {
       padding: EdgeInsets.zero,
       onSelected: (action) {
         switch (action) {
-          case _ContactAction.notify:   onNotify();   break;
-          case _ContactAction.whatsapp: onWhatsapp(); break;
-          case _ContactAction.call:     onCall();     break;
+          case _ContactAction.notify:   onNotify?.call(); break;
+          case _ContactAction.whatsapp: onWhatsapp();     break;
+          case _ContactAction.call:     onCall();         break;
         }
       },
       itemBuilder: (_) => [
-        PopupMenuItem(
-          value: _ContactAction.notify,
-          height: 40,
-          child: _ContactMenuRow(
-            icon: Icons.notifications_active_outlined,
-            iconColor: AppColors.red,
-            label: l.assistantNotifyArrivedMenu,
+        if (onNotify != null)
+          PopupMenuItem(
+            value: _ContactAction.notify,
+            height: 40,
+            child: _ContactMenuRow(
+              icon: Icons.notifications_active_outlined,
+              iconColor: AppColors.red,
+              label: l.assistantNotifyArrivedMenu,
+            ),
           ),
-        ),
         PopupMenuItem(
           value: _ContactAction.whatsapp,
           height: 40,

@@ -355,14 +355,12 @@ class AssistantRemoteDataSource {
   }
 
   /// Send a "bus arrived at home" push to the parent of a given student.
+  /// The server renders the title/body from the BusArrived template in the
+  /// parent's registered device language — no client-side strings.
   Future<void> notifyParentArrived(String studentId) async {
     try {
       await _dio.post<void>(
-        '/notifications/students/$studentId/push',
-        data: {
-          'title': 'Bus arrived',
-          'body': 'The bus has arrived at the student\'s home.',
-        },
+        '/notifications/students/$studentId/notify-arrived',
       );
     } on DioException catch (e) {
       throw mapDioErrorToFailure(e);
