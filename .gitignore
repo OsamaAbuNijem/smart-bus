@@ -56,3 +56,7 @@ Thumbs.db
 ## actual files dropped at runtime.
 src/TilmezBus.Web/wwwroot/uploads/schools/*
 !src/TilmezBus.Web/wwwroot/uploads/schools/.gitkeep
+
+## Firebase credentials (admin SDK private keys, app config files).
+## Kept out of source control; copied in place during deploy.
+firbase/

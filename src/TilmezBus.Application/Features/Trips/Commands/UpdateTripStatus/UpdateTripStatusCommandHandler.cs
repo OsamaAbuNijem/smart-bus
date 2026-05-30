@@ -13,6 +13,7 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
     private readonly IApplicationDbContext _context;
     private readonly ISignalRNotificationService _notificationService;
     private readonly IPushNotificationService _push;
+    private readonly INotificationTemplateService _templates;
     private readonly ILogger<UpdateTripStatusCommandHandler> _logger;
 
     public UpdateTripStatusCommandHandler(
@@ -20,12 +21,14 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
         IApplicationDbContext context,
         ISignalRNotificationService notificationService,
         IPushNotificationService push,
+        INotificationTemplateService templates,
         ILogger<UpdateTripStatusCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _context = context;
         _notificationService = notificationService;
         _push = push;
+        _templates = templates;
         _logger = logger;
     }
 
@@ -75,6 +78,7 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
             && request.NewStatus == TripStatus.InProgress)
         {
             await NotifyParentsTripStartedAsync(trip, cancellationToken);
+            await NotifyDriverTripStartedAsync(trip, cancellationToken);
         }
 
         // Morning trips end at the school, so completing the trip is the
@@ -207,6 +211,16 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
             }
         }
 
+        // Driver-facing completion push. Fires for both Morning and Return
+        // trips so the driver gets a banner confirming the trip closed,
+        // mirroring the parent-side StudentArrived/StudentArrivedAtSchool
+        // fan-out above. Best-effort: a push failure must not roll back
+        // the persisted status change.
+        if (request.NewStatus == TripStatus.Completed)
+        {
+            await NotifyDriverTripCompletedAsync(trip, cancellationToken);
+        }
+
         // SignalR broadcasts are best-effort — a hub failure must not roll back a persisted status change.
         try
         {
@@ -218,6 +232,113 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
         }
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Driver-facing TripStarted push for the Scheduled → InProgress
+    /// transition. Uses the same SendToUserAsync path as the SuperAdmin
+    /// broadcast at SendBroadcastCommandHandler.cs:46 — that path is
+    /// confirmed delivering to the driver's phone, so we mirror it here
+    /// instead of the templated/per-language variant.
+    /// </summary>
+    private async Task NotifyDriverTripStartedAsync(
+        Domain.Entities.Trip trip, CancellationToken ct)
+    {
+        var driverUserId = await _context.Drivers
+            .Where(d => d.Id == trip.DriverId)
+            .Select(d => d.UserId)
+            .FirstOrDefaultAsync(ct);
+        if (string.IsNullOrEmpty(driverUserId)) return;
+
+        var plate = await _context.Buses
+            .Where(b => b.Id == trip.BusId)
+            .Select(b => b.PlateNumber)
+            .FirstOrDefaultAsync(ct) ?? string.Empty;
+
+        try
+        {
+            var (title, message) = await _templates.RenderAsync(
+                NotificationType.TripStarted,
+                "ar",
+                new Dictionary<string, string?>
+                {
+                    ["busPlateNumber"] = plate,
+                    ["tripType"] = trip.Type == TripType.Morning
+                        ? "رحلة الصباح"
+                        : "رحلة العودة",
+                },
+                ct);
+            await _push.SendToUserAsync(
+                driverUserId,
+                title,
+                message,
+                NotificationType.TripStarted,
+                data: new Dictionary<string, string>
+                {
+                    ["type"]   = "TripStarted",
+                    ["tripId"] = trip.Id.ToString(),
+                    ["busId"]  = trip.BusId.ToString(),
+                },
+                cancellationToken: ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "[UpdateTripStatus] TripStarted push failed for driver={Driver} trip={Trip}",
+                driverUserId, trip.Id);
+        }
+    }
+
+    /// <summary>
+    /// Driver-facing TripCompleted push. Same SendToUserAsync path as
+    /// the SuperAdmin broadcast that's known to reach the driver phone.
+    /// </summary>
+    private async Task NotifyDriverTripCompletedAsync(
+        Domain.Entities.Trip trip, CancellationToken ct)
+    {
+        var driverUserId = await _context.Drivers
+            .Where(d => d.Id == trip.DriverId)
+            .Select(d => d.UserId)
+            .FirstOrDefaultAsync(ct);
+        if (string.IsNullOrEmpty(driverUserId)) return;
+
+        var plate = await _context.Buses
+            .Where(b => b.Id == trip.BusId)
+            .Select(b => b.PlateNumber)
+            .FirstOrDefaultAsync(ct) ?? string.Empty;
+
+        try
+        {
+            var (title, message) = await _templates.RenderAsync(
+                NotificationType.TripCompleted,
+                "ar",
+                new Dictionary<string, string?>
+                {
+                    ["busPlateNumber"] = plate,
+                    ["tripType"] = trip.Type == TripType.Morning
+                        ? "رحلة الصباح"
+                        : "رحلة العودة",
+                },
+                ct);
+            await _push.SendToUserAsync(
+                driverUserId,
+                title,
+                message,
+                NotificationType.TripCompleted,
+                data: new Dictionary<string, string>
+                {
+                    ["type"]   = "TripCompleted",
+                    ["tripId"] = trip.Id.ToString(),
+                    ["busId"]  = trip.BusId.ToString(),
+                },
+                cancellationToken: ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "[UpdateTripStatus] TripCompleted push failed for driver={Driver} trip={Trip}",
+                driverUserId, trip.Id);
+        }
     }
 
     /// <summary>

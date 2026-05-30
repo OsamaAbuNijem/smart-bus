@@ -213,11 +213,12 @@ public class StartTripCommandHandler
             "[StartTrip] Bus={BusId} Driver={DriverId} Type={Type} Students={N} → Trip {TripId}",
             bus.Id, driver.Id, request.TripType, studentIds.Count, trip.Id);
 
-        // Tell the driver the trip is live — shows up in their notifications
-        // list and triggers a SignalR push so a logged-in driver app reacts
-        // immediately. Best-effort: a notification failure shouldn't fail
-        // the trip creation itself. Suppressed for Scheduled trips — those
-        // fire the "trip started" push from UpdateTripStatusCommand instead.
+        // Tell the driver the trip is live. Goes through the same
+        // SendToUserAsync path as the SuperAdmin broadcast (proven to
+        // reach the driver phone) rather than the older SignalR-then-FCM
+        // path, which was being intercepted before FCM in this driver's
+        // case. Suppressed for Scheduled trips — those fire the "trip
+        // started" push from UpdateTripStatusCommand instead.
         if (!request.Scheduled && !string.IsNullOrEmpty(driver.UserId))
         {
             try
@@ -233,13 +234,18 @@ public class StartTripCommandHandler
                             : "رحلة العودة",
                     },
                     ct);
-                await _mediator.Send(new SendNotificationCommand(
-                    Title: title,
-                    Message: message,
-                    Type: NotificationType.TripStarted,
-                    RecipientId: driver.UserId,
-                    RelatedTripId: trip.Id,
-                    RelatedBusId: bus.Id), ct);
+                await _push.SendToUserAsync(
+                    driver.UserId,
+                    title,
+                    message,
+                    NotificationType.TripStarted,
+                    data: new Dictionary<string, string>
+                    {
+                        ["type"]   = "TripStarted",
+                        ["tripId"] = trip.Id.ToString(),
+                        ["busId"]  = bus.Id.ToString(),
+                    },
+                    cancellationToken: ct);
             }
             catch (Exception ex)
             {
