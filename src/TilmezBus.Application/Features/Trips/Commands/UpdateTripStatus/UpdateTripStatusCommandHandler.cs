@@ -13,7 +13,6 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
     private readonly IApplicationDbContext _context;
     private readonly ISignalRNotificationService _notificationService;
     private readonly IPushNotificationService _push;
-    private readonly INotificationTemplateService _templates;
     private readonly ILogger<UpdateTripStatusCommandHandler> _logger;
 
     public UpdateTripStatusCommandHandler(
@@ -21,14 +20,12 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
         IApplicationDbContext context,
         ISignalRNotificationService notificationService,
         IPushNotificationService push,
-        INotificationTemplateService templates,
         ILogger<UpdateTripStatusCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _context = context;
         _notificationService = notificationService;
         _push = push;
-        _templates = templates;
         _logger = logger;
     }
 
@@ -236,10 +233,10 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
 
     /// <summary>
     /// Driver-facing TripStarted push for the Scheduled → InProgress
-    /// transition. Uses the same SendToUserAsync path as the SuperAdmin
-    /// broadcast at SendBroadcastCommandHandler.cs:46 — that path is
-    /// confirmed delivering to the driver's phone, so we mirror it here
-    /// instead of the templated/per-language variant.
+    /// transition. Uses SendTemplatedToUserAsync so the title/body is
+    /// rendered against each device's registered language — a driver
+    /// whose phone is in English gets the English banner, Arabic phone
+    /// gets the Arabic copy.
     /// </summary>
     private async Task NotifyDriverTripStartedAsync(
         Domain.Entities.Trip trip, CancellationToken ct)
@@ -255,30 +252,30 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
             .Select(b => b.PlateNumber)
             .FirstOrDefaultAsync(ct) ?? string.Empty;
 
+        var tripTypeLabelAr = trip.Type == TripType.Morning
+            ? "رحلة الصباح" : "رحلة العودة";
+        var tripTypeLabelEn = trip.Type == TripType.Morning
+            ? "Morning trip" : "Return trip";
+
         try
         {
-            var (title, message) = await _templates.RenderAsync(
+            await _push.SendTemplatedToUserAsync(
+                driverUserId,
                 NotificationType.TripStarted,
-                "ar",
                 new Dictionary<string, string?>
                 {
                     ["busPlateNumber"] = plate,
-                    ["tripType"] = trip.Type == TripType.Morning
-                        ? "رحلة الصباح"
-                        : "رحلة العودة",
+                    ["tripType"]       = tripTypeLabelAr,
+                    ["tripTypeEn"]     = tripTypeLabelEn,
                 },
-                ct);
-            await _push.SendToUserAsync(
-                driverUserId,
-                title,
-                message,
-                NotificationType.TripStarted,
-                data: new Dictionary<string, string>
+                new Dictionary<string, string>
                 {
                     ["type"]   = "TripStarted",
                     ["tripId"] = trip.Id.ToString(),
                     ["busId"]  = trip.BusId.ToString(),
                 },
+                relatedTripId: trip.Id,
+                relatedBusId:  trip.BusId,
                 cancellationToken: ct);
         }
         catch (Exception ex)
@@ -290,8 +287,8 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
     }
 
     /// <summary>
-    /// Driver-facing TripCompleted push. Same SendToUserAsync path as
-    /// the SuperAdmin broadcast that's known to reach the driver phone.
+    /// Driver-facing TripCompleted push. Same per-device-language render
+    /// as the TripStarted helper above.
     /// </summary>
     private async Task NotifyDriverTripCompletedAsync(
         Domain.Entities.Trip trip, CancellationToken ct)
@@ -307,30 +304,30 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
             .Select(b => b.PlateNumber)
             .FirstOrDefaultAsync(ct) ?? string.Empty;
 
+        var tripTypeLabelAr = trip.Type == TripType.Morning
+            ? "رحلة الصباح" : "رحلة العودة";
+        var tripTypeLabelEn = trip.Type == TripType.Morning
+            ? "Morning trip" : "Return trip";
+
         try
         {
-            var (title, message) = await _templates.RenderAsync(
+            await _push.SendTemplatedToUserAsync(
+                driverUserId,
                 NotificationType.TripCompleted,
-                "ar",
                 new Dictionary<string, string?>
                 {
                     ["busPlateNumber"] = plate,
-                    ["tripType"] = trip.Type == TripType.Morning
-                        ? "رحلة الصباح"
-                        : "رحلة العودة",
+                    ["tripType"]       = tripTypeLabelAr,
+                    ["tripTypeEn"]     = tripTypeLabelEn,
                 },
-                ct);
-            await _push.SendToUserAsync(
-                driverUserId,
-                title,
-                message,
-                NotificationType.TripCompleted,
-                data: new Dictionary<string, string>
+                new Dictionary<string, string>
                 {
                     ["type"]   = "TripCompleted",
                     ["tripId"] = trip.Id.ToString(),
                     ["busId"]  = trip.BusId.ToString(),
                 },
+                relatedTripId: trip.Id,
+                relatedBusId:  trip.BusId,
                 cancellationToken: ct);
         }
         catch (Exception ex)

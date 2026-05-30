@@ -16,7 +16,6 @@ public class StartTripCommandHandler
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
     private readonly IMediator _mediator;
-    private readonly INotificationTemplateService _templates;
     private readonly IPushNotificationService _push;
     private readonly ILogger<StartTripCommandHandler> _logger;
 
@@ -25,7 +24,6 @@ public class StartTripCommandHandler
         IApplicationDbContext context,
         ICurrentUserService currentUser,
         IMediator mediator,
-        INotificationTemplateService templates,
         IPushNotificationService push,
         ILogger<StartTripCommandHandler> logger)
     {
@@ -33,7 +31,6 @@ public class StartTripCommandHandler
         _context     = context;
         _currentUser = currentUser;
         _mediator    = mediator;
-        _templates   = templates;
         _push        = push;
         _logger      = logger;
     }
@@ -213,38 +210,36 @@ public class StartTripCommandHandler
             "[StartTrip] Bus={BusId} Driver={DriverId} Type={Type} Students={N} → Trip {TripId}",
             bus.Id, driver.Id, request.TripType, studentIds.Count, trip.Id);
 
-        // Tell the driver the trip is live. Goes through the same
-        // SendToUserAsync path as the SuperAdmin broadcast (proven to
-        // reach the driver phone) rather than the older SignalR-then-FCM
-        // path, which was being intercepted before FCM in this driver's
-        // case. Suppressed for Scheduled trips — those fire the "trip
-        // started" push from UpdateTripStatusCommand instead.
+        // Tell the driver the trip is live. SendTemplatedToUserAsync
+        // renders the title/body against each registered device's
+        // language — Arabic phone → Arabic banner, English phone →
+        // English banner. Suppressed for Scheduled trips — those fire
+        // the "trip started" push from UpdateTripStatusCommand instead.
         if (!request.Scheduled && !string.IsNullOrEmpty(driver.UserId))
         {
             try
             {
-                var (title, message) = await _templates.RenderAsync(
+                var tripTypeLabelAr = request.TripType == TripType.Morning
+                    ? "رحلة الصباح" : "رحلة العودة";
+                var tripTypeLabelEn = request.TripType == TripType.Morning
+                    ? "Morning trip" : "Return trip";
+                await _push.SendTemplatedToUserAsync(
+                    driver.UserId,
                     NotificationType.TripStarted,
-                    "ar",
                     new Dictionary<string, string?>
                     {
                         ["busPlateNumber"] = bus.PlateNumber,
-                        ["tripType"] = request.TripType == TripType.Morning
-                            ? "رحلة الصباح"
-                            : "رحلة العودة",
+                        ["tripType"]       = tripTypeLabelAr,
+                        ["tripTypeEn"]     = tripTypeLabelEn,
                     },
-                    ct);
-                await _push.SendToUserAsync(
-                    driver.UserId,
-                    title,
-                    message,
-                    NotificationType.TripStarted,
-                    data: new Dictionary<string, string>
+                    new Dictionary<string, string>
                     {
                         ["type"]   = "TripStarted",
                         ["tripId"] = trip.Id.ToString(),
                         ["busId"]  = bus.Id.ToString(),
                     },
+                    relatedTripId: trip.Id,
+                    relatedBusId:  bus.Id,
                     cancellationToken: ct);
             }
             catch (Exception ex)
